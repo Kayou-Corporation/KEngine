@@ -1,10 +1,3 @@
-#---------------------------------------#
-#				SETUP					#
-#---------------------------------------#
-project(Engine VERSION 0.0.1 LANGUAGES CXX)
-
-
-
 # --------------------------------------- #
 #              FIND PACKAGES              #
 # --------------------------------------- #
@@ -20,7 +13,7 @@ find_package(Vulkan 1.4 REQUIRED)
 file(GLOB_RECURSE K_ENGINE_SOURCES "Code/*.cpp")
 
 # Define the lib name for easy modification
-set(K_TARGET_NAME K_ENGINE)
+set(K_TARGET_NAME KEngine)
 
 
 
@@ -45,9 +38,9 @@ target_compile_features(${K_TARGET_NAME} PUBLIC cxx_std_23)
 
 if(MSVC)
     set(CMAKE_DEBUG_POSTFIX "d")
-    target_compile_options(${L_TARGET_NAME} PUBLIC /W4 /WX)
+    target_compile_options(${K_TARGET_NAME} PUBLIC /W4 /WX)
 else()
-    target_compile_options(${L_TARGET_NAME} PUBLIC -Wall -Wextra -Wpedantic)
+    target_compile_options(${K_TARGET_NAME} PUBLIC -Wall -Wextra -Wpedantic)
 endif()
 
 # To build shared libraries in Windows, we set CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS to TRUE.
@@ -57,11 +50,9 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Disable C and C++ compiler extensions.
-set(CMAKE_C_EXTENSIONS OFF)
-set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-target_link_libraries(${K_TARGET_NAME} PUBLIC Vulkan::Vulkan) # TODO : Implement SDL
+target_link_libraries(${K_TARGET_NAME} PUBLIC Vulkan::Vulkan SDL3::SDL3)
 
 
 
@@ -103,4 +94,4 @@ add_custom_target(CopyAssets ALL
 
 
 # Make sure CopyAssets is executed before building the target
-add_dependencies(${L_TARGET_NAME} CopyAssets)
+add_dependencies(${K_TARGET_NAME} CopyAssets)

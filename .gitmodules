@@ -1,0 +1,9 @@
+[submodule "Engine/Libs/SDL"]
+	path = Engine/Libs/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "Engine/Libs/Glm"]
+	path = Engine/Libs/Glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Engine/Libs/Spdlog"]
+	path = Engine/Libs/Spdlog
+	url = https://github.com/gabime/spdlog.git

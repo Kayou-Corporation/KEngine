@@ -3,10 +3,10 @@
 # --------------------------------------- #
 
 # Define minimum CMake version required
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.20)
 
 # Define Project Name
-project(Kayou VERSION 0.0.1 LANGUAGES CXX)
+project(KEngine VERSION 0.0.1 LANGUAGES CXX)
 
 # Define output build folder
 set(OUTPUT_DIR_BASE "${CMAKE_SOURCE_DIR}/Builds/${CMAKE_CXX_COMPILER_ID}_$<CONFIG>")
