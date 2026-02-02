@@ -40,7 +40,7 @@ if(MSVC)
     set(CMAKE_DEBUG_POSTFIX "d")
     target_compile_options(${K_TARGET_NAME} PUBLIC /W4 /WX)
 else()
-    target_compile_options(${K_TARGET_NAME} PUBLIC -Wall -Wextra -Wpedantic)
+    target_compile_options(${K_TARGET_NAME} PUBLIC -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 # To build shared libraries in Windows, we set CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS to TRUE.
