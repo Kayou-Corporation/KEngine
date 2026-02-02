@@ -7,3 +7,9 @@
 [submodule "Engine/Libs/Spdlog"]
 	path = Engine/Libs/Spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "Engine/Libs/VulkanMemoryAllocator"]
+	path = Engine/Libs/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+[submodule "Engine/Libs/Assimp"]
+	path = Engine/Libs/Assimp
+	url = https://github.com/assimp/assimp.git

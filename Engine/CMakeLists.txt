@@ -27,7 +27,7 @@ add_library(${K_TARGET_NAME} STATIC ${K_ENGINE_SOURCES})
 #---------------------------------------#
 #                INCLUDE                #
 #---------------------------------------#
-target_include_directories(${K_TARGET_NAME} PUBLIC "Code/Include" "Libs/glm" "Libs")
+target_include_directories(${K_TARGET_NAME} PUBLIC "Code/Include" "Libs/Glm" "Libs/Stbimage" "Libs")
 
 
 
@@ -52,7 +52,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Disable C and C++ compiler extensions.
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-target_link_libraries(${K_TARGET_NAME} PUBLIC Vulkan::Vulkan SDL3::SDL3)
+target_link_libraries(${K_TARGET_NAME} PUBLIC Vulkan::Vulkan glm::glm SDL3::SDL3 spdlog::spdlog GPUOpen::VulkanMemoryAllocator assimp)
 
 
 
