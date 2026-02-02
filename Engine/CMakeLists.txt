@@ -76,7 +76,7 @@ add_custom_command(
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
-        "${K_OUTPUT_DIR}/Engine/Assets"
+        "${OUTPUT_DIR_BASE}/Engine/Assets"
         COMMENT "Copying Assets to output directory after build"
 )
 
