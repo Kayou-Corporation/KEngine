@@ -1,8 +1,27 @@
 #include <iostream>
 
+#include "Window/Window.hpp"
 
+#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 int main()
 {
-    std::cout << "Hello Kayou\n";
+    RefCountPtr<Window> window = WindowInterface::InitWindow(WindowAPI::SDL);
+
+    WindowSpecs specs;
+    specs.width = 720;
+    specs.height = 480;
+    specs.name = "KEngine";
+    specs.allowResize = true;
+
+    window->Create(specs);
+
+    while (!window->ShouldClose())
+    {
+        window->PollEvents();
+    }
+    
+    window->Destroy();
+
     return 0;
 }
