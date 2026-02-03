@@ -53,20 +53,20 @@ void SDLWindow::PollEvents()
 	}
 }
 
-std::vector<const char*> SDLWindow::GetVulkanInstanceExtension()
-{
-	uint32_t sdlInstanceExtensionsCount = 0;
-	const char* const* sdlInstanceExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlInstanceExtensionsCount);
-
-	if (sdlInstanceExtensions == NULL) 
-	{ 
-		spdlog::critical("Can't get vulkan extensions from window");
-	}
-
-	std::vector<const char*> extensions(sdlInstanceExtensions, sdlInstanceExtensions + sdlInstanceExtensionsCount);
-
-#ifdef KENGINE_DEBUG
-	extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-#endif
-	return extensions;
-}
+//std::vector<const char*> SDLWindow::GetVulkanInstanceExtension()
+//{
+//	uint32_t sdlInstanceExtensionsCount = 0;
+//	const char* const* sdlInstanceExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlInstanceExtensionsCount);
+//
+//	if (sdlInstanceExtensions == NULL) 
+//	{ 
+//		spdlog::critical("Can't get vulkan extensions from window");
+//	}
+//
+//	std::vector<const char*> extensions(sdlInstanceExtensions, sdlInstanceExtensions + sdlInstanceExtensionsCount);
+//
+//#ifdef KENGINE_DEBUG
+//	extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+//#endif
+//	return extensions;
+//}

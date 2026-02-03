@@ -2,8 +2,6 @@
 
 #include "Window/Window.hpp"
 
-#include <vulkan/vulkan.h>
-#include <vulkan/vulkan.hpp>
 int main()
 {
     RefCountPtr<Window> window = WindowInterface::InitWindow(WindowAPI::SDL);

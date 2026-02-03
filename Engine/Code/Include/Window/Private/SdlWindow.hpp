@@ -13,7 +13,7 @@ public:
 	bool ShouldClose() override { return !m_isRunning; }
 	void PollEvents() override;
 
-	std::vector<const char*> GetVulkanInstanceExtension() override;
+	//std::vector<const char*> GetVulkanInstanceExtension() override;
 
 
 private:

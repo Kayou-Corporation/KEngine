@@ -3,9 +3,12 @@
 # --------------------------------------- #
 add_subdirectory(Libs)
 
-find_package(Vulkan 1.4 REQUIRED)
-
-
+find_package(Vulkan 1.4)
+if (Vulkan_FOUND)
+    set(VULKAN_ENABLE ON CACHE BOOL "Enable Vulkan renderer")
+else()
+    set(VULKAN_ENABLE OFF CACHE BOOL "Enable Vulkan renderer")
+endif()
 
 #---------------------------------------#
 #                SOURCES                #
@@ -51,6 +54,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Disable C and C++ compiler extensions.
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+target_compile_definitions(${K_TARGET_NAME} PUBLIC VULKAN_ENABLE)
 
 target_link_libraries(${K_TARGET_NAME} PUBLIC Vulkan::Vulkan glm::glm SDL3::SDL3 spdlog::spdlog GPUOpen::VulkanMemoryAllocator assimp)
 
