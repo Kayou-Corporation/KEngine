@@ -19,12 +19,12 @@ void SDLWindow::Create(const WindowSpecs& specs)
 	switch (specs.rendererAPI)
 	{
 	case RendererAPI::Vulkan:
-		m_window = SDL_CreateWindow(m_windowName.c_str(), m_width, m_height, SDL_WINDOW_VULKAN);
+		m_window = SDL_CreateWindow(m_windowName.c_str(), static_cast<int>(m_width), static_cast<int>(m_height), SDL_WINDOW_VULKAN);
 		m_windowRenderer = new SDLVulkanWindowRenderer;
 		break;
 	}
 	
-	if (m_window == NULL)
+	if (m_window == nullptr)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
 	}
@@ -61,12 +61,14 @@ std::vector<const char*> SDLVulkanWindowRenderer::GetVulkanInstanceExtensions()
 	uint32_t sdlInstanceExtensionsCount = 0;
 	const char* const* sdlInstanceExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlInstanceExtensionsCount);
 
-	if (sdlInstanceExtensions == NULL) 
+	if (sdlInstanceExtensions == nullptr)
 	{ 
 		spdlog::critical("Can't get vulkan extensions from window");
 	}
 
-	std::vector<const char*> extensions(sdlInstanceExtensions, sdlInstanceExtensions + sdlInstanceExtensionsCount);
+	std::vector<const char*> extensions;
+	if (sdlInstanceExtensions && sdlInstanceExtensionsCount > 0)
+		extensions.assign(sdlInstanceExtensions, sdlInstanceExtensions + sdlInstanceExtensionsCount);
 
 #ifdef KENGINE_DEBUG
 	extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);

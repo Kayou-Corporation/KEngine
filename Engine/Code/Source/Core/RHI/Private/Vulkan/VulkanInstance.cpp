@@ -5,9 +5,9 @@
 void VulkanInstance::Create(const InstanceSpecs& specs)
 {
 	(void)specs;
-	auto wRenderer = specs.window->GetWindowRenderer();
+	RefCountPtr<WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
 	
-	auto wvkRenderer = wRenderer.UnsafeCastAs<VulkanWindowRenderer>();
+	RefCountPtr<VulkanWindowRenderer> wvkRenderer = wRenderer.UnsafeCastAs<VulkanWindowRenderer>();
 	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
 
 

@@ -14,7 +14,7 @@
 class WindowRenderer : public IResource
 {
 public:
-	~WindowRenderer() = default;
+	~WindowRenderer() override = default;
 };
 
 #ifdef VULKAN_ENABLE
@@ -22,7 +22,7 @@ class VulkanWindowRenderer : public RefCounter<WindowRenderer>
 {
 public:
 	VulkanWindowRenderer() = default;
-	~VulkanWindowRenderer() = default;
+	~VulkanWindowRenderer() override = default;
 
 	KENGINE_API virtual std::vector<const char*> GetVulkanInstanceExtensions() = 0;
 	KENGINE_API virtual VkSurfaceKHR CreateVulkanSurface(VkInstance instance) = 0;

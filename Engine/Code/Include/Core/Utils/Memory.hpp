@@ -27,7 +27,7 @@ public:
 
 	unsigned long Release() override
 	{
-		auto count = --m_refCount;
+		unsigned long count = --m_refCount;
 		if (count == 0)
 			delete this;
 		return count;

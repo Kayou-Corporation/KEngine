@@ -27,7 +27,7 @@ struct InstanceSpecs
 class Instance : public IResource
 {
 public:
-	virtual ~Instance() = default;
+	~Instance() override = default;
 
 	KENGINE_API virtual void Create(const InstanceSpecs& specs) = 0;
 	KENGINE_API virtual void Destroy() = 0;
