@@ -105,6 +105,23 @@ public:
 		return RefCountPtr<CastType>(casted);
 	}
 
+	template<typename CastType>
+	RefCountPtr<CastType> UnsafeCastAs() const
+	{
+		static_assert(std::is_base_of_v<IResource, CastType>, "CastAs<CastType>: CastType must inherit from IResource");
+
+		//static_assert(!std::is_abstract_v<CastType>, "CastAs<CastType>: CastType cannot be abstract class");
+
+		if (!ptr)
+			return {};
+
+		CastType* casted = dynamic_cast<CastType*>(ptr);
+		if (!casted)
+			return {};
+
+		return RefCountPtr<CastType>(casted);
+	}
+
 
 	T* operator->() const { return ptr; }
 	operator bool() const { return ptr != nullptr; }

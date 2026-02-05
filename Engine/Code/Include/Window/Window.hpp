@@ -7,10 +7,9 @@
 #include "Core/Utils/Export.hpp"
 
 #include "Core/RHI/Public/RHI.hpp"
+#include "Window/WindowRenderer.hpp"
 
-#ifdef VULKAN_ENABLE
-#include <vulkan/vulkan.h>
-#endif
+// -------- Base window ----------
 
 struct WindowSpecs
 {
@@ -37,10 +36,7 @@ public:
 	KENGINE_API uint32_t GetHeight() const { return m_height; }
 	KENGINE_API std::string GetName() const { return m_windowName; }
 
-//#ifdef VULKAN_ENABLE
-//	KENGINE_API virtual std::vector<const char*> GetVulkanInstanceExtension() = 0;
-//	KENGINE_API virtual VkSurfaceKHR CreateVulkanSurface() = 0;
-//#endif
+	RefCountPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
 
 protected:
 	uint32_t m_width;
@@ -48,19 +44,10 @@ protected:
 
 	std::string m_windowName;
 
-private:
-	class Internal
-	{
-		virtual ~Internal() = default;
-
-#ifdef VULKAN_ENABLE
-		virtual std::vector<const char*> GetVulkanInstanceExtensions() const = 0;
-		virtual VkSurfaceKHR CreateVulkanSurface(VkInstance instance) = 0;
-#endif
-	};
-
+	RefCountPtr<WindowRenderer> m_windowRenderer;
 };
 
+// -------- Interface ----------
 enum WindowAPI
 {
 	SDL = 0

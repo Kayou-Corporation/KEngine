@@ -20,6 +20,7 @@ void SDLWindow::Create(const WindowSpecs& specs)
 	{
 	case RendererAPI::Vulkan:
 		m_window = SDL_CreateWindow(m_windowName.c_str(), m_width, m_height, SDL_WINDOW_VULKAN);
+		m_windowRenderer = new SDLVulkanWindowRenderer;
 		break;
 	}
 	
@@ -53,20 +54,33 @@ void SDLWindow::PollEvents()
 	}
 }
 
-//std::vector<const char*> SDLWindow::GetVulkanInstanceExtension()
-//{
-//	uint32_t sdlInstanceExtensionsCount = 0;
-//	const char* const* sdlInstanceExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlInstanceExtensionsCount);
-//
-//	if (sdlInstanceExtensions == NULL) 
-//	{ 
-//		spdlog::critical("Can't get vulkan extensions from window");
-//	}
-//
-//	std::vector<const char*> extensions(sdlInstanceExtensions, sdlInstanceExtensions + sdlInstanceExtensionsCount);
-//
-//#ifdef KENGINE_DEBUG
-//	extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-//#endif
-//	return extensions;
-//}
+#ifdef VULKAN_ENABLE
+
+std::vector<const char*> SDLVulkanWindowRenderer::GetVulkanInstanceExtensions()
+{
+	uint32_t sdlInstanceExtensionsCount = 0;
+	const char* const* sdlInstanceExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlInstanceExtensionsCount);
+
+	if (sdlInstanceExtensions == NULL) 
+	{ 
+		spdlog::critical("Can't get vulkan extensions from window");
+	}
+
+	std::vector<const char*> extensions(sdlInstanceExtensions, sdlInstanceExtensions + sdlInstanceExtensionsCount);
+
+#ifdef KENGINE_DEBUG
+	extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+#endif
+	return extensions;
+}
+
+VkSurfaceKHR SDLVulkanWindowRenderer::CreateVulkanSurface(VkInstance instance)
+{
+	(void)instance;
+
+	//VkSurfaceKHR vkSurface;
+
+	return nullptr;
+}
+
+#endif

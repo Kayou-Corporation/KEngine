@@ -4,6 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
+
 RefCountPtr<Window> WindowInterface::InitWindow(WindowAPI api)
 {
 	switch (api)

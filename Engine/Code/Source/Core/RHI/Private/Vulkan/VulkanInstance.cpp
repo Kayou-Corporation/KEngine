@@ -5,7 +5,14 @@
 void VulkanInstance::Create(const InstanceSpecs& specs)
 {
 	(void)specs;
-	std::vector<const char*> vkExtensions;
+	auto wRenderer = specs.window->GetWindowRenderer();
+	
+	auto wvkRenderer = wRenderer.UnsafeCastAs<VulkanWindowRenderer>();
+	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
+
+
+	//wRenderer
+	//auto specs.window->GetWindowRenderer();
 }
 
 void VulkanInstance::Destroy()
