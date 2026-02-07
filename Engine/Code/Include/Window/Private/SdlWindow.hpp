@@ -16,19 +16,23 @@ public:
 	bool ShouldClose() override { return !m_isRunning; }
 	void PollEvents() override;
 
+	SDL_Window* GetSDLWindow() const { return m_window; }
+
 private:
 	SDL_Window* m_window;
 	bool m_isRunning = false;
 };
 
-#ifdef VULKAN_ENABLE
+//#ifdef VULKAN_ENABLE
 class SDLVulkanWindowRenderer : public VulkanWindowRenderer
 {
 public:
-	SDLVulkanWindowRenderer() = default;
+	SDLVulkanWindowRenderer(Window* ownerWindow);
 	virtual ~SDLVulkanWindowRenderer() override = default;
 
 	std::vector<const char*> GetVulkanInstanceExtensions() override;
 	VkSurfaceKHR CreateVulkanSurface(VkInstance instance) override;
+private:
+
 };
-#endif
+//#endif

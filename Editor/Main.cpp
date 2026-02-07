@@ -2,6 +2,7 @@
 
 #include "Window/Window.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanInstance.hpp"
+#include "Core/RHI/Public/Surface.hpp"
 
 int main()
 {
@@ -26,12 +27,15 @@ int main()
     test.debugLayers = { DebugLayers::Validation };
     
     instance->Create(test);
+
+    RefCountPtr<Surface> surface = instance->CreateSurface({ window });
     
     while (!window->ShouldClose())
     {
         window->PollEvents();
     }
     
+    instance->DestroySurface(surface);
     instance->Destroy();
     window->Destroy();
 

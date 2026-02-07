@@ -21,6 +21,9 @@ private:
 
 public:
     RefCounter() = default;
+
+    template<typename... Args>
+    RefCounter(Args&&... args) : T(std::forward<Args>(args)...) {}
     virtual ~RefCounter() = default;
 
     unsigned long AddRef() override

@@ -9,6 +9,9 @@
 #include <vulkan/vulkan.h>
 #endif
 
+
+class Window;
+
 // -------- Window Renderer ----------
 
 class WindowRenderer : virtual public IResource
@@ -25,5 +28,8 @@ public:
 
 	KENGINE_API virtual std::vector<const char*> GetVulkanInstanceExtensions() = 0;
 	KENGINE_API virtual VkSurfaceKHR CreateVulkanSurface(VkInstance instance) = 0;
+
+protected:
+	Window* m_ownerWindow = nullptr;
 };
 #endif

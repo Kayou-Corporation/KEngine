@@ -11,7 +11,7 @@
 // Forward declaration
 class Window;
 class Surface;
-
+struct SurfaceSpecs;
 
 struct InstanceSpecs
 {
@@ -30,6 +30,9 @@ public:
 
 	KENGINE_API virtual void Create(const InstanceSpecs& specs) = 0;
 	KENGINE_API virtual void Destroy() = 0;
+
+	KENGINE_API virtual RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySurface(RefCountPtr<Surface> surface) = 0;
 
 protected:
 	Version m_appVersion;

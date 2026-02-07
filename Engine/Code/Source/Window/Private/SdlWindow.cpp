@@ -20,7 +20,9 @@ void SDLWindow::Create(const WindowSpecs& specs)
 	{
 	case RendererAPI::Vulkan:
 		m_window = SDL_CreateWindow(m_windowName.c_str(), static_cast<int>(m_width), static_cast<int>(m_height), SDL_WINDOW_VULKAN);
-		m_windowRenderer = CreateRefPtr<SDLVulkanWindowRenderer>();
+
+		Window* myWindowPtr = static_cast<Window*>(this);
+		m_windowRenderer = CreateRefPtr<SDLVulkanWindowRenderer>(myWindowPtr);
 		break;
 	}
 	
@@ -36,6 +38,8 @@ void SDLWindow::Create(const WindowSpecs& specs)
 
 void SDLWindow::Destroy()
 {
+	m_windowRenderer = nullptr;
+
 	SDL_DestroyWindow(m_window);
 
 	SDL_Quit();
@@ -78,11 +82,23 @@ std::vector<const char*> SDLVulkanWindowRenderer::GetVulkanInstanceExtensions()
 
 VkSurfaceKHR SDLVulkanWindowRenderer::CreateVulkanSurface(VkInstance instance)
 {
-	(void)instance;
+	VkSurfaceKHR surface;
 
-	//VkSurfaceKHR vkSurface;
+	SDLWindow* sdlWin = static_cast<SDLWindow*>(m_ownerWindow);
 
-	return nullptr;
+	if (!sdlWin)
+	{
+		spdlog::error("Can't cast window into SDlWindow");
+		return nullptr;	
+	}
+	SDL_Vulkan_CreateSurface(sdlWin->GetSDLWindow(), instance, nullptr, &surface);
+
+	return surface;
 }
 
 #endif
+
+SDLVulkanWindowRenderer::SDLVulkanWindowRenderer(Window* ownerWindow)
+{
+	m_ownerWindow = ownerWindow;
+}

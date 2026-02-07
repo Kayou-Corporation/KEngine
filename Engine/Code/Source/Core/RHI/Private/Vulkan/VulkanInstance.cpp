@@ -6,6 +6,7 @@
 
 #include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanSurface.hpp"
 
 void VulkanInstance::Create(const InstanceSpecs& specs)
 {
@@ -70,15 +71,22 @@ void VulkanInstance::Destroy()
 	m_handle.destroy();
 }
 
-//RefCountPtr<Surface> VulkanInstance::CreateSurface(RefCountPtr<Window> window)
-//{
-//	return nullptr;
-//}
-//
-//void VulkanInstance::DestroySurface(RefCountPtr<Surface>)
-//{
-//
-//}
+RefCountPtr<Surface> VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
+{
+	RefCountPtr<WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	RefCountPtr<VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<VulkanWindowRenderer>();
+	VkSurfaceKHR vkSurface = wvkRenderer->CreateVulkanSurface(m_handle);
+
+	auto Surface = CreateRefPtr<VulkanSurface>();
+	Surface->SetHandle(vkSurface);
+
+	return Surface;
+}
+
+void VulkanInstance::DestroySurface(RefCountPtr<Surface> surface)
+{
+	m_handle.destroySurfaceKHR(surface.CastAs<VulkanSurface>()->GetHandle());
+}
 
 std::vector<const char*> VulkanInstance::CheckValidationLayersSupport(const std::vector<const char*>& requestedLayers)
 {

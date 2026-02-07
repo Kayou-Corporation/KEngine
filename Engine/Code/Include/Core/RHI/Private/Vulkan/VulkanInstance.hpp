@@ -14,6 +14,9 @@ public:
 	void Create(const InstanceSpecs& specs) override;
 	void Destroy() override;
 
+	RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) override;
+	void DestroySurface(RefCountPtr<Surface> surface) override;
+
 protected:
 	Version m_engineVersion;
 
