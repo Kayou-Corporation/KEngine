@@ -20,20 +20,16 @@ struct InstanceSpecs
 	Version appVersion;
 	Version engineVersion;
 
-	std::vector<Extensions> extensions;   // Extensions to check their availability
 	std::vector<DebugLayers> debugLayers; // Debug layers to use.
 };
 
-class Instance : public IResource
+class Instance : virtual public IResource
 {
 public:
-	~Instance() override = default;
+	virtual ~Instance() = default;
 
 	KENGINE_API virtual void Create(const InstanceSpecs& specs) = 0;
 	KENGINE_API virtual void Destroy() = 0;
-
-	//KENGINE_API virtual RefCountPtr<Surface> CreateSurface(RefCountPtr<Window> window) = 0;
-	//KENGINE_API virtual void DestroySurface(RefCountPtr<Surface>) = 0;
 
 protected:
 	Version m_appVersion;

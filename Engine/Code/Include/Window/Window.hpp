@@ -21,10 +21,10 @@ struct WindowSpecs
 	RendererAPI rendererAPI = RendererAPI::Vulkan;
 };
 
-class Window : public IResource
+class Window : virtual public IResource
 {
 public:
-	~Window() = default;
+	virtual ~Window() = default;
 
 	KENGINE_API virtual void Create(const WindowSpecs& specs) = 0;
 	KENGINE_API virtual void Destroy() = 0;
@@ -32,9 +32,9 @@ public:
 	KENGINE_API virtual bool ShouldClose() = 0;
 	KENGINE_API virtual void PollEvents() = 0;
 
-	KENGINE_API uint32_t GetWidth() const { return m_width; }
-	KENGINE_API uint32_t GetHeight() const { return m_height; }
-	KENGINE_API std::string GetName() const { return m_windowName; }
+	uint32_t GetWidth() const { return m_width; }
+	uint32_t GetHeight() const { return m_height; }
+	std::string GetName() const { return m_windowName; }
 
 	RefCountPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
 

@@ -4,17 +4,17 @@
 
 #include "Window/Window.hpp"
 
-class SDLWindow : public RefCounter<Window>
+class SDLWindow : public Window
 {
 public:
+	SDLWindow() = default;
+	virtual ~SDLWindow() override = default;
+
 	void Create(const WindowSpecs& specs) override;
 	void Destroy() override;
 
 	bool ShouldClose() override { return !m_isRunning; }
 	void PollEvents() override;
-
-	//std::vector<const char*> GetVulkanInstanceExtension() override;
-
 
 private:
 	SDL_Window* m_window;
@@ -26,7 +26,7 @@ class SDLVulkanWindowRenderer : public VulkanWindowRenderer
 {
 public:
 	SDLVulkanWindowRenderer() = default;
-	~SDLVulkanWindowRenderer() = default;
+	virtual ~SDLVulkanWindowRenderer() override = default;
 
 	std::vector<const char*> GetVulkanInstanceExtensions() override;
 	VkSurfaceKHR CreateVulkanSurface(VkInstance instance) override;

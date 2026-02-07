@@ -20,7 +20,7 @@ void SDLWindow::Create(const WindowSpecs& specs)
 	{
 	case RendererAPI::Vulkan:
 		m_window = SDL_CreateWindow(m_windowName.c_str(), static_cast<int>(m_width), static_cast<int>(m_height), SDL_WINDOW_VULKAN);
-		m_windowRenderer = new SDLVulkanWindowRenderer;
+		m_windowRenderer = CreateRefPtr<SDLVulkanWindowRenderer>();
 		break;
 	}
 	

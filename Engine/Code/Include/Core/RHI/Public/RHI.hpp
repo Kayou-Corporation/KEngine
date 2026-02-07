@@ -19,8 +19,7 @@ struct Version
 
 enum class DebugLayers 
 {
-	GraphicsDebug,
-	KhronosValidation,
+	Validation,
 	DeviceMonitor,
 	DeviceSimulation,
 	APIDump
@@ -28,5 +27,5 @@ enum class DebugLayers
 
 enum class Extensions
 {
-	Surface, // Check if instance support rendering
+	Swapchain, // Check if instance support rendering
 };

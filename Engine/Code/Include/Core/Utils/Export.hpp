@@ -24,3 +24,9 @@
 #else
 #define KENGINE_DEBUG
 #endif
+
+#ifdef _MSC_VER
+#define BREAKPOINT() __debugbreak()
+#else
+#define BREAKPOINT() __builtin_trap()
+#endif
