@@ -18,7 +18,6 @@ int main()
     window->Create(specs);
     
     
-    
     RefCountPtr<Instance> instance = CreateRefPtr<VulkanInstance>();
     InstanceSpecs test;
     test.window = window;
