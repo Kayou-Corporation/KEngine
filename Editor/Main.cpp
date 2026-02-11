@@ -3,6 +3,7 @@
 #include "Window/Window.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanInstance.hpp"
 #include "Core/RHI/Public/Surface.hpp"
+#include "Core/RHI/Public/Device.hpp"
 
 int main()
 {
@@ -28,6 +29,15 @@ int main()
     instance->Create(test);
 
     RefCountPtr<Surface> surface = instance->CreateSurface({ window });
+
+    DeviceSpecs dSpecs;
+    dSpecs.gpuType = GpuType::Discrete;
+    dSpecs.extensions = { Extensions::Swapchain, Extensions::DynamicRendering, Extensions::ShaderObject };
+    dSpecs.queues = { Queue::Graphics };
+    dSpecs.searchPresentQueue = true;
+    dSpecs.surface = surface;
+
+    RefCountPtr<Device> device = instance->CreateDevice(dSpecs);
     
     while (!window->ShouldClose())
     {

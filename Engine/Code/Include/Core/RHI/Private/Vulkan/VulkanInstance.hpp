@@ -17,6 +17,9 @@ public:
 	RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) override;
 	void DestroySurface(RefCountPtr<Surface> surface) override;
 
+	RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) override;
+	void DestroyDevice(RefCountPtr<Device> device) override;
+
 protected:
 	Version m_engineVersion;
 

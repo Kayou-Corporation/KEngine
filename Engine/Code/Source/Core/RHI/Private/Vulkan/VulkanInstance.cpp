@@ -7,6 +7,7 @@
 #include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanSurface.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanDevice.hpp"
 
 void VulkanInstance::Create(const InstanceSpecs& specs)
 {
@@ -159,4 +160,22 @@ VkBool32 VulkanInstance::DebugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT 
 	}
 
 	return VK_FALSE;
+}
+
+RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
+{
+	vk::SurfaceKHR surface = specs.surface.CastAs<VulkanSurface>()->GetHandle();
+	vk::PhysicalDeviceType type = TranslateToVulkan(specs.gpuType);
+	std::vector<const char*> extensions = TranslateToVulkan(specs.extensions);
+
+	RefCountPtr<VulkanDevice> device = CreateRefPtr<VulkanDevice>();
+
+	device->ChoosePhysicalDevice(m_handle, specs.queues, specs.searchPresentQueue, surface, type, extensions);
+
+	return device;
+}
+
+void VulkanInstance::DestroyDevice(RefCountPtr<Device> device)
+{
+	(void)device;
 }

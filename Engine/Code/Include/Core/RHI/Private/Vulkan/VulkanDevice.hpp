@@ -34,8 +34,9 @@ public:
     void Create(const DeviceSpecs specs) override;
     void Destroy() override;
 
-private:
     void ChoosePhysicalDevice(const vk::Instance& instance, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
+
+private:
     PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
 
     vk::PhysicalDevice m_pDevice;

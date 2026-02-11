@@ -78,7 +78,7 @@ PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physic
 			if (strcmp(availablesExtensions[i].extensionName, extensions[j]) == 0)
 			{
 				device.score += 50;
-				m_extensions.push_back(extensions[i]);
+				m_extensions.push_back(extensions[j]);
 			}
 		}
 	}

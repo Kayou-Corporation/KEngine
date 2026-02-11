@@ -10,8 +10,12 @@
 
 // Forward declaration
 class Window;
+
 class Surface;
 struct SurfaceSpecs;
+
+class Device;
+struct DeviceSpecs;
 
 struct InstanceSpecs
 {
@@ -34,7 +38,15 @@ public:
 	KENGINE_API virtual RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) = 0;
 	KENGINE_API virtual void DestroySurface(RefCountPtr<Surface> surface) = 0;
 
+	KENGINE_API virtual RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyDevice(RefCountPtr<Device> device) = 0;
+
 protected:
 	Version m_appVersion;
 	Version m_engineVersion;
+};
+
+class RendererInterface
+{
+	static RefCountPtr<Instance> InitWindow(RendererAPI api);
 };
