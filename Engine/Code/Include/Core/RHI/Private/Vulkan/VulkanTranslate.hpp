@@ -119,4 +119,22 @@ inline std::vector<const char*> TranslateToVulkan(const std::vector<Extensions>&
     return vkExtensions;
 }
 
-// ---------- EXTENSIONS ---------------
+// ---------- Features ---------------
+
+// ---------- GPU Type ----------------
+inline vk::PhysicalDeviceType TranslateToVulkan(GpuType gpuType)
+{
+    switch (gpuType)
+    {
+    case GpuType::Discrete :
+        return vk::PhysicalDeviceType::eDiscreteGpu;
+
+    case GpuType::Virtual:
+        return vk::PhysicalDeviceType::eVirtualGpu;
+
+    case GpuType::Cpu:
+        return vk::PhysicalDeviceType::eCpu;
+    }
+
+    return vk::PhysicalDeviceType::eOther;
+}

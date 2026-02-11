@@ -4,9 +4,25 @@
 
 #include "Core/RHI/Public/Device.hpp"
 
-struct PhysicalDeviceCompatibility
+#include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
+
+struct PhysicalDevice 
 {
-        
+    vk::PhysicalDevice physicalDevice;
+    QueueFamily family;
+    uint32_t score;
+
+    bool operator>(const PhysicalDevice& other) const
+    {
+        return score > other.score;
+    }
+};
+
+struct PhysicalDeviceCompatibiliy
+{
+    vk::SurfaceCapabilitiesKHR capabilities{};
+    std::vector<vk::SurfaceFormatKHR> formats{};
+    std::vector<vk::PresentModeKHR> presentModes{};
 };
 
 class VulkanDevice : public Device
@@ -19,8 +35,18 @@ public:
     void Destroy() override;
 
 private:
+    void ChoosePhysicalDevice(const vk::Instance& instance, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
+    PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
+
     vk::PhysicalDevice m_pDevice;
+    QueueFamily m_queueFamily;
+    std::vector<const char*> m_extensions;
+    PhysicalDeviceCompatibiliy m_compatibility{};
+
     vk::Device m_handle;
+
+    //vk::Queue presentQueue;
+    //std::unordered_map<Queue, vk::Queue> m_availableQueues;
         
 };
 

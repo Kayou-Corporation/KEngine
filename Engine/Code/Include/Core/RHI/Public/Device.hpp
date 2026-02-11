@@ -7,16 +7,20 @@
 
 #include "Core/RHI/Public/RHI.hpp"
 
+class Surface;
+
 class Swapchain;
 struct SwapchainSpecs;
 
 struct DeviceSpecs
 {
 	GpuType gpuType;
-	std::vector<Extensions> extensions;
-	std::vector<Features> features;
+	std::vector<Features> features; // Not implemented 
 
-	std::vector<Queue> queue;
+	std::vector<Extensions> extensions;
+	std::vector<Queue> queues;
+	bool searchPresentQueue;
+	RefCountPtr<Surface> surface;
 };
 
 class Device : public virtual IResource
