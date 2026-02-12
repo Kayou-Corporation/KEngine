@@ -74,9 +74,6 @@ inline const char* TranslateToVulkan(Extensions extension)
 
     case Extensions::ExtendedDynamicState2:
         return "VK_EXT_extended_dynamic_state2";
-
-    case Extensions::ExtendedDynamicState3:
-        return "VK_EXT_extended_dynamic_state3";
     }
 
     return nullptr;
@@ -108,10 +105,6 @@ inline std::vector<const char*> TranslateToVulkan(const std::vector<Extensions>&
 
         case Extensions::ExtendedDynamicState2:
             vkExtensions.push_back("VK_EXT_extended_dynamic_state2");
-            break;
-
-        case Extensions::ExtendedDynamicState3:
-            vkExtensions.push_back("VK_EXT_extended_dynamic_state3");
             break;
         }
     }

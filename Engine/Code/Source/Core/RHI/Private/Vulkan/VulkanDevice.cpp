@@ -116,11 +116,9 @@ void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLa
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(m_extensions.size());
 	createInfo.ppEnabledExtensionNames = m_extensions.data();
 
-	// Set pNext;
-
-	// Features, not implmented
-	vk::PhysicalDeviceFeatures features;
-	createInfo.pEnabledFeatures = &features;
+	// Enable extensions features
+	BuildFeaturesChain();
+	createInfo.pNext = &m_featuresChain;
 
 	m_handle = VK_CHECK_RESULT(m_pDevice.createDevice(createInfo), "Coudn't create device");
 }
@@ -128,4 +126,46 @@ void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLa
 void VulkanDevice::Destroy()
 {
 	m_handle.destroy();
+}
+
+void VulkanDevice::BuildFeaturesChain()
+{
+	m_featuresChain = vk::PhysicalDeviceFeatures2{};
+	void* currentPNext = nullptr;
+
+	for (const char* extName : m_extensions)
+	{
+		std::string name(extName);
+
+		if (name == VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)
+		{
+			features.dynamicRenderingFeatures.dynamicRendering = VK_TRUE;
+
+			features.dynamicRenderingFeatures.pNext = currentPNext;
+			currentPNext = &features.dynamicRenderingFeatures;
+		}
+		else if (name == VK_EXT_SHADER_OBJECT_EXTENSION_NAME)
+		{
+			features.shaderObjectFeatures.shaderObject = VK_TRUE;
+
+			features.shaderObjectFeatures.pNext = currentPNext;
+			currentPNext = &features.shaderObjectFeatures;
+		}
+		else if (name == VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)
+		{
+			features.extendedDynamicStateFeatures.extendedDynamicState = VK_TRUE;
+
+			features.extendedDynamicStateFeatures.pNext = currentPNext;
+			currentPNext = &features.extendedDynamicStateFeatures;
+		}
+		else if (name == VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)
+		{
+			features.extendedDynamicState2Features.extendedDynamicState2 = VK_TRUE;
+
+			features.extendedDynamicState2Features.pNext = currentPNext;
+			currentPNext = &features.extendedDynamicState2Features;
+		}
+	}
+
+	m_featuresChain.pNext = currentPNext;
 }

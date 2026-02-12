@@ -46,8 +46,7 @@ enum class Extensions
 	ShaderObject, // Shader not bound to pipeline
 
 	ExtendedDynamicState,
-	ExtendedDynamicState2,
-	ExtendedDynamicState3
+	ExtendedDynamicState2
 	// Add other extensions ? depend on driver
 };
 

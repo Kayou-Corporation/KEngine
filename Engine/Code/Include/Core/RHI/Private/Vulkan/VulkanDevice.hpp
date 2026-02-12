@@ -24,6 +24,14 @@ struct PhysicalDeviceCompatibiliy
     std::vector<vk::PresentModeKHR> presentModes{};
 };
 
+struct DeviceFeatures
+{
+    vk::PhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures;
+    vk::PhysicalDeviceShaderObjectFeaturesEXT shaderObjectFeatures;
+    vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT extendedDynamicStateFeatures;
+    vk::PhysicalDeviceExtendedDynamicState2FeaturesEXT extendedDynamicState2Features;
+};
+
 class VulkanDevice : public Device
 {
 public:
@@ -37,11 +45,15 @@ public:
 
 private:
     PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
+    void BuildFeaturesChain();
 
     vk::PhysicalDevice m_pDevice;
-    QueueFamily m_queueFamily;
-    std::vector<const char*> m_extensions;
     PhysicalDeviceCompatibiliy m_compatibility{};
+    QueueFamily m_queueFamily;
+     
+    std::vector<const char*> m_extensions;
+    vk::PhysicalDeviceFeatures2 m_featuresChain;
+    DeviceFeatures features;
 
     vk::Device m_handle;
 
