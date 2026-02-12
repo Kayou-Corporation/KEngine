@@ -44,6 +44,7 @@ int main()
         window->PollEvents();
     }
     
+    instance->DestroyDevice(device);
     instance->DestroySurface(surface);
     instance->Destroy();
     window->Destroy();

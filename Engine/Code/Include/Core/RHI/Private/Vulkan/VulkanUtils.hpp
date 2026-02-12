@@ -3,6 +3,9 @@
 #include <iostream>
 #include <cstring>
 
+#define VULKAN_HPP_NO_EXCEPTIONS
+#include <vulkan/vulkan.hpp>
+
 #include "Core/Utils/Export.hpp"
 
 #ifdef KENGINE_DEBUG

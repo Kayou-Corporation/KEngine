@@ -28,9 +28,6 @@ class Device : public virtual IResource
 public:
 	virtual ~Device() = default;
 
-	virtual void Create(const DeviceSpecs specs) = 0;
-	virtual void Destroy() = 0;
-
 	//virtual RefCountPtr<Swapchain>  CreateSwapchain(const SwapchainSpecs& specs) = 0
 	//virtual void DestroySwapchain(RefCountPtr<Swapchain> swapchain) = 0
 };

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <vulkan/vulkan.hpp>
-
 #include "Core/RHI/Public/Surface.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 
 class VulkanSurface : public Surface
 {

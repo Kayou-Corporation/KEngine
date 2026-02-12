@@ -170,12 +170,14 @@ RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 
 	RefCountPtr<VulkanDevice> device = CreateRefPtr<VulkanDevice>();
 
-	device->ChoosePhysicalDevice(m_handle, specs.queues, specs.searchPresentQueue, surface, type, extensions);
+	device->PickPhysicalDevice(m_handle, specs.queues, specs.searchPresentQueue, surface, type, extensions);
+
+	device->CreateLogicalDevice(m_debugLayers);
 
 	return device;
 }
 
 void VulkanInstance::DestroyDevice(RefCountPtr<Device> device)
 {
-	(void)device;
+	device.CastAs<VulkanDevice>()->Destroy();
 }

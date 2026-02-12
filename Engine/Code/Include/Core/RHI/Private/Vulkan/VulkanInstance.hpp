@@ -1,9 +1,8 @@
 #pragma once
 
-#define VULKAN_HPP_NO_EXCEPTIONS
-#include <vulkan/vulkan.hpp>
-
 #include "Core/RHI/Public/Instance.hpp"
+
+#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 
 class VulkanInstance : public Instance
 {

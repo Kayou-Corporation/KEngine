@@ -1,22 +1,12 @@
 #include "Core/RHI/Private/Vulkan/VulkanDevice.hpp"
 
 #include "Core/RHI/Private/Vulkan/VulkanSurface.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 #include <map>
 
-void VulkanDevice::Create(const DeviceSpecs specs)
+void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
 {
-
-	(void)specs;
-}
-
-void VulkanDevice::Destroy()
-{
-
-}
-
-void VulkanDevice::ChoosePhysicalDevice(const vk::Instance& instance, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
-{
-	std::vector<vk::PhysicalDevice> physicalDevices = instance.enumeratePhysicalDevices();
+	std::vector<vk::PhysicalDevice> physicalDevices = VK_CHECK_RESULT(instance.enumeratePhysicalDevices(), "Coudn't enumerate physicalDevice");
 	ASSERT(physicalDevices.size() != 0, "failed to find GPUs with Vulkan support!");
 
 	std::vector<PhysicalDevice> candidates;
@@ -41,12 +31,12 @@ void VulkanDevice::ChoosePhysicalDevice(const vk::Instance& instance, const std:
 
 	if (std::find(extensions.begin(), extensions.end(), VK_KHR_SWAPCHAIN_EXTENSION_NAME) != extensions.end() && searchPresentQueue)
 	{
-		m_compatibility.capabilities = m_pDevice.getSurfaceCapabilitiesKHR(surface);
+		m_compatibility.capabilities = VK_CHECK_RESULT(m_pDevice.getSurfaceCapabilitiesKHR(surface), "Coudn't get surface capabilities");
 
-		m_compatibility.formats = m_pDevice.getSurfaceFormatsKHR(surface);
+		m_compatibility.formats = VK_CHECK_RESULT(m_pDevice.getSurfaceFormatsKHR(surface), "Coudn't get surface format");
 		ASSERT(m_compatibility.formats.size() != 0, "No surface formats available");
 
-		m_compatibility.presentModes = m_pDevice.getSurfacePresentModesKHR(surface);
+		m_compatibility.presentModes = VK_CHECK_RESULT(m_pDevice.getSurfacePresentModesKHR(surface), "Coudn't get surface present mode");
 		ASSERT(m_compatibility.presentModes.size() != 0, "No surface present mode available");
 	}
 }
@@ -69,7 +59,7 @@ PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physic
 		device.score += 500;
 	}
 
-	std::vector<vk::ExtensionProperties> availablesExtensions = device.physicalDevice.enumerateDeviceExtensionProperties();
+	std::vector<vk::ExtensionProperties> availablesExtensions = VK_CHECK_RESULT(device.physicalDevice.enumerateDeviceExtensionProperties(), "Coudn't enumerate device extensions");
 	
 	for (uint32_t i = 0; i < availablesExtensions.size(); i++)
 	{
@@ -84,4 +74,58 @@ PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physic
 	}
 
 	return device;
+}
+
+void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers)
+{
+	std::unordered_set<uint32_t> uniqueFamilies;
+	for (const auto& [queueType, familyIndexOpt] : m_queueFamily.GetQueues())
+	{
+		if (familyIndexOpt.has_value())
+		{
+			uniqueFamilies.insert(familyIndexOpt.value());
+		}
+	}
+
+	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
+	
+	float queuePriority = 1.0f;
+	for (const auto& queueIndex : uniqueFamilies)
+	{
+		vk::DeviceQueueCreateInfo queueCreateInfo;
+		queueCreateInfo.queueFamilyIndex = queueIndex;
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+		queueCreateInfos.push_back(queueCreateInfo);
+	}
+
+	vk::DeviceCreateInfo createInfo;
+	// Queues informations
+	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+	createInfo.pQueueCreateInfos = queueCreateInfos.data();
+	
+	// Debug layers informations
+	#ifdef KENGINE_DEBUG
+	createInfo.enabledLayerCount = static_cast<uint32_t>(instanceDebugLayers.size());
+	createInfo.ppEnabledLayerNames = instanceDebugLayers.data();
+	#else
+		createInfo.enabledLayerCount = 0;
+	#endif
+	
+	// debug layers informations
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(m_extensions.size());
+	createInfo.ppEnabledExtensionNames = m_extensions.data();
+
+	// Set pNext;
+
+	// Features, not implmented
+	vk::PhysicalDeviceFeatures features;
+	createInfo.pEnabledFeatures = &features;
+
+	m_handle = VK_CHECK_RESULT(m_pDevice.createDevice(createInfo), "Coudn't create device");
+}
+
+void VulkanDevice::Destroy()
+{
+	m_handle.destroy();
 }

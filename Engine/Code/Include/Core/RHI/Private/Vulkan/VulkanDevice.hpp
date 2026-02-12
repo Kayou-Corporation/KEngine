@@ -1,9 +1,8 @@
 #pragma once
 
-#include <vulkan/vulkan.hpp>
-
 #include "Core/RHI/Public/Device.hpp"
 
+#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
 
 struct PhysicalDevice 
@@ -31,10 +30,10 @@ public:
     VulkanDevice() = default;
     virtual ~VulkanDevice() override = default;
 
-    void Create(const DeviceSpecs specs) override;
-    void Destroy() override;
+    void PickPhysicalDevice(const vk::Instance& instance, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
+    void CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers);
 
-    void ChoosePhysicalDevice(const vk::Instance& instance, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
+    void Destroy();
 
 private:
     PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);

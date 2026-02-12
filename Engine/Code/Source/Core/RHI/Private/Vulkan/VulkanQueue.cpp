@@ -20,7 +20,7 @@ QueueFamily QueueFamily::FindQueueFamily(const vk::PhysicalDevice& physicalDevic
         //// check for present
         if (searchPresentQueue)
         {
-            if (physicalDevice.getSurfaceSupportKHR(i, surface))
+            if (VK_CHECK_RESULT(physicalDevice.getSurfaceSupportKHR(i, surface), "Coudn't check if surface support presentation"))
             {
                 family.m_presentQueue = i;
                 family.m_searchPresentQueue = true;
