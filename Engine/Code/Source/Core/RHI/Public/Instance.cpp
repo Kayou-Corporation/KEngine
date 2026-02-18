@@ -2,7 +2,7 @@
 
 #include "Core/RHI/Private/Vulkan/VulkanInstance.hpp"
 
-RefCountPtr<Instance> RendererInterface::InitWindow(RendererAPI api)
+RefCountPtr<Instance> RendererInterface::InitRenderer(RendererAPI api)
 {
 	switch (api)
 	{

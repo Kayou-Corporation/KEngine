@@ -48,5 +48,6 @@ protected:
 
 class RendererInterface
 {
-	static RefCountPtr<Instance> InitWindow(RendererAPI api);
+public:
+	static RefCountPtr<Instance> InitRenderer(RendererAPI api);
 };

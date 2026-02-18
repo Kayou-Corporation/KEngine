@@ -26,7 +26,6 @@
 
 #else
 
-// define debug mode vkCheck
 #define VK_CHECK_RESULT(func, message)                                         \
     ([&]() {                                                                   \
         auto _res = (func);                                                    \
@@ -43,5 +42,29 @@
         return _res.value;                                                     \
     })()
 
+#endif
+
+#ifdef KENGINE_DEBUG
+#define VK_CHECK_VOID(func, message)                                             \
+    do {                                                                             \
+        vk::Result _code = (func);                                                   \
+        if (_code != vk::Result::eSuccess) {                                         \
+            std::cerr << "[Vulkan Error]\n"                                          \
+                      << "  Result  : " << vk::to_string(_code) << "\n"              \
+                      << "  Message : " << (message) << "\n"                         \
+                      << "  File    : "                                              \
+                      << (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 :    \
+                         (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)) \
+                      << "\n  Line    : " << __LINE__ << std::endl;                  \
+            BREAKPOINT();                                                            \
+        }                                                                            \
+    } while (0)
+#else
+#define VK_CHECK_VOID(func, message)                                             \
+    do {                                                                             \
+        if ((func) != vk::Result::eSuccess) {                                        \
+            abort();                                                                 \
+        }                                                                            \
+    } while (0)
 #endif
 

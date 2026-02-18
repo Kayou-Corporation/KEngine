@@ -58,9 +58,9 @@ enum class Features
 };
 
 //-------- QUEUE / COMMAND -----------
-enum class Queue
+enum class QueueType
 {
 	Graphics,
-	Transfert,
+	Transfer,
 	Compute
 };

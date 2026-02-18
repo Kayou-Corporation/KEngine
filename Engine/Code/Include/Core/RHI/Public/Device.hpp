@@ -18,7 +18,7 @@ struct DeviceSpecs
 	std::vector<Features> features; // Not implemented 
 
 	std::vector<Extensions> extensions;
-	std::vector<Queue> queues;
+	std::vector<QueueType> queues;
 	bool searchPresentQueue;
 	RefCountPtr<Surface> surface;
 };

@@ -19,7 +19,8 @@ int main()
     window->Create(specs);
     
     
-    RefCountPtr<Instance> instance = CreateRefPtr<VulkanInstance>();
+    RefCountPtr<Instance> instance = RendererInterface::InitRenderer(RendererAPI::Vulkan);
+
     InstanceSpecs test;
     test.window = window;
     test.appVersion = Version(0, 0, 1);
@@ -33,7 +34,7 @@ int main()
     DeviceSpecs dSpecs;
     dSpecs.gpuType = GpuType::Discrete;
     dSpecs.extensions = { Extensions::Swapchain, Extensions::DynamicRendering, Extensions::ShaderObject };
-    dSpecs.queues = { Queue::Graphics };
+    dSpecs.queues = { QueueType::Graphics };
     dSpecs.searchPresentQueue = true;
     dSpecs.surface = surface;
 

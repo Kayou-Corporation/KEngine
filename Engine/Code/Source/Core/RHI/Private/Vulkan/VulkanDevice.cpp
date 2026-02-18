@@ -2,9 +2,11 @@
 
 #include "Core/RHI/Private/Vulkan/VulkanSurface.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
 #include <map>
 
-void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
+void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
 {
 	std::vector<vk::PhysicalDevice> physicalDevices = VK_CHECK_RESULT(instance.enumeratePhysicalDevices(), "Coudn't enumerate physicalDevice");
 	ASSERT(physicalDevices.size() != 0, "failed to find GPUs with Vulkan support!");
@@ -41,7 +43,7 @@ void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::v
 	}
 }
 
-PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
+PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
 {
 	PhysicalDevice device;
 	device.physicalDevice = physicalDevice;
@@ -121,6 +123,21 @@ void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLa
 	createInfo.pNext = &m_featuresChain;
 
 	m_handle = VK_CHECK_RESULT(m_pDevice.createDevice(createInfo), "Coudn't create device");
+
+	// Queue setup
+	//for (auto& [type, index] : m_queueFamily.GetQueues())
+	//{
+	//	Queue queue;
+	//	
+	//	vk::QueueFlagBits vkType = TranslateToVulkan(type);
+	//	queue.SetType(vkType);
+	//	
+	//	vk::Queue vkQueue = m_handle.getQueue(index.value(), 0);
+	//	queue.SetHandle(vkQueue);
+	//	
+	//	m_queues.insert(std::make_pair(type, queue));
+	//
+	//}
 }
 
 void VulkanDevice::Destroy()

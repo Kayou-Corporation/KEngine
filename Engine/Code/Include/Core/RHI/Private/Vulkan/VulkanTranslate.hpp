@@ -131,3 +131,21 @@ inline vk::PhysicalDeviceType TranslateToVulkan(GpuType gpuType)
 
     return vk::PhysicalDeviceType::eOther;
 }
+
+// Queue type
+inline vk::QueueFlagBits TranslateToVulkan(QueueType type)
+{
+    switch (type)
+    {
+    case QueueType::Graphics:
+        return vk::QueueFlagBits::eGraphics;
+
+    case QueueType::Compute:
+        return vk::QueueFlagBits::eCompute;
+
+    case QueueType::Transfer:
+        return vk::QueueFlagBits::eTransfer;
+    }
+
+    return vk::QueueFlagBits::eGraphics;
+}

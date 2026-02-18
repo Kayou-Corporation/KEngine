@@ -38,19 +38,21 @@ public:
     VulkanDevice() = default;
     virtual ~VulkanDevice() override = default;
 
-    void PickPhysicalDevice(const vk::Instance& instance, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
+    void PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
     void CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers);
 
     void Destroy();
 
 private:
-    PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<Queue>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
+    PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
     void BuildFeaturesChain();
 
     vk::PhysicalDevice m_pDevice;
     PhysicalDeviceCompatibiliy m_compatibility{};
+
     QueueFamily m_queueFamily;
-     
+    std::unordered_map<QueueType, Queue> m_queues;
+
     std::vector<const char*> m_extensions;
     vk::PhysicalDeviceFeatures2 m_featuresChain;
     DeviceFeatures features;
