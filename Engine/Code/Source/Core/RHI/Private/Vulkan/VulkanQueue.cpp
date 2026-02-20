@@ -70,87 +70,97 @@ bool QueueFamily::IsComplete() const
     return true;
 }
 
+void Queue::Create(vk::Device& device)
+{
+    vk::SemaphoreTypeCreateInfo typeInfo(vk::SemaphoreType::eTimeline, 0);
+    vk::SemaphoreCreateInfo certInfo;
+    certInfo.pNext = &typeInfo;
+
+    trackingSemaphore = VK_CHECK_RESULT(device.createSemaphore(certInfo), "Coudn't create tracking semaphore");
+}
+
+void Queue::Destroy(vk::Device& device)
+{
+    device.destroySemaphore(trackingSemaphore);
+    
+    VK_CHECK_VOID(handle.waitIdle(), "Queue can't wait");
+
+    //for (const auto& cmdBuffer : commandBuffersPool)
+    //{
+    //    //cmdBuffer
+    //}
+}
+
 RefCountPtr<VulkanCommandList> Queue::GetOrCreateCommandBuffer(vk::Device& device)
 {
     RefCountPtr<VulkanCommandList> cmdList = CreateRefPtr<VulkanCommandList>();
 
-    vk::CommandBuffer cmbBuffer;
-    vk::Fence fence;
-
-    // Get a vk::CommandBuffer
-    if (idleCommandBuffers.empty())
+    if (!commandBuffersPool.empty())
     {
-        vk::CommandBufferAllocateInfo allocInfo;
-        allocInfo.commandPool = cmdPool;
-        allocInfo.level = vk::CommandBufferLevel::ePrimary;
-        allocInfo.commandBufferCount = 1;
-
-        auto cmdBufferVector = VK_CHECK_RESULT(device.allocateCommandBuffers(allocInfo), "Can't allocate command buffer");
-
-        cmbBuffer = cmdBufferVector[0];
+        cmdList->SetHandle(commandBuffersPool.front());
+        commandBuffersPool.pop_front();
     }
     else
     {
-        cmbBuffer = idleCommandBuffers.back();
-        idleCommandBuffers.pop_back();
+        TrackedCommandBufferPtr cmdBuffer = CreateRefPtr<TrackedCommandBuffer>();
+        
+        vk::CommandPoolCreateInfo poolInfo;
+        cmdBuffer->cmdPool = VK_CHECK_RESULT(device.createCommandPool(poolInfo), "Coudn't create command pool");
+        
+        vk::CommandBufferAllocateInfo bufferInfo;
+        bufferInfo.level = vk::CommandBufferLevel::ePrimary;
+        bufferInfo.commandPool = cmdBuffer->cmdPool;
+        bufferInfo.commandBufferCount = 1;
+        cmdBuffer->cmdBuffer = VK_CHECK_RESULT(device.allocateCommandBuffers(bufferInfo), "Coudn't allocate command buffer")[0];
+    
+        cmdList->SetHandle(cmdBuffer);
     }
-
-    // Get a vk::Fence 
-    if (idleFences.empty())
-    {
-        vk::FenceCreateInfo fenceInfo;
-        fence = VK_CHECK_RESULT(device.createFence(fenceInfo), "Can't create fence");
-    }
-    else
-    {
-        fence = idleFences.back();
-        idleFences.pop_back();
-        // Not sure, i want to reset in garbage not in acquire 
-        //VK_CHECK_VOID(device.resetFences(1, &fence), "Can't reset fence");
-    }
-
-    // Push items in inFlight to mark them as currently use
-    inFlightCommandBuffers.push_back(cmbBuffer);
-    inFlightFences.push_back(fence);
-
-    // Get an Index for tracking 
-    uint32_t activeIndex = static_cast<uint32_t>(inFlightCommandBuffers.size() - 1);
-
-    cmdList->SetHandle(cmbBuffer);
-    cmdList->SetIndex(activeIndex);
 
 	return cmdList;
 }
 
 void Queue::Submit(RefCountPtr<VulkanCommandList> cmdList)
 {
-    vk::CommandBuffer& cmdBuffer = cmdList->GetHandleRef();
-    uint32_t bufferIndex = cmdList->GetIndex();
+    lastSubmitdId++;
+
+    TrackedCommandBufferPtr cmd = cmdList->GetHandle();
+    cmd->submissionId = lastSubmitdId;
+
+    // Setup timeline semaphore for tracking
+    vk::TimelineSemaphoreSubmitInfo timelineInfo;
+    timelineInfo.setSignalSemaphoreValueCount(1);
+    timelineInfo.setPSignalSemaphoreValues(&cmd->submissionId);
 
     vk::SubmitInfo submitInfo;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &cmdBuffer;
+    submitInfo.setPNext(&timelineInfo);
+    submitInfo.setCommandBufferCount(1);
+    submitInfo.setPCommandBuffers(&cmd->cmdBuffer);
 
-    VK_CHECK_VOID(handle.submit(submitInfo, inFlightFences[bufferIndex]), "Can't submit command buffer");
+    submitInfo.setSignalSemaphoreCount(1);
+    submitInfo.setPSignalSemaphores(&trackingSemaphore);
+
+    VK_CHECK_VOID(handle.submit(submitInfo, nullptr), "Can't submit command buffer");
+
+    inFlightCommandBuffersPool.push_back(cmd);
 }
 
 void Queue::RunGarbageCollector(vk::Device& device)
 {
-    for (uint32_t i = 0; i < inFlightFences.size(); ++i)
-    {
-        vk::Fence& fence = inFlightFences[i];
-        vk::Result status = device.getFenceStatus(fence);
+    std::list<TrackedCommandBufferPtr> submissions = std::move(inFlightCommandBuffersPool);
 
-        // Fence is ready, we can recycle our fence and associated command buffer
-        if (status == vk::Result::eSuccess)
+    lastFinishedId = VK_CHECK_RESULT(device.getSemaphoreCounterValue(trackingSemaphore), "Coudn't get semaphore value");
+
+    for (const TrackedCommandBufferPtr& cmd : submissions)
+    {
+
+        if (cmd->submissionId <= lastFinishedId)
         {
-            VK_CHECK_VOID(device.resetFences(1, &fence), "Can't reset fence");
-            VK_CHECK_VOID(inFlightCommandBuffers[i].reset(), "Can't reset command buffer");
+            cmd->submissionId = 0;
+            commandBuffersPool.push_back(cmd);
         }
-        // Error other than the fence not being finish
-        else if (status != vk::Result::eNotReady)
+        else
         {
-            VK_CHECK_VOID(status, "Fence error while verifying status");
+            inFlightCommandBuffersPool.push_back(cmd);
         }
     }
 }

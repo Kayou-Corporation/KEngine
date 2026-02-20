@@ -4,6 +4,7 @@
 #include "Core/RHI/Public/RHI.hpp"
 
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
 
 class VulkanCommandList : public CommandList
 {
@@ -11,17 +12,16 @@ public:
 	VulkanCommandList() = default;
 	virtual ~VulkanCommandList() override = default;
 
-	void SetHandle(vk::CommandBuffer& cmdBuffer) { m_handle = cmdBuffer; }
-	void SetIndex(uint32_t index) { m_index = index; }
-	void SetOwnerQueueType(QueueType type) { m_OwnerQueueType = type; }
+	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }
+	//void SetIndex(uint32_t index) { m_index = index; }
+	//void SetOwnerQueueType(QueueType type) { m_OwnerQueueType = type; }
 
-	vk::CommandBuffer& GetHandleRef() { return m_handle; }
-	uint32_t GetIndex() { return m_index; }
+	TrackedCommandBufferPtr GetHandle() { return m_handle; }
+	//uint32_t GetIndex() { return m_index; }
 	QueueType GetOwnerQueueType() { return m_OwnerQueueType; }
 
 private:
-	vk::CommandBuffer m_handle;
-	uint32_t m_index;
+	TrackedCommandBufferPtr m_handle;
 	
 	QueueType m_OwnerQueueType;
 };

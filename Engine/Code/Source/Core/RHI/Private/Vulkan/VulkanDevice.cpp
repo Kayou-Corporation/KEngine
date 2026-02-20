@@ -5,6 +5,8 @@
 #include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
 #include <map>
+#include <set>
+#include <string>
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
 {
@@ -29,6 +31,7 @@ void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::v
 	ASSERT(candidates[0].score > 0, "failed to find a suitable GPU!");
 
 	m_pDevice = candidates[0].physicalDevice;
+	
 	m_queueFamily = candidates[0].family;
 
 	if (std::find(extensions.begin(), extensions.end(), VK_KHR_SWAPCHAIN_EXTENSION_NAME) != extensions.end() && searchPresentQueue)
@@ -43,37 +46,39 @@ void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::v
 	}
 }
 
-PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
+PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, const std::vector<const char*>& requiredExtensions)
 {
 	PhysicalDevice device;
 	device.physicalDevice = physicalDevice;
 	device.family = QueueFamily::FindQueueFamily(physicalDevice, queues, searchPresentQueue, surface);
 
-	if (device.family.IsComplete())
+	if (!device.family.IsComplete()) 
 	{
-		device.score += 250;
+		return device;
 	}
+	device.score += 250;
 
 	vk::PhysicalDeviceProperties properties = device.physicalDevice.getProperties();
-
-	if (properties.deviceType == gpuType)
+	if (properties.deviceType == gpuType) 
 	{
 		device.score += 500;
 	}
 
-	std::vector<vk::ExtensionProperties> availablesExtensions = VK_CHECK_RESULT(device.physicalDevice.enumerateDeviceExtensionProperties(), "Coudn't enumerate device extensions");
-	
-	for (uint32_t i = 0; i < availablesExtensions.size(); i++)
+	auto availableExtensions = VK_CHECK_RESULT(device.physicalDevice.enumerateDeviceExtensionProperties(), "Can't enumerate device extension properties");
+	std::set<std::string> required(requiredExtensions.begin(), requiredExtensions.end());
+
+	for (const auto& ext : availableExtensions) 
 	{
-		for (uint32_t j = 0; j < extensions.size(); ++j)
-		{
-			if (strcmp(availablesExtensions[i].extensionName, extensions[j]) == 0)
-			{
-				device.score += 50;
-				m_extensions.push_back(extensions[j]);
-			}
-		}
+		required.erase(ext.extensionName);
 	}
+
+	if (!required.empty()) 
+	{
+		device.score = 0;
+		return device;
+	}
+
+	device.score += static_cast<uint32_t>(requiredExtensions.size() * 50);
 
 	return device;
 }

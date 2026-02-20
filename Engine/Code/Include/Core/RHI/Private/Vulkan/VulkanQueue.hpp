@@ -28,11 +28,27 @@ private:
 
 class VulkanCommandList;
 
+class TrackedCommandBuffer : virtual public IResource
+{
+public:
+	TrackedCommandBuffer() = default;
+	virtual ~TrackedCommandBuffer() override = default;
+
+	vk::CommandPool cmdPool;
+	vk::CommandBuffer cmdBuffer;
+
+	uint64_t submissionId;
+};
+typedef RefCountPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
+
 struct Queue
 {
 public:
 	Queue() = default;
 	~Queue() = default;
+
+	void Create(vk::Device& device);
+	void Destroy(vk::Device& device);
 
 	RefCountPtr<VulkanCommandList> GetOrCreateCommandBuffer(vk::Device& device);
 	void Submit(RefCountPtr<VulkanCommandList> cmdList);
@@ -40,15 +56,28 @@ public:
 	void RunGarbageCollector(vk::Device& device);
 
 	vk::Queue handle;
-	vk::QueueFlagBits type;
+	uint32_t queueFamilyIndex;
 
-	vk::CommandPool cmdPool;
-	std::vector<vk::CommandBuffer> idleCommandBuffers;
-	std::vector<vk::Fence> idleFences;
+	vk::Semaphore trackingSemaphore;
+	//std::vector<vk::Semaphore> waitSemaprhores;
+	//std::vector<vk::Semaphore> signalSemaprhores;
 
-	std::vector<vk::CommandBuffer> inFlightCommandBuffers;
-	std::vector<vk::Fence> inFlightFences;
+	std::list<TrackedCommandBufferPtr> commandBuffersPool;
+	std::list<TrackedCommandBufferPtr> inFlightCommandBuffersPool;
 
-	int currentIndex = -1;
-	int queueIndex;
+	uint64_t lastSubmitdId = 0;
+	uint64_t lastFinishedId = 0;
+
+	//vk::QueueFlagBits type;
+	//
+	//vk::CommandPool cmdPool;
+	//
+	//std::vector<vk::CommandBuffer> idleCommandBuffers;
+	//std::vector<vk::Fence> idleFences;
+	//
+	//std::vector<vk::CommandBuffer> inFlightCommandBuffers;
+	//std::vector<vk::Fence> inFlightFences;
+	//
+	//int currentIndex = -1;
+	//int queueIndex;
 };
