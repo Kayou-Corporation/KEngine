@@ -16,6 +16,8 @@ QueueFamily QueueFamily::FindQueueFamily(const vk::PhysicalDevice& physicalDevic
         if (requested.find(QueueType::Graphics) != requested.end() && (properties[i].queueFlags & vk::QueueFlagBits::eGraphics))
         {
             family.m_queues[QueueType::Graphics] = i;
+
+            std::cout << properties[i].queueCount << '\n';
         }
 
         //// check for present
@@ -70,41 +72,54 @@ bool QueueFamily::IsComplete() const
     return true;
 }
 
-void Queue::Create(vk::Device& device)
+void Queue::Create(vk::Device& device, vk::Queue& queue, uint32_t index, vk::QueueFlagBits type)
 {
+    m_handle = queue;
+    m_queueFamilyIndex = index;
+    m_queueType = type;
+
     vk::SemaphoreTypeCreateInfo typeInfo(vk::SemaphoreType::eTimeline, 0);
     vk::SemaphoreCreateInfo certInfo;
     certInfo.pNext = &typeInfo;
 
-    trackingSemaphore = VK_CHECK_RESULT(device.createSemaphore(certInfo), "Coudn't create tracking semaphore");
+    m_trackingSemaphore = VK_CHECK_RESULT(device.createSemaphore(certInfo), "Coudn't create tracking semaphore");
 }
 
 void Queue::Destroy(vk::Device& device)
 {
-    device.destroySemaphore(trackingSemaphore);
+    device.destroySemaphore(m_trackingSemaphore);
     
-    VK_CHECK_VOID(handle.waitIdle(), "Queue can't wait");
+    VK_CHECK_VOID(m_handle.waitIdle(), "Queue can't wait");
 
-    //for (const auto& cmdBuffer : commandBuffersPool)
-    //{
-    //    //cmdBuffer
-    //}
+    for (const auto& cmdBuffer : m_commandBuffersPool)
+    {
+        device.freeCommandBuffers(cmdBuffer->cmdPool, cmdBuffer->cmdBuffer);
+        device.destroyCommandPool(cmdBuffer->cmdPool);
+    }
+
+    for (const auto& cmdBuffer : m_inFlightCommandBuffersPool)
+    {
+        device.freeCommandBuffers(cmdBuffer->cmdPool, cmdBuffer->cmdBuffer);
+        device.destroyCommandPool(cmdBuffer->cmdPool);
+    }
 }
 
-RefCountPtr<VulkanCommandList> Queue::GetOrCreateCommandBuffer(vk::Device& device)
+TrackedCommandBufferPtr Queue::GetOrCreateCommandBuffer(vk::Device& device)
 {
-    RefCountPtr<VulkanCommandList> cmdList = CreateRefPtr<VulkanCommandList>();
+    TrackedCommandBufferPtr cmdBuffer;
 
-    if (!commandBuffersPool.empty())
+    if (!m_commandBuffersPool.empty())
     {
-        cmdList->SetHandle(commandBuffersPool.front());
-        commandBuffersPool.pop_front();
+        cmdBuffer = m_commandBuffersPool.front();
+        m_commandBuffersPool.pop_front();
     }
     else
     {
-        TrackedCommandBufferPtr cmdBuffer = CreateRefPtr<TrackedCommandBuffer>();
+        cmdBuffer = CreateRefPtr<TrackedCommandBuffer>();
         
         vk::CommandPoolCreateInfo poolInfo;
+        poolInfo.queueFamilyIndex = m_queueFamilyIndex;
+        poolInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
         cmdBuffer->cmdPool = VK_CHECK_RESULT(device.createCommandPool(poolInfo), "Coudn't create command pool");
         
         vk::CommandBufferAllocateInfo bufferInfo;
@@ -112,55 +127,54 @@ RefCountPtr<VulkanCommandList> Queue::GetOrCreateCommandBuffer(vk::Device& devic
         bufferInfo.commandPool = cmdBuffer->cmdPool;
         bufferInfo.commandBufferCount = 1;
         cmdBuffer->cmdBuffer = VK_CHECK_RESULT(device.allocateCommandBuffers(bufferInfo), "Coudn't allocate command buffer")[0];
-    
-        cmdList->SetHandle(cmdBuffer);
     }
 
-	return cmdList;
+	return cmdBuffer;
 }
 
-void Queue::Submit(RefCountPtr<VulkanCommandList> cmdList)
+void Queue::Submit(TrackedCommandBufferPtr cmdBuffer)
 {
-    lastSubmitdId++;
+    m_lastSubmitdId++;
 
-    TrackedCommandBufferPtr cmd = cmdList->GetHandle();
-    cmd->submissionId = lastSubmitdId;
+    cmdBuffer->submissionId = m_lastSubmitdId;
 
     // Setup timeline semaphore for tracking
     vk::TimelineSemaphoreSubmitInfo timelineInfo;
     timelineInfo.setSignalSemaphoreValueCount(1);
-    timelineInfo.setPSignalSemaphoreValues(&cmd->submissionId);
+    timelineInfo.setPSignalSemaphoreValues(&cmdBuffer->submissionId);
 
     vk::SubmitInfo submitInfo;
     submitInfo.setPNext(&timelineInfo);
     submitInfo.setCommandBufferCount(1);
-    submitInfo.setPCommandBuffers(&cmd->cmdBuffer);
+    submitInfo.setPCommandBuffers(&cmdBuffer->cmdBuffer);
 
     submitInfo.setSignalSemaphoreCount(1);
-    submitInfo.setPSignalSemaphores(&trackingSemaphore);
+    submitInfo.setPSignalSemaphores(&m_trackingSemaphore);
 
-    VK_CHECK_VOID(handle.submit(submitInfo, nullptr), "Can't submit command buffer");
+    VK_CHECK_VOID(m_handle.submit(submitInfo, nullptr), "Can't submit command buffer");
 
-    inFlightCommandBuffersPool.push_back(cmd);
+    m_inFlightCommandBuffersPool.push_back(cmdBuffer);
 }
 
 void Queue::RunGarbageCollector(vk::Device& device)
 {
-    std::list<TrackedCommandBufferPtr> submissions = std::move(inFlightCommandBuffersPool);
+    std::list<TrackedCommandBufferPtr> submissions = std::move(m_inFlightCommandBuffersPool);
 
-    lastFinishedId = VK_CHECK_RESULT(device.getSemaphoreCounterValue(trackingSemaphore), "Coudn't get semaphore value");
+    m_lastFinishedId = VK_CHECK_RESULT(device.getSemaphoreCounterValue(m_trackingSemaphore), "Coudn't get semaphore value");
 
     for (const TrackedCommandBufferPtr& cmd : submissions)
     {
 
-        if (cmd->submissionId <= lastFinishedId)
+        if (cmd->submissionId <= m_lastFinishedId)
         {
             cmd->submissionId = 0;
-            commandBuffersPool.push_back(cmd);
+            VK_CHECK_VOID(cmd->cmdBuffer.reset(), "Can't reset command buffer");
+
+            m_commandBuffersPool.push_back(cmd);
         }
         else
         {
-            inFlightCommandBuffersPool.push_back(cmd);
+            m_inFlightCommandBuffersPool.push_back(cmd);
         }
     }
 }

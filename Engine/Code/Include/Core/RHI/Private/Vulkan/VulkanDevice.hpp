@@ -30,6 +30,13 @@ struct DeviceFeatures
     vk::PhysicalDeviceShaderObjectFeaturesEXT shaderObjectFeatures;
     vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT extendedDynamicStateFeatures;
     vk::PhysicalDeviceExtendedDynamicState2FeaturesEXT extendedDynamicState2Features;
+    vk::PhysicalDeviceTimelineSemaphoreFeatures timelineSemaphore;
+};
+
+// Native extensions required for our API implementation
+static std::vector<const char*> nativeExtensions =
+{
+    VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME
 };
 
 class VulkanDevice : public Device
@@ -38,10 +45,14 @@ public:
     VulkanDevice() = default;
     virtual ~VulkanDevice() override = default;
 
+    // Create
     void PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
     void CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers);
 
+    // Destroy
     void Destroy();
+
+
 
 private:
     PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, const std::vector<const char*>& requiredExtensions);
@@ -52,6 +63,9 @@ private:
 
     QueueFamily m_queueFamily;
     std::unordered_map<QueueType, Queue> m_queues;
+
+    bool m_bSearchPresent = false;
+    vk::Queue m_presentQueue;
 
     std::vector<const char*> m_extensions;
     vk::PhysicalDeviceFeatures2 m_featuresChain;

@@ -10,6 +10,8 @@
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
 {
+	m_bSearchPresent = searchPresentQueue;
+
 	std::vector<vk::PhysicalDevice> physicalDevices = VK_CHECK_RESULT(instance.enumeratePhysicalDevices(), "Coudn't enumerate physicalDevice");
 	ASSERT(physicalDevices.size() != 0, "failed to find GPUs with Vulkan support!");
 
@@ -130,23 +132,30 @@ void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLa
 	m_handle = VK_CHECK_RESULT(m_pDevice.createDevice(createInfo), "Coudn't create device");
 
 	// Queue setup
-	//for (auto& [type, index] : m_queueFamily.GetQueues())
-	//{
-	//	Queue queue;
-	//	
-	//	vk::QueueFlagBits vkType = TranslateToVulkan(type);
-	//	queue.SetType(vkType);
-	//	
-	//	vk::Queue vkQueue = m_handle.getQueue(index.value(), 0);
-	//	queue.SetHandle(vkQueue);
-	//	
-	//	m_queues.insert(std::make_pair(type, queue));
-	//
-	//}
+	for (auto& [type, index] : m_queueFamily.GetQueues())
+	{
+		Queue queue;
+		
+		vk::QueueFlagBits vkType = TranslateToVulkan(type);
+		vk::Queue vkQueue = m_handle.getQueue(index.value(), 0);
+
+		queue.Create(m_handle, vkQueue, index.value(), vkType);
+
+		m_queues.insert(std::make_pair(type, queue));
+	}
+
+	if (m_bSearchPresent)
+	{
+		uint32_t presentQueueIndex =  m_queueFamily.GetPresentQueueIndex();
+
+		m_presentQueue = m_handle.getQueue(presentQueueIndex, 0);
+	}
 }
 
 void VulkanDevice::Destroy()
 {
+
+
 	m_handle.destroy();
 }
 
@@ -154,6 +163,19 @@ void VulkanDevice::BuildFeaturesChain()
 {
 	m_featuresChain = vk::PhysicalDeviceFeatures2{};
 	void* currentPNext = nullptr;
+
+	for (const char* extName : nativeExtensions)
+	{
+		std::string name(extName);
+
+		if (name == VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)
+		{
+			features.timelineSemaphore.timelineSemaphore = VK_TRUE;
+
+			features.timelineSemaphore.pNext = currentPNext;
+			currentPNext = &features.timelineSemaphore;
+		}
+	}
 
 	for (const char* extName : m_extensions)
 	{

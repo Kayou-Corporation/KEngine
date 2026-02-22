@@ -17,6 +17,7 @@ public:
 	bool IsComplete() const;
 
 	const std::unordered_map<QueueType, std::optional<uint32_t>>& GetQueues() const { return m_queues; }
+	uint32_t GetPresentQueueIndex() { return m_presentQueue.value_or(0); }
 
 private:
 	std::vector<QueueType> m_requestedQueues;
@@ -47,37 +48,27 @@ public:
 	Queue() = default;
 	~Queue() = default;
 
-	void Create(vk::Device& device);
+	void Create(vk::Device& device, vk::Queue& queue, uint32_t index, vk::QueueFlagBits type);
 	void Destroy(vk::Device& device);
 
-	RefCountPtr<VulkanCommandList> GetOrCreateCommandBuffer(vk::Device& device);
-	void Submit(RefCountPtr<VulkanCommandList> cmdList);
+	TrackedCommandBufferPtr GetOrCreateCommandBuffer(vk::Device& device);
+	void Submit(TrackedCommandBufferPtr cmdBuffer);
 
 	void RunGarbageCollector(vk::Device& device);
 
-	vk::Queue handle;
-	uint32_t queueFamilyIndex;
+private:
+	vk::Queue m_handle;
+	vk::QueueFlagBits m_queueType;
+	uint32_t m_queueFamilyIndex;
+	
 
-	vk::Semaphore trackingSemaphore;
+	vk::Semaphore m_trackingSemaphore;
 	//std::vector<vk::Semaphore> waitSemaprhores;
 	//std::vector<vk::Semaphore> signalSemaprhores;
 
-	std::list<TrackedCommandBufferPtr> commandBuffersPool;
-	std::list<TrackedCommandBufferPtr> inFlightCommandBuffersPool;
+	std::list<TrackedCommandBufferPtr> m_commandBuffersPool;
+	std::list<TrackedCommandBufferPtr> m_inFlightCommandBuffersPool;
 
-	uint64_t lastSubmitdId = 0;
-	uint64_t lastFinishedId = 0;
-
-	//vk::QueueFlagBits type;
-	//
-	//vk::CommandPool cmdPool;
-	//
-	//std::vector<vk::CommandBuffer> idleCommandBuffers;
-	//std::vector<vk::Fence> idleFences;
-	//
-	//std::vector<vk::CommandBuffer> inFlightCommandBuffers;
-	//std::vector<vk::Fence> inFlightFences;
-	//
-	//int currentIndex = -1;
-	//int queueIndex;
+	uint64_t m_lastSubmitdId = 0;
+	uint64_t m_lastFinishedId = 0;
 };
