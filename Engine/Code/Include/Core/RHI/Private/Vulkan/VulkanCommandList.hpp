@@ -12,16 +12,16 @@ public:
 	VulkanCommandList() = default;
 	virtual ~VulkanCommandList() override = default;
 
-	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }
-	//void SetIndex(uint32_t index) { m_index = index; }
-	//void SetOwnerQueueType(QueueType type) { m_OwnerQueueType = type; }
+	void Open() override;
+	void Close() override;
 
+public:
+	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }
 	TrackedCommandBufferPtr GetHandle() { return m_handle; }
-	//uint32_t GetIndex() { return m_index; }
-	QueueType GetOwnerQueueType() { return m_OwnerQueueType; }
+	//QueueType GetOwnerQueueType() { return m_OwnerQueueType; }
 
 private:
 	TrackedCommandBufferPtr m_handle;
 	
-	QueueType m_OwnerQueueType;
+	//QueueType m_OwnerQueueType;
 };

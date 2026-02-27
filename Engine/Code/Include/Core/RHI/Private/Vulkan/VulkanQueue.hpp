@@ -48,8 +48,11 @@ public:
 	Queue() = default;
 	~Queue() = default;
 
+
 	void Create(vk::Device& device, vk::Queue& queue, uint32_t index, vk::QueueFlagBits type);
 	void Destroy(vk::Device& device);
+
+	void WaitIdle();
 
 	TrackedCommandBufferPtr GetOrCreateCommandBuffer(vk::Device& device);
 	void Submit(TrackedCommandBufferPtr cmdBuffer);

@@ -4,9 +4,55 @@
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanSwapchain.hpp"
+
 #include <map>
 #include <set>
 #include <string>
+
+void VulkanDevice::WaitIdle()
+{
+	VK_CHECK_VOID(m_handle.waitIdle(), "Device can't wait idle");
+}
+
+void VulkanDevice::QueueWaitIdle(QueueType type)
+{
+	m_queues[type].WaitIdle();
+}
+
+RefCountPtr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainSpecs& specs)
+{
+	RefCountPtr<VulkanSwapchain> swapchain = CreateRefPtr<VulkanSwapchain>();
+
+	std::unordered_map<int, int> map;
+
+	vk::SurfaceKHR& surface = specs.surface.CastAs<VulkanSurface>()->GetHandleRef();
+
+	uint32_t graphicsQueueIndex = m_queueFamily.GetQueues().at(QueueType::Graphics).value();
+	uint32_t presentQueueIndex = m_queueFamily.GetPresentQueueIndex();
+
+	vk::Format requestedFormat = TranslateToVulkan(specs.imageFormat);
+	vk::Format requestedDepthFormat = TranslateToVulkan(specs.depthImageFormat);
+
+	vk::PresentModeKHR requestedpresentMode = TranslateToVulkan(specs.presentMode);
+
+	vk::Extent2D requestedExtent = TranslateToVulkan(specs.extent);
+
+	vk::SwapchainCreateInfoKHR createInfo = swapchain->GetCreateInfo(m_compatibility, surface, graphicsQueueIndex, presentQueueIndex, specs.imageCount, requestedFormat, specs.isDepthEnable, requestedDepthFormat, requestedpresentMode, requestedExtent);
+
+	vk::SwapchainKHR vkSwapchain = VK_CHECK_RESULT(m_handle.createSwapchainKHR(createInfo), "Can't create swapchain");
+
+	swapchain->SetHandle(vkSwapchain);
+
+	return swapchain;
+}
+
+void VulkanDevice::DestroySwapchain(RefCountPtr<Swapchain> swapchain)
+{
+	auto vkSwapchain = swapchain.CastAs<VulkanSwapchain>();
+	
+	m_handle.destroySwapchainKHR(vkSwapchain->GetHandle());
+}
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
 {
@@ -85,8 +131,10 @@ PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physic
 	return device;
 }
 
-void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers)
+void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers, std::vector<const char*>& extensions)
 {
+	m_extensions = extensions;
+
 	std::unordered_set<uint32_t> uniqueFamilies;
 	for (const auto& [queueType, familyIndexOpt] : m_queueFamily.GetQueues())
 	{
@@ -154,7 +202,12 @@ void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLa
 
 void VulkanDevice::Destroy()
 {
+	WaitIdle();
 
+	for (auto& [type, queue] : m_queues)
+	{
+		queue.Destroy(m_handle);
+	}
 
 	m_handle.destroy();
 }

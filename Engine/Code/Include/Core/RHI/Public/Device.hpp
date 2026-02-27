@@ -28,6 +28,10 @@ class Device : public virtual IResource
 public:
 	virtual ~Device() = default;
 
-	//virtual RefCountPtr<Swapchain>  CreateSwapchain(const SwapchainSpecs& specs) = 0
-	//virtual void DestroySwapchain(RefCountPtr<Swapchain> swapchain) = 0
+	KENGINE_API virtual void WaitIdle() = 0;
+	KENGINE_API virtual void QueueWaitIdle(QueueType type) = 0;
+
+
+	KENGINE_API virtual RefCountPtr<Swapchain>  CreateSwapchain(const SwapchainSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySwapchain(RefCountPtr<Swapchain> swapchain) = 0;
 };

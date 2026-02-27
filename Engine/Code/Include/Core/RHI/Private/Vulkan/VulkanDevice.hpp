@@ -36,18 +36,31 @@ struct DeviceFeatures
 // Native extensions required for our API implementation
 static std::vector<const char*> nativeExtensions =
 {
-    VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME
+    VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
 class VulkanDevice : public Device
 {
+// Public
 public:
     VulkanDevice() = default;
     virtual ~VulkanDevice() override = default;
 
+    // Commands / sync
+    void WaitIdle() override;
+    void QueueWaitIdle(QueueType type) override;
+
+    // Create objects
+    RefCountPtr<Swapchain>  CreateSwapchain(const SwapchainSpecs& specs) override;
+    void DestroySwapchain(RefCountPtr<Swapchain> swapchain) override;
+
+
+// Public vulkan
+public:
     // Create
     void PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
-    void CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers);
+    void CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers, std::vector<const char*>& extensions);
 
     // Destroy
     void Destroy();

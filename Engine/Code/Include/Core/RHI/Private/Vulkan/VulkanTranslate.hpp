@@ -114,6 +114,8 @@ inline std::vector<const char*> TranslateToVulkan(const std::vector<Extensions>&
 
 // ---------- Features ---------------
 
+
+
 // ---------- GPU Type ----------------
 inline vk::PhysicalDeviceType TranslateToVulkan(GpuType gpuType)
 {
@@ -148,4 +150,143 @@ inline vk::QueueFlagBits TranslateToVulkan(QueueType type)
     }
 
     return vk::QueueFlagBits::eGraphics;
+}
+
+// Format
+inline vk::Format TranslateToVulkan(Format format)
+{
+    switch (format)
+    {
+    case Format::BGRA8_SRGB:
+        return vk::Format::eB8G8R8A8Srgb;
+
+    case Format::RGBA8_SRGB:
+        return vk::Format::eR8G8B8A8Srgb;
+
+    case Format::RGB8_SRGB:
+        return vk::Format::eR8G8B8Srgb;
+
+    case Format::RGBA8_UNORM:
+        return vk::Format::eR8G8B8A8Unorm;
+
+    case Format::RGB8_UNORM:
+        return vk::Format::eR8G8B8Unorm;
+
+    case Format::D32_SFLOAT:
+        return vk::Format::eD32Sfloat;
+
+    case Format::D32_SFLOAT_S8_UINT:
+        return vk::Format::eD32SfloatS8Uint;
+
+    case Format::D24_UNORM_S8_UINT:
+        return vk::Format::eD24UnormS8Uint;
+
+    case Format::Undefined:
+    default:
+        return vk::Format::eUndefined;
+    }
+}
+
+// ImageLayout
+inline vk::ImageLayout TranslateToVulkan(Layout layout)
+{
+    switch (layout)
+    {
+    case Layout::Present:
+        return vk::ImageLayout::ePresentSrcKHR;
+
+    case Layout::ColorAttachment:
+        return vk::ImageLayout::eColorAttachmentOptimal;
+
+    case Layout::DepthStencilAttachment:
+        return vk::ImageLayout::eDepthStencilAttachmentOptimal;
+
+    case Layout::ShaderReadOnly:
+        return vk::ImageLayout::eShaderReadOnlyOptimal;
+
+    case Layout::DepthStencilReadOnly:
+        return vk::ImageLayout::eDepthStencilReadOnlyOptimal;
+
+    case Layout::TransferSrc:
+        return vk::ImageLayout::eTransferSrcOptimal;
+
+    case Layout::TransferDst:
+        return vk::ImageLayout::eTransferDstOptimal;
+
+    case Layout::Undefined:
+    default:
+        return vk::ImageLayout::eUndefined;
+    }
+}
+
+// SampleCount
+inline vk::SampleCountFlagBits TranslateToVulkan(SampleCount samples)
+{
+    switch (samples)
+    {
+    case SampleCount::Count1:
+        return vk::SampleCountFlagBits::e1;
+
+    case SampleCount::Count2:
+        return vk::SampleCountFlagBits::e2;
+
+    case SampleCount::Count4:
+        return vk::SampleCountFlagBits::e4;
+
+    case SampleCount::Count8:
+        return vk::SampleCountFlagBits::e8;
+
+    case SampleCount::Count16:
+        return vk::SampleCountFlagBits::e16;
+
+    case SampleCount::Count32:
+        return vk::SampleCountFlagBits::e32;
+
+    case SampleCount::Count64:
+        return vk::SampleCountFlagBits::e64;
+
+    default:
+        return vk::SampleCountFlagBits::e1;
+    }
+}
+
+inline vk::PresentModeKHR TranslateToVulkan(PresentMode mode)
+{
+    switch (mode)
+    {
+    case PresentMode::Immediate:
+        return vk::PresentModeKHR::eImmediate;
+
+    case PresentMode::Mailbox:
+        return vk::PresentModeKHR::eMailbox;
+
+    case PresentMode::Fifo:
+        return vk::PresentModeKHR::eFifo;
+
+    case PresentMode::FifoRelaxed:
+        return vk::PresentModeKHR::eFifoRelaxed;
+
+    case PresentMode::Undefined:
+    default:
+        return vk::PresentModeKHR::eFifo;
+    }
+}
+
+inline vk::Extent2D TranslateToVulkan(const Extent2D& extent)
+{
+    return vk::Extent2D
+    {
+        extent.x,
+        extent.y
+    };
+}
+
+inline vk::Extent3D TranslateToVulkan(const Extent3D& extent)
+{
+    return vk::Extent3D
+    {
+        extent.x,
+        extent.y,
+        extent.z
+    };
 }

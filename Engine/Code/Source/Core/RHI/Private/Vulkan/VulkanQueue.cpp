@@ -104,6 +104,11 @@ void Queue::Destroy(vk::Device& device)
     }
 }
 
+void Queue::WaitIdle()
+{
+    VK_CHECK_VOID(m_handle.waitIdle(), "Queue can't wait");
+}
+
 TrackedCommandBufferPtr Queue::GetOrCreateCommandBuffer(vk::Device& device)
 {
     TrackedCommandBufferPtr cmdBuffer;

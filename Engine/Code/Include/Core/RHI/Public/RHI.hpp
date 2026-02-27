@@ -64,3 +64,102 @@ enum class QueueType
 	Transfer,
 	Compute
 };
+
+// IMAGE / PRESENTATION RELATED
+enum class Format
+{
+	BGRA8_SRGB, // Basic swapchain format
+	
+	RGBA8_SRGB,  //  
+	RGB8_SRGB,   // Some basic color formats
+	RGBA8_UNORM, // 
+	RGB8_UNORM,  //     
+	 
+	D32_SFLOAT,         //
+	D32_SFLOAT_S8_UINT, // Some basic depth formats
+	D24_UNORM_S8_UINT,  // 
+
+	Undefined
+};
+
+enum class Layout
+{
+	Present, // basic presentation for swapchain
+
+	ColorAttachment,        // basic color image layout (RenderTarget)
+	DepthStencilAttachment, // basic depth image layout (RenderTarget)
+
+	ShaderReadOnly,        // basic depth image layout (Textures)
+	DepthStencilReadOnly,  // basic depth image layout (Textures)
+
+	TransferSrc, // Transfer layout (Source for copy)
+	TransferDst, // Transfer layout (Destination for copy)
+
+	Undefined
+};
+
+enum class SampleCount // Sample count
+{
+	Count1,
+	Count2,
+	Count4,
+	Count8,
+	Count16,
+	Count32,
+	Count64
+};
+
+enum class ImageUsage
+{
+	Image2D,
+	Image3D,
+	ImageCube,
+
+	Storage,
+
+	Undefined
+};
+
+struct Extent2D
+{
+public:
+	Extent2D() = default;
+	Extent2D(uint32_t _x, uint32_t _y)
+	{
+		x = _x;
+		y = _y;
+	}
+
+	~Extent2D() = default;
+
+	uint32_t x = 0;
+	uint32_t y = 0;
+};
+
+struct Extent3D
+{
+public:
+	Extent3D() = default;
+	Extent3D(uint32_t _x, uint32_t _y, uint32_t _z)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+	}
+
+	~Extent3D() = default;
+
+	uint32_t x = 0;
+	uint32_t y = 0;
+	uint32_t z = 0;
+};
+
+enum class PresentMode
+{
+	Immediate,     // No vsync, may tear
+	Mailbox,       // Low latency, triple buffering style
+	Fifo,          // VSync (always supported)
+	FifoRelaxed,   // VSync but late frames don't wait
+
+	Undefined
+};

@@ -4,6 +4,7 @@
 #include "Core/RHI/Private/Vulkan/VulkanInstance.hpp"
 #include "Core/RHI/Public/Surface.hpp"
 #include "Core/RHI/Public/Device.hpp"
+#include "Core/RHI/Public/Swapchain.hpp"
 
 int main()
 {
@@ -39,15 +40,32 @@ int main()
     dSpecs.surface = surface;
 
     RefCountPtr<Device> device = instance->CreateDevice(dSpecs);
+
+    SwapchainSpecs sSpecs;
+    sSpecs.surface = surface;
+    sSpecs.extent = Extent2D(window->GetHeight(), window->GetWidth());
+    sSpecs.imageCount = 2;
+    sSpecs.presentMode = PresentMode::Mailbox;
+    sSpecs.imageFormat = Format::BGRA8_SRGB;
+    sSpecs.isDepthEnable = true;
+    sSpecs.depthImageFormat = Format::D32_SFLOAT;
+
+    RefCountPtr<Swapchain> swapchain = device->CreateSwapchain(sSpecs);
+
     
     while (!window->ShouldClose())
     {
         window->PollEvents();
     }
     
+    device->DestroySwapchain(swapchain);
+
     instance->DestroyDevice(device);
+
     instance->DestroySurface(surface);
+
     instance->Destroy();
+
     window->Destroy();
 
     return 0;
