@@ -60,7 +60,7 @@ public:
 public:
     // Create
     void PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
-    void CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers, std::vector<const char*>& extensions);
+    void CreateLogicalDevice(std::vector<const char*>& extensions);
 
     // Destroy
     void Destroy();

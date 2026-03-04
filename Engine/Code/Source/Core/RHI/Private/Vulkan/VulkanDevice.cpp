@@ -131,7 +131,7 @@ PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physic
 	return device;
 }
 
-void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLayers, std::vector<const char*>& extensions)
+void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& extensions)
 {
 	m_extensions = extensions;
 
@@ -160,14 +160,6 @@ void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& instanceDebugLa
 	// Queues informations
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 	createInfo.pQueueCreateInfos = queueCreateInfos.data();
-	
-	// Debug layers informations
-	#ifdef KENGINE_DEBUG
-	createInfo.enabledLayerCount = static_cast<uint32_t>(instanceDebugLayers.size());
-	createInfo.ppEnabledLayerNames = instanceDebugLayers.data();
-	#else
-		createInfo.enabledLayerCount = 0;
-	#endif
 	
 	// debug layers informations
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(m_extensions.size());

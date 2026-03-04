@@ -172,7 +172,7 @@ RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 
 	device->PickPhysicalDevice(m_handle, specs.queues, specs.searchPresentQueue, surface, type, extensions);
 
-	device->CreateLogicalDevice(m_debugLayers, extensions);
+	device->CreateLogicalDevice(extensions);
 
 	return device;
 }
