@@ -290,3 +290,96 @@ inline vk::Extent3D TranslateToVulkan(const Extent3D& extent)
         extent.z
     };
 }
+
+// Buffer usage
+inline vk::BufferUsageFlags TranslateToVulkan(BufferUsage usage)
+{
+    switch (usage)
+    {
+    case BufferUsage::Vertex:
+        return vk::BufferUsageFlagBits::eVertexBuffer;
+
+    case BufferUsage::Index:
+        return vk::BufferUsageFlagBits::eIndexBuffer;
+
+    case BufferUsage::Storage:
+        return vk::BufferUsageFlagBits::eStorageBuffer;
+
+    case BufferUsage::Uniform:
+        return vk::BufferUsageFlagBits::eUniformBuffer;
+
+    case BufferUsage::TransferSrc:
+        return vk::BufferUsageFlagBits::eTransferSrc;
+
+    case BufferUsage::TransferDst:
+        return vk::BufferUsageFlagBits::eTransferDst;
+
+    default:
+        return {};
+    }
+}
+
+inline vk::BufferUsageFlags TranslateToVulkan(
+    const std::vector<BufferUsage>& usages)
+{
+    vk::BufferUsageFlags flags{};
+
+    for (auto usage : usages)
+    {
+        switch (usage)
+        {
+        case BufferUsage::Vertex:
+            flags |= vk::BufferUsageFlagBits::eVertexBuffer;
+            break;
+
+        case BufferUsage::Index:
+            flags |= vk::BufferUsageFlagBits::eIndexBuffer;
+            break;
+
+        case BufferUsage::Storage:
+            flags |= vk::BufferUsageFlagBits::eStorageBuffer;
+            break;
+
+        case BufferUsage::Uniform:
+            flags |= vk::BufferUsageFlagBits::eUniformBuffer;
+            break;
+
+        case BufferUsage::TransferSrc:
+            flags |= vk::BufferUsageFlagBits::eTransferSrc;
+            break;
+
+        case BufferUsage::TransferDst:
+            flags |= vk::BufferUsageFlagBits::eTransferDst;
+            break;
+        }
+    }
+
+    return flags;
+}
+
+// Memory access
+inline vk::MemoryPropertyFlags TranslateToVulkan(MemoryAccess access)
+{
+    switch (access)
+    {
+    case MemoryAccess::CPU_Read:
+        return vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent;
+
+    case MemoryAccess::CPU_Write:
+        return vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent;
+
+    case MemoryAccess::GPU_Read:
+        return vk::MemoryPropertyFlagBits::eDeviceLocal;
+
+    case MemoryAccess::GPU_Write:
+        return vk::MemoryPropertyFlagBits::eDeviceLocal;
+
+    case MemoryAccess::GPU_ReadWrite:
+        return vk::MemoryPropertyFlagBits::eDeviceLocal;
+
+    default:
+        return {};
+    }
+}

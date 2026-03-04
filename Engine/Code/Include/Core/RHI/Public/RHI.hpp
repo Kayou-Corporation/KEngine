@@ -163,3 +163,28 @@ enum class PresentMode
 
 	Undefined
 };
+
+// BUFFER
+enum class BufferUsage
+{
+	Vertex,
+	Index,
+
+	Storage,
+
+	Uniform,
+
+	TransferSrc,
+	TransferDst
+};
+
+enum class MemoryAccess
+{
+	CPU_Read,
+	CPU_Write,
+
+	GPU_Read,
+	GPU_Write,
+	GPU_ReadWrite
+};
+
