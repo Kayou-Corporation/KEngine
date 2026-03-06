@@ -17,7 +17,4 @@ RefCountPtr<Window> WindowInterface::InitWindow(WindowAPI api)
 		return nullptr;
 		break;
 	}
-
-	spdlog::critical("Can't create window");
-	return nullptr;
 }

@@ -31,9 +31,9 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 
 	vk::InstanceCreateInfo createInfo{};
 	createInfo.setPApplicationInfo(&appInfo);
-	createInfo.setEnabledLayerCount(m_debugLayers.size());
+	createInfo.setEnabledLayerCount(static_cast<uint32_t>(m_debugLayers.size()));
 	createInfo.setPEnabledLayerNames(m_debugLayers);
-	createInfo.setEnabledExtensionCount(vkExtensions.size());
+	createInfo.setEnabledExtensionCount(static_cast<uint32_t>(vkExtensions.size()));
 	createInfo.setPEnabledExtensionNames(vkExtensions);
 
 	vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo{};

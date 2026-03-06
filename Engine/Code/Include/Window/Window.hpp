@@ -39,8 +39,8 @@ public:
 	RefCountPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
 
 protected:
-	uint32_t m_width;
-	uint32_t m_height;
+	uint32_t m_width = 0u;
+	uint32_t m_height = 0u;
 
 	std::string m_windowName;
 

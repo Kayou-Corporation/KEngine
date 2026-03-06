@@ -19,7 +19,7 @@ public:
 	SDL_Window* GetSDLWindow() const { return m_window; }
 
 private:
-	SDL_Window* m_window;
+	SDL_Window* m_window = nullptr;
 	bool m_isRunning = false;
 };
 

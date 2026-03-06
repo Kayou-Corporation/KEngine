@@ -108,11 +108,11 @@ vk::PresentModeKHR VulkanSwapchain::FindSuitablePresentMode(const std::vector<vk
 {
 	ASSERT(!availablePresentMode.empty(), "No available formats !");
 	
-	for (const auto& availablePresentMode : availablePresentMode)
+	for (const auto& presentMode : availablePresentMode)
 	{
-		if (availablePresentMode == requestedPresentMode)
+		if (presentMode == requestedPresentMode)
 		{
-			return availablePresentMode;
+			return presentMode;
 		}
 	}
 	spdlog::warn("Requested present mode unavailable, use default present mode instead");
