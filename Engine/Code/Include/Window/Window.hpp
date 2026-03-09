@@ -9,6 +9,8 @@
 #include "Core/RHI/Public/RHI.hpp"
 #include "Window/WindowRenderer.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 // -------- Base window ----------
 
 struct WindowSpecs
@@ -57,3 +59,5 @@ struct WindowInterface
 {
 	static RefCountPtr<Window> InitWindow(WindowAPI api);
 };
+
+END_NAMESPACE_CORE

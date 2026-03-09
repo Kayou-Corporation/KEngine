@@ -1,5 +1,7 @@
 #pragma once
+#include "Core/Utils/Core.hpp"
 
+BEGIN_NAMESPACE_CORE
 
 enum RendererAPI
 {
@@ -188,3 +190,4 @@ enum class MemoryAccess
 	GPU_ReadWrite
 };
 
+END_NAMESPACE_CORE

@@ -10,6 +10,8 @@
 #include "Core/RHI/Public/RHI.hpp"
 #include "Core/Utils/Memory.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 struct QueueFamily
 {
 public:
@@ -75,3 +77,5 @@ private:
 	uint64_t m_lastSubmitdId = 0;
 	uint64_t m_lastFinishedId = 0;
 };
+
+END_NAMESPACE_CORE

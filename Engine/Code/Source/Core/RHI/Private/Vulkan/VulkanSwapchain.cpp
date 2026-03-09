@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
+BEGIN_NAMESPACE_CORE
 
 vk::SwapchainCreateInfoKHR VulkanSwapchain::GetCreateInfo(const PhysicalDeviceCompatibiliy& compatibility, vk::SurfaceKHR surface, uint32_t graphicsQueueIndex, uint32_t presentQueueQueueIndex, uint32_t requestedImageCount, vk::Format requestedFormat, bool bIsDepthEnable, vk::Format requestedDepthFormat, vk::PresentModeKHR requestedPresentMode, vk::Extent2D requestedExtent)
 {
@@ -120,3 +121,5 @@ vk::PresentModeKHR VulkanSwapchain::FindSuitablePresentMode(const std::vector<vk
 }
 
 #pragma endregion
+
+END_NAMESPACE_CORE

@@ -5,6 +5,8 @@
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 struct PhysicalDevice 
 {
     vk::PhysicalDevice physicalDevice;
@@ -114,3 +116,4 @@ struct NativeExtensions
     const char* DynamicState3 = "VK_EXT_extended_dynamic_state3";
 };
 
+END_NAMESPACE_CORE

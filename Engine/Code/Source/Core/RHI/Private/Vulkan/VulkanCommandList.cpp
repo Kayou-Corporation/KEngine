@@ -1,5 +1,7 @@
 #include "Core/RHI/Private/Vulkan/VulkanCommandList.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 void VulkanCommandList::Open()
 {
 	vk::CommandBufferBeginInfo beginInfo{};
@@ -12,3 +14,5 @@ void VulkanCommandList::Close()
 {
 	VK_CHECK_VOID(m_handle->cmdBuffer.end(),"Can't end command buffer");
 }
+
+END_NAMESPACE_CORE

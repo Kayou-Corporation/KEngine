@@ -5,6 +5,8 @@
 
 #include "Core/RHI/Public/RHI.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 struct BufferSpecs
 {
 	BufferUsage usage;
@@ -18,3 +20,5 @@ public:
 
 	
 };
+
+END_NAMESPACE_CORE

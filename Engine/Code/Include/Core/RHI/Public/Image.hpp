@@ -3,6 +3,8 @@
 #include "Core/Utils/Export.hpp"
 #include "Core/Utils/Memory.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 struct ImageSpecs
 {
 
@@ -15,3 +17,5 @@ public:
 
 
 };
+
+END_NAMESPACE_CORE

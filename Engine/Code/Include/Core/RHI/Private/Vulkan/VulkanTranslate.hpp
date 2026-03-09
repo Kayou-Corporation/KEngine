@@ -4,6 +4,7 @@
 
 #include "Core/RHI/Public/RHI.hpp"
 
+BEGIN_NAMESPACE_CORE
 
 // ---------- DEBUG LAYERS ---------------
 inline const char* TranslateToVulkan(DebugLayers layer)
@@ -383,3 +384,5 @@ inline vk::MemoryPropertyFlags TranslateToVulkan(MemoryAccess access)
         return {};
     }
 }
+
+END_NAMESPACE_CORE

@@ -2,6 +2,8 @@
 
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 struct PhysicalDeviceCompatibiliy;
 
 class VulkanSwapchain : public Swapchain
@@ -33,3 +35,5 @@ private:
 	bool m_bIsDepthEnable;
 	vk::Format m_depthImageFormat;
 };
+
+END_NAMESPACE_CORE

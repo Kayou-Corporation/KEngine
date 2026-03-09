@@ -9,6 +9,8 @@
 #include "Core/RHI/Private/Vulkan/VulkanSurface.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanDevice.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 void VulkanInstance::Create(const InstanceSpecs& specs)
 {
 	vk::ApplicationInfo appInfo{};
@@ -181,3 +183,5 @@ void VulkanInstance::DestroyDevice(RefCountPtr<Device> device)
 {
 	device.CastAs<VulkanDevice>()->Destroy();
 }
+
+END_NAMESPACE_CORE

@@ -2,6 +2,9 @@
 
 #include <atomic>
 #include <spdlog/spdlog.h>
+#include "Core/Utils/Core.hpp"
+
+BEGIN_NAMESPACE_CORE
 
 class IResource
 {
@@ -104,3 +107,5 @@ RefCountPtr<T> CreateRefPtr(Args&&... args)
 {
     return RefCountPtr<T>(new RefCounter<T>(std::forward<Args>(args)...));
 }
+
+END_NAMESPACE_CORE

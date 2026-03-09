@@ -7,6 +7,8 @@
 
 #include "Core/RHI/Public/RHI.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 class Surface;
 
 class Swapchain;
@@ -35,3 +37,5 @@ public:
 	KENGINE_API virtual RefCountPtr<Swapchain>  CreateSwapchain(const SwapchainSpecs& specs) = 0;
 	KENGINE_API virtual void DestroySwapchain(RefCountPtr<Swapchain> swapchain) = 0;
 };
+
+END_NAMESPACE_CORE

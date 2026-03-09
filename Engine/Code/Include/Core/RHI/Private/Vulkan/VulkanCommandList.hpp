@@ -6,6 +6,8 @@
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 class VulkanCommandList : public CommandList
 {
 public:
@@ -25,3 +27,5 @@ private:
 	
 	//QueueType m_OwnerQueueType;
 };
+
+END_NAMESPACE_CORE

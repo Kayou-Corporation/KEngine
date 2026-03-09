@@ -8,6 +8,8 @@
 
 #include "Core/RHI/Public/RHI.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 // Forward declaration
 class Window;
 
@@ -51,3 +53,5 @@ class RendererInterface
 public:
 	static RefCountPtr<Instance> InitRenderer(RendererAPI api);
 };
+
+END_NAMESPACE_CORE

@@ -8,6 +8,8 @@
 
 #include "spdlog/spdlog.h"
 
+BEGIN_NAMESPACE_CORE
+
 void SDLWindow::Create(const WindowSpecs& specs)
 {
 	m_width = specs.width;
@@ -102,3 +104,5 @@ SDLVulkanWindowRenderer::SDLVulkanWindowRenderer(Window* ownerWindow)
 {
 	m_ownerWindow = ownerWindow;
 }
+
+END_NAMESPACE_CORE

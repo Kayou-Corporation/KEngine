@@ -2,6 +2,8 @@
 
 #include "Core/RHI/Private/Vulkan/VulkanInstance.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 RefCountPtr<Instance> RendererInterface::InitRenderer(RendererAPI api)
 {
 	switch (api)
@@ -14,3 +16,5 @@ RefCountPtr<Instance> RendererInterface::InitRenderer(RendererAPI api)
 
 	return nullptr;
 }
+
+END_NAMESPACE_CORE

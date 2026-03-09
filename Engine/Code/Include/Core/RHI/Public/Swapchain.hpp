@@ -5,6 +5,8 @@
 
 #include "Core/RHI/Public/RHI.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 class Window;
 class Surface;
 
@@ -28,3 +30,5 @@ class Swapchain : public virtual IResource
 public:
 	virtual ~Swapchain() = default;
 };
+
+END_NAMESPACE_CORE

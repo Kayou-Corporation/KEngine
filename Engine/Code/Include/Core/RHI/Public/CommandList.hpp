@@ -3,6 +3,8 @@
 #include "Core/Utils/Export.hpp"
 #include "Core/Utils/Memory.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 class CommandList : virtual public IResource
 {
 public:
@@ -16,3 +18,5 @@ public:
 
 	// Rendering
 };
+
+END_NAMESPACE_CORE

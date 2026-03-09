@@ -9,6 +9,7 @@
 #include <vulkan/vulkan.h>
 #endif
 
+BEGIN_NAMESPACE_CORE
 
 class Window;
 
@@ -33,3 +34,5 @@ protected:
 	Window* m_ownerWindow = nullptr;
 };
 #endif
+
+END_NAMESPACE_CORE

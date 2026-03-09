@@ -4,6 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
+BEGIN_NAMESPACE_CORE
 
 RefCountPtr<Window> WindowInterface::InitWindow(WindowAPI api)
 {
@@ -18,3 +19,5 @@ RefCountPtr<Window> WindowInterface::InitWindow(WindowAPI api)
 		break;
 	}
 }
+
+END_NAMESPACE_CORE

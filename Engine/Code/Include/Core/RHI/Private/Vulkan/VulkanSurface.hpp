@@ -3,6 +3,8 @@
 #include "Core/RHI/Public/Surface.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 class VulkanSurface : public Surface
 {
 public:
@@ -18,3 +20,5 @@ public:
 private:
 	vk::SurfaceKHR m_handle;
 };
+
+END_NAMESPACE_CORE

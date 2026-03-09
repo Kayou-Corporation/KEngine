@@ -10,6 +10,8 @@
 #include <set>
 #include <string>
 
+BEGIN_NAMESPACE_CORE
+
 void VulkanDevice::WaitIdle()
 {
 	VK_CHECK_VOID(m_handle.waitIdle(), "Device can't wait idle");
@@ -264,3 +266,5 @@ void VulkanDevice::BuildFeaturesChain()
 
 	m_featuresChain.pNext = currentPNext;
 }
+
+END_NAMESPACE_CORE

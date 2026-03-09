@@ -4,6 +4,8 @@
 
 #include "Window/Window.hpp"
 
+BEGIN_NAMESPACE_CORE
+
 class SDLWindow : public Window
 {
 public:
@@ -36,3 +38,5 @@ private:
 
 };
 //#endif
+
+END_NAMESPACE_CORE

@@ -12,49 +12,49 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-    RefCountPtr<Window> window = WindowInterface::InitWindow(WindowAPI::SDL);
-    
-    WindowSpecs specs;
+    Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
+
+    Kayou::Core::WindowSpecs specs;
     specs.width = 720;
     specs.height = 480;
     specs.name = "KEngine";
     specs.allowResize = true;
-    specs.rendererAPI = RendererAPI::Vulkan;
+    specs.rendererAPI = Kayou::Core::RendererAPI::Vulkan;
     
     window->Create(specs);
-    
-    
-    RefCountPtr<Instance> instance = RendererInterface::InitRenderer(RendererAPI::Vulkan);
 
-    InstanceSpecs test;
+
+    Kayou::Core::RefCountPtr<Kayou::Core::Instance> instance = Kayou::Core::RendererInterface::InitRenderer(Kayou::Core::RendererAPI::Vulkan);
+
+    Kayou::Core::InstanceSpecs test;
     test.window = window;
-    test.appVersion = Version(0, 0, 1);
-    test.engineVersion = Version(0, 0, 1);
-    test.debugLayers = { DebugLayers::Validation };
+    test.appVersion = Kayou::Core::Version(0, 0, 1);
+    test.engineVersion = Kayou::Core::Version(0, 0, 1);
+    test.debugLayers = {Kayou::Core::DebugLayers::Validation };
     
     instance->Create(test);
 
-    RefCountPtr<Surface> surface = instance->CreateSurface({ window });
+    Kayou::Core::RefCountPtr<Kayou::Core::Surface> surface = instance->CreateSurface({ window });
 
-    DeviceSpecs dSpecs;
-    dSpecs.gpuType = GpuType::Discrete;
-    dSpecs.extensions = { Extensions::Swapchain, Extensions::DynamicRendering, Extensions::ShaderObject };
-    dSpecs.queues = { QueueType::Graphics };
+    Kayou::Core::DeviceSpecs dSpecs;
+    dSpecs.gpuType = Kayou::Core::GpuType::Discrete;
+    dSpecs.extensions = {Kayou::Core::Extensions::Swapchain, Kayou::Core::Extensions::DynamicRendering, Kayou::Core::Extensions::ShaderObject };
+    dSpecs.queues = {Kayou::Core::QueueType::Graphics };
     dSpecs.searchPresentQueue = true;
     dSpecs.surface = surface;
 
-    RefCountPtr<Device> device = instance->CreateDevice(dSpecs);
+    Kayou::Core::RefCountPtr<Kayou::Core::Device> device = instance->CreateDevice(dSpecs);
 
-    SwapchainSpecs sSpecs;
+    Kayou::Core::SwapchainSpecs sSpecs;
     sSpecs.surface = surface;
-    sSpecs.extent = Extent2D(window->GetHeight(), window->GetWidth());
+    sSpecs.extent = Kayou::Core::Extent2D(window->GetHeight(), window->GetWidth());
     sSpecs.imageCount = 2;
-    sSpecs.presentMode = PresentMode::Mailbox;
-    sSpecs.imageFormat = Format::BGRA8_SRGB;
+    sSpecs.presentMode = Kayou::Core::PresentMode::Mailbox;
+    sSpecs.imageFormat = Kayou::Core::Format::BGRA8_SRGB;
     sSpecs.isDepthEnable = true;
-    sSpecs.depthImageFormat = Format::D32_SFLOAT;
+    sSpecs.depthImageFormat = Kayou::Core::Format::D32_SFLOAT;
 
-    RefCountPtr<Swapchain> swapchain = device->CreateSwapchain(sSpecs);
+    Kayou::Core::RefCountPtr<Kayou::Core::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
     
     while (!window->ShouldClose())
     {
