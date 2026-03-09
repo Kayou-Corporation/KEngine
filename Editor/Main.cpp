@@ -8,6 +8,10 @@
 
 int main()
 {
+#ifdef KENGINE_DEBUG
+    spdlog::set_level(spdlog::level::debug);
+#endif
+
     RefCountPtr<Window> window = WindowInterface::InitWindow(WindowAPI::SDL);
     
     WindowSpecs specs;
@@ -51,7 +55,6 @@ int main()
     sSpecs.depthImageFormat = Format::D32_SFLOAT;
 
     RefCountPtr<Swapchain> swapchain = device->CreateSwapchain(sSpecs);
-
     
     while (!window->ShouldClose())
     {

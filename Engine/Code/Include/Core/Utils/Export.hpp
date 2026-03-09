@@ -24,8 +24,6 @@
 
 #if defined(_DEBUG) || defined(DEBUG) || defined(__DEBUG__) || defined(__DEBUG)
 #define KENGINE_DEBUG
-#else
-#define KENGINE_DEBUG
 #endif
 
 #ifdef _MSC_VER

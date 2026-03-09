@@ -144,7 +144,7 @@ VkBool32 VulkanInstance::DebugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT 
 
 	if (messageSeverity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose)
 	{
-		spdlog::trace("[Vulkan] ({}) {}", type, msg);
+		spdlog::debug("[Vulkan] ({}) {}", type, msg);
 	}
 	else if (messageSeverity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo)
 	{
