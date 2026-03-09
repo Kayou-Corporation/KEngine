@@ -82,7 +82,13 @@ void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::v
 	
 	m_queueFamily = candidates[0].family;
 
-	if (std::find(extensions.begin(), extensions.end(), VK_KHR_SWAPCHAIN_EXTENSION_NAME) != extensions.end() && searchPresentQueue)
+	bool swapchainExtFound = std::find_if(extensions.begin(), extensions.end(), 
+											[](const char* ext) 
+											{ 
+												return std::strcmp(ext, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0; 
+											}) != extensions.end();
+
+	if (swapchainExtFound && searchPresentQueue)
 	{
 		m_compatibility.capabilities = VK_CHECK_RESULT(m_pDevice.getSurfaceCapabilitiesKHR(surface), "Coudn't get surface capabilities");
 
