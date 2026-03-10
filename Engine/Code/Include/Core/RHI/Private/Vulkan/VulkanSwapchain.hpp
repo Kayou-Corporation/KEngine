@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Core/RHI/Public/Swapchain.hpp"
 
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"

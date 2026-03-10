@@ -5,6 +5,12 @@
 #include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
 
+DISABLE_ALL_WARNINGS
+
+#include <vk_mem_alloc.h>
+
+RESTORE_WARNINGS
+
 BEGIN_NAMESPACE_CORE
 
 struct PhysicalDevice 
@@ -54,8 +60,11 @@ public:
     void QueueWaitIdle(QueueType type) override;
 
     // Create objects
-    RefCountPtr<Swapchain>  CreateSwapchain(const SwapchainSpecs& specs) override;
+    RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
     void DestroySwapchain(RefCountPtr<Swapchain> swapchain) override;
+
+    RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
+    void DestroyBuffer(RefCountPtr<Buffer> buffer) override;
 
 
 // Public vulkan
@@ -63,6 +72,7 @@ public:
     // Create
     void PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
     void CreateLogicalDevice(std::vector<const char*>& extensions);
+    void CreateMemoryAllocator(const vk::Instance& instance);
 
     // Destroy
     void Destroy();
@@ -87,6 +97,8 @@ private:
     DeviceFeatures features;
 
     vk::Device m_handle;
+
+    VmaAllocator m_memoryAllocator;
 
     //vk::Queue presentQueue;
     //std::unordered_map<Queue, vk::Queue> m_availableQueues;

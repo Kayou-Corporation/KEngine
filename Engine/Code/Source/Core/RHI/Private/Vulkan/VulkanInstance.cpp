@@ -178,6 +178,8 @@ RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 
 	device->CreateLogicalDevice(extensions);
 
+	device->CreateMemoryAllocator(m_handle);
+
 	return device;
 }
 

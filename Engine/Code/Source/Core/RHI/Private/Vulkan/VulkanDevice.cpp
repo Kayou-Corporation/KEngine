@@ -5,10 +5,18 @@
 #include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
 #include "Core/RHI/Private/Vulkan/VulkanSwapchain.hpp"
+#include "Core/RHI/Private/Vulkan/VulkanBuffer.hpp"
 
 #include <map>
 #include <set>
 #include <string>
+
+DISABLE_ALL_WARNINGS
+
+#define VMA_IMPLEMENTATION
+#include <vk_mem_alloc.h>
+
+RESTORE_WARNINGS
 
 BEGIN_NAMESPACE_CORE
 
@@ -54,6 +62,37 @@ void VulkanDevice::DestroySwapchain(RefCountPtr<Swapchain> swapchain)
 	auto vkSwapchain = swapchain.CastAs<VulkanSwapchain>();
 	
 	m_handle.destroySwapchainKHR(vkSwapchain->GetHandle());
+}
+
+RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
+{
+	RefCountPtr buffer = CreateRefPtr<VulkanBuffer>();
+
+	VkBufferCreateInfo bufferInfo = buffer->GetCreateInfo(specs);
+
+	VmaAllocationCreateInfo allocInfo{};
+	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+
+	VkBuffer buf;
+	VmaAllocation allocation;
+	VmaAllocationInfo allocationInfo;
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateBuffer(m_memoryAllocator, &bufferInfo, &allocInfo, &buf, &allocation, &allocationInfo)), "Feiled to create buffer");
+
+	buffer->SetHandle(static_cast<vk::Buffer>(buf));
+	buffer->SetAllocation(allocation);
+	buffer->SetAllocationInfo(allocationInfo);
+
+	return buffer;
+}
+
+void VulkanDevice::DestroyBuffer(RefCountPtr<Buffer> buffer)
+{
+	auto vkBuffer = buffer.CastAs<VulkanBuffer>();
+
+	VkBuffer rawBuffer = static_cast<VkBuffer>(vkBuffer->GetHandle());
+	VmaAllocation bufferAllocation = vkBuffer->GetAllocation();
+
+	vmaDestroyBuffer(m_memoryAllocator, rawBuffer, bufferAllocation);
 }
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
@@ -200,9 +239,21 @@ void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& extensions)
 	}
 }
 
+void VulkanDevice::CreateMemoryAllocator(const vk::Instance& instance)
+{
+	VmaAllocatorCreateInfo allocatorCreateInfo = {};
+	allocatorCreateInfo.instance = instance;
+	allocatorCreateInfo.physicalDevice = m_pDevice;
+	allocatorCreateInfo.device = m_handle;
+
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateAllocator(&allocatorCreateInfo, &m_memoryAllocator)), "Failed to create memory allocator");
+}
+
 void VulkanDevice::Destroy()
 {
 	WaitIdle();
+
+	vmaDestroyAllocator(m_memoryAllocator);
 
 	for (auto& [type, queue] : m_queues)
 	{

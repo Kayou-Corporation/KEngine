@@ -365,19 +365,13 @@ inline vk::MemoryPropertyFlags TranslateToVulkan(MemoryAccess access)
     {
     case MemoryAccess::CPU_Read:
         return vk::MemoryPropertyFlagBits::eHostVisible |
-            vk::MemoryPropertyFlagBits::eHostCoherent;
+            vk::MemoryPropertyFlagBits::eHostCached;
 
     case MemoryAccess::CPU_Write:
         return vk::MemoryPropertyFlagBits::eHostVisible |
             vk::MemoryPropertyFlagBits::eHostCoherent;
 
-    case MemoryAccess::GPU_Read:
-        return vk::MemoryPropertyFlagBits::eDeviceLocal;
-
-    case MemoryAccess::GPU_Write:
-        return vk::MemoryPropertyFlagBits::eDeviceLocal;
-
-    case MemoryAccess::GPU_ReadWrite:
+    case MemoryAccess::GPU_Only:
         return vk::MemoryPropertyFlagBits::eDeviceLocal;
 
     default:

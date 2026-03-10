@@ -57,8 +57,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 target_compile_definitions(${K_TARGET_NAME} PUBLIC VULKAN_ENABLE)
 
-target_link_libraries(${K_TARGET_NAME} PUBLIC Vulkan::Vulkan glm::glm SDL3::SDL3 spdlog::spdlog GPUOpen::VulkanMemoryAllocator assimp)
-
+target_link_libraries(${K_TARGET_NAME} PUBLIC Vulkan::Vulkan glm::glm SDL3::SDL3 spdlog::spdlog assimp)
+target_link_libraries(${K_TARGET_NAME} PRIVATE GPUOpen::VulkanMemoryAllocator)
 
 
 #---------------------------------------#

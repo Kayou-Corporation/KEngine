@@ -14,6 +14,9 @@ class Surface;
 class Swapchain;
 struct SwapchainSpecs;
 
+class Buffer;
+struct BufferSpecs;
+
 struct DeviceSpecs
 {
 	GpuType gpuType;
@@ -34,8 +37,11 @@ public:
 	KENGINE_API virtual void QueueWaitIdle(QueueType type) = 0;
 
 
-	KENGINE_API virtual RefCountPtr<Swapchain>  CreateSwapchain(const SwapchainSpecs& specs) = 0;
-	KENGINE_API virtual void DestroySwapchain(RefCountPtr<Swapchain> swapchain) = 0;
+	KENGINE_API virtual RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySwapchain(RefCountPtr<Swapchain> buffer) = 0;
+
+	KENGINE_API virtual RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyBuffer(RefCountPtr<Buffer> buffer) = 0;
 };
 
 END_NAMESPACE_CORE

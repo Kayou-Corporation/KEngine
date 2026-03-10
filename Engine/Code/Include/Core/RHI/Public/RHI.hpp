@@ -184,10 +184,7 @@ enum class MemoryAccess
 {
 	CPU_Read,
 	CPU_Write,
-
-	GPU_Read,
-	GPU_Write,
-	GPU_ReadWrite
+	GPU_Only
 };
 
 END_NAMESPACE_CORE
