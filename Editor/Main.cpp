@@ -5,6 +5,7 @@
 #include "Core/RHI/Public/Surface.hpp"
 #include "Core/RHI/Public/Device.hpp"
 #include "Core/RHI/Public/Swapchain.hpp"
+#include "Core/RHI/Public/Buffer.hpp"
 
 int main()
 {
@@ -55,12 +56,21 @@ int main()
     sSpecs.depthImageFormat = Kayou::Core::Format::D32_SFLOAT;
 
     Kayou::Core::RefCountPtr<Kayou::Core::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
+
+    Kayou::Core::BufferSpecs bufferSpecs{};
+    bufferSpecs.usages = { Kayou::Core::BufferUsage::Vertex, Kayou::Core::BufferUsage::TransferDst };
+    bufferSpecs.size = 65536;
+    bufferSpecs.memoryAccess = { Kayou::Core::MemoryAccess::CPU_Write };
+
+    Kayou::Core::RefCountPtr<Kayou::Core::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
     
     while (!window->ShouldClose())
     {
         window->PollEvents();
     }
     
+    device->DestroyBuffer(testBuffer);
+
     device->DestroySwapchain(swapchain);
 
     instance->DestroyDevice(device);
