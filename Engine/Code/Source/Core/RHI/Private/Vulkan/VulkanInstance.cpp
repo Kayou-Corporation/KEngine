@@ -69,7 +69,9 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 
 void VulkanInstance::Destroy()
 {
+#ifdef KENGINE_DEBUG
 	m_handle.destroyDebugUtilsMessengerEXT(m_debugHandler, nullptr, m_dispatchLoader);
+#endif
 
 	m_handle.destroy();
 }
