@@ -19,6 +19,8 @@ public:
 	VulkanBuffer() = default;
 	virtual ~VulkanBuffer() override = default;
 
+	void SetData(void* data, uint32_t size);
+	void* GetMappedData() const override { return m_allocationInfo.pMappedData; }
 
 public:
 	void SetHandle(vk::Buffer buffer) { m_handle = buffer; }
@@ -26,11 +28,15 @@ public:
 	void SetAllocation(VmaAllocation allocation) { m_allocation = allocation; }
 	void SetAllocationInfo(VmaAllocationInfo allocationInfo) { m_allocationInfo = allocationInfo; }
 
-	vk::Buffer GetHandle() { return m_handle; }
+	void SetSize(uint32_t size) { m_size = size; }
+
+	void SetIsGpuOnly(bool isGpuOnly) { m_isGpuOnly = isGpuOnly; }
+
+	vk::Buffer GetHandle() const { return m_handle; }
 	vk::Buffer& GetHandleRef() { return m_handle; }
 
-	VmaAllocation GetAllocation() { return m_allocation; }
-	VmaAllocationInfo GetAllocationInfo() { return m_allocationInfo; }
+	VmaAllocation GetAllocation() const { return m_allocation; }
+	VmaAllocationInfo GetAllocationInfo() const { return m_allocationInfo; }
 
 	vk::BufferCreateInfo GetCreateInfo(const BufferSpecs& specs);
 
@@ -40,6 +46,7 @@ private:
 	VmaAllocation m_allocation;
 	VmaAllocationInfo m_allocationInfo;
 
+	bool m_isGpuOnly = false;
 };
 
 END_NAMESPACE_RHI

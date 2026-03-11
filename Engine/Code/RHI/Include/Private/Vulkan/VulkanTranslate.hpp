@@ -2,6 +2,12 @@
 
 #include <vector>
 
+DISABLE_ALL_WARNINGS
+
+#include <vk_mem_alloc.h>
+
+RESTORE_WARNINGS
+
 #include "Public/RHI.hpp"
 
 BEGIN_NAMESPACE_RHI
@@ -359,24 +365,29 @@ inline vk::BufferUsageFlags TranslateToVulkan(
 }
 
 // Memory access
-inline vk::MemoryPropertyFlags TranslateToVulkan(MemoryAccess access)
+inline VmaAllocationCreateInfo TranslateToVulkan(MemoryAccess access)
 {
+    VmaAllocationCreateInfo createInfo{};
+
     switch (access)
     {
     case MemoryAccess::CPU_Read:
-        return vk::MemoryPropertyFlagBits::eHostVisible |
-            vk::MemoryPropertyFlagBits::eHostCached;
+        createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
+        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT |
+            VMA_ALLOCATION_CREATE_MAPPED_BIT;
+        break;
 
     case MemoryAccess::CPU_Write:
-        return vk::MemoryPropertyFlagBits::eHostVisible |
-            vk::MemoryPropertyFlagBits::eHostCoherent;
+        createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
+        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
+            VMA_ALLOCATION_CREATE_MAPPED_BIT;
+        break;
 
     case MemoryAccess::GPU_Only:
-        return vk::MemoryPropertyFlagBits::eDeviceLocal;
-
-    default:
-        return {};
+        createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
     }
+
+    return createInfo;
 }
 
 END_NAMESPACE_RHI

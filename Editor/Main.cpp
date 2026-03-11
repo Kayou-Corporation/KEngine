@@ -60,7 +60,7 @@ int main()
     Kayou::RHI::BufferSpecs bufferSpecs{};
     bufferSpecs.usages = { Kayou::RHI::BufferUsage::Vertex, Kayou::RHI::BufferUsage::TransferDst };
     bufferSpecs.size = 65536;
-    bufferSpecs.memoryAccess = { Kayou::RHI::MemoryAccess::CPU_Write };
+    bufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
     

@@ -70,8 +70,7 @@ Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
 
 	VkBufferCreateInfo bufferInfo = buffer->GetCreateInfo(specs);
 
-	VmaAllocationCreateInfo allocInfo{};
-	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+	VmaAllocationCreateInfo allocInfo = TranslateToVulkan(specs.memoryAccess);
 
 	VkBuffer buf;
 	VmaAllocation allocation;
@@ -81,6 +80,10 @@ Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
 	buffer->SetHandle(static_cast<vk::Buffer>(buf));
 	buffer->SetAllocation(allocation);
 	buffer->SetAllocationInfo(allocationInfo);
+	buffer->SetSize(specs.size);
+
+	if (specs.memoryAccess == MemoryAccess::GPU_Only)
+		buffer->SetIsGpuOnly(true);
 
 	return buffer;
 }
