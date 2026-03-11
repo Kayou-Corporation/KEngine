@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Core/RHI/Public/CommandList.hpp"
-#include "Core/RHI/Public/RHI.hpp"
+#include "Public/CommandList.hpp"
+#include "Public/RHI.hpp"
 
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
+#include "Private/Vulkan/VulkanQueue.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 class VulkanCommandList : public CommandList
 {
@@ -28,4 +28,4 @@ private:
 	//QueueType m_OwnerQueueType;
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

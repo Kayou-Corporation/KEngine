@@ -26,3 +26,12 @@
 #define DISABLE_ALL_WARNINGS
 #define RESTORE_WARNINGS
 #endif
+
+BEGIN_NAMESPACE_CORE
+
+enum RendererAPI
+{
+    Vulkan = 0
+};
+
+END_NAMESPACE_CORE

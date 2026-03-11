@@ -1,11 +1,13 @@
 #pragma once
 
-#include "Core/Utils/Export.hpp"
-#include "Core/Utils/Memory.hpp"
+#include "Utils/Export.hpp"
+#include "Utils/Memory.hpp"
 
-BEGIN_NAMESPACE_CORE
+#include "Public/RHI.hpp"
 
-class CommandList : virtual public IResource
+BEGIN_NAMESPACE_RHI
+
+class CommandList : virtual public Core::IResource
 {
 public:
 	virtual ~CommandList() = default;
@@ -19,4 +21,4 @@ public:
 	// Rendering
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 
-#include "Core/Utils/Memory.hpp"
-#include "Core/Utils/Export.hpp"
+#include "Utils/Memory.hpp"
+#include "Utils/Export.hpp"
 
-#include "Core/RHI/Public/RHI.hpp"
+#include "Window/Window.hpp"
 
-BEGIN_NAMESPACE_CORE
+#include "Public/RHI.hpp"
+
+BEGIN_NAMESPACE_RHI
 
 // Forward declaration
 class Window;
@@ -21,7 +23,7 @@ struct DeviceSpecs;
 
 struct InstanceSpecs
 {
-	RefCountPtr<Window> window; // To get window specific extensions required.
+	Core::RefCountPtr<Core::Window> window; // To get window specific extensions required.
 
 	Version appVersion;
 	Version engineVersion;
@@ -29,7 +31,7 @@ struct InstanceSpecs
 	std::vector<DebugLayers> debugLayers; // Debug layers to use.
 };
 
-class Instance : virtual public IResource
+class Instance : virtual public Core::IResource
 {
 public:
 	virtual ~Instance() = default;
@@ -37,11 +39,11 @@ public:
 	KENGINE_API virtual void Create(const InstanceSpecs& specs) = 0;
 	KENGINE_API virtual void Destroy() = 0;
 
-	KENGINE_API virtual RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) = 0;
-	KENGINE_API virtual void DestroySurface(RefCountPtr<Surface> surface) = 0;
+	KENGINE_API virtual Core::RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySurface(Core::RefCountPtr<Surface> surface) = 0;
 
-	KENGINE_API virtual RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyDevice(RefCountPtr<Device> device) = 0;
+	KENGINE_API virtual Core::RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyDevice(Core::RefCountPtr<Device> device) = 0;
 
 protected:
 	Version m_appVersion;
@@ -51,7 +53,7 @@ protected:
 class RendererInterface
 {
 public:
-	static RefCountPtr<Instance> InitRenderer(RendererAPI api);
+	static Core::RefCountPtr<Instance> InitRenderer(Core::RendererAPI api);
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

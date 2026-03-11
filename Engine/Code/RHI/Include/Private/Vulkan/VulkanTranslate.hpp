@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "Core/RHI/Public/RHI.hpp"
+#include "Public/RHI.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 // ---------- DEBUG LAYERS ---------------
 inline const char* TranslateToVulkan(DebugLayers layer)
@@ -379,4 +379,4 @@ inline vk::MemoryPropertyFlags TranslateToVulkan(MemoryAccess access)
     }
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

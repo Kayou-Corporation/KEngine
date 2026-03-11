@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "Core/Utils/Memory.hpp"
-#include "Core/Utils/Export.hpp"
+#include "Utils/Memory.hpp"
+#include "Utils/Export.hpp"
 
 #ifdef VULKAN_ENABLE
 #include <vulkan/vulkan.h>

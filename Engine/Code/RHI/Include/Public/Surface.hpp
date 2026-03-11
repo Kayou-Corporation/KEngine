@@ -1,22 +1,26 @@
 #pragma once
 
-#include "Core/Utils/Memory.hpp"
-#include "Core/Utils/Export.hpp"
+#include "Utils/Memory.hpp"
+#include "Utils/Export.hpp"
 
-BEGIN_NAMESPACE_CORE
+#include "Window/Window.hpp"
+
+#include "Public/RHI.hpp"
+
+BEGIN_NAMESPACE_RHI
 
 class Window;
 class Instance;
 
 struct SurfaceSpecs
 {
-	RefCountPtr<Window> window;
+	Core::RefCountPtr<Core::Window> window;
 };
 
-class Surface : virtual public IResource
+class Surface : virtual public Core::IResource
 {
 public:
 	virtual ~Surface() = default;
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

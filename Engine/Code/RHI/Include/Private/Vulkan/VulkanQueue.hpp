@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
 #include <vector>
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
 #include <optional>
 
-#include "Core/RHI/Public/RHI.hpp"
-#include "Core/Utils/Memory.hpp"
+#include "Public/RHI.hpp"
+#include "Utils/Memory.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 struct QueueFamily
 {
@@ -31,7 +31,7 @@ private:
 
 class VulkanCommandList;
 
-class TrackedCommandBuffer : virtual public IResource
+class TrackedCommandBuffer : virtual public Core::IResource
 {
 public:
 	TrackedCommandBuffer() = default;
@@ -42,7 +42,7 @@ public:
 
 	uint64_t submissionId;
 };
-typedef RefCountPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
+typedef Core::RefCountPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
 
 struct Queue
 {
@@ -78,4 +78,4 @@ private:
 	uint64_t m_lastFinishedId = 0;
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

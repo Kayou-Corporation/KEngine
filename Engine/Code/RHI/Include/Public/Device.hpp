@@ -2,12 +2,12 @@
 
 #include <vector>
 
-#include "Core/Utils/Memory.hpp"
-#include "Core/Utils/Export.hpp"
+#include "Utils/Memory.hpp"
+#include "Utils/Export.hpp"
 
-#include "Core/RHI/Public/RHI.hpp"
+#include "Public/RHI.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 class Surface;
 
@@ -25,10 +25,10 @@ struct DeviceSpecs
 	std::vector<Extensions> extensions;
 	std::vector<QueueType> queues;
 	bool searchPresentQueue;
-	RefCountPtr<Surface> surface;
+	Core::RefCountPtr<Surface> surface;
 };
 
-class Device : public virtual IResource
+class Device : public virtual Core::IResource
 {
 public:
 	virtual ~Device() = default;
@@ -37,11 +37,11 @@ public:
 	KENGINE_API virtual void QueueWaitIdle(QueueType type) = 0;
 
 
-	KENGINE_API virtual RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) = 0;
-	KENGINE_API virtual void DestroySwapchain(RefCountPtr<Swapchain> buffer) = 0;
+	KENGINE_API virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> buffer) = 0;
 
-	KENGINE_API virtual RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyBuffer(RefCountPtr<Buffer> buffer) = 0;
+	KENGINE_API virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) = 0;
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

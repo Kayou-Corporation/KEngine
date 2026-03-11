@@ -1,9 +1,9 @@
-#include "Core/RHI/Private/Vulkan/VulkanSwapchain.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanDevice.hpp"
+#include "Private/Vulkan/VulkanSwapchain.hpp"
+#include "Private/Vulkan/VulkanDevice.hpp"
 #include <algorithm>
 #include <iostream>
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 vk::SwapchainCreateInfoKHR VulkanSwapchain::GetCreateInfo(const PhysicalDeviceCompatibiliy& compatibility, vk::SurfaceKHR surface, uint32_t graphicsQueueIndex, uint32_t presentQueueQueueIndex, uint32_t requestedImageCount, vk::Format requestedFormat, bool bIsDepthEnable, vk::Format requestedDepthFormat, vk::PresentModeKHR requestedPresentMode, vk::Extent2D requestedExtent)
 {
@@ -96,11 +96,9 @@ vk::Extent2D VulkanSwapchain::FindSuitableExtent(const vk::SurfaceCapabilitiesKH
 		return availablecapabilities.currentExtent;
 	}
 	
-	VkExtent2D extent
-	{
-		.width = std::clamp(requestedExtent.width, availablecapabilities.minImageExtent.width, availablecapabilities.maxImageExtent.width),
-		.height = std::clamp(requestedExtent.height, availablecapabilities.minImageExtent.height, availablecapabilities.maxImageExtent.height)
-	};
+	vk::Extent2D extent{};
+	extent.width = std::clamp(requestedExtent.width, availablecapabilities.minImageExtent.width, availablecapabilities.maxImageExtent.width);
+	extent.height = std::clamp(requestedExtent.height, availablecapabilities.minImageExtent.height, availablecapabilities.maxImageExtent.height);
 	
 	return extent;
 }
@@ -122,4 +120,4 @@ vk::PresentModeKHR VulkanSwapchain::FindSuitablePresentMode(const std::vector<vk
 
 #pragma endregion
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

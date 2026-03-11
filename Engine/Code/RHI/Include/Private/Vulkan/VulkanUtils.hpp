@@ -6,7 +6,7 @@
 #define VULKAN_HPP_NO_EXCEPTIONS
 #include <vulkan/vulkan.hpp>
 
-#include "Core/Utils/Export.hpp"
+#include "Utils/Export.hpp"
 
 #ifdef KENGINE_DEBUG
 

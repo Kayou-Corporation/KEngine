@@ -9,13 +9,13 @@ set(RHI_TARGET_NAME RHI)
 #---------------------------------------#
 #            BUILD MODE                 #
 #---------------------------------------#
-add_library(${RHI_TARGET_NAME} STATIC ${RHI_SOURCES})
+ENGINE_ADD_MODULE(${RHI_TARGET_NAME} ${RHI_SOURCES})
 
 #---------------------------------------#
 #                INCLUDE                #
 #---------------------------------------#
-target_include_directories(${RHI_TARGET_NAME} PUBLIC "Include")
+target_include_directories(${RHI_TARGET_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Include")
 
 
 
-target_link_libraries(${RHI_TARGET_NAME} PRIVATE Vulkan::Vulkan GPUOpen::VulkanMemoryAllocator Core)
+target_link_libraries(${RHI_TARGET_NAME} PUBLIC GPUOpen::VulkanMemoryAllocator Core)

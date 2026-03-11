@@ -1,15 +1,13 @@
-#include "Core/RHI/Private/Vulkan/VulkanInstance.hpp"
-
-#include "Window/Window.hpp"
+#include "Private/Vulkan/VulkanInstance.hpp"
 
 #include <spdlog/spdlog.h>
 
-#include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanSurface.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanDevice.hpp"
+#include "Private/Vulkan/VulkanTranslate.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
+#include "Private/Vulkan/VulkanSurface.hpp"
+#include "Private/Vulkan/VulkanDevice.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 void VulkanInstance::Create(const InstanceSpecs& specs)
 {
@@ -20,8 +18,8 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	appInfo.setEngineVersion(VK_MAKE_VERSION(specs.engineVersion.major, specs.engineVersion.minor, specs.engineVersion.patch));
 	appInfo.setApiVersion(VK_API_VERSION_1_4);
 
-	RefCountPtr<WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	RefCountPtr<VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<VulkanWindowRenderer>();
+	Core::RefCountPtr<Core::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::RefCountPtr<Core::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Core::VulkanWindowRenderer>();
 	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
 
 #ifdef KENGINE_DEBUG
@@ -76,19 +74,19 @@ void VulkanInstance::Destroy()
 	m_handle.destroy();
 }
 
-RefCountPtr<Surface> VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
+Core::RefCountPtr<Surface> VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
 {
-	RefCountPtr<WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	RefCountPtr<VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<VulkanWindowRenderer>();
+	Core::RefCountPtr<Core::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::RefCountPtr<Core::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Core::VulkanWindowRenderer>();
 	VkSurfaceKHR vkSurface = wvkRenderer->CreateVulkanSurface(m_handle);
 
-	auto Surface = CreateRefPtr<VulkanSurface>();
+	auto Surface = Core::CreateRefPtr<VulkanSurface>();
 	Surface->SetHandle(vkSurface);
 
 	return Surface;
 }
 
-void VulkanInstance::DestroySurface(RefCountPtr<Surface> surface)
+void VulkanInstance::DestroySurface(Core::RefCountPtr<Surface> surface)
 {
 	m_handle.destroySurfaceKHR(surface.CastAs<VulkanSurface>()->GetHandle());
 }
@@ -166,13 +164,13 @@ VkBool32 VulkanInstance::DebugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT 
 	return VK_FALSE;
 }
 
-RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
+Core::RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 {
 	vk::SurfaceKHR surface = specs.surface.CastAs<VulkanSurface>()->GetHandle();
 	vk::PhysicalDeviceType type = TranslateToVulkan(specs.gpuType);
 	std::vector<const char*> extensions = TranslateToVulkan(specs.extensions);
 
-	RefCountPtr<VulkanDevice> device = CreateRefPtr<VulkanDevice>();
+	Core::RefCountPtr<VulkanDevice> device = Core::CreateRefPtr<VulkanDevice>();
 
 	device->PickPhysicalDevice(m_handle, specs.queues, specs.searchPresentQueue, surface, type, extensions);
 
@@ -183,9 +181,9 @@ RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 	return device;
 }
 
-void VulkanInstance::DestroyDevice(RefCountPtr<Device> device)
+void VulkanInstance::DestroyDevice(Core::RefCountPtr<Device> device)
 {
 	device.CastAs<VulkanDevice>()->Destroy();
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

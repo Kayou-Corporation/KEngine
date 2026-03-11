@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/RHI/Public/Buffer.hpp"
+#include "Public/Buffer.hpp"
 
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
+#include "Private/Vulkan/VulkanTranslate.hpp"
 
 DISABLE_ALL_WARNINGS
 
@@ -11,7 +11,7 @@ DISABLE_ALL_WARNINGS
 
 RESTORE_WARNINGS
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 class VulkanBuffer : public Buffer
 {
@@ -42,4 +42,4 @@ private:
 
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

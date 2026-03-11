@@ -1,15 +1,15 @@
-#include "Core/RHI/Public/Instance.hpp"
+#include "Public/Instance.hpp"
 
-#include "Core/RHI/Private/Vulkan/VulkanInstance.hpp"
+#include "Private/Vulkan/VulkanInstance.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
-RefCountPtr<Instance> RendererInterface::InitRenderer(RendererAPI api)
+Core::RefCountPtr<Instance> RendererInterface::InitRenderer(Core::RendererAPI api)
 {
 	switch (api)
 	{
-	case Vulkan:
-		return CreateRefPtr<VulkanInstance>();
+	case Core::RendererAPI::Vulkan:
+		return Core::CreateRefPtr<VulkanInstance>();
 	default:
 		break;
 	}
@@ -17,4 +17,4 @@ RefCountPtr<Instance> RendererInterface::InitRenderer(RendererAPI api)
 	return nullptr;
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

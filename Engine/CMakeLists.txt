@@ -26,14 +26,19 @@ add_library(${K_TARGET_NAME} STATIC ${DUMMY_SOURCE})
 #---------------------------------------#
 #                COMPILE MODE           #
 #---------------------------------------#
-target_compile_features(${K_TARGET_NAME} PUBLIC cxx_std_23)
+set(ENGINE_COMPILE_OPTIONS
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
+)
 
-if(MSVC)
-    set(CMAKE_DEBUG_POSTFIX "d")
-    target_compile_options(${K_TARGET_NAME} PUBLIC /W4 /WX)
-else()
-    target_compile_options(${K_TARGET_NAME} PUBLIC -Wall -Wextra -Wpedantic -Werror)
-endif()
+set(ENGINE_COMPILE_FEATURES cxx_std_23)
+
+function(engine_add_module MODULE_NAME)
+    add_library(${MODULE_NAME} STATIC ${ARGN})
+    target_compile_features(${MODULE_NAME} PUBLIC ${ENGINE_COMPILE_FEATURES})
+    target_compile_options(${MODULE_NAME} PUBLIC ${ENGINE_COMPILE_OPTIONS})
+    target_include_directories(${MODULE_NAME} PUBLIC Include)
+endfunction()
 
 # To build shared libraries in Windows, we set CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS to TRUE.
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -43,8 +48,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Disable C and C++ compiler extensions.
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-target_compile_definitions(${K_TARGET_NAME} PUBLIC VULKAN_ENABLE)
 
 add_subdirectory(Code/Core)
 add_subdirectory(Code/RHI)

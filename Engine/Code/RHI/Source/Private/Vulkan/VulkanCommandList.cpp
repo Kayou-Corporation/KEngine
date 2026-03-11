@@ -1,6 +1,6 @@
-#include "Core/RHI/Private/Vulkan/VulkanCommandList.hpp"
+#include "Private/Vulkan/VulkanCommandList.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 void VulkanCommandList::Open()
 {
@@ -15,4 +15,4 @@ void VulkanCommandList::Close()
 	VK_CHECK_VOID(m_handle->cmdBuffer.end(),"Can't end command buffer");
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

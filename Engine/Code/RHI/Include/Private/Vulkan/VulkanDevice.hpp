@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/RHI/Public/Device.hpp"
+#include "Public/Device.hpp"
 
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
+#include "Private/Vulkan/VulkanQueue.hpp"
 
 DISABLE_ALL_WARNINGS
 
@@ -11,7 +11,7 @@ DISABLE_ALL_WARNINGS
 
 RESTORE_WARNINGS
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 struct PhysicalDevice 
 {
@@ -60,11 +60,11 @@ public:
     void QueueWaitIdle(QueueType type) override;
 
     // Create objects
-    RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
-    void DestroySwapchain(RefCountPtr<Swapchain> swapchain) override;
+    Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
+    void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) override;
 
-    RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
-    void DestroyBuffer(RefCountPtr<Buffer> buffer) override;
+    Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
+    void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) override;
 
 
 // Public vulkan
@@ -128,4 +128,4 @@ struct NativeExtensions
     const char* DynamicState3 = "VK_EXT_extended_dynamic_state3";
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

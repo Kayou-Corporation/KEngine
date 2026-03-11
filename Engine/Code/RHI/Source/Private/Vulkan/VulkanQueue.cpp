@@ -1,7 +1,7 @@
-#include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanCommandList.hpp"
+#include "Private/Vulkan/VulkanQueue.hpp"
+#include "Private/Vulkan/VulkanCommandList.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 QueueFamily QueueFamily::FindQueueFamily(const vk::PhysicalDevice& physicalDevice, std::vector<QueueType> queues, bool searchPresentQueue, const vk::SurfaceKHR& surface)
 {
@@ -122,7 +122,7 @@ TrackedCommandBufferPtr Queue::GetOrCreateCommandBuffer(vk::Device& device)
     }
     else
     {
-        cmdBuffer = CreateRefPtr<TrackedCommandBuffer>();
+        cmdBuffer = Core::CreateRefPtr<TrackedCommandBuffer>();
         
         vk::CommandPoolCreateInfo poolInfo;
         poolInfo.queueFamilyIndex = m_queueFamilyIndex;
@@ -186,4 +186,4 @@ void Queue::RunGarbageCollector(vk::Device& device)
     }
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

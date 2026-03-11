@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/RHI/Public/Surface.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
+#include "Public/Surface.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 class VulkanSurface : public Surface
 {
@@ -21,4 +21,4 @@ private:
 	vk::SurfaceKHR m_handle;
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

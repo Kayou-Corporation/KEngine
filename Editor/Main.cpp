@@ -1,11 +1,11 @@
 #include <iostream>
 
 #include "Window/Window.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanInstance.hpp"
-#include "Core/RHI/Public/Surface.hpp"
-#include "Core/RHI/Public/Device.hpp"
-#include "Core/RHI/Public/Swapchain.hpp"
-#include "Core/RHI/Public/Buffer.hpp"
+#include "Private/Vulkan/VulkanInstance.hpp"
+#include "Public/Surface.hpp"
+#include "Public/Device.hpp"
+#include "Public/Swapchain.hpp"
+#include "Public/Buffer.hpp"
 
 int main()
 {
@@ -25,44 +25,44 @@ int main()
     window->Create(specs);
 
 
-    Kayou::Core::RefCountPtr<Kayou::Core::Instance> instance = Kayou::Core::RendererInterface::InitRenderer(Kayou::Core::RendererAPI::Vulkan);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Instance> instance = Kayou::RHI::RendererInterface::InitRenderer(Kayou::Core::RendererAPI::Vulkan);
 
-    Kayou::Core::InstanceSpecs test;
+    Kayou::RHI::InstanceSpecs test;
     test.window = window;
-    test.appVersion = Kayou::Core::Version(0, 0, 1);
-    test.engineVersion = Kayou::Core::Version(0, 0, 1);
-    test.debugLayers = {Kayou::Core::DebugLayers::Validation };
+    test.appVersion = Kayou::RHI::Version(0, 0, 1);
+    test.engineVersion = Kayou::RHI::Version(0, 0, 1);
+    test.debugLayers = {Kayou::RHI::DebugLayers::Validation };
     
     instance->Create(test);
 
-    Kayou::Core::RefCountPtr<Kayou::Core::Surface> surface = instance->CreateSurface({ window });
+    Kayou::Core::RefCountPtr<Kayou::RHI::Surface> surface = instance->CreateSurface({ window });
 
-    Kayou::Core::DeviceSpecs dSpecs;
-    dSpecs.gpuType = Kayou::Core::GpuType::Discrete;
-    dSpecs.extensions = {Kayou::Core::Extensions::Swapchain, Kayou::Core::Extensions::DynamicRendering, Kayou::Core::Extensions::ShaderObject };
-    dSpecs.queues = {Kayou::Core::QueueType::Graphics };
+    Kayou::RHI::DeviceSpecs dSpecs;
+    dSpecs.gpuType = Kayou::RHI::GpuType::Discrete;
+    dSpecs.extensions = {Kayou::RHI::Extensions::Swapchain, Kayou::RHI::Extensions::DynamicRendering, Kayou::RHI::Extensions::ShaderObject };
+    dSpecs.queues = {Kayou::RHI::QueueType::Graphics };
     dSpecs.searchPresentQueue = true;
     dSpecs.surface = surface;
 
-    Kayou::Core::RefCountPtr<Kayou::Core::Device> device = instance->CreateDevice(dSpecs);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Device> device = instance->CreateDevice(dSpecs);
 
-    Kayou::Core::SwapchainSpecs sSpecs;
+    Kayou::RHI::SwapchainSpecs sSpecs;
     sSpecs.surface = surface;
-    sSpecs.extent = Kayou::Core::Extent2D(window->GetHeight(), window->GetWidth());
+    sSpecs.extent = Kayou::RHI::Extent2D(window->GetHeight(), window->GetWidth());
     sSpecs.imageCount = 2;
-    sSpecs.presentMode = Kayou::Core::PresentMode::Mailbox;
-    sSpecs.imageFormat = Kayou::Core::Format::BGRA8_SRGB;
+    sSpecs.presentMode = Kayou::RHI::PresentMode::Mailbox;
+    sSpecs.imageFormat = Kayou::RHI::Format::BGRA8_SRGB;
     sSpecs.isDepthEnable = true;
-    sSpecs.depthImageFormat = Kayou::Core::Format::D32_SFLOAT;
+    sSpecs.depthImageFormat = Kayou::RHI::Format::D32_SFLOAT;
 
-    Kayou::Core::RefCountPtr<Kayou::Core::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
 
-    Kayou::Core::BufferSpecs bufferSpecs{};
-    bufferSpecs.usages = { Kayou::Core::BufferUsage::Vertex, Kayou::Core::BufferUsage::TransferDst };
+    Kayou::RHI::BufferSpecs bufferSpecs{};
+    bufferSpecs.usages = { Kayou::RHI::BufferUsage::Vertex, Kayou::RHI::BufferUsage::TransferDst };
     bufferSpecs.size = 65536;
-    bufferSpecs.memoryAccess = { Kayou::Core::MemoryAccess::CPU_Write };
+    bufferSpecs.memoryAccess = { Kayou::RHI::MemoryAccess::CPU_Write };
 
-    Kayou::Core::RefCountPtr<Kayou::Core::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
     
     while (!window->ShouldClose())
     {

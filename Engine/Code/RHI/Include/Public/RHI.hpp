@@ -1,14 +1,12 @@
 #pragma once
-#include "Core/Utils/Core.hpp"
+#include "Utils/Core.hpp"
 
-BEGIN_NAMESPACE_CORE
+#define RHI_NAMESPACE RHI
 
-enum RendererAPI
-{
-	Vulkan = 0
-};
+#define BEGIN_NAMESPACE_RHI BEGIN_NAMESPACE_KAYOU namespace RHI_NAMESPACE {
+#define END_NAMESPACE_RHI } /* namespace RHI_NAMESPACE */ END_NAMESPACE_KAYOU
 
-
+BEGIN_NAMESPACE_RHI
 
 // ---------- INSTANCE RELATED ----------
 struct Version
@@ -187,4 +185,4 @@ enum class MemoryAccess
 	GPU_Only
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

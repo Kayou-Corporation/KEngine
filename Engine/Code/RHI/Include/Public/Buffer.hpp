@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Core/Utils/Export.hpp"
-#include "Core/Utils/Memory.hpp"
+#include "Utils/Export.hpp"
+#include "Utils/Memory.hpp"
 
-#include "Core/RHI/Public/RHI.hpp"
+#include "Public/RHI.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 struct BufferSpecs
 {
@@ -14,7 +14,7 @@ struct BufferSpecs
 	uint32_t size;
 };
 
-class Buffer : public virtual IResource
+class Buffer : public virtual Core::IResource
 {
 public:
 	virtual ~Buffer() = default;
@@ -22,4 +22,4 @@ public:
 	
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

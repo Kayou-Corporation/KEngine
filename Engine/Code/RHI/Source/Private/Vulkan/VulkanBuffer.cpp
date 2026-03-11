@@ -1,6 +1,6 @@
-#include "Core/RHI/Private/Vulkan/VulkanBuffer.hpp"
+#include "Private/Vulkan/VulkanBuffer.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 vk::BufferCreateInfo VulkanBuffer::GetCreateInfo(const BufferSpecs& specs)
 {
@@ -11,4 +11,4 @@ vk::BufferCreateInfo VulkanBuffer::GetCreateInfo(const BufferSpecs& specs)
 	return bufferCreateInfo;
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

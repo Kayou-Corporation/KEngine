@@ -1,16 +1,18 @@
 #pragma once
 
-#include "Core/Utils/Export.hpp"
-#include "Core/Utils/Memory.hpp"
+#include "Utils/Export.hpp"
+#include "Utils/Memory.hpp"
 
-BEGIN_NAMESPACE_CORE
+#include "Public/RHI.hpp"
+
+BEGIN_NAMESPACE_RHI
 
 struct ImageSpecs
 {
 
 };
 
-class Image : virtual public IResource
+class Image : virtual public Core::IResource
 {
 public:
 	virtual ~Image() = default;
@@ -18,4 +20,4 @@ public:
 
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

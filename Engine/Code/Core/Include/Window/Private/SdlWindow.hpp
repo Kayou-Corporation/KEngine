@@ -25,7 +25,7 @@ private:
 	bool m_isRunning = false;
 };
 
-//#ifdef VULKAN_ENABLE
+#ifdef VULKAN_ENABLE
 class SDLVulkanWindowRenderer : public VulkanWindowRenderer
 {
 public:
@@ -37,6 +37,6 @@ public:
 private:
 
 };
-//#endif
+#endif
 
 END_NAMESPACE_CORE

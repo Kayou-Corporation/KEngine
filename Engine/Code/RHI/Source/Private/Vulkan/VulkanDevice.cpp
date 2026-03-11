@@ -1,11 +1,11 @@
-#include "Core/RHI/Private/Vulkan/VulkanDevice.hpp"
+#include "Private/Vulkan/VulkanDevice.hpp"
 
-#include "Core/RHI/Private/Vulkan/VulkanSurface.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanQueue.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanTranslate.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanSwapchain.hpp"
-#include "Core/RHI/Private/Vulkan/VulkanBuffer.hpp"
+#include "Private/Vulkan/VulkanSurface.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
+#include "Private/Vulkan/VulkanQueue.hpp"
+#include "Private/Vulkan/VulkanTranslate.hpp"
+#include "Private/Vulkan/VulkanSwapchain.hpp"
+#include "Private/Vulkan/VulkanBuffer.hpp"
 
 #include <map>
 #include <set>
@@ -18,7 +18,7 @@ DISABLE_ALL_WARNINGS
 
 RESTORE_WARNINGS
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 void VulkanDevice::WaitIdle()
 {
@@ -30,9 +30,9 @@ void VulkanDevice::QueueWaitIdle(QueueType type)
 	m_queues[type].WaitIdle();
 }
 
-RefCountPtr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainSpecs& specs)
+Core::RefCountPtr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainSpecs& specs)
 {
-	RefCountPtr<VulkanSwapchain> swapchain = CreateRefPtr<VulkanSwapchain>();
+	Core::RefCountPtr<VulkanSwapchain> swapchain = Core::CreateRefPtr<VulkanSwapchain>();
 
 	std::unordered_map<int, int> map;
 
@@ -57,16 +57,16 @@ RefCountPtr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainSpecs& specs
 	return swapchain;
 }
 
-void VulkanDevice::DestroySwapchain(RefCountPtr<Swapchain> swapchain)
+void VulkanDevice::DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain)
 {
 	auto vkSwapchain = swapchain.CastAs<VulkanSwapchain>();
 	
 	m_handle.destroySwapchainKHR(vkSwapchain->GetHandle());
 }
 
-RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
+Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
 {
-	RefCountPtr buffer = CreateRefPtr<VulkanBuffer>();
+	Core::RefCountPtr buffer = Core::CreateRefPtr<VulkanBuffer>();
 
 	VkBufferCreateInfo bufferInfo = buffer->GetCreateInfo(specs);
 
@@ -85,7 +85,7 @@ RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
 	return buffer;
 }
 
-void VulkanDevice::DestroyBuffer(RefCountPtr<Buffer> buffer)
+void VulkanDevice::DestroyBuffer(Core::RefCountPtr<Buffer> buffer)
 {
 	auto vkBuffer = buffer.CastAs<VulkanBuffer>();
 
@@ -318,4 +318,4 @@ void VulkanDevice::BuildFeaturesChain()
 	m_featuresChain.pNext = currentPNext;
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

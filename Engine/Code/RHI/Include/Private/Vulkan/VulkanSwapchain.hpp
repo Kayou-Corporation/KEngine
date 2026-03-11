@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/RHI/Public/Swapchain.hpp"
+#include "Public/Swapchain.hpp"
 
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 struct PhysicalDeviceCompatibiliy;
 
@@ -38,4 +38,4 @@ private:
 	vk::Format m_depthImageFormat;
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/RHI/Public/Instance.hpp"
+#include "Public/Instance.hpp"
 
-#include "Core/RHI/Private/Vulkan/VulkanUtils.hpp"
+#include "Private/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_RHI
 
 class VulkanInstance : public Instance
 {
@@ -15,11 +15,11 @@ public:
 	void Create(const InstanceSpecs& specs) override;
 	void Destroy() override;
 
-	RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) override;
-	void DestroySurface(RefCountPtr<Surface> surface) override;
+	Core::RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) override;
+	void DestroySurface(Core::RefCountPtr<Surface> surface) override;
 
-	RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) override;
-	void DestroyDevice(RefCountPtr<Device> device) override;
+	Core::RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) override;
+	void DestroyDevice(Core::RefCountPtr<Device> device) override;
 
 protected:
 	Version m_engineVersion;
@@ -37,4 +37,4 @@ private:
 	vk::detail::DispatchLoaderDynamic m_dispatchLoader;
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_RHI
