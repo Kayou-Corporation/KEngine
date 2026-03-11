@@ -13,26 +13,15 @@ endif()
 #---------------------------------------#
 #                SOURCES                #
 #---------------------------------------#
-file(GLOB_RECURSE K_ENGINE_SOURCES "Code/*.cpp")
-
 # Define the lib name for easy modification
 set(K_TARGET_NAME KEngine)
-
-
 
 #---------------------------------------#
 #            BUILD MODE                 #
 #---------------------------------------#
-add_library(${K_TARGET_NAME} STATIC ${K_ENGINE_SOURCES})
+set(DUMMY_SOURCE "Code/Dummy.cpp")
 
-
-
-#---------------------------------------#
-#                INCLUDE                #
-#---------------------------------------#
-target_include_directories(${K_TARGET_NAME} PUBLIC "Code/Include" "Libs/Glm" "Libs/Stbimage" "Libs")
-
-
+add_library(${K_TARGET_NAME} STATIC ${DUMMY_SOURCE})
 
 #---------------------------------------#
 #                COMPILE MODE           #
@@ -57,8 +46,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 target_compile_definitions(${K_TARGET_NAME} PUBLIC VULKAN_ENABLE)
 
-target_link_libraries(${K_TARGET_NAME} PUBLIC Vulkan::Vulkan glm::glm SDL3::SDL3 spdlog::spdlog assimp)
-target_link_libraries(${K_TARGET_NAME} PRIVATE GPUOpen::VulkanMemoryAllocator)
+add_subdirectory(Code/Core)
+add_subdirectory(Code/RHI)
+
+target_link_libraries(${K_TARGET_NAME} PUBLIC Core)
+
+if (LINK_RHI)
+    target_link_libraries(${K_TARGET_NAME} PUBLIC RHI)
+endif()
 
 
 #---------------------------------------#

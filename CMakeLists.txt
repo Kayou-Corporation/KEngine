@@ -25,6 +25,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # --------------------------------------- #
 #              SUB DIRECTORIES            #
 # --------------------------------------- #
+set (LINK_RHI ON CACHE BOOL "Link the RHI module")
 add_subdirectory(Engine)
 add_subdirectory(Editor)
 
