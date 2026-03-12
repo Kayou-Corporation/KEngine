@@ -19,7 +19,6 @@ public:
 	VulkanBuffer() = default;
 	virtual ~VulkanBuffer() override = default;
 
-	void SetData(void* data, uint32_t size);
 	void* GetMappedData() const override { return m_allocationInfo.pMappedData; }
 
 public:
@@ -46,7 +45,6 @@ private:
 	VmaAllocation m_allocation;
 	VmaAllocationInfo m_allocationInfo;
 
-	bool m_isGpuOnly = false;
 };
 
 END_NAMESPACE_RHI
