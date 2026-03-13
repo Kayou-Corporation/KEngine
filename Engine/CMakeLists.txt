@@ -21,7 +21,7 @@ set(K_TARGET_NAME KEngine)
 #---------------------------------------#
 set(DUMMY_SOURCE "Code/Dummy.cpp")
 
-add_library(${K_TARGET_NAME} STATIC ${DUMMY_SOURCE})
+add_library(${K_TARGET_NAME} SHARED ${DUMMY_SOURCE})
 
 #---------------------------------------#
 #                COMPILE MODE           #
