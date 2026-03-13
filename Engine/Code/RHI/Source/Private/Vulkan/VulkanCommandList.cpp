@@ -21,6 +21,8 @@ void VulkanCommandList::Close()
 void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset, Core::RefCountPtr<Device> device)
 {
 	ASSERT((size + offset) <= buffer->GetSize(), "Data is too large");
+	(void)data;
+	(void)device;
 
 	if (buffer->GetIsGpuOnly())
 	{
