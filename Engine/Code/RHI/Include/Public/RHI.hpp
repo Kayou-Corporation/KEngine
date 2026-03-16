@@ -185,4 +185,15 @@ enum class MemoryAccess
 	GPU_Only
 };
 
+enum class PipelineStage
+{
+	VertexInput,
+	VertexShader,
+	FragmentShader,
+	ComputeShader,
+	GeometryShader,
+	Transfer,
+	None
+};
+
 END_NAMESPACE_RHI

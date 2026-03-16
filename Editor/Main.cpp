@@ -58,9 +58,11 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
 
     Kayou::RHI::BufferSpecs bufferSpecs{};
-    bufferSpecs.usages = { Kayou::RHI::BufferUsage::Vertex, Kayou::RHI::BufferUsage::TransferDst };
+    bufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Vertex;
+    bufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
     bufferSpecs.size = 65536;
     bufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
+    bufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
     

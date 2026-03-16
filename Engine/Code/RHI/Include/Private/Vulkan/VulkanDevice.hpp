@@ -77,7 +77,7 @@ public:
     // Destroy
     void Destroy();
 
-
+    VmaAllocator GetMemoryAllocator() const { return m_memoryAllocator; }
 
 private:
     PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, const std::vector<const char*>& requiredExtensions);

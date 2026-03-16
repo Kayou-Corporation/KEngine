@@ -37,6 +37,8 @@ public:
 	VmaAllocation GetAllocation() const { return m_allocation; }
 	VmaAllocationInfo GetAllocationInfo() const { return m_allocationInfo; }
 
+	vk::PipelineStageFlagBits GetPipelineStage() const { return m_pipelineStage; }
+
 	vk::BufferCreateInfo GetCreateInfo(const BufferSpecs& specs);
 
 private:
@@ -44,6 +46,8 @@ private:
 	vk::Buffer m_handle;
 	VmaAllocation m_allocation;
 	VmaAllocationInfo m_allocationInfo;
+	vk::BufferUsageFlags m_primaryUsage;
+	vk::PipelineStageFlagBits m_pipelineStage;
 
 };
 

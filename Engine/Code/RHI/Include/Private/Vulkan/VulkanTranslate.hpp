@@ -390,4 +390,33 @@ inline VmaAllocationCreateInfo TranslateToVulkan(MemoryAccess access)
     return createInfo;
 }
 
+// Pipeline stage
+inline vk::PipelineStageFlagBits TranslateToVulkan(PipelineStage stage)
+{
+    switch (stage)
+    {
+    case PipelineStage::VertexInput:
+        return vk::PipelineStageFlagBits::eVertexInput;
+
+    case PipelineStage::VertexShader:
+        return vk::PipelineStageFlagBits::eVertexShader;
+
+    case PipelineStage::FragmentShader:
+        return vk::PipelineStageFlagBits::eFragmentShader;
+
+    case PipelineStage::ComputeShader:
+        return vk::PipelineStageFlagBits::eComputeShader;
+
+    case PipelineStage::GeometryShader:
+        return vk::PipelineStageFlagBits::eGeometryShader;
+        
+    case PipelineStage::Transfer:
+        return vk::PipelineStageFlagBits::eTransfer;
+
+    case PipelineStage::None:
+    default:
+        return vk::PipelineStageFlagBits::eNone;
+    }
+}
+
 END_NAMESPACE_RHI
