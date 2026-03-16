@@ -36,7 +36,7 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	createInfo.setEnabledExtensionCount(static_cast<uint32_t>(vkExtensions.size()));
 	createInfo.setPEnabledExtensionNames(vkExtensions);
 
-	vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+	[[maybe_unused]] vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
 #ifdef KENGINE_DEBUG
 	debugCreateInfo.setMessageSeverity
 	(vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |

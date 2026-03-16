@@ -223,6 +223,20 @@
       "configurePreset": "GCC",
       "configuration": "Release",
       "verbose": true
+    },
+    {
+      "name": "Clang Debug",
+      "description": "Clang debug preset",
+      "configurePreset": "Clang",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "Clang Release",
+      "description": "Clang debug preset",
+      "configurePreset": "Clang",
+      "configuration": "Release",
+      "verbose": true
     }
   ],
   "testPresets": [
