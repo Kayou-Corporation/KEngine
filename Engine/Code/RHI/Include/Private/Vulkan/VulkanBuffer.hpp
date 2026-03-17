@@ -37,6 +37,8 @@ public:
 	VmaAllocation GetAllocation() const { return m_allocation; }
 	VmaAllocationInfo GetAllocationInfo() const { return m_allocationInfo; }
 
+	vk::BufferUsageFlags GetPrimaryUsage() const { return m_primaryUsage; }
+	vk::BufferUsageFlags GetUsage() const { return m_usage; }
 	vk::PipelineStageFlagBits GetPipelineStage() const { return m_pipelineStage; }
 
 	vk::BufferCreateInfo GetCreateInfo(const BufferSpecs& specs);
@@ -47,8 +49,35 @@ private:
 	VmaAllocation m_allocation;
 	VmaAllocationInfo m_allocationInfo;
 	vk::BufferUsageFlags m_primaryUsage;
+	vk::BufferUsageFlags m_usage;
 	vk::PipelineStageFlagBits m_pipelineStage;
 
 };
+
+// It will probably be useful to implement more flags later...
+inline vk::AccessFlags GetAccessFlagsFromUsage(vk::BufferUsageFlags usage)
+{
+	vk::AccessFlags flags{};
+
+	if (usage & vk::BufferUsageFlagBits::eVertexBuffer)
+		flags |= vk::AccessFlagBits::eVertexAttributeRead;
+
+	if (usage & vk::BufferUsageFlagBits::eIndexBuffer)
+		flags |= vk::AccessFlagBits::eIndexRead;
+
+	if (usage & vk::BufferUsageFlagBits::eUniformBuffer)
+		flags |= vk::AccessFlagBits::eUniformRead;
+
+	if (usage & vk::BufferUsageFlagBits::eStorageBuffer)
+		flags |= vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite;
+
+	if (usage & vk::BufferUsageFlagBits::eTransferSrc)
+		flags |= vk::AccessFlagBits::eTransferRead;
+
+	if (usage & vk::BufferUsageFlagBits::eTransferDst)
+		flags |= vk::AccessFlagBits::eTransferWrite;
+
+	return flags;
+}
 
 END_NAMESPACE_RHI

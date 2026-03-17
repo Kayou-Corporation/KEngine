@@ -5,15 +5,16 @@ BEGIN_NAMESPACE_RHI
 vk::BufferCreateInfo VulkanBuffer::GetCreateInfo(const BufferSpecs& specs)
 {
 	vk::BufferUsageFlags primaryUsage = TranslateToVulkan(specs.primaryUsage);
-	vk::BufferUsageFlags additionalUsages = TranslateToVulkan(specs.additionalUsages);
+	vk::BufferUsageFlags usage = primaryUsage | TranslateToVulkan(specs.additionalUsages);
 	uint32_t size = specs.size;
 
 	m_primaryUsage = primaryUsage;
+	m_usage = usage;
 	m_size = specs.size;
 	m_pipelineStage = TranslateToVulkan(specs.pipelineStage);
 
 	vk::BufferCreateInfo bufferCreateInfo{};
-	bufferCreateInfo.usage = primaryUsage | additionalUsages;
+	bufferCreateInfo.usage = usage;
 	bufferCreateInfo.size = size;
 
 	return bufferCreateInfo;
