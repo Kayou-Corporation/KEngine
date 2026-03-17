@@ -114,7 +114,7 @@ std::vector<const char*> VulkanInstance::CheckValidationLayersSupport(const std:
 		}
 		else
 		{
-			spdlog::warn("[Vulkan] {}", requestedLayer);
+			spdlog::debug("[Vulkan] {}", requestedLayer);
 		}
 	}
 
