@@ -148,6 +148,7 @@ PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physic
 	PhysicalDevice device;
 	device.physicalDevice = physicalDevice;
 	device.family = QueueFamily::FindQueueFamily(physicalDevice, queues, searchPresentQueue, surface);
+	device.score = 0;
 
 	if (!device.family.IsComplete()) 
 	{
