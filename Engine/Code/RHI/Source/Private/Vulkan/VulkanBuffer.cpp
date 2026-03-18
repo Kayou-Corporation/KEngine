@@ -12,6 +12,7 @@ vk::BufferCreateInfo VulkanBuffer::GetCreateInfo(const BufferSpecs& specs)
 	m_usage = usage;
 	m_size = specs.size;
 	m_pipelineStage = TranslateToVulkan(specs.pipelineStage);
+	m_isPersistentMapped = specs.isPersistentMapped;
 
 	vk::BufferCreateInfo bufferCreateInfo{};
 	bufferCreateInfo.usage = usage;

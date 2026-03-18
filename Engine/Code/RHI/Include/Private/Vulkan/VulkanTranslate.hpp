@@ -373,14 +373,12 @@ inline VmaAllocationCreateInfo TranslateToVulkan(MemoryAccess access)
     {
     case MemoryAccess::CPU_Read:
         createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
-        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT |
-            VMA_ALLOCATION_CREATE_MAPPED_BIT;
+        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
         break;
 
     case MemoryAccess::CPU_Write:
         createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
-        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
-            VMA_ALLOCATION_CREATE_MAPPED_BIT;
+        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         break;
 
     case MemoryAccess::GPU_Only:

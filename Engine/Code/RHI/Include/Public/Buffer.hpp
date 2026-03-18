@@ -16,6 +16,7 @@ struct BufferSpecs
 	std::vector<BufferUsage> additionalUsages;
 	MemoryAccess memoryAccess;
 	PipelineStage pipelineStage;
+	bool isPersistentMapped = false;
 };
 
 class Buffer : public virtual Core::IResource
@@ -30,9 +31,12 @@ public:
 
 	virtual uint32_t GetSize() const { return m_size; }
 
+	virtual bool GetIsPersistentMapped() const { return m_isPersistentMapped; }
+
 protected:
 	uint32_t m_size;
 	bool m_isGpuOnly = false;
+	bool m_isPersistentMapped = false;
 };
 
 END_NAMESPACE_RHI

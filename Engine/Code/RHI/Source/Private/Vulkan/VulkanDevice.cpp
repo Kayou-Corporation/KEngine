@@ -71,6 +71,8 @@ Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
 	VkBufferCreateInfo bufferInfo = buffer->GetCreateInfo(specs);
 
 	VmaAllocationCreateInfo allocInfo = TranslateToVulkan(specs.memoryAccess);
+	if (buffer->GetIsPersistentMapped())
+		allocInfo.flags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
 	VkBuffer buf;
 	VmaAllocation allocation;
