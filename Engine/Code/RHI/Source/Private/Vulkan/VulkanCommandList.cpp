@@ -3,7 +3,7 @@
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanDevice.hpp"
 
-DISABLE_ALL_WARNINGS
+DISABLE_WARNINGS
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>

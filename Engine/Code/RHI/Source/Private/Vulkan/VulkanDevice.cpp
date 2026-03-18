@@ -11,7 +11,7 @@
 #include <set>
 #include <string>
 
-DISABLE_ALL_WARNINGS
+DISABLE_WARNINGS
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-DISABLE_ALL_WARNINGS
+DISABLE_WARNINGS
 
 #include <vk_mem_alloc.h>
 
