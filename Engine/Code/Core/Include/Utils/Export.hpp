@@ -7,13 +7,13 @@
 #define ENGINEEXPORT_H
 
 #ifdef Engine_EXPORTS
-#ifdef _MSC_VER
+#if defined _MSC_VER && not defined(__clang__)
 #define KENGINE_API __declspec(dllexport)
 #else
 #define KENGINE_API __attribute__((visibility("default")))
 #endif
 #else
-#ifdef _MSC_VER
+#if defined _MSC_VER && not defined(__clang__)
 #define KENGINE_API __declspec(dllimport)
 #else
 #define KENGINE_API
@@ -22,18 +22,18 @@
 
 #endif
 
-#if defined(_DEBUG) || defined(DEBUG) || defined(__DEBUG__) || defined(__DEBUG) || not defined(NDEGUG)
+#if (defined(_DEBUG) || defined(DEBUG) || defined(__DEBUG__) || defined(__DEBUG)) && not defined(NDEGUG)
 #define KENGINE_DEBUG
 #endif
 
-#ifdef _MSC_VER
+#if defined _MSC_VER && not defined(__clang__)
 #define BREAKPOINT() __debugbreak()
 #else
 #define BREAKPOINT() __builtin_trap()
 #endif
 
 #ifdef KENGINE_DEBUG
-#ifdef _MSC_VER
+#if defined _MSC_VER && not defined(__clang__)
 #define BREAKPOINT() __debugbreak()
 #else
 #define BREAKPOINT() __builtin_trap()

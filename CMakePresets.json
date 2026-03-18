@@ -237,6 +237,13 @@
       "configurePreset": "Clang",
       "configuration": "Release",
       "verbose": true
+    },
+    {
+      "name": "Clang MinSizeRel",
+      "description": "Clang debug preset",
+      "configurePreset": "Clang",
+      "configuration": "MinSizeRel",
+      "verbose": true
     }
   ],
   "testPresets": [
