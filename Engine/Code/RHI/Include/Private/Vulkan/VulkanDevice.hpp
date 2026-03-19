@@ -48,20 +48,6 @@ static std::vector<const char*> nativeExtensions =
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-class TrackedStagingBuffer : virtual public Core::IResource
-{
-public:
-    TrackedStagingBuffer() = default;
-    virtual ~TrackedStagingBuffer() override = default;
-
-    vk::Buffer handle;
-    VmaAllocation allocation;
-    VmaAllocationInfo allocationInfo;
-
-    uint64_t submissionId;
-};
-typedef Core::RefCountPtr<TrackedStagingBuffer> TrackedStagingBufferPtr;
-
 class VulkanDevice : public Device
 {
 // Public
@@ -90,7 +76,9 @@ public:
 
     // Destroy
     void Destroy();
+    void DestroyBuffer(vk::Buffer buffer, VmaAllocation allocation);
 
+    vk::Device GetHandle() const { return m_handle; }
     VmaAllocator GetMemoryAllocator() const { return m_memoryAllocator; }
 
 private:

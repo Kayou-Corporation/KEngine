@@ -66,7 +66,7 @@ void VulkanDevice::DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain)
 
 Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
 {
-	Core::RefCountPtr buffer = Core::CreateRefPtr<VulkanBuffer>();
+	Core::RefCountPtr<VulkanBuffer> buffer = Core::CreateRefPtr<VulkanBuffer>();
 
 	VkBufferCreateInfo bufferInfo = buffer->GetCreateInfo(specs);
 
@@ -97,6 +97,11 @@ void VulkanDevice::DestroyBuffer(Core::RefCountPtr<Buffer> buffer)
 	VmaAllocation bufferAllocation = vkBuffer->GetAllocation();
 
 	vmaDestroyBuffer(m_memoryAllocator, rawBuffer, bufferAllocation);
+}
+
+void VulkanDevice::DestroyBuffer(vk::Buffer buffer, VmaAllocation allocation)
+{
+	vmaDestroyBuffer(m_memoryAllocator, buffer, allocation);
 }
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)

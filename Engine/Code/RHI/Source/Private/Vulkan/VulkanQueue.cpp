@@ -1,5 +1,6 @@
 #include "Private/Vulkan/VulkanQueue.hpp"
 #include "Private/Vulkan/VulkanCommandList.hpp"
+#include "Private/Vulkan/VulkanDevice.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -104,6 +105,9 @@ void Queue::Destroy(vk::Device& device)
         device.freeCommandBuffers(cmdBuffer->cmdPool, cmdBuffer->cmdBuffer);
         device.destroyCommandPool(cmdBuffer->cmdPool);
     }
+
+    m_commandBuffersPool.clear();
+    m_inFlightCommandBuffersPool.clear();
 }
 
 void Queue::WaitIdle()
@@ -163,11 +167,13 @@ void Queue::Submit(TrackedCommandBufferPtr cmdBuffer)
     m_inFlightCommandBuffersPool.push_back(cmdBuffer);
 }
 
-void Queue::RunGarbageCollector(vk::Device& device)
+void Queue::RunGarbageCollector(Core::RefCountPtr<VulkanDevice>& device)
 {
+    vk::Device vkDevice = device->GetHandle();
+
     std::list<TrackedCommandBufferPtr> submissions = std::move(m_inFlightCommandBuffersPool);
 
-    m_lastFinishedId = VK_CHECK_RESULT(device.getSemaphoreCounterValue(m_trackingSemaphore), "Coudn't get semaphore value");
+    m_lastFinishedId = VK_CHECK_RESULT(vkDevice.getSemaphoreCounterValue(m_trackingSemaphore), "Coudn't get semaphore value");
 
     for (const TrackedCommandBufferPtr& cmd : submissions)
     {
@@ -176,6 +182,13 @@ void Queue::RunGarbageCollector(vk::Device& device)
         {
             cmd->submissionId = 0;
             VK_CHECK_VOID(cmd->cmdBuffer.reset(), "Can't reset command buffer");
+
+            TrackedStagingBufferPtr trackedStagingBuffer = cmd->trackedStagingBuffer;
+            if (trackedStagingBuffer)
+            {
+                device->DestroyBuffer(trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
+                trackedStagingBuffer = {};
+            }
 
             m_commandBuffersPool.push_back(cmd);
         }

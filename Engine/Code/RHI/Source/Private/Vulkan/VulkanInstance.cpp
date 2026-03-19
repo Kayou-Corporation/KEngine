@@ -71,6 +71,7 @@ void VulkanInstance::Destroy()
 	m_handle.destroyDebugUtilsMessengerEXT(m_debugHandler, nullptr, m_dispatchLoader);
 #endif
 
+	m_debugLayers.clear();
 	m_handle.destroy();
 }
 

@@ -10,6 +10,12 @@
 #include "Utils/Memory.hpp"
 #include "Private/Vulkan/VulkanUtils.hpp"
 
+DISABLE_WARNINGS
+
+#include <vk_mem_alloc.h>
+
+RESTORE_WARNINGS
+
 BEGIN_NAMESPACE_RHI
 
 struct QueueFamily
@@ -31,6 +37,18 @@ private:
 
 class VulkanCommandList;
 
+class TrackedStagingBuffer : virtual public Core::IResource
+{
+public:
+	TrackedStagingBuffer() = default;
+	virtual ~TrackedStagingBuffer() override = default;
+
+	vk::Buffer handle;
+	VmaAllocation allocation;
+	VmaAllocationInfo allocationInfo;
+};
+typedef Core::RefCountPtr<TrackedStagingBuffer> TrackedStagingBufferPtr;
+
 class TrackedCommandBuffer : virtual public Core::IResource
 {
 public:
@@ -41,6 +59,8 @@ public:
 	vk::CommandBuffer cmdBuffer;
 
 	uint64_t submissionId;
+
+	TrackedStagingBufferPtr trackedStagingBuffer;
 };
 typedef Core::RefCountPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
 
@@ -59,7 +79,7 @@ public:
 	TrackedCommandBufferPtr GetOrCreateCommandBuffer(vk::Device& device);
 	void Submit(TrackedCommandBufferPtr cmdBuffer);
 
-	void RunGarbageCollector(vk::Device& device);
+	void RunGarbageCollector(Core::RefCountPtr<VulkanDevice>& device);
 
 private:
 	vk::Queue m_handle;

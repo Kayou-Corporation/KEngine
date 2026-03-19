@@ -90,7 +90,12 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> buffer, void* da
 
 		cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, pipelineStage, {}, nullptr, bufferMemBarrier2, nullptr);
 
-		// TODO : manage staging buffer destruction
+		TrackedStagingBufferPtr trackedStagingBuffer = Core::CreateRefPtr<TrackedStagingBuffer>();
+		trackedStagingBuffer->handle = stagingBuf;
+		trackedStagingBuffer->allocation = stagingAlloc;
+		trackedStagingBuffer->allocationInfo = stagingAllocInfo;
+
+		m_handle->trackedStagingBuffer = trackedStagingBuffer;
 	}
 	else
 	{
