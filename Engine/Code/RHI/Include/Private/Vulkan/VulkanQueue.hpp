@@ -18,6 +18,8 @@ RESTORE_WARNINGS
 
 BEGIN_NAMESPACE_RHI
 
+class VulkanDevice;
+
 struct QueueFamily
 {
 public:
