@@ -187,7 +187,7 @@ void Queue::RunGarbageCollector(Core::RefCountPtr<VulkanDevice>& device)
             if (trackedStagingBuffer)
             {
                 device->DestroyBuffer(trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
-                trackedStagingBuffer = {};
+                cmd->trackedStagingBuffer = {};
             }
 
             m_commandBuffersPool.push_back(cmd);
