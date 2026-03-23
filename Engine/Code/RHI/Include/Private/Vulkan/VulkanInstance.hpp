@@ -12,14 +12,14 @@ public:
 	VulkanInstance() = default;
 	virtual ~VulkanInstance() override = default;
 
-	void Create(const InstanceSpecs& specs) override;
-	void Destroy() override;
+	virtual void Create(const InstanceSpecs& specs) override;
+	virtual void Destroy() override;
 
-	Core::RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) override;
-	void DestroySurface(Core::RefCountPtr<Surface> surface) override;
+	virtual Core::RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) override;
+	virtual void DestroySurface(Core::RefCountPtr<Surface> surface) override;
 
-	Core::RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) override;
-	void DestroyDevice(Core::RefCountPtr<Device> device) override;
+	virtual Core::RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) override;
+	virtual void DestroyDevice(Core::RefCountPtr<Device> device) override;
 
 protected:
 	Version m_engineVersion;

@@ -14,10 +14,10 @@ public:
 	VulkanCommandList() = default;
 	virtual ~VulkanCommandList() override = default;
 
-	void Open() override;
-	void Close() override;
+	virtual void Open() override;
+	virtual void Close() override;
 
-	void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset, Core::RefCountPtr<Device> device) override;
+	virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset, Core::RefCountPtr<Device> device) override;
 
 public:
 	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }

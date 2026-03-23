@@ -12,11 +12,11 @@ public:
 	SDLWindow() = default;
 	virtual ~SDLWindow() override = default;
 
-	void Create(const WindowSpecs& specs) override;
-	void Destroy() override;
+	virtual void Create(const WindowSpecs& specs) override;
+	virtual void Destroy() override;
 
-	bool ShouldClose() override { return !m_isRunning; }
-	void PollEvents() override;
+	virtual bool ShouldClose() override { return !m_isRunning; }
+	virtual void PollEvents() override;
 
 	SDL_Window* GetSDLWindow() const { return m_window; }
 
@@ -32,8 +32,8 @@ public:
 	SDLVulkanWindowRenderer(Window* ownerWindow);
 	virtual ~SDLVulkanWindowRenderer() override = default;
 
-	std::vector<const char*> GetVulkanInstanceExtensions() override;
-	VkSurfaceKHR CreateVulkanSurface(VkInstance instance) override;
+	virtual std::vector<const char*> GetVulkanInstanceExtensions() override;
+	virtual VkSurfaceKHR CreateVulkanSurface(VkInstance instance) override;
 private:
 
 };

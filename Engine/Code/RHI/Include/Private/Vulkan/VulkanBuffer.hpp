@@ -19,7 +19,7 @@ public:
 	VulkanBuffer() = default;
 	virtual ~VulkanBuffer() override = default;
 
-	void* GetMappedData() const override { return m_allocationInfo.pMappedData; }
+	virtual void* GetMappedData() const override { return m_allocationInfo.pMappedData; }
 
 public:
 	void SetHandle(vk::Buffer buffer) { m_handle = buffer; }
