@@ -29,12 +29,12 @@ public:
     RefCounter(Args&&... args) : T(std::forward<Args>(args)...) {}
     virtual ~RefCounter() = default;
 
-    unsigned long AddRef() override
+    virtual unsigned long AddRef() override
     {
         return ++m_count;
     }
 
-    unsigned long Release() override
+    virtual unsigned long Release() override
     {
         unsigned long currentCount = --m_count;
         if (currentCount == 0)
@@ -44,7 +44,7 @@ public:
         return currentCount;
     }
 
-    unsigned long GetRefCount() override { return m_count.load(); }
+    virtual unsigned long GetRefCount() override { return m_count.load(); }
 };
 
 template<typename T>

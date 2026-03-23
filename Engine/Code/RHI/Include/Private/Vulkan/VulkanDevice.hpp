@@ -56,15 +56,15 @@ public:
     virtual ~VulkanDevice() override = default;
 
     // Commands / sync
-    void WaitIdle() override;
-    void QueueWaitIdle(QueueType type) override;
+    virtual void WaitIdle() override;
+    virtual void QueueWaitIdle(QueueType type) override;
 
     // Create objects
-    Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
-    void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) override;
+    virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
+    virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) override;
 
-    Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
-    void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) override;
+    virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
+    virtual void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) override;
 
 
 // Public vulkan
