@@ -194,6 +194,35 @@ inline vk::Format TranslateToVulkan(Format format)
     }
 }
 
+// ImageUsage
+inline vk::ImageUsageFlagBits TranslateToVulkan(ImageUsage usage)
+{
+    switch (usage)
+    {
+    case ImageUsage::ColorAttachment :
+        return vk::ImageUsageFlagBits::eColorAttachment;
+
+    case ImageUsage::DepthStencilAttachment:
+        return vk::ImageUsageFlagBits::eDepthStencilAttachment;
+
+    case ImageUsage::TransferSrc:
+        return vk::ImageUsageFlagBits::eTransferSrc;
+
+    case ImageUsage::TransferDst:
+        return vk::ImageUsageFlagBits::eTransferDst;
+
+    case ImageUsage::ShaderSampled:
+        return vk::ImageUsageFlagBits::eSampled;
+
+    case ImageUsage::Storage:
+        return vk::ImageUsageFlagBits::eStorage;
+
+    case ImageUsage::Undefined:
+    default:
+        return vk::ImageUsageFlagBits::eColorAttachment;
+    }
+}
+
 // ImageLayout
 inline vk::ImageLayout TranslateToVulkan(Layout layout)
 {
@@ -223,6 +252,26 @@ inline vk::ImageLayout TranslateToVulkan(Layout layout)
     case Layout::Undefined:
     default:
         return vk::ImageLayout::eUndefined;
+    }
+}
+
+// ImageLayout
+inline vk::ImageType TranslateToVulkan(ImageType type)
+{
+    switch (type)
+    {
+    case ImageType::Image1D:
+        return vk::ImageType::e1D;
+
+    case ImageType::Image2D:
+        return vk::ImageType::e2D;
+
+    case ImageType::Image3D:
+        return vk::ImageType::e3D;
+
+    case ImageType::Undefined:
+    default:
+        return vk::ImageType::e2D;
     }
 }
 
