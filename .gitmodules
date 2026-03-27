@@ -13,3 +13,6 @@
 [submodule "Engine/Libs/Assimp"]
 	path = Engine/Libs/Assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "Engine/Libs/Slang"]
+	path = Engine/Libs/Slang
+	url = https://github.com/shader-slang/slang.git
