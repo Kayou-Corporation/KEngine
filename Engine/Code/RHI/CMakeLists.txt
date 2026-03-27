@@ -18,4 +18,4 @@ target_include_directories(${RHI_TARGET_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR
 
 
 
-target_link_libraries(${RHI_TARGET_NAME} PUBLIC GPUOpen::VulkanMemoryAllocator Core)
+target_link_libraries(${RHI_TARGET_NAME} PUBLIC GPUOpen::VulkanMemoryAllocator slang Core)

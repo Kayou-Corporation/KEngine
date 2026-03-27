@@ -52,3 +52,12 @@ set(ASSIMP_BUILD_ASSBIN_EXPORTER OFF CACHE BOOL "Disable ASSBIN exporter")
 set(ASSIMP_BUILD_ASSXML_EXPORTER OFF CACHE BOOL "Disable ASSXML exporter")
 
 add_subdirectory(Assimp)
+
+# ----------- Slang ----------- #
+set(SLANG_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_RHI OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(Slang EXCLUDE_FROM_ALL)
+
+target_compile_definitions(slang PRIVATE _CRT_SECURE_NO_WARNINGS)
