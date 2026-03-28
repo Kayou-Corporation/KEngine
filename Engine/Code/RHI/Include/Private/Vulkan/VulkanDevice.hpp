@@ -66,6 +66,9 @@ public:
     virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
     virtual void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) override;
 
+    virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) override;
+    virtual void DestroyImage(Core::RefCountPtr<Image> image) override;
+
 
 // Public vulkan
 public:

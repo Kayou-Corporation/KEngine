@@ -34,13 +34,17 @@ public:
 	vk::ImageView GetHandleView() const { return m_handleView; }
 	vk::ImageView& GetHandleViewRef() { return m_handleView; }
 
-private:
+private: 
+	void ComputeUsage(vk::ImageUsageFlags usages);
 
+private:
 	vk::Image m_handle;
 	vk::ImageView m_handleView;
 
 	vk::ImageLayout m_finalLayout;
 	vk::Format m_imageFormat;
+	uint32_t m_layersCount;
+	uint32_t m_mipLevels;
 
 	VmaAllocation m_allocation;
 	VmaAllocationInfo m_allocationInfo;

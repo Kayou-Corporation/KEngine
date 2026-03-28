@@ -9,10 +9,14 @@ BEGIN_NAMESPACE_RHI
 
 struct ImageSpecs
 {
+	ImageSource source;
+
 	Format format;
 	Layout finalLayout;
 
 	ImageType type;
+	ImageViewType viewType;
+	ImageViewAspect viewAspect;
 	std::vector<ImageUsage> usages;
 
 	Extent3D extent;
@@ -29,7 +33,10 @@ class Image : virtual public Core::IResource
 public:
 	virtual ~Image() = default;
 
+	KENGINE_API ImageSource GetSource() { return m_source; }
 
+protected:
+	ImageSource m_source;
 };
 
 END_NAMESPACE_RHI

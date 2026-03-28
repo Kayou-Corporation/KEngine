@@ -132,6 +132,32 @@ enum class ImageType
 	Undefined
 };
 
+enum class ImageViewType
+{
+	Image1D,
+	Image2D,
+	Image3D,
+	ImageCube,
+
+	Undefined
+};
+
+enum class ImageViewAspect
+{
+	Color,
+	Depth,
+
+	Undefined
+};
+
+enum class ImageSource
+{
+	Cpu,
+	Gpu,
+
+	Undefined
+};
+
 struct Extent2D
 {
 public:

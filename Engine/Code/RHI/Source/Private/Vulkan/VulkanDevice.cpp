@@ -6,6 +6,7 @@
 #include "Private/Vulkan/VulkanTranslate.hpp"
 #include "Private/Vulkan/VulkanSwapchain.hpp"
 #include "Private/Vulkan/VulkanBuffer.hpp"
+#include "Private/Vulkan/VulkanImage.hpp"
 
 #include <map>
 #include <set>
@@ -102,6 +103,39 @@ void VulkanDevice::DestroyBuffer(Core::RefCountPtr<Buffer> buffer)
 void VulkanDevice::DestroyBuffer(vk::Buffer buffer, VmaAllocation allocation)
 {
 	vmaDestroyBuffer(m_memoryAllocator, buffer, allocation);
+}
+
+Core::RefCountPtr<Image> VulkanDevice::CreateImage(const ImageSpecs& specs)
+{
+	Core::RefCountPtr<VulkanImage> image = Core::CreateRefPtr<VulkanImage>();
+
+	vk::ImageCreateInfo imageCreateInfo = image->GetCreateInfo(specs);
+	vk::ImageViewCreateInfo imageViewCreateInfo = image->GetViewCreateInfo(specs);
+
+	VkImage im;
+
+	VmaAllocationCreateInfo allocInfo;
+	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+	VmaAllocation allocation;
+	VmaAllocationInfo allocationInfo;
+
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, imageCreateInfo, &allocInfo, &im, &allocation, &allocationInfo)), "Failed to create image");
+
+	vk::ImageView imView = VK_CHECK_RESULT(m_handle.createImageView(imageViewCreateInfo, nullptr), "Failed to create image");
+
+	image->SetAllocation(allocation);
+	image->SetAllocationInfo(allocationInfo);
+
+	image->SetHandle(im);
+
+	image->SetHandleView(imView);
+
+	return image;
+}
+
+void VulkanDevice::DestroyImage(Core::RefCountPtr<Image> image)
+{
+	(void)image;
 }
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)

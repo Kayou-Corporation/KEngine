@@ -275,6 +275,44 @@ inline vk::ImageType TranslateToVulkan(ImageType type)
     }
 }
 
+inline vk::ImageViewType TranslateToVulkan(ImageViewType type)
+{
+    switch (type)
+    {
+    case ImageViewType::Image1D:
+        return vk::ImageViewType::e1D;
+
+    case ImageViewType::Image2D:
+        return vk::ImageViewType::e2D;
+
+    case ImageViewType::Image3D:
+        return vk::ImageViewType::e3D;
+
+    case ImageViewType::ImageCube:
+        return vk::ImageViewType::eCube;
+
+    case ImageViewType::Undefined:
+    default:
+        return vk::ImageViewType::e2D;
+    }
+}
+
+inline vk::ImageAspectFlagBits TranslateToVulkan(ImageViewAspect aspect)
+{
+    switch (aspect)
+    {
+    case ImageViewAspect::Color:
+        return vk::ImageAspectFlagBits::eColor;
+
+    case ImageViewAspect::Depth:
+        return vk::ImageAspectFlagBits::eColor;
+
+    case ImageViewAspect::Undefined:
+    default:
+        return vk::ImageAspectFlagBits::eNone;
+    }
+}
+
 // SampleCount
 inline vk::SampleCountFlagBits TranslateToVulkan(SampleCount samples)
 {
