@@ -118,6 +118,7 @@ void Queue::WaitIdle()
 TrackedCommandBufferPtr Queue::GetOrCreateCommandBuffer(vk::Device& device)
 {
     TrackedCommandBufferPtr cmdBuffer;
+    cmdBuffer->memoryAllocator = m_memoryAllocator;
 
     if (!m_commandBuffersPool.empty())
     {

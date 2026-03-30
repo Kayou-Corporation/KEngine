@@ -2,6 +2,7 @@
 
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanDevice.hpp"
+#include "Private/Vulkan/VulkanImage.hpp"
 
 DISABLE_WARNINGS
 
@@ -25,14 +26,13 @@ void VulkanCommandList::Close()
 	VK_CHECK_VOID(m_handle->cmdBuffer.end(),"Can't end command buffer");
 }
 
-void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset, Core::RefCountPtr<Device> device)
+void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset)
 {
 	ASSERT((size + offset) <= buffer->GetSize(), "Data is too large");
 
-	Core::RefCountPtr<VulkanDevice> vulkanDevice = device.CastAs<VulkanDevice>();
 	Core::RefCountPtr<VulkanBuffer> vulkanBuffer = buffer.CastAs<VulkanBuffer>();
 
-	VmaAllocator memoryAllocator = vulkanDevice->GetMemoryAllocator();
+	VmaAllocator memoryAllocator = m_handle->memoryAllocator;
 
 	VmaAllocation bufferAllocation = vulkanBuffer->GetAllocation();
 	vk::PipelineStageFlagBits pipelineStage = vulkanBuffer->GetPipelineStage();
@@ -113,5 +113,14 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> buffer, void* da
 		cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eHost, pipelineStage, {}, nullptr, bufferMemBarrier, nullptr);
 	}
 }
+
+void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size, uint32_t offset)
+{
+	(void)image;
+	(void)data;
+	(void)size;
+	(void)offset;
+}
+
 
 END_NAMESPACE_RHI

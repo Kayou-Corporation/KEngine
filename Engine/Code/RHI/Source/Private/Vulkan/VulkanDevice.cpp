@@ -291,6 +291,11 @@ void VulkanDevice::CreateMemoryAllocator(const vk::Instance& instance)
 	allocatorCreateInfo.device = m_handle;
 
 	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateAllocator(&allocatorCreateInfo, &m_memoryAllocator)), "Failed to create memory allocator");
+
+	for (auto& [type, index] : m_queues)
+	{
+		m_queues[type].SetAllocator(m_memoryAllocator);
+	}
 }
 
 void VulkanDevice::Destroy()
