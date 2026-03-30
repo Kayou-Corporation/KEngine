@@ -22,7 +22,6 @@ struct ImageSpecs
 	Extent3D extent;
 
 	uint32_t layersCount = 1;
-	uint32_t channelsCount = 4;
 
 	uint32_t mipLevels = 1;
 	SampleCount sampleCount = SampleCount::Count1;

@@ -114,12 +114,118 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> buffer, void* da
 	}
 }
 
-void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size, uint32_t offset)
+void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size)
 {
-	(void)image;
-	(void)data;
-	(void)size;
-	(void)offset;
+	Core::RefCountPtr<VulkanImage> vulkanImage = image.CastAs<VulkanImage>();
+
+	if (vulkanImage->GetSource() == ImageSource::Gpu)
+	{
+		spdlog::error("Be carefull you tried to pass CPU data into a only GPU image");
+		return;
+	}
+
+	VmaAllocator allocator = m_handle->memoryAllocator;
+
+	// -------------------- STAGING BUFFER ----------------------- // 
+	VkBufferCreateInfo stagingCreateInfo{};
+	stagingCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingCreateInfo.size = size;
+	stagingCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+	VmaAllocationCreateInfo stagingAllocCreateInfo{};
+	stagingAllocCreateInfo.usage = VMA_MEMORY_USAGE_AUTO;
+	stagingAllocCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
+
+	VkBuffer stagingBuf;
+	VmaAllocation stagingAlloc;
+	VmaAllocationInfo stagingAllocInfo;
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateBuffer(allocator, &stagingCreateInfo, &stagingAllocCreateInfo, &stagingBuf, &stagingAlloc, &stagingAllocInfo)), "Failed to create staging buffer");
+
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCopyMemoryToAllocation(allocator, data, stagingAlloc, 0, size)), "Failed to copy memory to staging buffer");
+
+
+	// --------------------  COPY DATA TO GPU IMAGE ----------------------- // 
+	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
+
+	vk::BufferMemoryBarrier bufferMemBarrier{};
+	bufferMemBarrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
+	bufferMemBarrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
+	bufferMemBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+	bufferMemBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+	bufferMemBarrier.buffer = stagingBuf;
+	bufferMemBarrier.offset = 0;
+	bufferMemBarrier.size = size;
+
+	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eHost, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, bufferMemBarrier, nullptr);
+
+	uint32_t layers = vulkanImage->GetLayersCount();
+	uint32_t mips = vulkanImage->GetMipLevels();
+	uint32_t bytesPerPixel = vulkanImage->GetBytesPerPixel();
+	vk::Extent3D extent = vulkanImage->GetExtent();
+	vk::ImageAspectFlags aspect = vulkanImage->GetAspect();
+
+	std::vector<vk::BufferImageCopy> regions;
+	vk::DeviceSize copyOffset = 0;
+	
+	for (uint32_t layer = 0; layer < layers; ++layer)
+	{
+		for (uint32_t mip = 0; mip < mips; ++mip)
+		{
+			vk::Extent3D mipExtent;
+			mipExtent.width = std::max(1u, extent.width >> mip);
+			mipExtent.height = std::max(1u, extent.height >> mip);
+			mipExtent.depth = std::max(1u, extent.depth >> mip);
+
+			vk::BufferImageCopy region;
+			region.bufferOffset = copyOffset;
+			region.bufferRowLength = 0;
+			region.bufferImageHeight = 0;
+			region.imageSubresource.aspectMask = aspect;
+			region.imageSubresource.mipLevel = mip;
+			region.imageSubresource.baseArrayLayer = layer;
+			region.imageSubresource.layerCount = 1;
+			region.imageOffset = vk::Offset3D();
+			region.imageExtent = mipExtent;
+
+			regions.push_back(region);
+
+			copyOffset += static_cast<vk::DeviceSize>(mipExtent.width) * mipExtent.height * mipExtent.depth * bytesPerPixel;
+		}
+	}
+
+	cmdBuffer.copyBufferToImage(stagingBuf, vulkanImage->GetHandle(), vk::ImageLayout::eTransferDstOptimal, regions);
+
+
+	// --------------------  GETTING RID OF THE STAGING BUFFER ----------------------- // 
+
+	// Getting rid of the staging buffer later in Queue::Submit
+	TrackedStagingBufferPtr trackedStagingBuffer = Core::CreateRefPtr<TrackedStagingBuffer>();
+	trackedStagingBuffer->handle = stagingBuf;
+	trackedStagingBuffer->allocation = stagingAlloc;
+	trackedStagingBuffer->allocationInfo = stagingAllocInfo;
+	m_handle->trackedStagingBuffer = trackedStagingBuffer;
+
+
+	// --------------------  TRANSITION TO FINAL LAYOUT FOR USE ----------------------- // 
+	vk::ImageLayout finalLayout = vulkanImage->GetLayout();
+
+
+	// A little bit "hardcode" but this function should only be use with a final layout = transitionToFinalLayout
+	vk::ImageMemoryBarrier transitionToFinalLayout{};
+	transitionToFinalLayout.oldLayout = vk::ImageLayout::eTransferDstOptimal;
+	transitionToFinalLayout.newLayout = finalLayout;
+	transitionToFinalLayout.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+	transitionToFinalLayout.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+	transitionToFinalLayout.image = vulkanImage->GetHandle();
+	transitionToFinalLayout.subresourceRange.aspectMask = aspect;
+	transitionToFinalLayout.subresourceRange.baseMipLevel = 0;
+	transitionToFinalLayout.subresourceRange.levelCount = mips;
+	transitionToFinalLayout.subresourceRange.baseArrayLayer = 0;
+	transitionToFinalLayout.subresourceRange.layerCount = layers;
+	transitionToFinalLayout.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+	transitionToFinalLayout.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+
+	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, nullptr, nullptr, transitionToFinalLayout);
 }
 
 

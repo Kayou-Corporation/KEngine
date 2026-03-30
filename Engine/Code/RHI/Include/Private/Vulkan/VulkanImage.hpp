@@ -34,8 +34,16 @@ public:
 	vk::ImageView GetHandleView() const { return m_handleView; }
 	vk::ImageView& GetHandleViewRef() { return m_handleView; }
 
+	uint32_t GetLayersCount() { return m_layersCount; }
+	uint32_t GetMipLevels() { return m_mipLevels; }
+	uint32_t GetBytesPerPixel() { return m_bytesPerPixel; }
+	vk::Extent3D GetExtent() { return m_imageExtent; }
+	vk::ImageAspectFlags GetAspect() { return m_imageAspects; }
+	vk::ImageLayout GetLayout() { return m_finalLayout; }
+
 private: 
 	void ComputeUsage(vk::ImageUsageFlags usages);
+	uint32_t GetFormatSize(vk::Format format);
 
 private:
 	vk::Image m_handle;
@@ -43,8 +51,12 @@ private:
 
 	vk::ImageLayout m_finalLayout;
 	vk::Format m_imageFormat;
+	vk::Extent3D m_imageExtent;
+	vk::ImageAspectFlags m_imageAspects;
+
 	uint32_t m_layersCount;
 	uint32_t m_mipLevels;
+	uint32_t m_bytesPerPixel;
 
 	VmaAllocation m_allocation;
 	VmaAllocationInfo m_allocationInfo;

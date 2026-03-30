@@ -10,13 +10,15 @@ vk::ImageCreateInfo VulkanImage::GetCreateInfo(const ImageSpecs& specs)
 
 	m_finalLayout = TranslateToVulkan(specs.finalLayout);
 	m_imageFormat = TranslateToVulkan(specs.format);
+	m_imageExtent = TranslateToVulkan(specs.extent);
 	m_layersCount = specs.layersCount;
 	m_mipLevels = specs.mipLevels;
+	m_bytesPerPixel = GetFormatSize(m_imageFormat);
 
 	vk::ImageCreateInfo createInfo;
 	createInfo.imageType = TranslateToVulkan(specs.type);
 	createInfo.format = m_imageFormat;
-	createInfo.extent = TranslateToVulkan(specs.extent);
+	createInfo.extent = m_imageExtent;
 	createInfo.mipLevels = m_mipLevels;
 	createInfo.arrayLayers = specs.layersCount;
 	createInfo.samples = TranslateToVulkan(specs.sampleCount);
@@ -44,11 +46,13 @@ vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfo(const ImageSpecs& specs)
 {
 	(void)specs;
 
+	m_imageAspects = TranslateToVulkan(specs.viewAspect);
+
 	vk::ImageViewCreateInfo createInfo;
 	createInfo.image = m_handle;
 	createInfo.viewType = TranslateToVulkan(specs.viewType);
 	createInfo.format = m_imageFormat;
-	createInfo.subresourceRange.aspectMask = TranslateToVulkan(specs.viewAspect);
+	createInfo.subresourceRange.aspectMask = m_imageAspects;
 	createInfo.subresourceRange.baseMipLevel = 0;
 	createInfo.subresourceRange.levelCount = m_mipLevels;
 	createInfo.subresourceRange.baseArrayLayer = 0;
@@ -57,4 +61,30 @@ vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfo(const ImageSpecs& specs)
 	return createInfo;
 }
 
+uint32_t VulkanImage::GetFormatSize(vk::Format format)
+{
+	switch (format)
+	{
+	case vk::Format::eB8G8R8A8Srgb:
+	case vk::Format::eR8G8B8A8Srgb:
+	case vk::Format::eR8G8B8A8Unorm:
+		return 4;
+
+	case vk::Format::eR8G8B8Srgb:
+	case vk::Format::eR8G8B8Unorm:
+		return 3;
+
+	case vk::Format::eD32Sfloat:
+		return 4;
+
+	case vk::Format::eD32SfloatS8Uint:
+		return 8;
+
+	case vk::Format::eD24UnormS8Uint:
+		return 4;
+
+	default:
+		return 0;
+	}
+}
 END_NAMESPACE_RHI

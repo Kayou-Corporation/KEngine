@@ -18,7 +18,7 @@ public:
 	virtual void Close() override;
 
 	virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) override;
-	virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size, uint32_t offset) override;
+	virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) override;
 
 public:
 	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }
