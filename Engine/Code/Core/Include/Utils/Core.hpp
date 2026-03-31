@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #define KAYOU_GLOBAL Kayou
 
 #define BEGIN_NAMESPACE_KAYOU namespace KAYOU_GLOBAL {
@@ -37,7 +35,7 @@
 
 BEGIN_NAMESPACE_CORE
 
-enum RendererAPI
+enum class RendererAPI : uint8_t
 {
     Vulkan = 0
 };
