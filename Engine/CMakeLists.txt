@@ -38,6 +38,9 @@ function(engine_add_module MODULE_NAME)
     target_compile_features(${MODULE_NAME} PUBLIC ${ENGINE_COMPILE_FEATURES})
     target_compile_options(${MODULE_NAME} PUBLIC ${ENGINE_COMPILE_OPTIONS})
     target_include_directories(${MODULE_NAME} PUBLIC Include)
+    target_compile_definitions(${MODULE_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(${MODULE_NAME} PRIVATE _CRT_SECURE_NO_DEPRECATE)
+
 endfunction()
 
 # To build shared libraries in Windows, we set CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS to TRUE.

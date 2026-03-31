@@ -57,7 +57,9 @@ add_subdirectory(Assimp)
 set(SLANG_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
 set(SLANG_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(SLANG_ENABLE_RHI OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SCCACHE ON CACHE BOOL "" FORCE)
 
-add_subdirectory(Slang EXCLUDE_FROM_ALL)
+add_subdirectory(Slang)
 
 target_compile_definitions(slang PRIVATE _CRT_SECURE_NO_WARNINGS)
+set_target_properties(slang PROPERTIES COMPILE_FLAGS "-w" CXX_CLANG_TIDY "")
