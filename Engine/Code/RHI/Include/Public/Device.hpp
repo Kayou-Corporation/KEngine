@@ -17,6 +17,9 @@ struct SwapchainSpecs;
 class Buffer;
 struct BufferSpecs;
 
+class Image;
+struct ImageSpecs;
+
 struct DeviceSpecs
 {
 	GpuType gpuType;
@@ -42,6 +45,9 @@ public:
 
 	KENGINE_API virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) = 0;
 	KENGINE_API virtual void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) = 0;
+
+	KENGINE_API virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyImage(Core::RefCountPtr<Image> image) = 0;
 };
 
 END_NAMESPACE_RHI

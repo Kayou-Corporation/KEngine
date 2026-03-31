@@ -55,7 +55,7 @@
     },
     {
       "name": "windows-msvc-debug-developer-mode",
-      "displayName": "msvc Debug (Developer Mode)",
+      "displayName": "MSVC Debug (Developer Mode)",
       "description": "Target Windows with the msvc compiler, debug build type",
       "inherits": "conf-windows-common",
       "cacheVariables": {
@@ -67,7 +67,7 @@
     },
     {
       "name": "windows-msvc-release-developer-mode",
-      "displayName": "msvc Release (Developer Mode)",
+      "displayName": "MSVC Release (Developer Mode)",
       "description": "Target Windows with the msvc compiler, release build type",
       "inherits": "conf-windows-common",
       "cacheVariables": {
@@ -78,40 +78,8 @@
       }
     },
     {
-      "name": "windows-clang-debug",
-      "displayName": "clang Debug",
-      "description": "Target Windows with the clang compiler, debug build type",
-      "inherits": "conf-windows-common",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl",
-        "CMAKE_BUILD_TYPE": "Debug"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "intelliSenseMode": "windows-clang-x64"
-        }
-      }
-    },
-    {
-      "name": "windows-clang-release",
-      "displayName": "clang Release",
-      "description": "Target Windows with the clang compiler, release build type",
-      "inherits": "conf-windows-common",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl",
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "intelliSenseMode": "windows-clang-x64"
-        }
-      }
-    },
-    {
       "name": "unixlike-gcc-debug",
-      "displayName": "gcc Debug",
+      "displayName": "Unix GCC Debug",
       "description": "Target Unix-like OS with the gcc compiler, debug build type",
       "inherits": "conf-unixlike-common",
       "cacheVariables": {
@@ -122,7 +90,7 @@
     },
     {
       "name": "unixlike-gcc-release",
-      "displayName": "gcc Release",
+      "displayName": "Unix GCC Release",
       "description": "Target Unix-like OS with the gcc compiler, release build type",
       "inherits": "conf-unixlike-common",
       "cacheVariables": {
@@ -133,7 +101,7 @@
     },
     {
       "name": "unixlike-clang-debug",
-      "displayName": "clang Debug",
+      "displayName": "Unix Clang Debug",
       "description": "Target Unix-like OS with the clang compiler, debug build type",
       "inherits": "conf-unixlike-common",
       "cacheVariables": {
@@ -144,7 +112,7 @@
     },
     {
       "name": "unixlike-clang-release",
-      "displayName": "clang Release",
+      "displayName": "Unix Clang Release",
       "description": "Target Unix-like OS with the clang compiler, release build type",
       "inherits": "conf-unixlike-common",
       "cacheVariables": {
@@ -272,20 +240,6 @@
       "description": "Enable output and stop on failure",
       "inherits": "test-common",
       "configurePreset": "windows-msvc-release-developer-mode"
-    },
-    {
-      "name": "test-windows-clang-debug",
-      "displayName": "Strict",
-      "description": "Enable output and stop on failure",
-      "inherits": "test-common",
-      "configurePreset": "windows-clang-debug"
-    },
-    {
-      "name": "test-windows-clang-release",
-      "displayName": "Strict",
-      "description": "Enable output and stop on failure",
-      "inherits": "test-common",
-      "configurePreset": "windows-clang-release"
     },
     {
       "name": "test-unixlike-gcc-debug",

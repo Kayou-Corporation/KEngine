@@ -111,11 +111,49 @@ enum class SampleCount // Sample count
 
 enum class ImageUsage
 {
+	ColorAttachment,
+	DepthStencilAttachment,
+
+	TransferSrc,
+	TransferDst,
+
+	ShaderSampled,
+	Storage,
+
+	Undefined
+};
+
+enum class ImageType
+{
+	Image1D,
+	Image2D,
+	Image3D,
+
+	Undefined
+};
+
+enum class ImageViewType
+{
+	Image1D,
 	Image2D,
 	Image3D,
 	ImageCube,
 
-	Storage,
+	Undefined
+};
+
+enum class ImageViewAspect
+{
+	Color,
+	Depth,
+
+	Undefined
+};
+
+enum class ImageSource
+{
+	Cpu,
+	Gpu,
 
 	Undefined
 };

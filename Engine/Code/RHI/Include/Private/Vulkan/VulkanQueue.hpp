@@ -63,6 +63,7 @@ public:
 	uint64_t submissionId;
 
 	TrackedStagingBufferPtr trackedStagingBuffer;
+	VmaAllocator memoryAllocator;
 };
 typedef Core::RefCountPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
 
@@ -83,11 +84,13 @@ public:
 
 	void RunGarbageCollector(Core::RefCountPtr<VulkanDevice>& device);
 
+	void SetAllocator(VmaAllocator allocator) { m_memoryAllocator = allocator; }
+
 private:
 	vk::Queue m_handle;
 	vk::QueueFlagBits m_queueType;
 	uint32_t m_queueFamilyIndex;
-	
+	VmaAllocator m_memoryAllocator;
 
 	vk::Semaphore m_trackingSemaphore;
 	//std::vector<vk::Semaphore> waitSemaprhores;
