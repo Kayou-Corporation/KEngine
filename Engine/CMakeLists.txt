@@ -10,6 +10,8 @@ else()
     set(VULKAN_ENABLE OFF CACHE BOOL "Enable Vulkan renderer")
 endif()
 
+find_package(slang REQUIRED)
+
 #---------------------------------------#
 #                SOURCES                #
 #---------------------------------------#
