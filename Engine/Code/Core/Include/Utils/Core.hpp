@@ -13,7 +13,7 @@
 #define END_NAMESPACE_CORE } /* namespace CORE_NAMESPACE */ END_NAMESPACE_KAYOU
 
 
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__clang__) || defined(__GNUC__)
 #define DO_PRAGMA(x) _Pragma(#x)
 // Some warning flags might need to be added, see the flag in the output to add it here
 #define DISABLE_WARNINGS \
