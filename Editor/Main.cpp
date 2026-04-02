@@ -6,12 +6,19 @@
 #include "Public/Device.hpp"
 #include "Public/Swapchain.hpp"
 #include "Public/Buffer.hpp"
+#include "Public/Shader.hpp"
 
 int main()
 {
 #ifdef KENGINE_DEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
+
+    Kayou::RHI::ShaderCompiler compiler{};
+
+    compiler.Initialize();
+
+    compiler.Load("Engine/Assets/Shaders/hello-world.compute.slang", Kayou::RHI::ShaderType::Compute);
 
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
 
