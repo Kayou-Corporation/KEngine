@@ -1,6 +1,8 @@
 @echo off
 SETLOCAL
 
+cd /d "%~dp0"
+
 :: Checking for admin rights
 net session >nul 2>&1
 if %errorLevel% neq 0 (
