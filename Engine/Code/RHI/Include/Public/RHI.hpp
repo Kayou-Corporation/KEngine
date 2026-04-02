@@ -234,4 +234,30 @@ enum class PipelineStage
 	None
 };
 
+enum class ShaderType
+{
+	Vertex,
+	Fragment,
+	Compute,
+	Geometry,
+	Tesselation
+};
+
+constexpr const char* ShaderTypeToEntry(ShaderType sType)
+{
+	switch (sType)
+	{
+	case ShaderType::Vertex:
+		return "vsMain";
+	case ShaderType::Fragment:
+		return "fsMain";
+	case ShaderType::Compute:
+		return "csMain";
+	case ShaderType::Geometry:
+		return "gsMain";
+	case ShaderType::Tesselation:
+		return "tsMain";
+	}
+}
+
 END_NAMESPACE_RHI
