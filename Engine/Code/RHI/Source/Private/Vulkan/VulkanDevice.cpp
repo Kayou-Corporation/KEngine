@@ -110,6 +110,7 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImage(const ImageSpecs& specs)
 	Core::RefCountPtr<VulkanImage> image = Core::CreateRefPtr<VulkanImage>();
 
 	vk::ImageCreateInfo imageCreateInfo = image->GetCreateInfo(specs);
+
 	vk::ImageViewCreateInfo imageViewCreateInfo = image->GetViewCreateInfo(specs);
 
 	VkImage im;
@@ -119,7 +120,8 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImage(const ImageSpecs& specs)
 	VmaAllocation allocation;
 	VmaAllocationInfo allocationInfo;
 
-	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, imageCreateInfo, &allocInfo, &im, &allocation, &allocationInfo)), "Failed to create image");
+	const VkImageCreateInfo cImageCreateInfo = static_cast<VkImageCreateInfo>(imageCreateInfo);
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, &cImageCreateInfo, &allocInfo, &im, &allocation, &allocationInfo)), "Failed to create image");
 
 	vk::ImageView imView = VK_CHECK_RESULT(m_handle.createImageView(imageViewCreateInfo, nullptr), "Failed to create image");
 

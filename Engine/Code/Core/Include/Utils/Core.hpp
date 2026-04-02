@@ -33,6 +33,8 @@
 #define RESTORE_WARNINGS
 #endif
 
+#include "stdint.h"
+
 BEGIN_NAMESPACE_CORE
 
 enum class RendererAPI : uint8_t
