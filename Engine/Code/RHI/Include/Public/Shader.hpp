@@ -20,9 +20,8 @@ struct ShaderBinary
 
 std::string GetShaderName(const std::string& path);
 
-inline std::string CacheShaderPath(const std::string& hash, const std::string& file, const char* ext)
+inline std::string CacheShaderPath(const std::string& hash, const std::string& name, const char* ext)
 {
-    std::string name = GetShaderName(file);
     return "Cache/Shaders/" + name + '.' + hash + ext;
 }
 

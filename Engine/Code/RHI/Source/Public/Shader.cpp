@@ -56,15 +56,17 @@ ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sTy
     std::ifstream fileContent(file, std::ios::binary);
     std::string content((std::istreambuf_iterator<char>(fileContent)), std::istreambuf_iterator<char>());
 
+    std::string name = GetShaderName(file);
+
     const std::string entry = ShaderTypeToEntry(sType);
     const std::string hash = HashFile(content, entry);
 
-    const std::string spirvPath = CacheShaderPath(hash, file, ".spv");
+    const std::string spirvPath = CacheShaderPath(hash, name, ".spv");
 
     bool pathExists = std::filesystem::exists(spirvPath);
 
 #if defined(_WIN32)
-    const std::string dxilPath = CacheShaderPath(hash, file, ".dxil");
+    const std::string dxilPath = CacheShaderPath(hash, name, ".dxil");
     
     pathExists = pathExists && std::filesystem::exists(dxilPath);
 #endif
@@ -84,7 +86,15 @@ ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sTy
 
     bin = Compile(file, content, entry);
 
-    std::filesystem::create_directories("Cache/Shaders");
+    const std::string shaderCacheDir = "Cache/Shaders";
+
+    std::filesystem::create_directories(shaderCacheDir);
+
+    for (auto& f : std::filesystem::directory_iterator(shaderCacheDir))
+    {
+        if (f.path().filename().string().starts_with(name))
+            std::filesystem::remove(f.path());
+    }
 
     std::ofstream s(spirvPath, std::ios::binary);
     s.write((char*)bin.spirv.data(), bin.spirv.size());
