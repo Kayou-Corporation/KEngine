@@ -138,7 +138,15 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImage(const ImageSpecs& specs)
 
 void VulkanDevice::DestroyImage(Core::RefCountPtr<Image> image)
 {
-	(void)image;
+	Core::RefCountPtr<VulkanImage> vulkanImage = image.CastAs<VulkanImage>();
+
+	vk::Image imageHandle = vulkanImage->GetHandleRef();
+	vk::ImageView imageViewHandle = vulkanImage->GetHandleViewRef();
+	VmaAllocation imageAllocation = vulkanImage->GetAllocation();
+
+	m_handle.destroyImageView(imageViewHandle);
+
+	vmaDestroyImage(m_memoryAllocator, imageHandle, imageAllocation);
 }
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)

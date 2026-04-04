@@ -41,6 +41,7 @@ public:
 	vk::ImageAspectFlags GetAspect() { return m_imageAspects; }
 	vk::ImageLayout GetLayout() { return m_finalLayout; }
 
+	VmaAllocation GetAllocation() { return  m_allocation; }
 private: 
 	void ComputeUsage(vk::ImageUsageFlags usages);
 	uint32_t GetFormatSize(vk::Format format);
