@@ -88,7 +88,14 @@ add_custom_command(
         COMMENT "Copying Assets to output directory after build"
 )
 
-
+# Copy slang-compiler.dll to the output directory after target is built
+add_custom_command(
+        TARGET ${K_TARGET_NAME} 
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/Libs/Slang/build/Release/bin/slang-compiler.dll"
+        "${OUTPUT_DIR_BASE}/"
+)
 
 # Ensure Assets are also present in the general binary dir (for IDEs like Visual Studio)
 add_custom_target(CopyAssets ALL
@@ -98,8 +105,6 @@ add_custom_target(CopyAssets ALL
         "${CMAKE_BINARY_DIR}/Engine/Assets"
         COMMENT "Forcefully copying Assets to build directory"
 )
-
-
 
 # Make sure CopyAssets is executed before building the target
 add_dependencies(${K_TARGET_NAME} CopyAssets)
