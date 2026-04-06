@@ -118,17 +118,18 @@ void Queue::WaitIdle()
 TrackedCommandBufferPtr Queue::GetOrCreateCommandBuffer(vk::Device& device)
 {
     TrackedCommandBufferPtr cmdBuffer;
-    cmdBuffer->memoryAllocator = m_memoryAllocator;
 
     if (!m_commandBuffersPool.empty())
     {
         cmdBuffer = m_commandBuffersPool.front();
+        cmdBuffer->memoryAllocator = m_memoryAllocator;
         m_commandBuffersPool.pop_front();
     }
     else
     {
         cmdBuffer = Core::CreateRefPtr<TrackedCommandBuffer>();
-        
+        cmdBuffer->memoryAllocator = m_memoryAllocator;
+
         vk::CommandPoolCreateInfo poolInfo;
         poolInfo.queueFamilyIndex = m_queueFamilyIndex;
         poolInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
@@ -168,13 +169,11 @@ void Queue::Submit(TrackedCommandBufferPtr cmdBuffer)
     m_inFlightCommandBuffersPool.push_back(cmdBuffer);
 }
 
-void Queue::RunGarbageCollector(Core::RefCountPtr<VulkanDevice>& device)
+void Queue::RunGarbageCollector(vk::Device& device)
 {
-    vk::Device vkDevice = device->GetHandle();
-
     std::list<TrackedCommandBufferPtr> submissions = std::move(m_inFlightCommandBuffersPool);
 
-    m_lastFinishedId = VK_CHECK_RESULT(vkDevice.getSemaphoreCounterValue(m_trackingSemaphore), "Coudn't get semaphore value");
+    m_lastFinishedId = VK_CHECK_RESULT(device.getSemaphoreCounterValue(m_trackingSemaphore), "Coudn't get semaphore value");
 
     for (const TrackedCommandBufferPtr& cmd : submissions)
     {
@@ -187,7 +186,7 @@ void Queue::RunGarbageCollector(Core::RefCountPtr<VulkanDevice>& device)
             TrackedStagingBufferPtr trackedStagingBuffer = cmd->trackedStagingBuffer;
             if (trackedStagingBuffer)
             {
-                device->DestroyBuffer(trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
+                vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
                 cmd->trackedStagingBuffer = {};
             }
 

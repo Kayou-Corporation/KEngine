@@ -4,13 +4,6 @@
 #include "Private/Vulkan/VulkanDevice.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
 
-DISABLE_WARNINGS
-
-#define VMA_IMPLEMENTATION
-#include <vk_mem_alloc.h>
-
-RESTORE_WARNINGS
-
 BEGIN_NAMESPACE_RHI
 
 void VulkanCommandList::Open()
@@ -163,6 +156,22 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data,
 	uint32_t bytesPerPixel = vulkanImage->GetBytesPerPixel();
 	vk::Extent3D extent = vulkanImage->GetExtent();
 	vk::ImageAspectFlags aspect = vulkanImage->GetAspect();
+
+	vk::ImageMemoryBarrier transitionToCopyLayout{};
+	transitionToCopyLayout.oldLayout = vk::ImageLayout::eUndefined;
+	transitionToCopyLayout.newLayout = vk::ImageLayout::eTransferDstOptimal;
+	transitionToCopyLayout.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+	transitionToCopyLayout.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+	transitionToCopyLayout.image = vulkanImage->GetHandle();
+	transitionToCopyLayout.subresourceRange.aspectMask = aspect;
+	transitionToCopyLayout.subresourceRange.baseMipLevel = 0;
+	transitionToCopyLayout.subresourceRange.levelCount = mips;
+	transitionToCopyLayout.subresourceRange.baseArrayLayer = 0;
+	transitionToCopyLayout.subresourceRange.layerCount = layers;
+	transitionToCopyLayout.srcAccessMask = vk::AccessFlagBits::eNone;
+	transitionToCopyLayout.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+
+	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, nullptr, transitionToCopyLayout);
 
 	std::vector<vk::BufferImageCopy> regions;
 	vk::DeviceSize copyOffset = 0;

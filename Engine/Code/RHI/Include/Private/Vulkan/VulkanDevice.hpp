@@ -56,8 +56,11 @@ public:
     virtual ~VulkanDevice() override = default;
 
     // Commands / sync
+    virtual Core::RefCountPtr<CommandList> GetCommandList(QueueType type) override;
+    virtual void SubmitCommandList(Core::RefCountPtr<CommandList> commandList) override;
     virtual void WaitIdle() override;
     virtual void QueueWaitIdle(QueueType type) override;
+    virtual void RunGarbageCollector() override;
 
     // Create objects
     virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
@@ -68,6 +71,11 @@ public:
 
     virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) override;
     virtual void DestroyImage(Core::RefCountPtr<Image> image) override;
+
+    virtual std::vector<Core::RefCountPtr<Image>> CreatePresentationImages(Core::RefCountPtr<Swapchain> swapchain) override;
+    virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) override;
+
+    virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) override;
 
 
 // Public vulkan
@@ -80,6 +88,8 @@ public:
     // Destroy
     void Destroy();
     void DestroyBuffer(vk::Buffer buffer, VmaAllocation allocation);
+
+    vk::Format CheckFormatCompatibility(vk::Format requestedFormat, vk::ImageTiling tiling, vk::FormatFeatureFlags requiredFeatures);
 
     vk::Device GetHandle() const { return m_handle; }
     VmaAllocator GetMemoryAllocator() const { return m_memoryAllocator; }

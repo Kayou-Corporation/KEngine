@@ -305,7 +305,7 @@ inline vk::ImageAspectFlagBits TranslateToVulkan(ImageViewAspect aspect)
         return vk::ImageAspectFlagBits::eColor;
 
     case ImageViewAspect::Depth:
-        return vk::ImageAspectFlagBits::eColor;
+        return vk::ImageAspectFlagBits::eDepth;
 
     case ImageViewAspect::Undefined:
     default:

@@ -7,6 +7,8 @@
 #include "Public/Swapchain.hpp"
 #include "Public/Buffer.hpp"
 #include "Public/Shader.hpp"
+#include "Public/Image.hpp"
+#include "Public/CommandList.hpp"
 
 int main()
 {
@@ -14,11 +16,11 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-    Kayou::RHI::ShaderCompiler compiler{};
-
-    compiler.Initialize();
-
-    compiler.Load("Engine/Assets/Shaders/hello-world.compute.slang", Kayou::RHI::ShaderType::Compute);
+    //Kayou::RHI::ShaderCompiler compiler{};
+    //
+    //compiler.Initialize();
+    //
+    //compiler.Load("Engine/Assets/Shaders/hello-world.compute.slang", Kayou::RHI::ShaderType::Compute);
 
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
 
@@ -64,21 +66,67 @@ int main()
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
 
-    Kayou::RHI::BufferSpecs bufferSpecs{};
-    bufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Vertex;
-    bufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
-    bufferSpecs.size = 65536;
-    bufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
-    bufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
+    //Kayou::RHI::BufferSpecs bufferSpecs{};
+    //bufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Vertex;
+    //bufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
+    //bufferSpecs.size = 65536;
+    //bufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
+    //bufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
+    //
+    //Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
+    //std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Image>> presentationImages = device->CreatePresentationImages(swapchain);
+
+    //Kayou::RHI::SwapchainImageSpecs depthImageSpecs; 
+    //depthImageSpecs.imageType = Kayou::RHI::SwapchainImageType::Depth;
+    //depthImageSpecs.targetLayout = Kayou::RHI::Layout::DepthStencilAttachment;
+    //depthImageSpecs.finalLayout = Kayou::RHI::Layout::DepthStencilAttachment;
+    //depthImageSpecs.type = Kayou::RHI::ImageType::Image2D;
+    //depthImageSpecs.usages = { Kayou::RHI::ImageUsage::DepthStencilAttachment };
+    //depthImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
+    //depthImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Depth;
+
+    //Kayou::Core::RefCountPtr<Kayou::RHI::Image> depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+
+    Kayou::RHI::ImageSpecs textureImageSpecs;
+    textureImageSpecs.source = Kayou::RHI::ImageSource::Cpu;
+    textureImageSpecs.format = Kayou::RHI::Format::RGBA8_SRGB;
+    textureImageSpecs.targetLayout = Kayou::RHI::Layout::ShaderReadOnly;
+    textureImageSpecs.finalLayout = Kayou::RHI::Layout::ShaderReadOnly;
+    textureImageSpecs.type = Kayou::RHI::ImageType::Image2D;
+    textureImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
+    textureImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Color;
+    textureImageSpecs.usages = { Kayou::RHI::ImageUsage::TransferDst, Kayou::RHI::ImageUsage::ShaderSampled };
+    textureImageSpecs.extent = { 1024, 1024, 1};
+
+    Kayou::Core::RefCountPtr<Kayou::RHI::Image> textureImage = device->CreateImage(textureImageSpecs);
+
+    Kayou::Core::RefCountPtr<Kayou::RHI::CommandList> commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+
+    std::vector<uint32_t> data(1024 * 1024, 0xFF0000FF);
+
+    commandList->Open();
+
+    commandList->SetImageData(textureImage, data.data(), data.size() * sizeof(uint32_t));
+
+    commandList->Close();
+
+    device->SubmitCommandList(commandList);
     
     while (!window->ShouldClose())
     {
         window->PollEvents();
+        device->RunGarbageCollector();
     }
     
-    device->DestroyBuffer(testBuffer);
+    device->WaitIdle();
+    //device->DestroyBuffer(testBuffer);
+
+    //device->DestroyPresentationImages(presentationImages);
+
+    //device->DestroyImage(depthImage);
+
+    device->DestroyImage(textureImage);
 
     device->DestroySwapchain(swapchain);
 

@@ -23,12 +23,14 @@ public:
 public:
 	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }
 	TrackedCommandBufferPtr GetHandle() { return m_handle; }
-	//QueueType GetOwnerQueueType() { return m_OwnerQueueType; }
+
+	void SetOwnerQueueType(QueueType queueType) { m_OwnerQueueType = queueType; }
+	QueueType GetOwnerQueueType() { return m_OwnerQueueType; }
 
 private:
 	TrackedCommandBufferPtr m_handle;
 	
-	//QueueType m_OwnerQueueType;
+	QueueType m_OwnerQueueType;
 };
 
 END_NAMESPACE_RHI

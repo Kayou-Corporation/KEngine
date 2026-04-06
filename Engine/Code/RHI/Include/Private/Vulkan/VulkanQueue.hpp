@@ -82,7 +82,7 @@ public:
 	TrackedCommandBufferPtr GetOrCreateCommandBuffer(vk::Device& device);
 	void Submit(TrackedCommandBufferPtr cmdBuffer);
 
-	void RunGarbageCollector(Core::RefCountPtr<VulkanDevice>& device);
+	void RunGarbageCollector(vk::Device& device);
 
 	void SetAllocator(VmaAllocator allocator) { m_memoryAllocator = allocator; }
 

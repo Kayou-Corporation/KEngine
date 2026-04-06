@@ -2,15 +2,17 @@
 
 #include "Private/Vulkan/VulkanSurface.hpp"
 #include "Private/Vulkan/VulkanUtils.hpp"
-#include "Private/Vulkan/VulkanQueue.hpp"
 #include "Private/Vulkan/VulkanTranslate.hpp"
 #include "Private/Vulkan/VulkanSwapchain.hpp"
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
+#include "Private/Vulkan/VulkanCommandList.hpp"
 
 #include <map>
 #include <set>
 #include <string>
+
+// TODO Cleanup whole code to follow RHI implementation rules
 
 DISABLE_WARNINGS
 
@@ -20,6 +22,29 @@ DISABLE_WARNINGS
 RESTORE_WARNINGS
 
 BEGIN_NAMESPACE_RHI
+
+
+Core::RefCountPtr<CommandList> VulkanDevice::GetCommandList(QueueType type)
+{
+	Core::RefCountPtr<VulkanCommandList> RHIVulkanCommandList = Core::CreateRefPtr<VulkanCommandList>();
+
+	TrackedCommandBufferPtr commandBuffer = m_queues[type].GetOrCreateCommandBuffer(m_handle);
+
+	RHIVulkanCommandList->SetHandle(commandBuffer);
+	RHIVulkanCommandList->SetOwnerQueueType(type);
+
+	return RHIVulkanCommandList;
+}
+
+void VulkanDevice::SubmitCommandList(Core::RefCountPtr<CommandList> commandList)
+{
+	Core::RefCountPtr<VulkanCommandList> RHIVulkanCommandList = commandList.CastAs<VulkanCommandList>();
+	
+	TrackedCommandBufferPtr commandBuffer = RHIVulkanCommandList->GetHandle();
+	QueueType commandBufferQueue = RHIVulkanCommandList->GetOwnerQueueType();
+	
+	m_queues[commandBufferQueue].Submit(commandBuffer);
+}
 
 void VulkanDevice::WaitIdle()
 {
@@ -31,9 +56,17 @@ void VulkanDevice::QueueWaitIdle(QueueType type)
 	m_queues[type].WaitIdle();
 }
 
+void VulkanDevice::RunGarbageCollector()
+{
+	for (auto& [type, queue] : m_queues)
+	{
+		queue.RunGarbageCollector(m_handle);
+	}
+}
+
 Core::RefCountPtr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainSpecs& specs)
 {
-	Core::RefCountPtr<VulkanSwapchain> swapchain = Core::CreateRefPtr<VulkanSwapchain>();
+	Core::RefCountPtr<VulkanSwapchain> vulkanSwapchain = Core::CreateRefPtr<VulkanSwapchain>();
 
 	std::unordered_map<int, int> map;
 
@@ -45,24 +78,118 @@ Core::RefCountPtr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainSpecs&
 	vk::Format requestedFormat = TranslateToVulkan(specs.imageFormat);
 	vk::Format requestedDepthFormat = TranslateToVulkan(specs.depthImageFormat);
 
+	vk::Format depthFormat = CheckFormatCompatibility(requestedDepthFormat, vk::ImageTiling::eOptimal, vk::FormatFeatureFlagBits::eDepthStencilAttachment);
+
 	vk::PresentModeKHR requestedpresentMode = TranslateToVulkan(specs.presentMode);
 
 	vk::Extent2D requestedExtent = TranslateToVulkan(specs.extent);
 
-	vk::SwapchainCreateInfoKHR createInfo = swapchain->GetCreateInfo(m_compatibility, surface, graphicsQueueIndex, presentQueueIndex, specs.imageCount, requestedFormat, specs.isDepthEnable, requestedDepthFormat, requestedpresentMode, requestedExtent);
+	vk::SwapchainCreateInfoKHR createInfo = vulkanSwapchain->GetCreateInfo(m_compatibility, surface, graphicsQueueIndex, presentQueueIndex, specs.imageCount, requestedFormat, specs.isDepthEnable, depthFormat, requestedpresentMode, requestedExtent);
 
-	vk::SwapchainKHR vkSwapchain = VK_CHECK_RESULT(m_handle.createSwapchainKHR(createInfo), "Can't create swapchain");
+	vk::SwapchainKHR swapchainHandle = VK_CHECK_RESULT(m_handle.createSwapchainKHR(createInfo), "Can't create swapchain");
 
-	swapchain->SetHandle(vkSwapchain);
+	vulkanSwapchain->SetHandle(swapchainHandle);
 
-	return swapchain;
+	return vulkanSwapchain;
 }
 
 void VulkanDevice::DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain)
 {
-	auto vkSwapchain = swapchain.CastAs<VulkanSwapchain>();
+	Core::RefCountPtr<VulkanSwapchain> vulkanSwapchain = swapchain.CastAs<VulkanSwapchain>();
 	
-	m_handle.destroySwapchainKHR(vkSwapchain->GetHandle());
+	m_handle.destroySwapchainKHR(vulkanSwapchain->GetHandle());
+}
+
+std::vector<Core::RefCountPtr<Image>> VulkanDevice::CreatePresentationImages(Core::RefCountPtr<Swapchain> swapchain)
+{
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = swapchain.CastAs<VulkanSwapchain>();
+	uint32_t swapchainImageCount = RHIVulkanSwapchain->GetImageCount();
+
+	std::vector<Core::RefCountPtr<Image>> RHIImages(swapchainImageCount);
+
+	vk::SwapchainKHR swapchainHandle = RHIVulkanSwapchain->GetHandle();
+	std::vector<vk::Image> swapchainImages = VK_CHECK_RESULT(m_handle.getSwapchainImagesKHR(swapchainHandle), "Coudn't extract images from swapchain");
+
+	ASSERT(swapchainImageCount == RHIImages.size(), "Swapchain images count don't match acquired images");
+
+	vk::Format colorImageFormat = RHIVulkanSwapchain->GetColorImageFormat();
+	vk::Extent2D imageExtent = RHIVulkanSwapchain->GetImageExtent();
+
+	for (uint32_t i = 0; i < RHIImages.size(); ++i)
+	{
+		Core::RefCountPtr<VulkanImage> RHIVulkanImage = Core::CreateRefPtr<VulkanImage>();
+
+		RHIVulkanImage->SetHandle(swapchainImages[i]);
+
+		vk::ImageViewCreateInfo imageViewCreateInfo = RHIVulkanImage->GetViewCreateInfoForPresentation(colorImageFormat, { imageExtent.width, imageExtent.height, 0 });
+
+		vk::ImageView imageViewHandle = VK_CHECK_RESULT(m_handle.createImageView(imageViewCreateInfo, nullptr), "Failed to create image");
+
+
+		RHIVulkanImage->SetHandleView(imageViewHandle);
+
+		RHIImages[i] = RHIVulkanImage;
+	}
+	
+	return RHIImages;
+}
+
+void VulkanDevice::DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages)
+{
+	// With swapchain images you only destroy their vk::ImageView not the vk::Image
+	for (uint32_t i = 0; i < presentationImages.size(); ++i)
+	{
+		Core::RefCountPtr<VulkanImage> RHIVulkanImage = presentationImages[i].CastAs<VulkanImage>();
+
+		vk::ImageView imageViewHandle = RHIVulkanImage->GetHandleViewRef();
+
+		m_handle.destroyImageView(imageViewHandle);
+	}
+}
+
+Core::RefCountPtr<Image> VulkanDevice::CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain)
+{
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = swapchain.CastAs<VulkanSwapchain>();
+	uint32_t swapchainImageCount = RHIVulkanSwapchain->GetImageCount();
+
+	Core::RefCountPtr<VulkanImage> RHIVulkanImage = Core::CreateRefPtr<VulkanImage>();
+
+	vk::Format imageFormat;
+	if (specs.imageType == SwapchainImageType::Color)
+	{
+		imageFormat = RHIVulkanSwapchain->GetColorImageFormat();
+	}
+	else
+	{
+		imageFormat = RHIVulkanSwapchain->GetDepthImageFormat();
+	}
+	vk::Extent2D imageExtent = RHIVulkanSwapchain->GetImageExtent();
+
+	VkImageCreateInfo imageCreateInfo = static_cast<VkImageCreateInfo>(RHIVulkanImage->GetCreateInfoForSwapchain(specs, imageFormat, { imageExtent.width, imageExtent.height, 1 }));
+
+	VkImage image;
+
+	VmaAllocationCreateInfo allocInfo{};
+	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+	allocInfo.flags = 0;
+	VmaAllocation allocation;
+	VmaAllocationInfo allocationInfo;
+
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, &imageCreateInfo, &allocInfo, &image, &allocation, &allocationInfo)), "Failed to create image");
+
+	RHIVulkanImage->SetHandle(image);
+
+	vk::ImageViewCreateInfo imageViewCreateInfo = RHIVulkanImage->GetViewCreateInfoForSwapchain(specs);
+
+	vk::ImageView imView = VK_CHECK_RESULT(m_handle.createImageView(imageViewCreateInfo, nullptr), "Failed to create image");
+	
+	RHIVulkanImage->SetAllocation(allocation);
+	RHIVulkanImage->SetAllocationInfo(allocationInfo);
+	
+	
+	RHIVulkanImage->SetHandleView(imView);
+
+	return RHIVulkanImage;
 }
 
 Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
@@ -109,27 +236,29 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImage(const ImageSpecs& specs)
 {
 	Core::RefCountPtr<VulkanImage> image = Core::CreateRefPtr<VulkanImage>();
 
-	vk::ImageCreateInfo imageCreateInfo = image->GetCreateInfo(specs);
+	VkImageCreateInfo imageCreateInfo = static_cast<VkImageCreateInfo>(image->GetCreateInfo(specs));
 
-	vk::ImageViewCreateInfo imageViewCreateInfo = image->GetViewCreateInfo(specs);
 
 	VkImage im;
 
-	VmaAllocationCreateInfo allocInfo;
+	VmaAllocationCreateInfo allocInfo{};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+	allocInfo.flags = 0;
 	VmaAllocation allocation;
 	VmaAllocationInfo allocationInfo;
 
 	// TODO : Remove later
 	//const VkImageCreateInfo cImageCreateInfo = static_cast<VkImageCreateInfo>(imageCreateInfo);
-	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, imageCreateInfo, &allocInfo, &im, &allocation, &allocationInfo)), "Failed to create image");
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, &imageCreateInfo, &allocInfo, &im, &allocation, &allocationInfo)), "Failed to create image");
 
+	image->SetHandle(im);
+
+	vk::ImageViewCreateInfo imageViewCreateInfo = image->GetViewCreateInfo(specs);
 	vk::ImageView imView = VK_CHECK_RESULT(m_handle.createImageView(imageViewCreateInfo, nullptr), "Failed to create image");
 
 	image->SetAllocation(allocation);
 	image->SetAllocationInfo(allocationInfo);
 
-	image->SetHandle(im);
 
 	image->SetHandleView(imView);
 
@@ -307,6 +436,20 @@ void VulkanDevice::CreateMemoryAllocator(const vk::Instance& instance)
 	{
 		m_queues[type].SetAllocator(m_memoryAllocator);
 	}
+}
+
+vk::Format VulkanDevice::CheckFormatCompatibility(vk::Format requestedFormat, vk::ImageTiling tiling, vk::FormatFeatureFlags requiredFeatures)
+{
+	vk::FormatProperties props = m_pDevice.getFormatProperties(requestedFormat);
+
+	vk::FormatFeatureFlags availableFeatures = (tiling == vk::ImageTiling::eOptimal) ? props.optimalTilingFeatures : props.linearTilingFeatures;
+
+	if ((availableFeatures & requiredFeatures) == requiredFeatures)
+	{
+		return requestedFormat;
+	}
+
+	return vk::Format::eUndefined;
 }
 
 void VulkanDevice::Destroy()

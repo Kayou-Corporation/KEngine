@@ -23,6 +23,11 @@ public:
 	vk::ImageCreateInfo GetCreateInfo(const ImageSpecs& specs);
 	vk::ImageViewCreateInfo GetViewCreateInfo(const ImageSpecs& specs);
 
+	vk::ImageViewCreateInfo GetViewCreateInfoForPresentation(vk::Format format, vk::Extent3D extent);
+
+	vk::ImageCreateInfo GetCreateInfoForSwapchain(SwapchainImageSpecs specs, vk::Format format, vk::Extent3D extent);
+	vk::ImageViewCreateInfo GetViewCreateInfoForSwapchain(SwapchainImageSpecs specs);
+
 	void SetHandle(vk::Image image) { m_handle = image; }
 	void SetHandleView(vk::ImageView imageView) { m_handleView = imageView; }
 
@@ -50,6 +55,11 @@ private:
 	vk::Image m_handle;
 	vk::ImageView m_handleView;
 
+	// Target = Main image use, Final = Final image use)
+	// Ex : texture : Target & Final = ShaderReadOnly
+	// Ex : SwapchainColor : Target : ColorOutput, Final = Present
+	// Ex : PresentationDepth : Target & Final = DepthOutput
+	vk::ImageLayout m_targetLayout;
 	vk::ImageLayout m_finalLayout;
 	vk::Format m_imageFormat;
 	vk::Extent3D m_imageExtent;
