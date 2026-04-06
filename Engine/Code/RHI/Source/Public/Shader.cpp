@@ -29,8 +29,8 @@ void ShaderCompiler::Initialize()
     constexpr uint8_t nbTargets = 2;
     slang::TargetDesc targets[nbTargets] = {};
 
-    targets[0].format = SLANG_SPIRV;
-    targets[0].profile = m_globalSession->findProfile("spirv_1_5");
+    targets[0].format = SLANG_GLSL;
+    targets[0].profile = m_globalSession->findProfile("glsl450");
 
     targets[1].format = SLANG_DXIL;
     targets[1].profile = m_globalSession->findProfile("sm_6_6");
@@ -49,7 +49,7 @@ void ShaderCompiler::Initialize()
     m_globalSession->createSession(desc, m_session.writeRef());
 }
 
-ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sType)
+ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sType) const
 {
     ShaderBinary bin{};
 
@@ -97,22 +97,29 @@ ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sTy
     }
 
     std::ofstream s(spirvPath, std::ios::binary);
-    s.write((char*)bin.spirv.data(), bin.spirv.size());
+    s.write(reinterpret_cast<char*>(bin.spirv.data()), bin.spirv.size());
 
 #if defined(_WIN32)
     std::ofstream d(dxilPath, std::ios::binary);
-    d.write((char*)bin.dxil.data(), bin.dxil.size());
+    d.write(reinterpret_cast<char*>(bin.dxil.data()), bin.dxil.size());
 #endif
 
     return bin;
 }
 
-ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry)
+ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry) const
 {
     ShaderBinary bin{};
 
     Slang::ComPtr<slang::IModule> slangModule;
-    slangModule = m_session->loadModuleFromSourceString(file.c_str(), file.c_str(), content.c_str());
+    Slang::ComPtr<ISlangBlob> diagnostics;
+
+    slangModule = m_session->loadModuleFromSourceString(file.c_str(), file.c_str(), content.c_str(), diagnostics.writeRef());
+
+    if (diagnostics)
+    {
+        spdlog::error("Slang diagnostics for {}:\n{}", file, static_cast<const char*>(diagnostics->getBufferPointer()));
+    }
 
     if (!slangModule)
     {
@@ -121,9 +128,9 @@ ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string&
     }
 
     Slang::ComPtr<slang::IEntryPoint> entryPoint;
-    slangModule->findEntryPointByName(entry.c_str(), entryPoint.writeRef());
+    SlangResult result = slangModule->findEntryPointByName(entry.c_str(), entryPoint.writeRef());
 
-    if (!entryPoint)
+    if (SLANG_FAILED(result) || !entryPoint)
     {
         spdlog::error("Wrong entry point for shader {}: {}", file, entry);
         return {};
@@ -137,11 +144,33 @@ ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string&
 
     Slang::ComPtr<slang::IComponentType> composedProgram;
 
-    m_session->createCompositeComponentType(components, 2, composedProgram.writeRef());
+    result = m_session->createCompositeComponentType(components, 2, composedProgram.writeRef(), diagnostics.writeRef());
+
+    if (diagnostics)
+    {
+        spdlog::error("Slang compose diagnostics for {}:\n{}", file, static_cast<const char*>(diagnostics->getBufferPointer()));
+    }
+
+    if (SLANG_FAILED(result) || !composedProgram)
+    {
+        spdlog::error("Failed to compose program for shader {}", file);
+        return {};
+    }
 
     Slang::ComPtr<slang::IComponentType> linkedProgram;
 
-    composedProgram->link(linkedProgram.writeRef());
+    result = composedProgram->link(linkedProgram.writeRef(), diagnostics.writeRef());
+
+    if (diagnostics)
+    {
+        spdlog::error("Slang link diagnostics for {}:\n{}", file, static_cast<const char*>(diagnostics->getBufferPointer()));
+    }
+
+    if (SLANG_FAILED(result) || !linkedProgram)
+    {
+        spdlog::error("Failed to link shader {}", file);
+        return {};
+    }
 
 #if defined(_WIN32)
     constexpr int nbTargets = 2;
@@ -153,11 +182,27 @@ ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string&
     {
         Slang::ComPtr<ISlangBlob> code;
 
-        linkedProgram->getEntryPointCode(0, target, code.writeRef());
+        result = linkedProgram->getEntryPointCode(0, target, code.writeRef(), diagnostics.writeRef());
+
+        if (diagnostics)
+        {
+            spdlog::error("Slang codegen diagnostics for {}:\n{}", file,  static_cast<const char*>(diagnostics->getBufferPointer()));
+        }
+
+        if (SLANG_FAILED(result) || !code)
+        {
+            spdlog::error("Failed to generate shader code for target {} in {}", target, file);
+            continue;
+        }
 
         uint8_t* data = (uint8_t*)code->getBufferPointer();
-
         size_t size = code->getBufferSize();
+
+        if (!data || size == 0)
+        {
+            spdlog::error("Generated shader code is empty for {}", file);
+            continue;
+        }
 
 #if defined(_WIN32)
         if (target == 0)
@@ -168,6 +213,18 @@ ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string&
         bin.spirv.assign(data, data + size);
 #endif
     }
+
+    if (bin.spirv.empty())
+    {
+        spdlog::error("SPIR-V compilation failed for {}", file);
+    }
+
+#if defined(_WIN32)
+    if (bin.dxil.empty())
+    {
+        spdlog::warn("DXIL compilation failed for {}", file);
+    }
+#endif
 
     return bin;
 }

@@ -32,10 +32,10 @@ class ShaderCompiler
 public:
     void Initialize();
 
-    ShaderBinary Load(const std::string& file, const ShaderType& sType);
+    ShaderBinary Load(const std::string& file, const ShaderType& sType) const;
 
 private:
-    ShaderBinary Compile(const std::string& file, const std::string& content, const std::string& entry);
+    ShaderBinary Compile(const std::string& file, const std::string& content, const std::string& entry) const;
 
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;
     Slang::ComPtr<slang::ISession> m_session;
