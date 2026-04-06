@@ -14,13 +14,6 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-    Kayou::RHI::ShaderCompiler compiler{};
-
-    compiler.Initialize();
-
-    compiler.Load("Engine/Assets/Shaders/base.vert.slang", Kayou::RHI::ShaderType::Vertex);
-    compiler.Load("Engine/Assets/Shaders/unlit.frag.slang", Kayou::RHI::ShaderType::Fragment);
-
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
 
     Kayou::Core::WindowSpecs specs;
@@ -73,11 +66,17 @@ int main()
     bufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
+
+    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderType::Vertex);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderType::Fragment);
     
     while (!window->ShouldClose())
     {
         window->PollEvents();
     }
+
+	device->DestroyShader(unlitFrag);
+	device->DestroyShader(baseVert);
     
     device->DestroyBuffer(testBuffer);
 

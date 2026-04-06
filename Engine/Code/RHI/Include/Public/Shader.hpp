@@ -8,6 +8,9 @@
 #include <slang-com-ptr.h>
 #include <slang-com-helper.h>
 
+#include "Utils/Export.hpp"
+#include "Utils/Memory.hpp"
+
 BEGIN_NAMESPACE_RHI
 
 struct ShaderBinary
@@ -39,6 +42,12 @@ private:
 
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;
     Slang::ComPtr<slang::ISession> m_session;
+};
+
+class Shader : public virtual Core::IResource
+{
+public:
+	virtual ~Shader() = default;
 };
 
 END_NAMESPACE_RHI

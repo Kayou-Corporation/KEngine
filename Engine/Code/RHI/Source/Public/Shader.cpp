@@ -53,10 +53,12 @@ ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sTy
 {
     ShaderBinary bin{};
 
-    std::ifstream fileContent(file, std::ios::binary);
+	const std::string fullFile = "Engine/Assets/Shaders/" + file + ".slang";
+
+    std::ifstream fileContent(fullFile, std::ios::binary);
     std::string content((std::istreambuf_iterator<char>(fileContent)), std::istreambuf_iterator<char>());
 
-    std::string name = GetShaderName(file);
+    std::string name = GetShaderName(fullFile);
 
     const std::string entry = ShaderTypeToEntry(sType);
     const std::string hash = HashFile(content, entry);
@@ -84,7 +86,7 @@ ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sTy
         return bin;
     }
 
-    bin = Compile(file, content, entry);
+    bin = Compile(fullFile, content, entry);
 
     const std::string shaderCacheDir = "Cache/Shaders";
 
@@ -216,7 +218,7 @@ ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string&
 
     if (bin.spirv.empty())
     {
-        spdlog::error("SPIR-V compilation failed for {}", file);
+        spdlog::warn("SPIR-V compilation failed for {}", file);
     }
 
 #if defined(_WIN32)

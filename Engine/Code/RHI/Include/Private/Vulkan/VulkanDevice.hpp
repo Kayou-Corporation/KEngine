@@ -52,7 +52,7 @@ class VulkanDevice : public Device
 {
 // Public
 public:
-    VulkanDevice() = default;
+    VulkanDevice();
     virtual ~VulkanDevice() override = default;
 
     // Commands / sync
@@ -68,6 +68,9 @@ public:
 
     virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) override;
     virtual void DestroyImage(Core::RefCountPtr<Image> image) override;
+
+    virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderType& sType) override;
+    virtual void DestroyShader(Core::RefCountPtr<Shader> shader) override;
 
 
 // Public vulkan

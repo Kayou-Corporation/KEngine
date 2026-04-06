@@ -6,6 +6,7 @@
 #include "Utils/Export.hpp"
 
 #include "Public/RHI.hpp"
+#include "Public/Shader.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -48,6 +49,12 @@ public:
 
 	KENGINE_API virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) = 0;
 	KENGINE_API virtual void DestroyImage(Core::RefCountPtr<Image> image) = 0;
+
+	KENGINE_API virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderType& sType) = 0;
+	KENGINE_API virtual void DestroyShader(Core::RefCountPtr<Shader> shader) = 0;
+
+protected:
+	ShaderCompiler m_shaderCompiler;
 };
 
 END_NAMESPACE_RHI

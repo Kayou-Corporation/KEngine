@@ -7,6 +7,7 @@
 #include "Private/Vulkan/VulkanSwapchain.hpp"
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
+#include "Private/Vulkan/VulkanShader.hpp"
 
 #include <map>
 #include <set>
@@ -20,6 +21,13 @@ DISABLE_WARNINGS
 RESTORE_WARNINGS
 
 BEGIN_NAMESPACE_RHI
+
+VulkanDevice::VulkanDevice()
+{
+	m_shaderCompiler.Initialize();
+	m_queueFamily = QueueFamily();
+	m_memoryAllocator = nullptr;
+}
 
 void VulkanDevice::WaitIdle()
 {
@@ -138,6 +146,37 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImage(const ImageSpecs& specs)
 void VulkanDevice::DestroyImage(Core::RefCountPtr<Image> image)
 {
 	(void)image;
+}
+
+Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderType& sType)
+{
+	Core::RefCountPtr<VulkanShader> shader = Core::CreateRefPtr<VulkanShader>();
+
+	ShaderBinary bin = m_shaderCompiler.Load(file, sType);
+
+	size_t size = bin.spirv.size();
+
+	if (size % 4 != 0)
+	{
+		spdlog::error("SPIR-V size not multiple of 4 for: {}", file);
+		return {};
+	}
+
+	vk::ShaderModuleCreateInfo createInfo;
+	createInfo.codeSize = size;
+	createInfo.pCode = reinterpret_cast<const uint32_t*>(bin.spirv.data());
+
+	shader->SetModule(VK_CHECK_RESULT(m_handle.createShaderModule(createInfo), "Failed to create shader module"));
+	shader->SetShaderType(sType);
+
+	return shader;
+}
+
+void VulkanDevice::DestroyShader(Core::RefCountPtr<Shader> shader)
+{
+	vk::ShaderModule shaderModule = shader.CastAs<VulkanShader>()->GetModule();
+
+	m_handle.destroyShaderModule(shaderModule);
 }
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
