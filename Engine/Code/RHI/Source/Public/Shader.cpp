@@ -29,8 +29,8 @@ void ShaderCompiler::Initialize()
     constexpr uint8_t nbTargets = 2;
     slang::TargetDesc targets[nbTargets] = {};
 
-    targets[0].format = SLANG_GLSL;
-    targets[0].profile = m_globalSession->findProfile("glsl450");
+    targets[0].format = SLANG_SPIRV;
+    targets[0].profile = m_globalSession->findProfile("spirv_1_5");
 
     targets[1].format = SLANG_DXIL;
     targets[1].profile = m_globalSession->findProfile("sm_6_6");
