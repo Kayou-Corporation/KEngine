@@ -18,7 +18,8 @@ int main()
 
     compiler.Initialize();
 
-    compiler.Load("Engine/Assets/Shaders/hello-world.compute.slang", Kayou::RHI::ShaderType::Compute);
+    compiler.Load("Engine/Assets/Shaders/base.vert.slang", Kayou::RHI::ShaderType::Vertex);
+    compiler.Load("Engine/Assets/Shaders/unlit.frag.slang", Kayou::RHI::ShaderType::Fragment);
 
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
 

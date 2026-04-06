@@ -10,8 +10,9 @@ struct ObjectParams
 
 struct MaterialParams
 {
-    Texture2D albedoMap;
+    Sampler2D albedoMap;
 };
 
+ParameterBlock<FrameParams> frame;
 ParameterBlock<ObjectParams> object;
 ParameterBlock<MaterialParams> material;
