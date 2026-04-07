@@ -14,6 +14,8 @@ public:
 	VulkanSwapchain() = default;
 	virtual ~VulkanSwapchain() override = default;
 
+	virtual uint32_t GetCurrentImageIndex() override { return m_currentImageIndex; }
+	virtual void SwapImages() override;
 	
 public:
 	void SetHandle(vk::SwapchainKHR swapchain) { m_handle = swapchain; }
@@ -37,6 +39,7 @@ private:
 	vk::SwapchainKHR m_handle;
 
 	uint32_t m_imageCount;
+	uint32_t m_currentImageIndex = 0;
 
 	vk::Format m_colorImageFormat;
 	bool m_bIsDepthEnable;

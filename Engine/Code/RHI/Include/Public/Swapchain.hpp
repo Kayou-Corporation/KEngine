@@ -29,6 +29,9 @@ class Swapchain : public virtual Core::IResource
 {
 public:
 	virtual ~Swapchain() = default;
+
+	KENGINE_API virtual uint32_t GetCurrentImageIndex() = 0;
+	KENGINE_API virtual void SwapImages() = 0;
 };
 
 END_NAMESPACE_RHI

@@ -3,6 +3,7 @@
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanDevice.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
+#include "Private/Vulkan/VulkanRenderpass.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -235,6 +236,34 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data,
 	transitionToFinalLayout.dstAccessMask = vk::AccessFlagBits::eShaderRead;
 
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, nullptr, nullptr, transitionToFinalLayout);
+}
+
+void VulkanCommandList::BeginRendering(const RenderingInfo& renderingInfo)
+{
+	vk::RenderingInfo info{};
+	info.renderArea.offset = TranslateToVulkan(renderingInfo.offset);
+	info.renderArea.extent = TranslateToVulkan(renderingInfo.extent);
+	info.layerCount = renderingInfo.layerCount;
+	info.colorAttachmentCount = renderingInfo.colorAttachmentCount;
+
+	std::vector<vk::RenderingAttachmentInfo> colorAttachments;
+	for (uint32_t i = 0; i < renderingInfo.colorAttachments.size(); ++i)
+	{
+		vk::RenderingAttachmentInfo colorAttachment = VulkanRenderpass::GetRenderingAttachmentInfo(renderingInfo.colorAttachments[i]);
+		colorAttachments.push_back(colorAttachment);
+	}
+	info.pColorAttachments = colorAttachments.data();
+
+	vk::RenderingAttachmentInfo depthAttachment = VulkanRenderpass::GetRenderingAttachmentInfo(renderingInfo.depthAttachment);
+	info.pDepthAttachment = &depthAttachment;
+	//info.pStencilAttachment = &VulkanRenderpass::GetRenderingAttachmentInfo(renderingInfo.stencilAttachment);
+
+	m_handle->cmdBuffer.beginRendering(info);
+}
+
+void VulkanCommandList::EndRendering()
+{
+	m_handle->cmdBuffer.endRendering();
 }
 
 

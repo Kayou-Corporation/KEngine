@@ -8,6 +8,7 @@
 #include "Public/Buffer.hpp"
 #include "Public/Shader.hpp"
 #include "Public/Image.hpp"
+#include "Public/Renderpass.hpp"
 #include "Public/CommandList.hpp"
 
 int main()
@@ -75,58 +76,93 @@ int main()
     //
     //Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
 
-    //std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Image>> presentationImages = device->CreatePresentationImages(swapchain);
+    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Image>> presentationImages = device->CreatePresentationImages(swapchain);
 
-    //Kayou::RHI::SwapchainImageSpecs depthImageSpecs; 
-    //depthImageSpecs.imageType = Kayou::RHI::SwapchainImageType::Depth;
-    //depthImageSpecs.targetLayout = Kayou::RHI::Layout::DepthStencilAttachment;
-    //depthImageSpecs.finalLayout = Kayou::RHI::Layout::DepthStencilAttachment;
-    //depthImageSpecs.type = Kayou::RHI::ImageType::Image2D;
-    //depthImageSpecs.usages = { Kayou::RHI::ImageUsage::DepthStencilAttachment };
-    //depthImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
-    //depthImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Depth;
+    Kayou::RHI::SwapchainImageSpecs depthImageSpecs; 
+    depthImageSpecs.imageType = Kayou::RHI::SwapchainImageType::Depth;
+    depthImageSpecs.targetLayout = Kayou::RHI::Layout::DepthStencilAttachment;
+    depthImageSpecs.finalLayout = Kayou::RHI::Layout::DepthStencilAttachment;
+    depthImageSpecs.type = Kayou::RHI::ImageType::Image2D;
+    depthImageSpecs.usages = { Kayou::RHI::ImageUsage::DepthStencilAttachment };
+    depthImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
+    depthImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Depth;
 
-    //Kayou::Core::RefCountPtr<Kayou::RHI::Image> depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Image> depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
 
-    Kayou::RHI::ImageSpecs textureImageSpecs;
-    textureImageSpecs.source = Kayou::RHI::ImageSource::Cpu;
-    textureImageSpecs.format = Kayou::RHI::Format::RGBA8_SRGB;
-    textureImageSpecs.targetLayout = Kayou::RHI::Layout::ShaderReadOnly;
-    textureImageSpecs.finalLayout = Kayou::RHI::Layout::ShaderReadOnly;
-    textureImageSpecs.type = Kayou::RHI::ImageType::Image2D;
-    textureImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
-    textureImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Color;
-    textureImageSpecs.usages = { Kayou::RHI::ImageUsage::TransferDst, Kayou::RHI::ImageUsage::ShaderSampled };
-    textureImageSpecs.extent = { 1024, 1024, 1};
+    //Kayou::RHI::RenderingAttachment colorAttachment;
+    //colorAttachment.
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::Image> textureImage = device->CreateImage(textureImageSpecs);
-
-    Kayou::Core::RefCountPtr<Kayou::RHI::CommandList> commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
-
-    std::vector<uint32_t> data(1024 * 1024, 0xFF0000FF);
-
-    commandList->Open();
-
-    commandList->SetImageData(textureImage, data.data(), data.size() * sizeof(uint32_t));
-
-    commandList->Close();
-
-    device->SubmitCommandList(commandList);
+    //Kayou::RHI::ImageSpecs textureImageSpecs;
+    //textureImageSpecs.source = Kayou::RHI::ImageSource::Cpu;
+    //textureImageSpecs.format = Kayou::RHI::Format::RGBA8_SRGB;
+    //textureImageSpecs.targetLayout = Kayou::RHI::Layout::ShaderReadOnly;
+    //textureImageSpecs.finalLayout = Kayou::RHI::Layout::ShaderReadOnly;
+    //textureImageSpecs.type = Kayou::RHI::ImageType::Image2D;
+    //textureImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
+    //textureImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Color;
+    //textureImageSpecs.usages = { Kayou::RHI::ImageUsage::TransferDst, Kayou::RHI::ImageUsage::ShaderSampled };
+    //textureImageSpecs.extent = { 1024, 1024, 1};
+    //
+    //Kayou::Core::RefCountPtr<Kayou::RHI::Image> textureImage = device->CreateImage(textureImageSpecs);
+    //
+    //Kayou::Core::RefCountPtr<Kayou::RHI::CommandList> commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+    //
+    //std::vector<uint32_t> data(1024 * 1024, 0xFF0000FF);
+    //
+    //commandList->Open();
+    //
+    //commandList->SetImageData(textureImage, data.data(), data.size() * sizeof(uint32_t));
+    //
+    //commandList->Close();
+    //
+    //device->SubmitCommandList(commandList);
     
     while (!window->ShouldClose())
     {
         window->PollEvents();
         device->RunGarbageCollector();
+
+        Kayou::RHI::RenderingAttachment colorAttachment;
+        colorAttachment.image = presentationImages[swapchain->GetCurrentImageIndex()];
+        colorAttachment.layout = Kayou::RHI::Layout::ColorAttachment;
+        colorAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
+        colorAttachment.storeOp = Kayou::RHI::StoreOp::Store;
+        colorAttachment.clearValue = Kayou::RHI::ClearValue(0.3f, 0.3f, 0.3f, 1.0f);
+
+        Kayou::RHI::RenderingAttachment depthAttachment;
+        depthAttachment.image = depthImage;
+        depthAttachment.layout = Kayou::RHI::Layout::DepthStencilAttachment;
+        depthAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
+        depthAttachment.storeOp = Kayou::RHI::StoreOp::Store;
+        depthAttachment.clearValue = Kayou::RHI::ClearValue(0.3f, 0.3f, 0.3f, 1.0f);
+
+        Kayou::RHI::RenderingInfo renderingInfo;
+        renderingInfo.offset = Kayou::RHI::Offset2D(0, 0);
+        renderingInfo.extent = Kayou::RHI::Extent2D(720, 480);
+        renderingInfo.layerCount = 1;
+        renderingInfo.colorAttachmentCount = 1;
+        renderingInfo.colorAttachments = { colorAttachment };
+        renderingInfo.depthAttachment = { depthAttachment };
+
+        Kayou::Core::RefCountPtr<Kayou::RHI::CommandList> commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+
+        commandList->Open();
+
+        commandList->BeginRendering(renderingInfo);
+        commandList->EndRendering();
+
+        commandList->Close();
+        device->SubmitCommandList(commandList);
     }
     
     device->WaitIdle();
     //device->DestroyBuffer(testBuffer);
 
-    //device->DestroyPresentationImages(presentationImages);
+    device->DestroyPresentationImages(presentationImages);
 
-    //device->DestroyImage(depthImage);
+    device->DestroyImage(depthImage);
 
-    device->DestroyImage(textureImage);
+    //device->DestroyImage(textureImage);
 
     device->DestroySwapchain(swapchain);
 

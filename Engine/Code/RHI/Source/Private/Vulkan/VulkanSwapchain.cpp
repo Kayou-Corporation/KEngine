@@ -72,6 +72,11 @@ vk::SwapchainCreateInfoKHR VulkanSwapchain::GetCreateInfo(const PhysicalDeviceCo
 	return createInfo;
 }
 
+void VulkanSwapchain::SwapImages()
+{
+	m_currentImageIndex = (m_currentImageIndex + 1) % m_imageCount;
+}
+
 #pragma region Compatibility
 
 vk::SurfaceFormatKHR VulkanSwapchain::FindSuitableFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats, const vk::SurfaceFormatKHR requestedFormat)

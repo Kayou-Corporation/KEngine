@@ -243,6 +243,46 @@ enum class ShaderType
 	Tesselation
 };
 
+enum class LoadOp
+{
+	Load,
+	Clear,
+	DontCare
+};
+
+enum class StoreOp
+{
+	Store,
+	DontCare
+};
+
+struct Offset2D
+{
+	Offset2D() = default;
+
+	Offset2D(int inX, int inY) { x = inX; y = inY; }
+	int x = 0;
+	int y = 0;
+};
+
+struct ClearValue
+{
+	ClearValue() = default;
+
+	ClearValue(float inX, float inY, float inZ, float inDepthStencil)
+	{
+		float x = inX;
+		float y = inY;
+		float z = inZ;
+		float depthStencil = inDepthStencil;
+	};
+
+	float x = 0.f;
+	float y = 0.f;
+	float z = 0.f;
+	float depthStencil = 1.0f;
+};
+
 constexpr const char* ShaderTypeToEntry(ShaderType sType)
 {
 	switch (sType)

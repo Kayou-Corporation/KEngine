@@ -10,6 +10,7 @@ BEGIN_NAMESPACE_RHI
 class Buffer;
 class Image;
 class Device;
+struct RenderingInfo;
 
 class CommandList : virtual public Core::IResource
 {
@@ -22,6 +23,9 @@ public:
 
 	KENGINE_API virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) = 0;
 	KENGINE_API virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) = 0;
+
+	KENGINE_API virtual void BeginRendering(const RenderingInfo& renderingInfo) = 0;
+	KENGINE_API virtual void EndRendering() = 0;
 
 	// Rendering
 };

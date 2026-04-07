@@ -5,6 +5,7 @@
 
 #include "Private/Vulkan/VulkanUtils.hpp"
 #include "Private/Vulkan/VulkanQueue.hpp"
+#include "Private/Vulkan/VulkanRenderpass.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -19,6 +20,9 @@ public:
 
 	virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) override;
 	virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) override;
+
+	virtual void BeginRendering(const RenderingInfo& renderingInfo) override;
+	virtual void EndRendering() override;
 
 public:
 	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }

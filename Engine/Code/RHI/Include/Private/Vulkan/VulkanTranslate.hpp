@@ -375,6 +375,15 @@ inline vk::Extent2D TranslateToVulkan(const Extent2D& extent)
     };
 }
 
+inline vk::Offset2D TranslateToVulkan(const Offset2D& extent)
+{
+    return vk::Offset2D
+    {
+        extent.x,
+        extent.y
+    };
+}
+
 inline vk::Extent3D TranslateToVulkan(const Extent3D& extent)
 {
     return vk::Extent3D
@@ -501,6 +510,39 @@ inline vk::PipelineStageFlagBits TranslateToVulkan(PipelineStage stage)
     case PipelineStage::None:
     default:
         return vk::PipelineStageFlagBits::eNone;
+    }
+}
+
+inline vk::AttachmentStoreOp TranslateToVulkan(StoreOp storeOp)
+{
+    switch (storeOp)
+    {
+    case StoreOp::Store:
+        return vk::AttachmentStoreOp::eStore;
+
+    case StoreOp::DontCare:
+        return vk::AttachmentStoreOp::eDontCare;
+
+    default:
+        return vk::AttachmentStoreOp::eNone;
+    }
+}
+
+inline vk::AttachmentLoadOp TranslateToVulkan(LoadOp storeOp)
+{
+    switch (storeOp)
+    {
+    case LoadOp::Load:
+        return vk::AttachmentLoadOp::eLoad;
+
+    case LoadOp::DontCare:
+        return vk::AttachmentLoadOp::eDontCare;
+
+    case LoadOp::Clear:
+        return vk::AttachmentLoadOp::eClear;
+
+    default:
+        return vk::AttachmentLoadOp::eNone;
     }
 }
 
