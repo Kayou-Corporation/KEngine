@@ -131,7 +131,7 @@ int main()
         inFlightFences.push_back(fence);
     
         Kayou::RHI::SemaphoreSpecs semaphoreSpecs;
-        semaphoreSpecs.type = Kayou::RHI::SemaphoreType::Classic;
+        semaphoreSpecs.type = Kayou::RHI::SemaphoreType::Timeline;
     
         Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> semaphore = device->CreateSemaphore(semaphoreSpecs);
         renderFinishedSemaphores.push_back(semaphore);
@@ -143,21 +143,26 @@ int main()
     while (!window->ShouldClose())
     {
         window->PollEvents();
-        device->RunGarbageCollector();
+
+        // Wait for fence
+        device->WaitForFence(inFlightFences[swapchain->GetCurrentImageIndex()]);
+        device->ResetFence(inFlightFences[swapchain->GetCurrentImageIndex()]);
     
+        device->RunGarbageCollector();
+
         Kayou::RHI::RenderingAttachment colorAttachment;
         colorAttachment.image = presentationImages[swapchain->GetCurrentImageIndex()];
         colorAttachment.layout = Kayou::RHI::Layout::ColorAttachment;
         colorAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
         colorAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-        colorAttachment.clearValue = Kayou::RHI::ClearValue(0.3f, 0.3f, 0.3f, 1.0f);
+        colorAttachment.clearValue = Kayou::RHI::ClearValue(255, 0.3f, 0.3f, 1.0f);
     
         Kayou::RHI::RenderingAttachment depthAttachment;
         depthAttachment.image = depthImage;
         depthAttachment.layout = Kayou::RHI::Layout::DepthStencilAttachment;
         depthAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
         depthAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-        depthAttachment.clearValue = Kayou::RHI::ClearValue(0.3f, 0.3f, 0.3f, 1.0f);
+        depthAttachment.clearValue = Kayou::RHI::ClearValue(255, 0.3f, 0.3f, 1.0f);
     
         Kayou::RHI::RenderingInfo renderingInfo;
         renderingInfo.offset = Kayou::RHI::Offset2D(0, 0);

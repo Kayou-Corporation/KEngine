@@ -99,6 +99,23 @@ void VulkanDevice::Present(const PresentInfo& present)
 	VK_CHECK_VOID(m_presentQueue.presentKHR(presentInfo), "Can't present");
 }
 
+void VulkanDevice::WaitForFence(Core::RefCountPtr<Fence> RHIFence)
+{
+	Core::RefCountPtr<VulkanFence> RHIVulkanFence = RHIFence.CastAs<VulkanFence>();
+
+	vk::Fence fence = RHIVulkanFence->GetHandle();
+
+	VK_CHECK_VOID(m_handle.waitForFences({ fence }, VK_TRUE, UINT64_MAX), "can't wait for fence");
+}
+void VulkanDevice::ResetFence(Core::RefCountPtr<Fence> RHIFence)
+{
+	Core::RefCountPtr<VulkanFence> RHIVulkanFence = RHIFence.CastAs<VulkanFence>();
+
+	vk::Fence fence = RHIVulkanFence->GetHandle();
+
+	VK_CHECK_VOID(m_handle.resetFences({ fence }), "Can't reset for fence");
+}
+
 // Remove later
 vk::SubmitInfo VulkanDevice::GetSubmitInfo(const SubmitInfo& RHISubmitInfo)
 {
@@ -152,7 +169,17 @@ void VulkanDevice::RunGarbageCollector()
 Core::RefCountPtr<Semaphore> VulkanDevice::CreateSemaphore(const SemaphoreSpecs& specs)
 {
 	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = Core::CreateRefPtr<VulkanSemaphore>();
-	vk::SemaphoreCreateInfo createInfo = RHIVulkanSemaphore->GetCreateInfo(specs);
+	//vk::SemaphoreCreateInfo createInfo = RHIVulkanSemaphore->GetCreateInfo(specs);
+
+	vk::SemaphoreCreateInfo createInfo{};
+	vk::SemaphoreTypeCreateInfo typeInfo{};
+
+	if (specs.type == SemaphoreType::Timeline)
+	{
+		typeInfo.semaphoreType = vk::SemaphoreType::eTimeline;
+		typeInfo.initialValue = specs.timelineValue;
+		createInfo.pNext = &typeInfo;
+	}
 
 	vk::Semaphore semaphore = VK_CHECK_RESULT(m_handle.createSemaphore(createInfo), "Coudn't create semaphore");
 
@@ -175,6 +202,7 @@ Core::RefCountPtr<Fence> VulkanDevice::CreateFence()
 	Core::RefCountPtr<VulkanFence> RHIVulkanFence = Core::CreateRefPtr<VulkanFence>();
 	
 	vk::FenceCreateInfo createInfo{};
+	createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
 	vk::Fence fence = VK_CHECK_RESULT(m_handle.createFence(createInfo), "Coudn't create fence");
 	
 	RHIVulkanFence->SetHandle(fence);

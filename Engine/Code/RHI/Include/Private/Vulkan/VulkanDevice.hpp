@@ -62,6 +62,8 @@ public:
     virtual void QueueWaitIdle(QueueType type) override;
     virtual void RunGarbageCollector() override;
     virtual void Present(const PresentInfo& present) override;
+    virtual void WaitForFence(Core::RefCountPtr<Fence> fence) override;
+    virtual void ResetFence(Core::RefCountPtr<Fence> fence) override;
 
     virtual Core::RefCountPtr<Semaphore> CreateSemaphore(const SemaphoreSpecs& specs) override;
     virtual void DestroySemaphore(Core::RefCountPtr<Semaphore> semaphore) override;

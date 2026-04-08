@@ -58,6 +58,8 @@ public:
 	KENGINE_API virtual void QueueWaitIdle(QueueType type) = 0;
 	KENGINE_API virtual void RunGarbageCollector() = 0;
 	KENGINE_API virtual void Present(const PresentInfo& present) = 0;
+	KENGINE_API virtual void WaitForFence(Core::RefCountPtr<Fence> fence) = 0;
+	KENGINE_API virtual void ResetFence(Core::RefCountPtr<Fence> fence) = 0;
 
 	// -------- Syncronisation -------- // 
 	KENGINE_API virtual Core::RefCountPtr<Semaphore> CreateSemaphore(const SemaphoreSpecs& specs) = 0;
