@@ -272,10 +272,10 @@ struct ClearValue
 
 	ClearValue(float inX, float inY, float inZ, float inDepthStencil)
 	{
-		float x = inX;
-		float y = inY;
-		float z = inZ;
-		float depthStencil = inDepthStencil;
+		x = inX;
+		y = inY;
+		z = inZ;
+		depthStencil = inDepthStencil;
 	};
 
 	float x = 0.f;
@@ -304,6 +304,8 @@ constexpr const char* ShaderTypeToEntry(ShaderType sType)
 		return "gsMain";
 	case ShaderType::Tesselation:
 		return "tsMain";
+		default:
+			return "";
 	}
 }
 
