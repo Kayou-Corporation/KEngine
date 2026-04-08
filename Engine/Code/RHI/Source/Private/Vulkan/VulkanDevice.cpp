@@ -277,7 +277,7 @@ void VulkanDevice::DestroyPresentationImages(std::vector<Core::RefCountPtr<Image
 Core::RefCountPtr<Image> VulkanDevice::CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain)
 {
 	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = swapchain.CastAs<VulkanSwapchain>();
-	uint32_t swapchainImageCount = RHIVulkanSwapchain->GetImageCount();
+	[[maybe_unused]] uint32_t swapchainImageCount = RHIVulkanSwapchain->GetImageCount();
 
 	Core::RefCountPtr<VulkanImage> RHIVulkanImage = Core::CreateRefPtr<VulkanImage>();
 
