@@ -145,7 +145,7 @@ TrackedCommandBufferPtr Queue::GetOrCreateCommandBuffer(vk::Device& device)
 	return cmdBuffer;
 }
 
-void Queue::Submit(TrackedCommandBufferPtr cmdBuffer)
+void Queue::Submit(TrackedCommandBufferPtr cmdBuffer, vk::Fence fence, vk::PipelineStageFlags waitStages)
 {
     m_lastSubmitdId++;
 
@@ -161,10 +161,18 @@ void Queue::Submit(TrackedCommandBufferPtr cmdBuffer)
     submitInfo.setCommandBufferCount(1);
     submitInfo.setPCommandBuffers(&cmdBuffer->cmdBuffer);
 
-    submitInfo.setSignalSemaphoreCount(1);
-    submitInfo.setPSignalSemaphores(&m_trackingSemaphore);
+    signalSemaprhores.push_back(m_trackingSemaphore);
+    submitInfo.setSignalSemaphoreCount(signalSemaprhores.size());
+    submitInfo.setPSignalSemaphores(signalSemaprhores.data());
+    signalSemaprhores.clear();
 
-    VK_CHECK_VOID(m_handle.submit(submitInfo, nullptr), "Can't submit command buffer");
+    submitInfo.setWaitSemaphoreCount(waitSemaprhores.size());
+    submitInfo.setPWaitSemaphores(waitSemaprhores.data());
+    waitSemaprhores.clear();
+
+    submitInfo.pWaitDstStageMask = &waitStages;
+
+    VK_CHECK_VOID(m_handle.submit(submitInfo, fence), "Can't submit command buffer");
 
     m_inFlightCommandBuffersPool.push_back(cmdBuffer);
 }

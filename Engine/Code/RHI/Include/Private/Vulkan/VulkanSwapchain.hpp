@@ -14,6 +14,7 @@ public:
 	VulkanSwapchain() = default;
 	virtual ~VulkanSwapchain() override = default;
 
+	virtual uint32_t GetImageCount() override { return m_imageCount; }
 	virtual uint32_t GetCurrentImageIndex() override { return m_currentImageIndex; }
 	virtual void SwapImages() override;
 	
@@ -23,7 +24,7 @@ public:
 	vk::SwapchainKHR GetHandle() { return m_handle; }
 	vk::SwapchainKHR& GetHandleRef() { return m_handle; }
 
-	uint32_t GetImageCount() { return m_imageCount; }
+	//uint32_t GetImageCount() { return m_imageCount; }
 	vk::Format GetColorImageFormat() { return m_colorImageFormat; }
 	vk::Format GetDepthImageFormat() { return m_depthImageFormat; }
 	vk::Extent2D GetImageExtent() { return m_imageExtent; }

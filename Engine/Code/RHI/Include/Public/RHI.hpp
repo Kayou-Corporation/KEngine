@@ -231,6 +231,7 @@ enum class PipelineStage
 	ComputeShader,
 	GeometryShader,
 	Transfer,
+	ColorOutput,
 	None
 };
 
@@ -281,6 +282,12 @@ struct ClearValue
 	float y = 0.f;
 	float z = 0.f;
 	float depthStencil = 1.0f;
+};
+
+enum class SemaphoreType
+{
+	Classic,
+	Timeline
 };
 
 constexpr const char* ShaderTypeToEntry(ShaderType sType)

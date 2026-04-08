@@ -507,6 +507,8 @@ inline vk::PipelineStageFlagBits TranslateToVulkan(PipelineStage stage)
     case PipelineStage::Transfer:
         return vk::PipelineStageFlagBits::eTransfer;
 
+    case PipelineStage::ColorOutput:
+        return vk::PipelineStageFlagBits::eColorAttachmentOutput;
     case PipelineStage::None:
     default:
         return vk::PipelineStageFlagBits::eNone;

@@ -5,12 +5,29 @@
 
 #include "Public/RHI.hpp"
 
+#include <vector>
+
 BEGIN_NAMESPACE_RHI
 
 class Buffer;
 class Image;
 class Device;
 struct RenderingInfo;
+
+class Fence;
+class Semaphore;
+
+struct SubmitInfo
+{
+	SubmitInfo() = default;
+
+	PipelineStage stage;
+
+	std::vector<Core::RefCountPtr<Semaphore>> signalSemaphores;
+	std::vector<Core::RefCountPtr<Semaphore>> waitSemaphores;
+
+	Core::RefCountPtr<Fence> fence;
+};
 
 class CommandList : virtual public Core::IResource
 {

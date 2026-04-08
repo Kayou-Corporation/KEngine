@@ -23,6 +23,11 @@ struct SwapchainImageSpecs;
 
 class CommandList;
 
+class Semaphore;
+struct SemaphoreSpecs;
+class Fence;
+struct SubmitInfo;
+
 struct DeviceSpecs
 {
 	GpuType gpuType;
@@ -34,18 +39,32 @@ struct DeviceSpecs
 	Core::RefCountPtr<Surface> surface;
 };
 
+struct PresentInfo
+{
+	std::vector<Core::RefCountPtr<Semaphore>> waitSemaphores;
+
+	Core::RefCountPtr<Swapchain> swapchain;
+	uint32_t imageIndex;
+};
+
 class Device : public virtual Core::IResource
 {
 public:
 	virtual ~Device() = default;
 
 	KENGINE_API virtual Core::RefCountPtr<CommandList> GetCommandList(QueueType type) = 0;
-	KENGINE_API virtual void SubmitCommandList(Core::RefCountPtr<CommandList> commandList) = 0;
+	KENGINE_API virtual void SubmitCommandList(Core::RefCountPtr<CommandList> commandList, const SubmitInfo& submitInfo) = 0;
 	KENGINE_API virtual void WaitIdle() = 0;
 	KENGINE_API virtual void QueueWaitIdle(QueueType type) = 0;
 	KENGINE_API virtual void RunGarbageCollector() = 0;
+	KENGINE_API virtual void Present(const PresentInfo& present) = 0;
 
-	// -------- Create -------- // 
+	// -------- Syncronisation -------- // 
+	KENGINE_API virtual Core::RefCountPtr<Semaphore> CreateSemaphore(const SemaphoreSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySemaphore(Core::RefCountPtr<Semaphore> semaphore) = 0;
+
+	KENGINE_API virtual Core::RefCountPtr<Fence> CreateFence() = 0;
+	KENGINE_API virtual void DestroyFence(Core::RefCountPtr<Fence> fence) = 0;
 	
 	// ----- Swapchain ------- // 
 	KENGINE_API virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) = 0;

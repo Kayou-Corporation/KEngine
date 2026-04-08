@@ -57,10 +57,16 @@ public:
 
     // Commands / sync
     virtual Core::RefCountPtr<CommandList> GetCommandList(QueueType type) override;
-    virtual void SubmitCommandList(Core::RefCountPtr<CommandList> commandList) override;
+    virtual void SubmitCommandList(Core::RefCountPtr<CommandList> commandList, const SubmitInfo& submitInfo) override;
     virtual void WaitIdle() override;
     virtual void QueueWaitIdle(QueueType type) override;
     virtual void RunGarbageCollector() override;
+    virtual void Present(const PresentInfo& present) override;
+
+    virtual Core::RefCountPtr<Semaphore> CreateSemaphore(const SemaphoreSpecs& specs) override;
+    virtual void DestroySemaphore(Core::RefCountPtr<Semaphore> semaphore) override;
+    virtual Core::RefCountPtr<Fence> CreateFence() override;
+    virtual void DestroyFence(Core::RefCountPtr<Fence> fence) override;
 
     // Create objects
     virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
@@ -97,6 +103,8 @@ public:
 private:
     PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, const std::vector<const char*>& requiredExtensions);
     void BuildFeaturesChain();
+
+    vk::SubmitInfo GetSubmitInfo(const SubmitInfo& submitInfo);
 
     vk::PhysicalDevice m_pDevice;
     PhysicalDeviceCompatibiliy m_compatibility{};

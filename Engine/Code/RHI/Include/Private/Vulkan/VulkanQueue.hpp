@@ -80,7 +80,13 @@ public:
 	void WaitIdle();
 
 	TrackedCommandBufferPtr GetOrCreateCommandBuffer(vk::Device& device);
-	void Submit(TrackedCommandBufferPtr cmdBuffer);
+	void Submit(TrackedCommandBufferPtr cmdBuffer, vk::Fence fence, vk::PipelineStageFlags waitStages);
+
+	void PushSignalSemaphore(const vk::Semaphore& semaphore) { signalSemaprhores.push_back(semaphore); }
+	void PushSignalSemaphores(const std::vector<vk::Semaphore>& semaphores) { signalSemaprhores.insert(signalSemaprhores.end(), semaphores.begin(), semaphores.end()); }
+
+	void PushWaitSemaphore(const vk::Semaphore& semaphore) { waitSemaprhores.push_back(semaphore); }
+	void PushWaitSemaphores(const std::vector<vk::Semaphore>& semaphores) { waitSemaprhores.insert(waitSemaprhores.end(), semaphores.begin(), semaphores.end()); }
 
 	void RunGarbageCollector(vk::Device& device);
 
@@ -93,8 +99,8 @@ private:
 	VmaAllocator m_memoryAllocator;
 
 	vk::Semaphore m_trackingSemaphore;
-	//std::vector<vk::Semaphore> waitSemaprhores;
-	//std::vector<vk::Semaphore> signalSemaprhores;
+	std::vector<vk::Semaphore> signalSemaprhores;
+	std::vector<vk::Semaphore> waitSemaprhores;
 
 	std::list<TrackedCommandBufferPtr> m_commandBuffersPool;
 	std::list<TrackedCommandBufferPtr> m_inFlightCommandBuffersPool;
