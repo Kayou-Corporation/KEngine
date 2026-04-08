@@ -6,9 +6,12 @@ vk::SemaphoreCreateInfo VulkanSemaphore::GetCreateInfo(const SemaphoreSpecs& spe
 {
 	vk::SemaphoreCreateInfo createInfo{};
 
+	vk::SemaphoreTypeCreateInfo typeInfo{};
+
 	if (specs.type == SemaphoreType::Timeline)
 	{
-		vk::SemaphoreTypeCreateInfo typeInfo(vk::SemaphoreType::eTimeline, specs.timelineValue);
+		typeInfo.semaphoreType = vk::SemaphoreType::eTimeline;
+		typeInfo.initialValue = specs.timelineValue;
 		createInfo.pNext = &typeInfo;
 	}
 
