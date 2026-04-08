@@ -125,65 +125,72 @@ int main()
     std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> imageAvailablesSemaphore;
     std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> renderFinishedSemaphores;
 
-    //for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
-    //{
-    //    Kayou::Core::RefCountPtr<Kayou::RHI::Fence> fence = device->CreateFence();
-    //    inFlightFences.push_back(fence);
-    //
-    //    Kayou::RHI::SemaphoreSpecs semaphoreSpecs;
-    //    semaphoreSpecs.type = Kayou::RHI::SemaphoreType::Classic;
-    //
-    //    Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> semaphore = device->CreateSemaphore(semaphoreSpecs);
-    //    renderFinishedSemaphores.push_back(semaphore);
-    //
-    //    Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> availableSemaphore = device->CreateSemaphore(semaphoreSpecs);
-    //    imageAvailablesSemaphore.push_back(availableSemaphore);
-    //}
-    //
-    //while (!window->ShouldClose())
-    //{
-    //    window->PollEvents();
-    //    device->RunGarbageCollector();
-    //
-    //    Kayou::RHI::RenderingAttachment colorAttachment;
-    //    colorAttachment.image = presentationImages[swapchain->GetCurrentImageIndex()];
-    //    colorAttachment.layout = Kayou::RHI::Layout::ColorAttachment;
-    //    colorAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
-    //    colorAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-    //    colorAttachment.clearValue = Kayou::RHI::ClearValue(0.3f, 0.3f, 0.3f, 1.0f);
-    //
-    //    Kayou::RHI::RenderingAttachment depthAttachment;
-    //    depthAttachment.image = depthImage;
-    //    depthAttachment.layout = Kayou::RHI::Layout::DepthStencilAttachment;
-    //    depthAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
-    //    depthAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-    //    depthAttachment.clearValue = Kayou::RHI::ClearValue(0.3f, 0.3f, 0.3f, 1.0f);
-    //
-    //    Kayou::RHI::RenderingInfo renderingInfo;
-    //    renderingInfo.offset = Kayou::RHI::Offset2D(0, 0);
-    //    renderingInfo.extent = Kayou::RHI::Extent2D(windowWidth, windowHeight);
-    //    renderingInfo.layerCount = 1;
-    //    renderingInfo.colorAttachmentCount = 1;
-    //    renderingInfo.colorAttachments = { colorAttachment };
-    //    renderingInfo.depthAttachment = { depthAttachment };
-    //
-    //    Kayou::Core::RefCountPtr<Kayou::RHI::CommandList> commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
-    //
-    //    commandList->Open();
-    //
-    //    commandList->BeginRendering(renderingInfo);
-    //    commandList->EndRendering();
-    //
-    //    commandList->Close();
-    //    
-    //    Kayou::RHI::SubmitInfo submitInfo;
-    //    submitInfo.signalSemaphores = { imageAvailablesSemaphore[swapchain->GetCurrentImageIndex()]};
-    //    submitInfo.waitSemaphores = { renderFinishedSemaphores[swapchain->GetCurrentImageIndex()] };
-    //    submitInfo.stage = Kayou::RHI::PipelineStage::ColorOutput;
-    //    submitInfo.fence = inFlightFences[swapchain->GetCurrentImageIndex()];
-    //
-    //    device->SubmitCommandList(commandList, submitInfo);
-    //}
+    for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
+    {
+        Kayou::Core::RefCountPtr<Kayou::RHI::Fence> fence = device->CreateFence();
+        inFlightFences.push_back(fence);
+    
+        Kayou::RHI::SemaphoreSpecs semaphoreSpecs;
+        semaphoreSpecs.type = Kayou::RHI::SemaphoreType::Classic;
+    
+        Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> semaphore = device->CreateSemaphore(semaphoreSpecs);
+        renderFinishedSemaphores.push_back(semaphore);
+    
+        Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> availableSemaphore = device->CreateSemaphore(semaphoreSpecs);
+        imageAvailablesSemaphore.push_back(availableSemaphore);
+    }
+    
+    while (!window->ShouldClose())
+    {
+        window->PollEvents();
+        device->RunGarbageCollector();
+    
+        Kayou::RHI::RenderingAttachment colorAttachment;
+        colorAttachment.image = presentationImages[swapchain->GetCurrentImageIndex()];
+        colorAttachment.layout = Kayou::RHI::Layout::ColorAttachment;
+        colorAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
+        colorAttachment.storeOp = Kayou::RHI::StoreOp::Store;
+        colorAttachment.clearValue = Kayou::RHI::ClearValue(0.3f, 0.3f, 0.3f, 1.0f);
+    
+        Kayou::RHI::RenderingAttachment depthAttachment;
+        depthAttachment.image = depthImage;
+        depthAttachment.layout = Kayou::RHI::Layout::DepthStencilAttachment;
+        depthAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
+        depthAttachment.storeOp = Kayou::RHI::StoreOp::Store;
+        depthAttachment.clearValue = Kayou::RHI::ClearValue(0.3f, 0.3f, 0.3f, 1.0f);
+    
+        Kayou::RHI::RenderingInfo renderingInfo;
+        renderingInfo.offset = Kayou::RHI::Offset2D(0, 0);
+        renderingInfo.extent = Kayou::RHI::Extent2D(windowWidth, windowHeight);
+        renderingInfo.layerCount = 1;
+        renderingInfo.colorAttachmentCount = 1;
+        renderingInfo.colorAttachments = { colorAttachment };
+        renderingInfo.depthAttachment = { depthAttachment };
+    
+        Kayou::Core::RefCountPtr<Kayou::RHI::CommandList> commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+    
+        commandList->Open();
+    
+        commandList->BeginRendering(renderingInfo);
+        commandList->EndRendering();
+    
+        commandList->Close();
+        
+        Kayou::RHI::SubmitInfo submitInfo;
+        submitInfo.signalSemaphores = { renderFinishedSemaphores[swapchain->GetCurrentImageIndex()]};
+        submitInfo.waitSemaphores = { imageAvailablesSemaphore[swapchain->GetCurrentImageIndex()] };
+        submitInfo.stage = Kayou::RHI::PipelineStage::ColorOutput;
+        submitInfo.fence = inFlightFences[swapchain->GetCurrentImageIndex()];
+    
+        device->SubmitCommandList(commandList, submitInfo);
+
+        Kayou::RHI::PresentInfo presentInfo;
+        presentInfo.waitSemaphores = { renderFinishedSemaphores[swapchain->GetCurrentImageIndex()] };
+        presentInfo.swapchain = swapchain;
+        presentInfo.imageIndex = swapchain->GetCurrentImageIndex();
+
+        swapchain->SwapImages();
+    }
     
     device->WaitIdle();
     //device->DestroyBuffer(testBuffer);
@@ -193,7 +200,7 @@ int main()
         // delete fence & semaphore
         device->DestroyFence(inFlightFences[i]);
         device->DestroySemaphore(imageAvailablesSemaphore[i]);
-        device->DestroyFence(renderFinishedSemaphores[i]);
+        device->DestroySemaphore(renderFinishedSemaphores[i]);
     }
 
     device->DestroyPresentationImages(presentationImages);

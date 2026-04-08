@@ -173,12 +173,12 @@ void VulkanDevice::DestroySemaphore(Core::RefCountPtr<Semaphore> RHISemaphore)
 Core::RefCountPtr<Fence> VulkanDevice::CreateFence()
 {
 	Core::RefCountPtr<VulkanFence> RHIVulkanFence = Core::CreateRefPtr<VulkanFence>();
-
+	
 	vk::FenceCreateInfo createInfo{};
 	vk::Fence fence = VK_CHECK_RESULT(m_handle.createFence(createInfo), "Coudn't create fence");
-
+	
 	RHIVulkanFence->SetHandle(fence);
-
+	
 	return RHIVulkanFence;
 }
 
