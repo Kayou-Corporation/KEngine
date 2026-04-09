@@ -145,36 +145,78 @@ TrackedCommandBufferPtr Queue::GetOrCreateCommandBuffer(vk::Device& device)
 	return cmdBuffer;
 }
 
-void Queue::Submit(TrackedCommandBufferPtr cmdBuffer, vk::Fence fence, vk::PipelineStageFlags waitStages)
+void Queue::Submit(TrackedCommandBufferPtr cmdBuffer, vk::PipelineStageFlags waitStages)
 {
     m_lastSubmitdId++;
 
     cmdBuffer->submissionId = m_lastSubmitdId;
 
     // Setup timeline semaphore for tracking
+    m_signalSemaprhores.push_back(m_trackingSemaphore);
+    m_signalSemaphoresValues.push_back(cmdBuffer->submissionId);
+
     vk::TimelineSemaphoreSubmitInfo timelineInfo;
-    timelineInfo.setSignalSemaphoreValueCount(1);
-    timelineInfo.setPSignalSemaphoreValues(&cmdBuffer->submissionId);
+    timelineInfo.setSignalSemaphoreValueCount(m_signalSemaprhores.size());
+    timelineInfo.setPSignalSemaphoreValues(m_signalSemaphoresValues.data());
+    timelineInfo.setWaitSemaphoreValueCount(m_waitSemaprhores.size());
+    timelineInfo.setPWaitSemaphoreValues(m_waitSemaprhoresValues.data());
 
     vk::SubmitInfo submitInfo;
     submitInfo.setPNext(&timelineInfo);
     submitInfo.setCommandBufferCount(1);
     submitInfo.setPCommandBuffers(&cmdBuffer->cmdBuffer);
 
-    signalSemaprhores.push_back(m_trackingSemaphore);
-    submitInfo.setSignalSemaphoreCount(signalSemaprhores.size());
-    submitInfo.setPSignalSemaphores(signalSemaprhores.data());
-    signalSemaprhores.clear();
+    submitInfo.setSignalSemaphoreCount(m_signalSemaprhores.size());
+    submitInfo.setPSignalSemaphores(m_signalSemaprhores.data());
+    m_signalSemaprhores.clear();
 
-    submitInfo.setWaitSemaphoreCount(waitSemaprhores.size());
-    submitInfo.setPWaitSemaphores(waitSemaprhores.data());
-    waitSemaprhores.clear();
+    submitInfo.setWaitSemaphoreCount(m_waitSemaprhores.size());
+    submitInfo.setPWaitSemaphores(m_waitSemaprhores.data());
+    m_waitSemaprhoresValues.clear();
 
     submitInfo.pWaitDstStageMask = &waitStages;
 
-    VK_CHECK_VOID(m_handle.submit(submitInfo, fence), "Can't submit command buffer");
+    VK_CHECK_VOID(m_handle.submit(submitInfo), "Can't submit command buffer");
 
     m_inFlightCommandBuffersPool.push_back(cmdBuffer);
+}
+
+void Queue::PushSignalSemaphore(const vk::Semaphore& semaphore, uint64_t value)
+{ 
+    m_signalSemaprhores.push_back(semaphore); 
+    m_signalSemaphoresValues.push_back(value);
+}
+
+void Queue::PushSignalSemaphores(const std::vector<vk::Semaphore>& semaphores, const std::vector<uint64_t>& values)
+{
+    m_signalSemaprhores.reserve(m_signalSemaprhores.size() + semaphores.size());
+    for (const auto& s : semaphores) 
+    {
+        m_signalSemaprhores.push_back(s);
+    }
+
+    m_signalSemaphoresValues.insert(m_signalSemaphoresValues.end(), values.begin(), values.end());
+   // m_signalSemaprhores.insert(m_signalSemaprhores.end(), semaphores.begin(), semaphores.end());
+   // m_signalSemaphoresValues.insert(m_signalSemaphoresValues.end(), values.begin(), values.end());
+}
+
+void Queue::PushWaitSemaphore(const vk::Semaphore& semaphore, uint64_t value)
+{ 
+    m_waitSemaprhores.push_back(semaphore); 
+    m_waitSemaprhoresValues.push_back(value);
+}
+void Queue::PushWaitSemaphores(const std::vector<vk::Semaphore>& semaphores, const std::vector<uint64_t>& values)
+{ 
+    m_waitSemaprhores.reserve(m_waitSemaprhores.size() + semaphores.size());
+    for (const auto& s : semaphores)
+    {
+        m_signalSemaprhores.push_back(s);
+    }
+
+    m_waitSemaprhoresValues.insert(m_waitSemaprhoresValues.end(), values.begin(), values.end());
+    //
+// m_waitSemaprhoresValues.insert(m_waitSemaprhoresValues.end(), semaphores.begin(), semaphores.end());
+    //m_waitSemaprhoresValues.insert(m_waitSemaprhoresValues.end(), values.begin(), values.end());
 }
 
 void Queue::RunGarbageCollector(vk::Device& device)

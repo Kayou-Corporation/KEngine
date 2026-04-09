@@ -121,32 +121,65 @@ int main()
     uint32_t windowWidth = window->GetWidth();
     uint32_t windowHeight = window->GetHeight();
 
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Fence>> inFlightFences;
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> imageAvailablesSemaphore;
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> renderFinishedSemaphores;
+    //std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Fence>> inFlightFences;
+    //std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> imageAvailablesSemaphore;
+    //std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> renderFinishedSemaphores;
 
-    for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
+    //for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
+    //{
+    //    Kayou::Core::RefCountPtr<Kayou::RHI::Fence> fence = device->CreateFence();
+    //    inFlightFences.push_back(fence);
+    //
+    //    Kayou::RHI::SemaphoreSpecs semaphoreSpecs;
+    //    semaphoreSpecs.type = Kayou::RHI::SemaphoreType::Timeline;
+    //
+    //    Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> semaphore = device->CreateSemaphore(semaphoreSpecs);
+    //    renderFinishedSemaphores.push_back(semaphore);
+    //
+    //    Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> availableSemaphore = device->CreateSemaphore(semaphoreSpecs);
+    //    imageAvailablesSemaphore.push_back(availableSemaphore);
+    //}
+
+    // Timeline
+    Kayou::RHI::SemaphoreSpecs timelineSpecs;
+    timelineSpecs.type = Kayou::RHI::SemaphoreType::Timeline;
+    Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
+
+    // Binary 
+    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> renderFinishedSemaphores;
+    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> imageAvailablesSemaphores;
+
+    for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i) 
     {
-        Kayou::Core::RefCountPtr<Kayou::RHI::Fence> fence = device->CreateFence();
-        inFlightFences.push_back(fence);
-    
-        Kayou::RHI::SemaphoreSpecs semaphoreSpecs;
-        semaphoreSpecs.type = Kayou::RHI::SemaphoreType::Timeline;
-    
-        Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> semaphore = device->CreateSemaphore(semaphoreSpecs);
-        renderFinishedSemaphores.push_back(semaphore);
-    
-        Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> availableSemaphore = device->CreateSemaphore(semaphoreSpecs);
-        imageAvailablesSemaphore.push_back(availableSemaphore);
+        Kayou::RHI::SemaphoreSpecs binarySpecs{};
+        binarySpecs.type = Kayou::RHI::SemaphoreType::Classic;
+
+        Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
+        Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
+
+        imageAvailablesSemaphores.push_back(imageAvailableSemaphore);
+        renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
+
+    uint64_t frameCounter = 0;
     
     while (!window->ShouldClose())
     {
         window->PollEvents();
 
-        // Wait for fence
-        device->WaitForFence(inFlightFences[swapchain->GetCurrentImageIndex()]);
-        device->ResetFence(inFlightFences[swapchain->GetCurrentImageIndex()]);
+        uint32_t syncIndex = frameCounter % swapchain->GetImageCount();
+        uint32_t imageIndex = device->AcquirreNextImage(swapchain, imageAvailablesSemaphores[syncIndex]);
+
+        frameCounter++;
+
+        if (frameCounter > swapchain->GetImageCount()) 
+        {
+            device->WaitForSemaphore(frameTimelineSemaphore, frameCounter - swapchain->GetImageCount());
+        }
+
+        //// Wait for fence
+        //device->WaitForFence(inFlightFences[swapchain->GetCurrentImageIndex()]);
+        //device->ResetFence(inFlightFences[swapchain->GetCurrentImageIndex()]);
     
         device->RunGarbageCollector();
 
@@ -182,17 +215,24 @@ int main()
         commandList->Close();
         
         Kayou::RHI::SubmitInfo submitInfo;
-        submitInfo.signalSemaphores = { renderFinishedSemaphores[swapchain->GetCurrentImageIndex()]};
-        submitInfo.waitSemaphores = { imageAvailablesSemaphore[swapchain->GetCurrentImageIndex()] };
+        submitInfo.waitSemaphores = { imageAvailablesSemaphores[syncIndex] };
+        submitInfo.waitSemaphoresValues = { 0 };
+
+        submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[syncIndex] };
+        submitInfo.signalSemaphoresValues = { frameCounter, 0 };
+
         submitInfo.stage = Kayou::RHI::PipelineStage::ColorOutput;
-        submitInfo.fence = inFlightFences[swapchain->GetCurrentImageIndex()];
+        //submitInfo.fence = inFlightFences[swapchain->GetCurrentImageIndex()];
     
         device->SubmitCommandList(commandList, submitInfo);
 
         Kayou::RHI::PresentInfo presentInfo;
-        presentInfo.waitSemaphores = { renderFinishedSemaphores[swapchain->GetCurrentImageIndex()] };
+        presentInfo.waitSemaphores = { renderFinishedSemaphores[syncIndex]};
+        //presentInfo.waitSemaphoresValues = { frameCounter };
         presentInfo.swapchain = swapchain;
-        presentInfo.imageIndex = swapchain->GetCurrentImageIndex();
+        presentInfo.imageIndex = imageIndex;
+
+        device->Present(presentInfo);
 
         swapchain->SwapImages();
     }
@@ -203,10 +243,10 @@ int main()
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
     {
         // delete fence & semaphore
-        device->DestroyFence(inFlightFences[i]);
-        device->DestroySemaphore(imageAvailablesSemaphore[i]);
+        device->DestroySemaphore(imageAvailablesSemaphores[i]);
         device->DestroySemaphore(renderFinishedSemaphores[i]);
     }
+    device->DestroySemaphore(frameTimelineSemaphore);
 
     device->DestroyPresentationImages(presentationImages);
 

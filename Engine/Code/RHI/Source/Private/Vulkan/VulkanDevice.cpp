@@ -53,7 +53,7 @@ void VulkanDevice::SubmitCommandList(Core::RefCountPtr<CommandList> commandList,
 
 		signalSemaphores.push_back(semaphore);
 	}
-	m_queues[commandBufferQueue].PushSignalSemaphores(signalSemaphores);
+	m_queues[commandBufferQueue].PushSignalSemaphores(signalSemaphores, submitInfo.signalSemaphoresValues);
 
 	std::vector<vk::Semaphore> waitSemaphores;
 	for (uint32_t i = 0; i < submitInfo.waitSemaphores.size(); ++i)
@@ -64,14 +64,14 @@ void VulkanDevice::SubmitCommandList(Core::RefCountPtr<CommandList> commandList,
 
 		waitSemaphores.push_back(semaphore);
 	}
-	m_queues[commandBufferQueue].PushSignalSemaphores(waitSemaphores);
+	m_queues[commandBufferQueue].PushWaitSemaphores(waitSemaphores, submitInfo.waitSemaphoresValues);
 
-	Core::RefCountPtr<VulkanFence> RHIVulkanFence = submitInfo.fence.CastAs<VulkanFence>();
-	vk::Fence fence = RHIVulkanFence->GetHandle();
+	//Core::RefCountPtr<VulkanFence> RHIVulkanFence = submitInfo.fence.CastAs<VulkanFence>();
+	//vk::Fence fence = RHIVulkanFence->GetHandle();
 
 	vk::PipelineStageFlagBits stage = TranslateToVulkan(submitInfo.stage);
 
-	m_queues[commandBufferQueue].Submit(commandBuffer, fence, stage);
+	m_queues[commandBufferQueue].Submit(commandBuffer, stage);
 }
 
 void VulkanDevice::Present(const PresentInfo& present)
@@ -92,11 +92,25 @@ void VulkanDevice::Present(const PresentInfo& present)
 	vk::PresentInfoKHR presentInfo;
 	presentInfo.waitSemaphoreCount = waitSemaphores.size();
 	presentInfo.pWaitSemaphores = waitSemaphores.data();
-	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &swapchain;
 	presentInfo.pImageIndices = &present.imageIndex;
 
 	VK_CHECK_VOID(m_presentQueue.presentKHR(presentInfo), "Can't present");
+}
+
+void VulkanDevice::WaitForSemaphore(Core::RefCountPtr<Semaphore> RHISemaphore, uint64_t waitValue)
+{
+	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISemaphore.CastAs<VulkanSemaphore>();
+
+	vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
+
+	vk::SemaphoreWaitInfo waitInfo{};
+	waitInfo.flags = vk::SemaphoreWaitFlagBits::eAny;
+	waitInfo.semaphoreCount = 1;
+	waitInfo.pSemaphores = &semaphore;
+	waitInfo.pValues = &waitValue;
+
+	VK_CHECK_VOID(m_handle.waitSemaphores(waitInfo, UINT64_MAX), "Can't wait semaphore");
 }
 
 void VulkanDevice::WaitForFence(Core::RefCountPtr<Fence> RHIFence)
@@ -168,6 +182,8 @@ void VulkanDevice::RunGarbageCollector()
 
 Core::RefCountPtr<Semaphore> VulkanDevice::CreateSemaphore(const SemaphoreSpecs& specs)
 {
+	(void)specs;
+
 	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = Core::CreateRefPtr<VulkanSemaphore>();
 	//vk::SemaphoreCreateInfo createInfo = RHIVulkanSemaphore->GetCreateInfo(specs);
 
@@ -253,6 +269,19 @@ void VulkanDevice::DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain)
 	Core::RefCountPtr<VulkanSwapchain> vulkanSwapchain = swapchain.CastAs<VulkanSwapchain>();
 	
 	m_handle.destroySwapchainKHR(vulkanSwapchain->GetHandle());
+}
+
+uint32_t VulkanDevice::AcquirreNextImage(Core::RefCountPtr<Swapchain> RHISwapchain, Core::RefCountPtr<Semaphore> RHISemaphore)
+{
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = RHISwapchain.CastAs<VulkanSwapchain>();
+	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISemaphore.CastAs<VulkanSemaphore>();
+
+	vk::SwapchainKHR swapchain = RHIVulkanSwapchain->GetHandle();
+	vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
+	
+	uint32_t imageIndex = VK_CHECK_RESULT(m_handle.acquireNextImageKHR(swapchain, UINT64_MAX, semaphore), "Failed to acquired next image");
+
+	return imageIndex;
 }
 
 std::vector<Core::RefCountPtr<Image>> VulkanDevice::CreatePresentationImages(Core::RefCountPtr<Swapchain> swapchain)

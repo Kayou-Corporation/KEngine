@@ -24,9 +24,12 @@ struct SubmitInfo
 	PipelineStage stage;
 
 	std::vector<Core::RefCountPtr<Semaphore>> signalSemaphores;
+	std::vector<uint64_t> signalSemaphoresValues;
 	std::vector<Core::RefCountPtr<Semaphore>> waitSemaphores;
+	std::vector<uint64_t> waitSemaphoresValues;
 
-	Core::RefCountPtr<Fence> fence;
+	// Deprecated
+	//Core::RefCountPtr<Fence> fence;
 };
 
 class CommandList : virtual public Core::IResource

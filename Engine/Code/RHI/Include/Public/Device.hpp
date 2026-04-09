@@ -42,6 +42,7 @@ struct DeviceSpecs
 struct PresentInfo
 {
 	std::vector<Core::RefCountPtr<Semaphore>> waitSemaphores;
+	std::vector<uint64_t> waitSemaphoresValues;
 
 	Core::RefCountPtr<Swapchain> swapchain;
 	uint32_t imageIndex;
@@ -58,6 +59,7 @@ public:
 	KENGINE_API virtual void QueueWaitIdle(QueueType type) = 0;
 	KENGINE_API virtual void RunGarbageCollector() = 0;
 	KENGINE_API virtual void Present(const PresentInfo& present) = 0;
+	KENGINE_API virtual void WaitForSemaphore(Core::RefCountPtr<Semaphore> semaphore, uint64_t waitValue) = 0;
 	KENGINE_API virtual void WaitForFence(Core::RefCountPtr<Fence> fence) = 0;
 	KENGINE_API virtual void ResetFence(Core::RefCountPtr<Fence> fence) = 0;
 
@@ -71,6 +73,7 @@ public:
 	// ----- Swapchain ------- // 
 	KENGINE_API virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) = 0;
 	KENGINE_API virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) = 0;
+	KENGINE_API virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, Core::RefCountPtr<Semaphore> Semaphore) = 0;
 
 	// ----- Buffer ------- // 
 	KENGINE_API virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) = 0;

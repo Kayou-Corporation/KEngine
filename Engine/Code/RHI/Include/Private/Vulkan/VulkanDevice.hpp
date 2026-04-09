@@ -62,6 +62,7 @@ public:
     virtual void QueueWaitIdle(QueueType type) override;
     virtual void RunGarbageCollector() override;
     virtual void Present(const PresentInfo& present) override;
+    virtual void WaitForSemaphore(Core::RefCountPtr<Semaphore> semaphore, uint64_t waitValue) override;
     virtual void WaitForFence(Core::RefCountPtr<Fence> fence) override;
     virtual void ResetFence(Core::RefCountPtr<Fence> fence) override;
 
@@ -73,6 +74,7 @@ public:
     // Create objects
     virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
     virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) override;
+    virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, Core::RefCountPtr<Semaphore> Semaphore) override;
 
     virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
     virtual void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) override;
