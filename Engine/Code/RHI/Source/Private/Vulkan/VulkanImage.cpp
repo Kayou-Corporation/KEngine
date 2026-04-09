@@ -10,6 +10,7 @@ vk::ImageCreateInfo VulkanImage::GetCreateInfo(const ImageSpecs& specs)
 
 	m_targetLayout = TranslateToVulkan(specs.targetLayout);
 	m_finalLayout = TranslateToVulkan(specs.finalLayout);
+	m_layout = vk::ImageLayout::eUndefined;
 	m_imageFormat = TranslateToVulkan(specs.format);
 	m_imageExtent = TranslateToVulkan(specs.extent);
 	m_layersCount = specs.layersCount;

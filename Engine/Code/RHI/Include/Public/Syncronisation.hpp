@@ -9,8 +9,8 @@ BEGIN_NAMESPACE_RHI
 
 struct SemaphoreSpecs
 {
-	SemaphoreType type;
-	uint64_t timelineValue;
+	SemaphoreType type = SemaphoreType::Classic;
+	uint64_t timelineValue = 0;
 };
 
 class Semaphore : virtual public Core::IResource

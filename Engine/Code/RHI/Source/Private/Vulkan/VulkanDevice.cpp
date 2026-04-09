@@ -667,6 +667,13 @@ void VulkanDevice::BuildFeaturesChain()
 			features.timelineSemaphore.pNext = currentPNext;
 			currentPNext = &features.timelineSemaphore;
 		}
+		else if (name == VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)
+		{
+			features.sync2Features.synchronization2 = VK_TRUE;
+
+			features.sync2Features.pNext = currentPNext;
+			currentPNext = &features.sync2Features;
+		}
 	}
 
 	for (const char* extName : m_extensions)

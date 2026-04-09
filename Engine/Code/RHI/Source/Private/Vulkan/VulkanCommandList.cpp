@@ -217,7 +217,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data,
 
 
 	// --------------------  TRANSITION TO FINAL LAYOUT FOR USE ----------------------- // 
-	vk::ImageLayout finalLayout = vulkanImage->GetLayout();
+	vk::ImageLayout finalLayout = vulkanImage->GetFinalLayout();
 
 
 	// A little bit "hardcode" but this function should only be use with a final layout = transitionToFinalLayout
@@ -266,5 +266,62 @@ void VulkanCommandList::EndRendering()
 	m_handle->cmdBuffer.endRendering();
 }
 
+void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout)
+{
+	Core::RefCountPtr<VulkanImage> RHIVulkanImage = image.CastAs<VulkanImage>();
+
+	vk::ImageLayout oldLayout = RHIVulkanImage->GetLayout();
+	vk::ImageLayout newLayout = TranslateToVulkan(dstLayout);
+
+	vk::ImageMemoryBarrier barrier{};
+	barrier.oldLayout = RHIVulkanImage->GetLayout();
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = RHIVulkanImage->GetHandle();
+
+	if (newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+	{
+		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth;
+	}
+	else 
+	{
+		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+	}
+
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+
+	vk::PipelineStageFlags srcStage;
+	vk::PipelineStageFlags dstStage;
+
+	if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eColorAttachmentOptimal) 
+	{
+		barrier.srcAccessMask = vk::AccessFlags();
+		barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+		srcStage = vk::PipelineStageFlagBits::eTopOfPipe;
+		dstStage = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+	}
+	else if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal) 
+	{
+		barrier.srcAccessMask = vk::AccessFlags();
+		barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+		srcStage = vk::PipelineStageFlagBits::eTopOfPipe;
+		dstStage = vk::PipelineStageFlagBits::eEarlyFragmentTests;
+	}
+	else if (oldLayout == vk::ImageLayout::eColorAttachmentOptimal && newLayout == vk::ImageLayout::ePresentSrcKHR)
+	{
+		barrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+		barrier.dstAccessMask = vk::AccessFlags();
+		srcStage = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+		dstStage = vk::PipelineStageFlagBits::eBottomOfPipe;
+	}
+
+	m_handle->cmdBuffer.pipelineBarrier(srcStage, dstStage, vk::DependencyFlags(), nullptr, nullptr, barrier);	
+	
+	RHIVulkanImage->SetLayout(newLayout);
+}
 
 END_NAMESPACE_RHI

@@ -38,6 +38,7 @@ struct DeviceFeatures
     vk::PhysicalDeviceShaderObjectFeaturesEXT shaderObjectFeatures;
     vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT extendedDynamicStateFeatures;
     vk::PhysicalDeviceExtendedDynamicState2FeaturesEXT extendedDynamicState2Features;
+    vk::PhysicalDeviceSynchronization2Features sync2Features;
     vk::PhysicalDeviceTimelineSemaphoreFeatures timelineSemaphore;
 };
 
@@ -45,7 +46,8 @@ struct DeviceFeatures
 static std::vector<const char*> nativeExtensions =
 {
     VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME
 };
 
 class VulkanDevice : public Device
