@@ -24,6 +24,8 @@ public:
 	virtual void BeginRendering(const RenderingInfo& renderingInfo) override;
 	virtual void EndRendering() override;
 
+	virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) override;
+
 public:
 	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }
 	TrackedCommandBufferPtr GetHandle() { return m_handle; }

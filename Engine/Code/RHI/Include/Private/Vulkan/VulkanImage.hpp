@@ -30,6 +30,7 @@ public:
 
 	void SetHandle(vk::Image image) { m_handle = image; }
 	void SetHandleView(vk::ImageView imageView) { m_handleView = imageView; }
+	void SetLayout(vk::ImageLayout layout) { m_layout = layout; }
 
 	void SetAllocation(VmaAllocation allocation) { m_allocation = allocation; }
 	void SetAllocationInfo(VmaAllocationInfo allocationInfo) { m_allocationInfo = allocationInfo; }
@@ -44,7 +45,8 @@ public:
 	uint32_t GetBytesPerPixel() { return m_bytesPerPixel; }
 	vk::Extent3D GetExtent() { return m_imageExtent; }
 	vk::ImageAspectFlags GetAspect() { return m_imageAspects; }
-	vk::ImageLayout GetLayout() { return m_finalLayout; }
+	vk::ImageLayout GetFinalLayout() { return m_finalLayout; }
+	vk::ImageLayout GetLayout() { return m_layout; }
 
 	VmaAllocation GetAllocation() { return  m_allocation; }
 private: 
@@ -61,6 +63,7 @@ private:
 	// Ex : PresentationDepth : Target & Final = DepthOutput
 	vk::ImageLayout m_targetLayout;
 	vk::ImageLayout m_finalLayout;
+	vk::ImageLayout m_layout;
 	vk::Format m_imageFormat;
 	vk::Extent3D m_imageExtent;
 	vk::ImageAspectFlags m_imageAspects;

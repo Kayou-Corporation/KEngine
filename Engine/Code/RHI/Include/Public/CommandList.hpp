@@ -47,6 +47,8 @@ public:
 	KENGINE_API virtual void BeginRendering(const RenderingInfo& renderingInfo) = 0;
 	KENGINE_API virtual void EndRendering() = 0;
 
+	KENGINE_API virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) = 0;
+
 	// Rendering
 };
 

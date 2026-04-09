@@ -204,8 +204,17 @@ int main()
 
         auto commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
         commandList->Open();
+
+        commandList->TransitionImageLayout(presentationImages[imageIndex], Kayou::RHI::Layout::ColorAttachment);
+
+        commandList->TransitionImageLayout(depthImage, Kayou::RHI::Layout::DepthStencilAttachment);
+
         commandList->BeginRendering(renderingInfo);
+
         commandList->EndRendering();
+
+        commandList->TransitionImageLayout(presentationImages[imageIndex], Kayou::RHI::Layout::Present);
+
         commandList->Close();
 
         uint64_t signalValue = frameCounter + 1;
