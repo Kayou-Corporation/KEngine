@@ -35,7 +35,7 @@ class ShaderCompiler
 public:
     void Initialize();
 
-    ShaderBinary Load(const std::string& file, const ShaderType& sType) const;
+    ShaderBinary Load(const std::string& file, const ShaderStage& sType) const;
 
 private:
     ShaderBinary Compile(const std::string& file, const std::string& content, const std::string& entry) const;
@@ -48,6 +48,13 @@ class Shader : public virtual Core::IResource
 {
 public:
 	virtual ~Shader() = default;
+
+    virtual ShaderStage GetShaderStage() const { return m_type; }
+
+    virtual void SetShaderStage(const ShaderStage& type) { m_type = type; }
+
+protected:
+    ShaderStage m_type;
 };
 
 END_NAMESPACE_RHI

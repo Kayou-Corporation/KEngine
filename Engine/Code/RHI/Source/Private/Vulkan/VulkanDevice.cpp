@@ -8,6 +8,7 @@
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
 #include "Private/Vulkan/VulkanShader.hpp"
+#include "Private/Vulkan/VulkanGraphicsPipeline.hpp"
 
 #include <map>
 #include <set>
@@ -148,11 +149,11 @@ void VulkanDevice::DestroyImage(Core::RefCountPtr<Image> image)
 	(void)image;
 }
 
-Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderType& sType)
+Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage)
 {
 	Core::RefCountPtr<VulkanShader> shader = Core::CreateRefPtr<VulkanShader>();
 
-	ShaderBinary bin = m_shaderCompiler.Load(file, sType);
+	ShaderBinary bin = m_shaderCompiler.Load(file, sStage);
 
 	size_t size = bin.spirv.size();
 
@@ -167,7 +168,7 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 	createInfo.pCode = reinterpret_cast<const uint32_t*>(bin.spirv.data());
 
 	shader->SetModule(VK_CHECK_RESULT(m_handle.createShaderModule(createInfo), "Failed to create shader module"));
-	shader->SetShaderType(sType);
+	shader->SetShaderStage(sStage);
 
 	return shader;
 }
@@ -177,6 +178,22 @@ void VulkanDevice::DestroyShader(Core::RefCountPtr<Shader> shader)
 	vk::ShaderModule shaderModule = shader.CastAs<VulkanShader>()->GetModule();
 
 	m_handle.destroyShaderModule(shaderModule);
+}
+
+Core::RefCountPtr<GraphicsPipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& specs)
+{
+	Core::RefCountPtr<VulkanGraphicsPipeline> pipeline = Core::CreateRefPtr<VulkanGraphicsPipeline>();
+
+	vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> createInfo = pipeline->GetCreateInfo(specs);
+
+	pipeline->SetHandle(VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo.get<vk::GraphicsPipelineCreateInfo>()), "Failed to create graphics pipeline"));
+
+	return pipeline;
+}
+
+void VulkanDevice::DestroyPipeline(Core::RefCountPtr<GraphicsPipeline> pipeline)
+{
+	m_handle.destroyPipeline(pipeline.CastAs<VulkanGraphicsPipeline>()->GetHandle());
 }
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)

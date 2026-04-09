@@ -21,6 +21,9 @@ public:
 	vk::SwapchainKHR GetHandle() { return m_handle; }
 	vk::SwapchainKHR& GetHandleRef() { return m_handle; }
 
+	vk::Format GetColorImageFormat() const { return m_colorImageFormat; }
+	vk::Format GetDepthFormat() const { return m_depthImageFormat; }
+
 	vk::SwapchainCreateInfoKHR GetCreateInfo(const PhysicalDeviceCompatibiliy& compatibility, vk::SurfaceKHR surface, uint32_t graphicsQueueIndex, uint32_t presentQueueQueueIndex, uint32_t requestedImageCount, vk::Format requestedFormat, bool bIsDepthEnable, vk::Format requestedDepthFormat, vk::PresentModeKHR requestedPresentMode, vk::Extent2D requestedExtent);
 
 private:

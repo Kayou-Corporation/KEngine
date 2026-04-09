@@ -69,8 +69,11 @@ public:
     virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) override;
     virtual void DestroyImage(Core::RefCountPtr<Image> image) override;
 
-    virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderType& sType) override;
+    virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage) override;
     virtual void DestroyShader(Core::RefCountPtr<Shader> shader) override;
+
+    virtual Core::RefCountPtr<GraphicsPipeline> CreatePipeline(const PipelineSpecs& specs) override;
+    virtual void DestroyPipeline(Core::RefCountPtr<GraphicsPipeline> pipeline) override;
 
 
 // Public vulkan

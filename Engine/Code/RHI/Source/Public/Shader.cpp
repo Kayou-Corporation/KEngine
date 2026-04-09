@@ -49,7 +49,7 @@ void ShaderCompiler::Initialize()
     m_globalSession->createSession(desc, m_session.writeRef());
 }
 
-ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sType) const
+ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderStage& sType) const
 {
     ShaderBinary bin{};
 
@@ -60,7 +60,7 @@ ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderType& sTy
 
     std::string name = GetShaderName(fullFile);
 
-    const std::string entry = ShaderTypeToEntry(sType);
+    const std::string entry = ShaderStageToEntry(sType);
     const std::string hash = HashFile(content, entry);
 
     const std::string spirvPath = CacheShaderPath(hash, name, ".spv");

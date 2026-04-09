@@ -504,4 +504,22 @@ inline vk::PipelineStageFlagBits TranslateToVulkan(PipelineStage stage)
     }
 }
 
+inline vk::ShaderStageFlagBits TranslateToVulkan(ShaderStage stage)
+{
+    switch (stage)
+    {
+    case ShaderStage::Vertex:
+        return vk::ShaderStageFlagBits::eVertex;
+    case ShaderStage::Fragment:
+        return vk::ShaderStageFlagBits::eFragment;
+    case ShaderStage::Compute:
+        return vk::ShaderStageFlagBits::eCompute;
+    case ShaderStage::Geometry:
+        return vk::ShaderStageFlagBits::eGeometry;
+    case ShaderStage::Tesselation: // Tesselation not supported for now
+    default:
+        return vk::ShaderStageFlagBits::eAll;
+    }
+}
+
 END_NAMESPACE_RHI
