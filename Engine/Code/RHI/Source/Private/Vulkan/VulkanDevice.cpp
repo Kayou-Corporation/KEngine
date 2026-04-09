@@ -92,6 +92,7 @@ void VulkanDevice::Present(const PresentInfo& present)
 	vk::PresentInfoKHR presentInfo;
 	presentInfo.waitSemaphoreCount = waitSemaphores.size();
 	presentInfo.pWaitSemaphores = waitSemaphores.data();
+	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &swapchain;
 	presentInfo.pImageIndices = &present.imageIndex;
 

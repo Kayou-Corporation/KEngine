@@ -155,6 +155,8 @@ void Queue::Submit(TrackedCommandBufferPtr cmdBuffer, vk::PipelineStageFlags wai
     m_signalSemaprhores.push_back(m_trackingSemaphore);
     m_signalSemaphoresValues.push_back(cmdBuffer->submissionId);
 
+    std::vector<vk::PipelineStageFlags> waitMasks(m_waitSemaprhores.size(), waitStages);
+
     vk::TimelineSemaphoreSubmitInfo timelineInfo;
     timelineInfo.setSignalSemaphoreValueCount(m_signalSemaprhores.size());
     timelineInfo.setPSignalSemaphoreValues(m_signalSemaphoresValues.data());
@@ -168,15 +170,19 @@ void Queue::Submit(TrackedCommandBufferPtr cmdBuffer, vk::PipelineStageFlags wai
 
     submitInfo.setSignalSemaphoreCount(m_signalSemaprhores.size());
     submitInfo.setPSignalSemaphores(m_signalSemaprhores.data());
-    m_signalSemaprhores.clear();
 
     submitInfo.setWaitSemaphoreCount(m_waitSemaprhores.size());
     submitInfo.setPWaitSemaphores(m_waitSemaprhores.data());
-    m_waitSemaprhoresValues.clear();
 
-    submitInfo.pWaitDstStageMask = &waitStages;
+    submitInfo.setPWaitDstStageMask(waitMasks.data());
 
     VK_CHECK_VOID(m_handle.submit(submitInfo), "Can't submit command buffer");
+
+    m_signalSemaprhores.clear();
+    m_signalSemaphoresValues.clear();
+
+    m_waitSemaprhores.clear();
+    m_waitSemaprhoresValues.clear();
 
     m_inFlightCommandBuffersPool.push_back(cmdBuffer);
 }
@@ -210,13 +216,10 @@ void Queue::PushWaitSemaphores(const std::vector<vk::Semaphore>& semaphores, con
     m_waitSemaprhores.reserve(m_waitSemaprhores.size() + semaphores.size());
     for (const auto& s : semaphores)
     {
-        m_signalSemaprhores.push_back(s);
+        m_waitSemaprhores.push_back(s);
     }
 
     m_waitSemaprhoresValues.insert(m_waitSemaprhoresValues.end(), values.begin(), values.end());
-    //
-// m_waitSemaprhoresValues.insert(m_waitSemaprhoresValues.end(), semaphores.begin(), semaphores.end());
-    //m_waitSemaprhoresValues.insert(m_waitSemaprhoresValues.end(), values.begin(), values.end());
 }
 
 void Queue::RunGarbageCollector(vk::Device& device)

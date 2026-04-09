@@ -146,8 +146,8 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
 
     // Binary 
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> renderFinishedSemaphores;
     std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> imageAvailablesSemaphores;
+    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> renderFinishedSemaphores;
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i) 
     {
@@ -167,74 +167,66 @@ int main()
     {
         window->PollEvents();
 
-        uint32_t syncIndex = frameCounter % swapchain->GetImageCount();
-        uint32_t imageIndex = device->AcquirreNextImage(swapchain, imageAvailablesSemaphores[syncIndex]);
+        uint32_t maxFramesInFlight = swapchain->GetImageCount();
+        uint32_t syncIndex = frameCounter % maxFramesInFlight;
 
-        frameCounter++;
-
-        if (frameCounter > swapchain->GetImageCount()) 
+        if (frameCounter >= maxFramesInFlight)
         {
-            device->WaitForSemaphore(frameTimelineSemaphore, frameCounter - swapchain->GetImageCount());
+            uint64_t waitValue = frameCounter - maxFramesInFlight + 1;
+            device->WaitForSemaphore(frameTimelineSemaphore, waitValue);
         }
 
-        //// Wait for fence
-        //device->WaitForFence(inFlightFences[swapchain->GetCurrentImageIndex()]);
-        //device->ResetFence(inFlightFences[swapchain->GetCurrentImageIndex()]);
-    
+        uint32_t imageIndex = device->AcquirreNextImage(swapchain, imageAvailablesSemaphores[syncIndex]);
+
         device->RunGarbageCollector();
 
         Kayou::RHI::RenderingAttachment colorAttachment;
-        colorAttachment.image = presentationImages[swapchain->GetCurrentImageIndex()];
+        colorAttachment.image = presentationImages[imageIndex];
         colorAttachment.layout = Kayou::RHI::Layout::ColorAttachment;
         colorAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
         colorAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-        colorAttachment.clearValue = Kayou::RHI::ClearValue(255, 0.3f, 0.3f, 1.0f);
-    
+        colorAttachment.clearValue = Kayou::RHI::ClearValue(1.0f, 0.0f, 0.0f, 1.0f);
+
         Kayou::RHI::RenderingAttachment depthAttachment;
         depthAttachment.image = depthImage;
         depthAttachment.layout = Kayou::RHI::Layout::DepthStencilAttachment;
         depthAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
         depthAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-        depthAttachment.clearValue = Kayou::RHI::ClearValue(255, 0.3f, 0.3f, 1.0f);
-    
+        depthAttachment.clearValue = Kayou::RHI::ClearValue(1.0f, 0.f, 0.f, 0.f);
+
         Kayou::RHI::RenderingInfo renderingInfo;
-        renderingInfo.offset = Kayou::RHI::Offset2D(0, 0);
-        renderingInfo.extent = Kayou::RHI::Extent2D(windowWidth, windowHeight);
+        renderingInfo.offset = { 0, 0 };
+        renderingInfo.extent = { windowWidth, windowHeight };
         renderingInfo.layerCount = 1;
         renderingInfo.colorAttachmentCount = 1;
         renderingInfo.colorAttachments = { colorAttachment };
-        renderingInfo.depthAttachment = { depthAttachment };
-    
-        Kayou::Core::RefCountPtr<Kayou::RHI::CommandList> commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
-    
+        renderingInfo.depthAttachment = depthAttachment;
+
+        auto commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
         commandList->Open();
-    
         commandList->BeginRendering(renderingInfo);
         commandList->EndRendering();
-    
         commandList->Close();
-        
+
+        uint64_t signalValue = frameCounter + 1;
+
         Kayou::RHI::SubmitInfo submitInfo;
         submitInfo.waitSemaphores = { imageAvailablesSemaphores[syncIndex] };
         submitInfo.waitSemaphoresValues = { 0 };
-
         submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[syncIndex] };
-        submitInfo.signalSemaphoresValues = { frameCounter, 0 };
-
+        submitInfo.signalSemaphoresValues = { signalValue, 0 };
         submitInfo.stage = Kayou::RHI::PipelineStage::ColorOutput;
-        //submitInfo.fence = inFlightFences[swapchain->GetCurrentImageIndex()];
-    
+
         device->SubmitCommandList(commandList, submitInfo);
 
         Kayou::RHI::PresentInfo presentInfo;
-        presentInfo.waitSemaphores = { renderFinishedSemaphores[syncIndex]};
-        //presentInfo.waitSemaphoresValues = { frameCounter };
+        presentInfo.waitSemaphores = { renderFinishedSemaphores[syncIndex] };
         presentInfo.swapchain = swapchain;
         presentInfo.imageIndex = imageIndex;
 
         device->Present(presentInfo);
 
-        swapchain->SwapImages();
+        frameCounter++;
     }
     
     device->WaitIdle();
