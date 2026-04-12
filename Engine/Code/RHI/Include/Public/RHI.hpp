@@ -286,7 +286,7 @@ struct ClearValue
 
 enum class SemaphoreType
 {
-	Classic,
+	Binary,
 	Timeline
 };
 

@@ -91,17 +91,6 @@ void VulkanDevice::RunGarbageCollector()
 	}
 }
 
-void VulkanDevice::ClearQueues()
-{
-	// Finish all in flight ressources
-	RunGarbageCollector();
-
-	for (auto& [type, queue] : m_queues)
-	{
-		queue.Destroy(m_handle);
-	}
-}
-
 //----------- Syncronisation --------------// 
 Core::RefCountPtr<Semaphore> VulkanDevice::CreateSemaphore(const SemaphoreSpecs& RHISpecs)
 {
@@ -559,14 +548,14 @@ void VulkanDevice::CreateMemoryAllocator(const vk::Instance& instance)
 
 void VulkanDevice::Destroy()
 {
-	//WaitIdle();
-
-	//for (auto& [type, queue] : m_queues)
-	//{
-	//	queue.Destroy(m_handle);
-	//}
+	WaitIdle();
 
 	vmaDestroyAllocator(m_memoryAllocator);
+
+	for (auto& [type, queue] : m_queues)
+	{
+		queue.Destroy(m_handle);
+	}
 
 	m_handle.destroy();
 }

@@ -9,7 +9,7 @@ BEGIN_NAMESPACE_RHI
 
 struct SemaphoreSpecs
 {
-	SemaphoreType type = SemaphoreType::Classic;
+	SemaphoreType type = SemaphoreType::Binary;
 	uint64_t timelineValue = 0;
 };
 

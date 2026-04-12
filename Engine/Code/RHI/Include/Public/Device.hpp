@@ -59,7 +59,6 @@ public:
 	KENGINE_API virtual void WaitIdle() = 0;
 	KENGINE_API virtual void QueueWaitIdle(QueueType queueType) = 0;
 	KENGINE_API virtual void RunGarbageCollector() = 0;
-	KENGINE_API virtual void ClearQueues() = 0;
 
 
 	//----------- Syncronisation --------------// 
