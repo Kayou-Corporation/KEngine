@@ -112,6 +112,7 @@ public:
     vk::Device GetHandle() const { return m_handle; }
     VmaAllocator GetMemoryAllocator() const { return m_memoryAllocator; }
 
+// Private Vulkan
 private:
     PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, const std::vector<const char*>& requiredExtensions);
     void BuildFeaturesChain();

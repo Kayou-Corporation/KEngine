@@ -20,7 +20,6 @@ public:
 };
 
 
-
 class Fence : virtual public Core::IResource
 {
 public:
