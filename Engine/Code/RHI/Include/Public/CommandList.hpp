@@ -37,19 +37,23 @@ class CommandList : virtual public Core::IResource
 public:
 	virtual ~CommandList() = default;
 
-	// base functions to open close commandBuffer
+	//----------- Open / Close --------------//
 	KENGINE_API virtual void Open() = 0;
 	KENGINE_API virtual void Close() = 0;
 
-	KENGINE_API virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) = 0;
-	KENGINE_API virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) = 0;
 
+	//----------- Dynamic Rendering --------------//
 	KENGINE_API virtual void BeginRendering(const RenderingInfo& renderingInfo) = 0;
 	KENGINE_API virtual void EndRendering() = 0;
 
-	KENGINE_API virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) = 0;
 
-	// Rendering
+	//----------- Set Buffer / Image Data --------------//
+	KENGINE_API virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) = 0;
+	KENGINE_API virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) = 0;
+
+
+	//----------- Transition Image Layout --------------//
+	KENGINE_API virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) = 0;
 };
 
 END_NAMESPACE_RHI
