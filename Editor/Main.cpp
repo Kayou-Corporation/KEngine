@@ -152,7 +152,7 @@ int main()
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i) 
     {
         Kayou::RHI::SemaphoreSpecs binarySpecs{};
-        binarySpecs.type = Kayou::RHI::SemaphoreType::Classic;
+        binarySpecs.type = Kayou::RHI::SemaphoreType::Binary;
 
         Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
         Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);

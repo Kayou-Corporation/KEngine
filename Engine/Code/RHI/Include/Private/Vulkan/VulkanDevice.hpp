@@ -57,48 +57,54 @@ public:
     VulkanDevice() = default;
     virtual ~VulkanDevice() override = default;
 
-    // Commands / sync
-    virtual Core::RefCountPtr<CommandList> GetCommandList(QueueType type) override;
+    //----------- Queue / Command --------------//
+    virtual Core::RefCountPtr<CommandList> GetCommandList(QueueType queueType) override;
     virtual void SubmitCommandList(Core::RefCountPtr<CommandList> commandList, const SubmitInfo& submitInfo) override;
     virtual void WaitIdle() override;
-    virtual void QueueWaitIdle(QueueType type) override;
+    virtual void QueueWaitIdle(QueueType queueType) override;
     virtual void RunGarbageCollector() override;
-    virtual void Present(const PresentInfo& present) override;
+
+
+    //----------- Syncronisation --------------// 
+    virtual Core::RefCountPtr<Semaphore> CreateSemaphore(const SemaphoreSpecs& specs) override;
+    virtual void DestroySemaphore(Core::RefCountPtr<Semaphore> semaphore) override;
     virtual void WaitForSemaphore(Core::RefCountPtr<Semaphore> semaphore, uint64_t waitValue) override;
+    virtual Core::RefCountPtr<Fence> CreateFence() override;
+    virtual void DestroyFence(Core::RefCountPtr<Fence> fence) override;
     virtual void WaitForFence(Core::RefCountPtr<Fence> fence) override;
     virtual void ResetFence(Core::RefCountPtr<Fence> fence) override;
 
-    virtual Core::RefCountPtr<Semaphore> CreateSemaphore(const SemaphoreSpecs& specs) override;
-    virtual void DestroySemaphore(Core::RefCountPtr<Semaphore> semaphore) override;
-    virtual Core::RefCountPtr<Fence> CreateFence() override;
-    virtual void DestroyFence(Core::RefCountPtr<Fence> fence) override;
 
-    // Create objects
+    //----------- Swapchain --------------// 
     virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
     virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) override;
     virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, Core::RefCountPtr<Semaphore> Semaphore) override;
+    virtual void Present(const PresentInfo& presentInfo) override;
 
+
+    //-------------- Buffer --------------// 
     virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
     virtual void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) override;
 
+
+    //-------------- Image --------------// 
     virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) override;
     virtual void DestroyImage(Core::RefCountPtr<Image> image) override;
-
     virtual std::vector<Core::RefCountPtr<Image>> CreatePresentationImages(Core::RefCountPtr<Swapchain> swapchain) override;
     virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) override;
-
     virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) override;
 
 
 // Public vulkan
 public:
-    // Create
+    // Create vk::Device & vk::PhysicalDevice
     void PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions);
     void CreateLogicalDevice(std::vector<const char*>& extensions);
+
     void CreateMemoryAllocator(const vk::Instance& instance);
 
-    // Destroy
     void Destroy();
+
     void DestroyBuffer(vk::Buffer buffer, VmaAllocation allocation);
 
     vk::Format CheckFormatCompatibility(vk::Format requestedFormat, vk::ImageTiling tiling, vk::FormatFeatureFlags requiredFeatures);
@@ -109,8 +115,6 @@ public:
 private:
     PhysicalDevice RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, const std::vector<const char*>& requiredExtensions);
     void BuildFeaturesChain();
-
-    vk::SubmitInfo GetSubmitInfo(const SubmitInfo& submitInfo);
 
     vk::PhysicalDevice m_pDevice;
     PhysicalDeviceCompatibiliy m_compatibility{};
@@ -128,33 +132,6 @@ private:
     vk::Device m_handle;
 
     VmaAllocator m_memoryAllocator;
-
-    //vk::Queue presentQueue;
-    //std::unordered_map<Queue, vk::Queue> m_availableQueues;
-        
-};
-
-/*
- DEVICE EXTENSIONS TO CHECK INTERNALLY : 
-
- - VK_KHR_dynamic_rendering // Dynamic Rendering
-
- - VK_EXT_shader_object // conseil d'utiliser en plus : 
-                            VK_EXT_extended_dynamic_state
-                            VK_EXT_extended_dynamic_state2
-                            VK_EXT_extended_dynamic_state3
-
- - 
-*/
-
-struct NativeExtensions
-{
-    const char* DynamicRendering = "VK_KHR_dynamic_rendering";
-
-    const char* ShaderObject = "VK_EXT_shader_object";
-    const char* DynamicState = "VK_EXT_extended_dynamic_state";
-    const char* DynamicState2 = "VK_EXT_extended_dynamic_state2";
-    const char* DynamicState3 = "VK_EXT_extended_dynamic_state3";
 };
 
 END_NAMESPACE_RHI
