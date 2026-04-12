@@ -1,5 +1,6 @@
 // base.vert.slang
 
+import "frame";
 import "object";
 
 struct VSInput
@@ -24,11 +25,11 @@ VSOutput vsMain(VSInput input)
 {
     VSOutput o;
 
-    float4 world = mul(object.model, float4(input.position, 1));
+    float4 world = mul(object.object.model, float4(input.position, 1));
 
     o.worldPos = world.xyz;
 
-    o.normal = mul((float3x3)object.normalMat, input.normal);
+    o.normal = mul((float3x3)object.object.normalMat, input.normal);
 
     o.uv = input.uv;
 

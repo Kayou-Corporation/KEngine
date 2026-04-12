@@ -1,5 +1,6 @@
 // unlit.frag.slang
 
+import "frame";
 import "object";
 
 struct FSInput
@@ -13,6 +14,6 @@ struct FSInput
 [shader("fragment")]
 float4 fsMain(FSInput input) : SV_Target
 {
-    float4 albedo = material.albedoMap.Sample(input.uv);
+    float4 albedo = object.material.albedoMap.Sample(input.uv);
     return albedo;
 }

@@ -39,6 +39,7 @@ public:
 
 private:
     ShaderBinary Compile(const std::string& file, const std::string& content, const std::string& entry) const;
+	void Reflect(slang::ProgramLayout* layout) const;
 
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;
     Slang::ComPtr<slang::ISession> m_session;

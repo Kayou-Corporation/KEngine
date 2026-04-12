@@ -1,7 +1,5 @@
 // object.slang
 
-import "frame";
-
 struct ObjectParams
 {
     float4x4 model;
@@ -13,6 +11,12 @@ struct MaterialParams
     Sampler2D albedoMap;
 };
 
-ParameterBlock<FrameParams> frame;
-ParameterBlock<ObjectParams> object;
-ParameterBlock<MaterialParams> material;
+struct FullObjectParams
+{
+    ObjectParams object;
+    MaterialParams material;
+};
+
+ParameterBlock<FullObjectParams> object;
+//ParameterBlock<ObjectParams> object;
+//ParameterBlock<MaterialParams> material;

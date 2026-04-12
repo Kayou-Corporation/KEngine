@@ -228,7 +228,28 @@ ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string&
     }
 #endif
 
+	Reflect(linkedProgram->getLayout());
+
     return bin;
+}
+
+void ShaderCompiler::Reflect(slang::ProgramLayout* layout) const
+{
+    auto globals = layout->getGlobalParamsTypeLayout();
+
+    int count = globals->getFieldCount();
+
+    for (int i = 0; i < count; i++)
+    {
+        auto field = globals->getFieldByIndex(i);
+
+        const char* name = field->getName();
+
+        uint32_t set = field->getBindingSpace();
+        uint32_t binding = field->getBindingIndex();
+
+        spdlog::info("Resource {} set={} binding={}", name, set, binding);
+    }
 }
 
 END_NAMESPACE_RHI
