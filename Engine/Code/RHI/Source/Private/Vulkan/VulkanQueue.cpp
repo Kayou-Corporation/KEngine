@@ -90,7 +90,6 @@ void Queue::Create(vk::Device& device, vk::Queue& queue, uint32_t index, vk::Que
 
 void Queue::Destroy(vk::Device& device)
 {
-    device.destroySemaphore(m_trackingSemaphore);
     
     VK_CHECK_VOID(m_handle.waitIdle(), "Queue can't wait");
 
@@ -98,13 +97,29 @@ void Queue::Destroy(vk::Device& device)
     {
         device.freeCommandBuffers(cmdBuffer->cmdPool, cmdBuffer->cmdBuffer);
         device.destroyCommandPool(cmdBuffer->cmdPool);
+
+        TrackedStagingBufferPtr trackedStagingBuffer = cmdBuffer->trackedStagingBuffer;
+        if (trackedStagingBuffer)
+        {
+            vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
+            cmdBuffer->trackedStagingBuffer = {};
+        }
     }
 
     for (const auto& cmdBuffer : m_inFlightCommandBuffersPool)
     {
         device.freeCommandBuffers(cmdBuffer->cmdPool, cmdBuffer->cmdBuffer);
         device.destroyCommandPool(cmdBuffer->cmdPool);
+
+        TrackedStagingBufferPtr trackedStagingBuffer = cmdBuffer->trackedStagingBuffer;
+        if (trackedStagingBuffer)
+        {
+            vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
+            cmdBuffer->trackedStagingBuffer = {};
+        }
     }
+
+    device.destroySemaphore(m_trackingSemaphore);
 
     m_commandBuffersPool.clear();
     m_inFlightCommandBuffersPool.clear();

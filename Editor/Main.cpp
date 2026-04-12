@@ -230,6 +230,7 @@ int main()
     }
     
     device->WaitIdle();
+    device->ClearQueues();
     //device->DestroyBuffer(testBuffer);
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
