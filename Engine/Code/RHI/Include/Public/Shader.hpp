@@ -16,7 +16,8 @@ BEGIN_NAMESPACE_RHI
 struct Binding
 {
     uint32_t index = -1;
-    slang::TypeLayoutReflection* typeLayout = nullptr;
+	slang::BindingType type = slang::BindingType::Unknown;
+	SlangResourceShape shape = SLANG_RESOURCE_UNKNOWN;
     ShaderStage stage{};
     uint32_t count = 0;
 };
@@ -50,11 +51,14 @@ class ShaderCompiler
 public:
     void Initialize();
 
-    ShaderData Load(const std::string& file, const ShaderStage& sType) const;
+    ShaderData Load(const std::string& file, const ShaderStage& stage) const;
 
 private:
-    ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry) const;
-	void Reflect(slang::ProgramLayout* layout) const;
+    ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage) const;
+    static std::vector<Descriptor> Reflect(slang::ProgramLayout* layout, const ShaderStage& stage);
+
+	void WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const;
+	std::vector<Descriptor> ReadDescriptors(std::ifstream& in) const;
 
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;
     Slang::ComPtr<slang::ISession> m_session;
@@ -70,7 +74,8 @@ public:
     virtual void SetShaderStage(const ShaderStage& type) { m_type = type; }
 
 protected:
-    ShaderStage m_type;
+    ShaderStage m_type{};
+	std::vector<Descriptor> m_descriptors{};
 };
 
 END_NAMESPACE_RHI

@@ -527,10 +527,8 @@ inline vk::ShaderStageFlagBits TranslateToVulkan(ShaderStage stage)
     }
 }
 
-inline vk::DescriptorType TranslateToVulkan(slang::TypeLayoutReflection* typeLayout)
+inline vk::DescriptorType TranslateToVulkan(const slang::BindingType bindingType, const SlangResourceShape shape)
 {
-    slang::BindingType bindingType = typeLayout->getBindingRangeType(0);
-
     switch (bindingType)
     {
     case slang::BindingType::ConstantBuffer:
@@ -542,9 +540,6 @@ inline vk::DescriptorType TranslateToVulkan(slang::TypeLayoutReflection* typeLay
 
     case slang::BindingType::Texture:
     {
-        auto type = typeLayout->getType();
-        auto shape = type->getResourceShape();
-
         switch (shape)
         {
         case SLANG_TEXTURE_1D:

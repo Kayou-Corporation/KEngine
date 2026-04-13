@@ -5,6 +5,8 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
+#include "Utils/File.hpp"
+
 BEGIN_NAMESPACE_RHI
 
 std::string GetShaderName(const std::string& path)
@@ -49,7 +51,7 @@ void ShaderCompiler::Initialize()
     m_globalSession->createSession(desc, m_session.writeRef());
 }
 
-ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& sType) const
+ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage) const
 {
     ShaderData bin{};
 
@@ -60,12 +62,13 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& sTyp
 
     std::string name = GetShaderName(fullFile);
 
-    const std::string entry = ShaderStageToEntry(sType);
+    const std::string entry = ShaderStageToEntry(stage);
     const std::string hash = HashFile(content, entry);
 
+    const std::string reflectionPath = CacheShaderPath(hash, name, ".kayou");
     const std::string spirvPath = CacheShaderPath(hash, name, ".spv");
 
-    bool pathExists = std::filesystem::exists(spirvPath);
+    bool pathExists = std::filesystem::exists(spirvPath) && std::filesystem::exists(reflectionPath);
 
 #if defined(_WIN32)
     const std::string dxilPath = CacheShaderPath(hash, name, ".dxil");
@@ -75,6 +78,10 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& sTyp
 
     if (pathExists)
     {
+        std::ifstream r(reflectionPath, std::ios::binary);
+		bin.descriptors = ReadDescriptors(r);
+		spdlog::info("descriptors: {}", bin.descriptors.size());
+
         std::ifstream s(spirvPath, std::ios::binary);
         bin.spirv.assign(std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>());
 
@@ -86,7 +93,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& sTyp
         return bin;
     }
 
-    bin = Compile(fullFile, content, entry);
+    bin = Compile(fullFile, content, entry, stage);
 
     const std::string shaderCacheDir = "Cache/Shaders";
 
@@ -97,6 +104,9 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& sTyp
         if (f.path().filename().string().starts_with(name))
             std::filesystem::remove(f.path());
     }
+
+    std::ofstream r(reflectionPath, std::ios::binary);
+    WriteDescriptors(r, bin.descriptors);
 
     std::ofstream s(spirvPath, std::ios::binary);
     s.write(reinterpret_cast<char*>(bin.spirv.data()), bin.spirv.size());
@@ -109,7 +119,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& sTyp
     return bin;
 }
 
-ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry) const
+ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage) const
 {
     ShaderData bin{};
 
@@ -228,49 +238,98 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
     }
 #endif
 
-	Reflect(linkedProgram->getLayout());
+	bin.descriptors = Reflect(linkedProgram->getLayout(), stage);
 
     return bin;
 }
 
-void ShaderCompiler::Reflect(slang::ProgramLayout* layout) const
+std::vector<Descriptor> ShaderCompiler::Reflect(slang::ProgramLayout* layout, const ShaderStage& stage)
 {
-    auto globals = layout->getGlobalParamsTypeLayout();
+    const auto globals = layout->getGlobalParamsTypeLayout();
 
-    int count = globals->getFieldCount();
-    int descCount = globals->getBindingRangeCount();
+    const uint32_t count = globals->getFieldCount();
+    const int descCount = static_cast<int>(globals->getBindingRangeCount());
 
     std::vector<Descriptor> descriptors;
     descriptors.resize(descCount);
 
     for (int i = 0; i < descCount; ++i)
     {
-        descriptors[i].m_index = i;
+        descriptors[i].index = i;
     }
 
-    for (int i = 0; i < count; i++)
+    for (uint32_t i = 0; i < count; ++i)
     {
-        auto field = globals->getFieldByIndex(i);
+        slang::VariableLayoutReflection* field = globals->getFieldByIndex(i);
 
-        const char* name = field->getName();
-
-        uint32_t set = field->getBindingSpace();
-        uint32_t bindingIndex = field->getBindingIndex();
-        auto typeLayout = field->getTypeLayout();
+        const uint32_t bindingIndex = field->getBindingIndex();
+        slang::TypeLayoutReflection* typeLayout = field->getTypeLayout();
+		typeLayout->getKind();
 
         uint32_t descriptorCount = 1;
 
         if (typeLayout->getKind() == slang::TypeReflection::Kind::Array)
         {
-            descriptorCount = typeLayout->getElementCount();
+            descriptorCount = static_cast<uint32_t>(typeLayout->getElementCount());
         }
 
         Binding binding;
         binding.index = bindingIndex;
-        binding.typeLayout = typeLayout;
-        binding.count = 
+        binding.type = typeLayout->getBindingRangeType(0);
+        binding.shape = typeLayout->getType()->getResourceShape();
+		binding.count = descriptorCount;
+        binding.stage = stage;
         descriptors[i].bindings.push_back(binding);
     }
+
+	return descriptors;
+}
+
+void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const
+{
+	uint32_t descriptorCount = static_cast<uint32_t>(descriptors.size());
+	Core::Write(out, descriptorCount);
+
+    for (const auto& descriptor : descriptors)
+    {
+        Core::Write(out, descriptor.index);
+        uint32_t bindingCount = static_cast<uint32_t>(descriptor.bindings.size());
+        Core::Write(out, bindingCount);
+		for (const auto& binding : descriptor.bindings)
+		{
+			Core::Write(out, binding.index);
+			Core::Write(out, binding.stage);
+			Core::Write(out, binding.count);
+			Core::Write(out, binding.type);
+			Core::Write(out, binding.shape);
+		}
+    }
+}
+
+std::vector<Descriptor> ShaderCompiler::ReadDescriptors(std::ifstream& in) const
+{
+	std::vector<Descriptor> descriptors;
+	uint32_t descriptorCount;
+
+	Core::Read(in, descriptorCount);
+
+	descriptors.resize(descriptorCount);
+	for (uint32_t i = 0; i < descriptorCount; ++i)
+	{
+		Core::Read(in, descriptors[i].index);
+		uint32_t bindingCount;
+		Core::Read(in, bindingCount);
+		descriptors[i].bindings.resize(bindingCount);
+		for (uint32_t j = 0; j < bindingCount; ++j)
+		{
+			Core::Read(in, descriptors[i].bindings[j].index);
+			Core::Read(in, descriptors[i].bindings[j].stage);
+			Core::Read(in, descriptors[i].bindings[j].count);
+			Core::Read(in, descriptors[i].bindings[j].type);
+			Core::Read(in, descriptors[i].bindings[j].shape);
+		}
+	}
+	return descriptors;
 }
 
 END_NAMESPACE_RHI
