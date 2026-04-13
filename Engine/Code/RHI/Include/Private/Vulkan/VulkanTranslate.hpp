@@ -8,6 +8,11 @@ DISABLE_WARNINGS
 
 RESTORE_WARNINGS
 
+#include <slang.h>
+#include <slang-com-ptr.h>
+#include <slang-com-helper.h>
+
+
 #include "Public/RHI.hpp"
 
 BEGIN_NAMESPACE_RHI
@@ -519,6 +524,59 @@ inline vk::ShaderStageFlagBits TranslateToVulkan(ShaderStage stage)
     case ShaderStage::Tesselation: // Tesselation not supported for now
     default:
         return vk::ShaderStageFlagBits::eAll;
+    }
+}
+
+inline vk::DescriptorType TranslateToVulkan(slang::TypeLayoutReflection* typeLayout)
+{
+    slang::BindingType bindingType = typeLayout->getBindingRangeType(0);
+
+    switch (bindingType)
+    {
+    case slang::BindingType::ConstantBuffer:
+    case slang::BindingType::ParameterBlock:
+        return vk::DescriptorType::eUniformBuffer;
+
+    case slang::BindingType::Sampler:
+        return vk::DescriptorType::eSampler;
+
+    case slang::BindingType::Texture:
+    {
+        auto type = typeLayout->getType();
+        auto shape = type->getResourceShape();
+
+        switch (shape)
+        {
+        case SLANG_TEXTURE_1D:
+        case SLANG_TEXTURE_2D:
+        case SLANG_TEXTURE_3D:
+        case SLANG_TEXTURE_CUBE:
+        case SLANG_TEXTURE_1D_ARRAY:
+        case SLANG_TEXTURE_2D_ARRAY:
+        case SLANG_TEXTURE_CUBE_ARRAY:
+            return vk::DescriptorType::eSampledImage;
+
+        default:
+            return vk::DescriptorType::eSampledImage;
+        }
+    }
+
+    case slang::BindingType::CombinedTextureSampler:
+        return vk::DescriptorType::eCombinedImageSampler;
+
+    case slang::BindingType::MutableTexture:
+    case slang::BindingType::RawBuffer:
+    case slang::BindingType::TypedBuffer:
+    case slang::BindingType::MutableTypedBuffer:
+    case slang::BindingType::MutableRawBuffer:
+        return vk::DescriptorType::eStorageBuffer;
+
+    case slang::BindingType::RayTracingAccelerationStructure:
+        return vk::DescriptorType::eAccelerationStructureKHR;
+
+    default:
+        spdlog::error("Unsupported Slang binding type");
+        return vk::DescriptorType::eUniformBuffer;
     }
 }
 

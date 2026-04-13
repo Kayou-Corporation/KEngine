@@ -13,12 +13,27 @@
 
 BEGIN_NAMESPACE_RHI
 
-struct ShaderBinary
+struct Binding
+{
+    uint32_t index = -1;
+    slang::TypeLayoutReflection* typeLayout = nullptr;
+    ShaderStage stage{};
+    uint32_t count = 0;
+};
+
+struct Descriptor
+{
+    uint32_t m_index = -1;
+    std::vector<Binding> bindings{};
+};
+
+struct ShaderData
 {
     std::vector<uint8_t> spirv;
 #if defined(_WIN32)
     std::vector<uint8_t> dxil;
 #endif
+    std::vector<Descriptor> descriptors;
 };
 
 std::string GetShaderName(const std::string& path);
@@ -35,10 +50,10 @@ class ShaderCompiler
 public:
     void Initialize();
 
-    ShaderBinary Load(const std::string& file, const ShaderStage& sType) const;
+    ShaderData Load(const std::string& file, const ShaderStage& sType) const;
 
 private:
-    ShaderBinary Compile(const std::string& file, const std::string& content, const std::string& entry) const;
+    ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry) const;
 	void Reflect(slang::ProgramLayout* layout) const;
 
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;

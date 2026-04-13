@@ -9,41 +9,11 @@
 #include "Public/Shader.hpp"
 #include <fstream>
 
-struct test
-{
-	const char* name;
-	int a;
-	float b;
-	std::vector<float> c;
-};
-
 int main()
 {
 #ifdef KENGINE_DEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
-
-    test t;
-	t.name = "test";
-    t.a = 69;
-	t.b = 42.0f;
-	t.c = { 1.0f, 2.0f, 3.0f };
-	for (int i = 0; i < 100000; ++i)
-	{
-		t.c.push_back(static_cast<float>(i));
-	}
-
-    std::ofstream file("Cache/Shaders/test.kayou", std::ios::binary);
-    file.write((char*)&t, sizeof(t));
-    file.close();
-
-    test t2;
-
-    std::ifstream file2("Cache/Shaders/test.kayou", std::ios::binary);
-    file2.read((char*)&t2, sizeof(t2));
-    file2.close();
-
-	std::cout << t2.name << " " << t2.a << " " << t2.b << " " << t2.c[0] << " " << t2.c[1] << " " << t2.c[100002] << std::endl;
 
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
 

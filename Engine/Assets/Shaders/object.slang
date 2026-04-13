@@ -1,22 +1,7 @@
 // object.slang
 
-struct ObjectParams
+struct ObjectUBO
 {
     float4x4 model;
-    float4x4 normalMat;
+    float4x4 normalMatrix;
 };
-
-struct MaterialParams
-{
-    Sampler2D albedoMap;
-};
-
-struct FullObjectParams
-{
-    ObjectParams object;
-    MaterialParams material;
-};
-
-ParameterBlock<FullObjectParams> object;
-//ParameterBlock<ObjectParams> object;
-//ParameterBlock<MaterialParams> material;

@@ -1,9 +1,7 @@
 // frame.slang
 
-struct FrameParams
+struct CameraUBO
 {
     float4x4 viewProj;
     float3 camPos;
 };
-
-ParameterBlock<FrameParams> frame;

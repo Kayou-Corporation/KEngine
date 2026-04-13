@@ -49,9 +49,9 @@ void ShaderCompiler::Initialize()
     m_globalSession->createSession(desc, m_session.writeRef());
 }
 
-ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderStage& sType) const
+ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& sType) const
 {
-    ShaderBinary bin{};
+    ShaderData bin{};
 
 	const std::string fullFile = "Engine/Assets/Shaders/" + file + ".slang";
 
@@ -109,9 +109,9 @@ ShaderBinary ShaderCompiler::Load(const std::string& file, const ShaderStage& sT
     return bin;
 }
 
-ShaderBinary ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry) const
+ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry) const
 {
-    ShaderBinary bin{};
+    ShaderData bin{};
 
     Slang::ComPtr<slang::IModule> slangModule;
     Slang::ComPtr<ISlangBlob> diagnostics;
@@ -247,8 +247,16 @@ void ShaderCompiler::Reflect(slang::ProgramLayout* layout) const
 
         uint32_t set = field->getBindingSpace();
         uint32_t binding = field->getBindingIndex();
+        auto type = field->getTypeLayout();
 
-        spdlog::info("Resource {} set={} binding={}", name, set, binding);
+        uint32_t descriptorCount = 1;
+
+        if (type->getKind() == slang::TypeReflection::Kind::Array)
+        {
+            descriptorCount = type->getElementCount();
+        }
+
+        spdlog::info("Resource {} set={} binding={} type={} count={}", name, set, binding, type->getName(), descriptorCount);
     }
 }
 

@@ -1,7 +1,7 @@
 // unlit.frag.slang
 
-import "frame";
-import "object";
+[[vk::binding(1, 1)]]
+Sampler2D per_albedoMap;
 
 struct FSInput
 {
@@ -14,6 +14,6 @@ struct FSInput
 [shader("fragment")]
 float4 fsMain(FSInput input) : SV_Target
 {
-    float4 albedo = object.material.albedoMap.Sample(input.uv);
+    float4 albedo = per_albedoMap.Sample(input.uv);
     return albedo;
 }

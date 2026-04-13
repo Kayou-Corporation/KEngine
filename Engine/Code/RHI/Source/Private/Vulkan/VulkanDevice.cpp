@@ -153,7 +153,7 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 {
 	Core::RefCountPtr<VulkanShader> shader = Core::CreateRefPtr<VulkanShader>();
 
-	ShaderBinary bin = m_shaderCompiler.Load(file, sStage);
+	ShaderData bin = m_shaderCompiler.Load(file, sStage);
 
 	size_t size = bin.spirv.size();
 
