@@ -23,7 +23,7 @@ struct Binding
 
 struct Descriptor
 {
-    uint32_t m_index = -1;
+    uint32_t index = -1;
     std::vector<Binding> bindings{};
 };
 

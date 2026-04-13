@@ -238,6 +238,15 @@ void ShaderCompiler::Reflect(slang::ProgramLayout* layout) const
     auto globals = layout->getGlobalParamsTypeLayout();
 
     int count = globals->getFieldCount();
+    int descCount = globals->getBindingRangeCount();
+
+    std::vector<Descriptor> descriptors;
+    descriptors.resize(descCount);
+
+    for (int i = 0; i < descCount; ++i)
+    {
+        descriptors[i].m_index = i;
+    }
 
     for (int i = 0; i < count; i++)
     {
@@ -246,17 +255,21 @@ void ShaderCompiler::Reflect(slang::ProgramLayout* layout) const
         const char* name = field->getName();
 
         uint32_t set = field->getBindingSpace();
-        uint32_t binding = field->getBindingIndex();
-        auto type = field->getTypeLayout();
+        uint32_t bindingIndex = field->getBindingIndex();
+        auto typeLayout = field->getTypeLayout();
 
         uint32_t descriptorCount = 1;
 
-        if (type->getKind() == slang::TypeReflection::Kind::Array)
+        if (typeLayout->getKind() == slang::TypeReflection::Kind::Array)
         {
-            descriptorCount = type->getElementCount();
+            descriptorCount = typeLayout->getElementCount();
         }
 
-        spdlog::info("Resource {} set={} binding={} type={} count={}", name, set, binding, type->getName(), descriptorCount);
+        Binding binding;
+        binding.index = bindingIndex;
+        binding.typeLayout = typeLayout;
+        binding.count = 
+        descriptors[i].bindings.push_back(binding);
     }
 }
 
