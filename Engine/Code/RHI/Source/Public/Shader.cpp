@@ -80,7 +80,6 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     {
         std::ifstream r(reflectionPath, std::ios::binary);
 		bin.descriptors = ReadDescriptors(r);
-		spdlog::info("descriptors: {}", bin.descriptors.size());
 
         std::ifstream s(spirvPath, std::ios::binary);
         bin.spirv.assign(std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>());
