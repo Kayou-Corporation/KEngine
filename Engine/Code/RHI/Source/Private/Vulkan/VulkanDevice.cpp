@@ -180,20 +180,33 @@ void VulkanDevice::DestroyShader(Core::RefCountPtr<Shader> shader)
 	m_handle.destroyShaderModule(shaderModule);
 }
 
-Core::RefCountPtr<GraphicsPipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& specs)
+Core::RefCountPtr<Pipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& RHISpecs)
 {
-	Core::RefCountPtr<VulkanGraphicsPipeline> pipeline = Core::CreateRefPtr<VulkanGraphicsPipeline>();
+	Core::RefCountPtr<VulkanPipeline> RHIVulkanPipeline = Core::CreateRefPtr<VulkanPipeline>();
 
-	vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> createInfo = pipeline->GetCreateInfo(specs);
+	if (RHISpecs.type == PipelineType::Graphics)
+	{
+		vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
+		vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+		RHIVulkanPipeline->SetHandle(pipeline);
+	}
+	else
+	{
+		vk::ComputePipelineCreateInfo createInfo = RHIVulkanPipeline->GetComputeCreateInfo(RHISpecs);
+		vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+		RHIVulkanPipeline->SetHandle(pipeline);
+	}
 
-	pipeline->SetHandle(VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo.get<vk::GraphicsPipelineCreateInfo>()), "Failed to create graphics pipeline"));
-
-	return pipeline;
+	return RHIVulkanPipeline;
 }
 
-void VulkanDevice::DestroyPipeline(Core::RefCountPtr<GraphicsPipeline> pipeline)
+void VulkanDevice::DestroyPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
 {
-	m_handle.destroyPipeline(pipeline.CastAs<VulkanGraphicsPipeline>()->GetHandle());
+	Core::RefCountPtr<VulkanPipeline> RHIVulkanPipeline = RHIPipeline.CastAs<VulkanPipeline>();
+
+	vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();
+
+	m_handle.destroyPipeline(pipeline);
 }
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)

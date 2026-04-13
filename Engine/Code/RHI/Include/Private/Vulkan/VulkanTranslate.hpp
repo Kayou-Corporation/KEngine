@@ -199,6 +199,56 @@ inline vk::Format TranslateToVulkan(Format format)
     }
 }
 
+inline std::vector<vk::Format> TranslateToVulkan(const std::vector<Format>& formatsIn)
+{
+    std::vector<vk::Format> formatsOut;
+    formatsOut.reserve(formatsIn.size());
+
+    for (const auto& f : formatsIn)
+    {
+        switch (f)
+        {
+        case Format::BGRA8_SRGB:
+            formatsOut.push_back(vk::Format::eB8G8R8A8Srgb);
+            break;
+
+        case Format::RGBA8_SRGB:
+            formatsOut.push_back(vk::Format::eR8G8B8A8Srgb);
+            break;
+
+        case Format::RGB8_SRGB:
+            formatsOut.push_back(vk::Format::eR8G8B8Srgb);
+            break;
+
+        case Format::RGBA8_UNORM:
+            formatsOut.push_back(vk::Format::eR8G8B8A8Unorm);
+            break;
+
+        case Format::RGB8_UNORM:
+            formatsOut.push_back(vk::Format::eR8G8B8Unorm);
+            break;
+
+        case Format::D32_SFLOAT:
+            formatsOut.push_back(vk::Format::eD32Sfloat);
+            break;
+
+        case Format::D32_SFLOAT_S8_UINT:
+            formatsOut.push_back(vk::Format::eD32SfloatS8Uint);
+            break;
+
+        case Format::D24_UNORM_S8_UINT:
+            formatsOut.push_back(vk::Format::eD24UnormS8Uint);
+            break;
+
+        case Format::Undefined:
+        default:
+            formatsOut.push_back(vk::Format::eUndefined);
+            break;
+        }
+    }
+    return formatsOut;
+}
+
 // ImageUsage
 inline vk::ImageUsageFlagBits TranslateToVulkan(ImageUsage usage)
 {
@@ -572,6 +622,67 @@ inline vk::DescriptorType TranslateToVulkan(const slang::BindingType bindingType
     default:
         spdlog::error("Unsupported Slang binding type");
         return vk::DescriptorType::eUniformBuffer;
+    }
+}
+
+inline vk::PrimitiveTopology TranslateToVulkan(PrimitiveTopology topology)
+{
+    switch (topology)
+    {
+    case PrimitiveTopology::TriangleList:
+        return vk::PrimitiveTopology::eTriangleList;
+
+    case PrimitiveTopology::TriangleStrip:
+        return vk::PrimitiveTopology::eTriangleStrip;
+
+    default:
+        return vk::PrimitiveTopology::eTriangleList;
+    }
+}
+
+inline std::vector<vk::DynamicState> TranslateToVulkan(const std::vector<DynamicState>& statesIn)
+{
+    std::vector<vk::DynamicState> statesOut;
+    statesOut.reserve(statesIn.size());
+
+    for (const auto& s : statesIn)
+    {
+        switch (s)
+        {
+        case DynamicState::ViewPort:
+            statesOut.push_back(vk::DynamicState::eViewport);
+            break;
+        case DynamicState::Scissor:
+            statesOut.push_back(vk::DynamicState::eScissor);
+            break;
+        }
+    }
+    return statesOut;
+}
+
+inline vk::FrontFace TranslateToVulkan(FrontFace face)
+{
+    switch (face)
+    {
+    case FrontFace::ClockWise:
+        return vk::FrontFace::eClockwise;
+    case FrontFace::CounterClockWise:
+        return vk::FrontFace::eCounterClockwise;
+    default:
+        return vk::FrontFace::eCounterClockwise;
+    }
+}
+
+inline vk::CullModeFlags TranslateToVulkan(CullMode mode)
+{
+    switch (mode)
+    {
+    case CullMode::Front:
+        return vk::CullModeFlagBits::eFront;
+    case CullMode::Back:
+        return vk::CullModeFlagBits::eBack;
+    default:
+        return vk::CullModeFlagBits::eNone;
     }
 }
 

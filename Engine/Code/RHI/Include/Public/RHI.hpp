@@ -243,6 +243,36 @@ enum class ShaderStage
 	Tesselation
 };
 
+enum class PipelineType
+{
+	Graphics,
+	Compute
+};
+
+enum class DynamicState
+{
+	ViewPort,
+	Scissor
+};
+
+enum class CullMode
+{
+	Front,
+	Back
+};
+
+enum class FrontFace
+{
+	ClockWise,
+	CounterClockWise
+};
+
+enum class PrimitiveTopology
+{
+	TriangleList,
+	TriangleStrip
+};
+
 constexpr const char* ShaderStageToEntry(ShaderStage sType)
 {
 	switch (sType)

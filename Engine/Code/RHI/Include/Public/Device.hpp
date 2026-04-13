@@ -21,7 +21,7 @@ struct BufferSpecs;
 class Image;
 struct ImageSpecs;
 
-class GraphicsPipeline;
+class Pipeline;
 struct PipelineSpecs;
 
 struct DeviceSpecs
@@ -56,8 +56,8 @@ public:
 	KENGINE_API virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage) = 0;
 	KENGINE_API virtual void DestroyShader(Core::RefCountPtr<Shader> shader) = 0;
 
-	KENGINE_API virtual Core::RefCountPtr<GraphicsPipeline> CreatePipeline(const PipelineSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyPipeline(Core::RefCountPtr<GraphicsPipeline> pipeline) = 0;
+	KENGINE_API virtual Core::RefCountPtr<Pipeline> CreatePipeline(const PipelineSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) = 0;
 
 protected:
 	ShaderCompiler m_shaderCompiler;
