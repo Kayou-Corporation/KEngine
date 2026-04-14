@@ -8,11 +8,12 @@
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
 #include "Private/Vulkan/VulkanShader.hpp"
-#include "Private/Vulkan/VulkanGraphicsPipeline.hpp"
+#include "Private/Vulkan/VulkanPipeline.hpp"
 
 #include <map>
 #include <set>
 #include <string>
+#include <spdlog/spdlog.h>
 
 DISABLE_WARNINGS
 
@@ -157,7 +158,7 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 
 	size_t size = bin.spirv.size();
 
-	if (size % 4 != 0)
+	if (size % 4 != 0 || size == 0)
 	{
 		spdlog::error("SPIR-V size not multiple of 4 for: {}", file);
 		return {};
@@ -193,7 +194,7 @@ Core::RefCountPtr<Pipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& RH
 	else
 	{
 		vk::ComputePipelineCreateInfo createInfo = RHIVulkanPipeline->GetComputeCreateInfo(RHISpecs);
-		vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+		vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create compute pipeline");
 		RHIVulkanPipeline->SetHandle(pipeline);
 	}
 

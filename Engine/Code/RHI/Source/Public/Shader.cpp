@@ -5,8 +5,6 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-#include "Utils/File.hpp"
-
 BEGIN_NAMESPACE_RHI
 
 std::string GetShaderName(const std::string& path)
@@ -58,6 +56,9 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
 	const std::string fullFile = "Engine/Assets/Shaders/" + file + ".slang";
 
     std::ifstream fileContent(fullFile, std::ios::binary);
+    if (!CheckIsFileOpenOrValid(fileContent, fullFile))
+        return bin;
+
     std::string content((std::istreambuf_iterator<char>(fileContent)), std::istreambuf_iterator<char>());
 
     std::string name = GetShaderName(fullFile);
@@ -79,14 +80,17 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     if (pathExists)
     {
         std::ifstream r(reflectionPath, std::ios::binary);
-		bin.descriptors = ReadDescriptors(r);
+        if (CheckIsFileOpenOrValid(r, reflectionPath))
+            bin.descriptors = ReadDescriptors(r);
 
         std::ifstream s(spirvPath, std::ios::binary);
-        bin.spirv.assign(std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>());
+        if (CheckIsFileOpenOrValid(s, spirvPath))
+            bin.spirv.assign(std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>());
 
 #if defined(_WIN32)
         std::ifstream d(dxilPath, std::ios::binary);
-        bin.dxil.assign(std::istreambuf_iterator<char>(d), std::istreambuf_iterator<char>());
+        if (CheckIsFileOpenOrValid(d, dxilPath))
+            bin.dxil.assign(std::istreambuf_iterator<char>(d), std::istreambuf_iterator<char>());
 #endif
 
         return bin;
@@ -105,14 +109,17 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     }
 
     std::ofstream r(reflectionPath, std::ios::binary);
-    WriteDescriptors(r, bin.descriptors);
+    if (CheckIsFileOpenOrValid(r, reflectionPath))
+        WriteDescriptors(r, bin.descriptors);
 
     std::ofstream s(spirvPath, std::ios::binary);
-    s.write(reinterpret_cast<char*>(bin.spirv.data()), bin.spirv.size());
+    if (CheckIsFileOpenOrValid(s, spirvPath))
+        s.write(reinterpret_cast<char*>(bin.spirv.data()), bin.spirv.size());
 
 #if defined(_WIN32)
     std::ofstream d(dxilPath, std::ios::binary);
-    d.write(reinterpret_cast<char*>(bin.dxil.data()), bin.dxil.size());
+    if (CheckIsFileOpenOrValid(d, dxilPath))
+        d.write(reinterpret_cast<char*>(bin.dxil.data()), bin.dxil.size());
 #endif
 
     return bin;
@@ -246,21 +253,18 @@ std::vector<Descriptor> ShaderCompiler::Reflect(slang::ProgramLayout* layout, co
 {
     const auto globals = layout->getGlobalParamsTypeLayout();
 
-    const uint32_t count = globals->getFieldCount();
-    const int descCount = static_cast<int>(globals->getBindingRangeCount());
+    const uint32_t descCount = static_cast<uint32_t>(globals->getBindingRangeCount());
 
     std::vector<Descriptor> descriptors;
     descriptors.resize(descCount);
 
-    for (int i = 0; i < descCount; ++i)
+    for (uint32_t i = 0; i < descCount; ++i)
     {
         descriptors[i].index = i;
-    }
 
-    for (uint32_t i = 0; i < count; ++i)
-    {
         slang::VariableLayoutReflection* field = globals->getFieldByIndex(i);
 
+        uint32_t set = field->getBindingSpace();
         const uint32_t bindingIndex = field->getBindingIndex();
         slang::TypeLayoutReflection* typeLayout = field->getTypeLayout();
 		typeLayout->getKind();

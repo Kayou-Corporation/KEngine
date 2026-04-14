@@ -11,7 +11,7 @@ RESTORE_WARNINGS
 #include <slang.h>
 #include <slang-com-ptr.h>
 #include <slang-com-helper.h>
-
+#include <spdlog/spdlog.h>
 
 #include "Public/RHI.hpp"
 
@@ -572,8 +572,10 @@ inline vk::ShaderStageFlagBits TranslateToVulkan(ShaderStage stage)
     case ShaderStage::Geometry:
         return vk::ShaderStageFlagBits::eGeometry;
     case ShaderStage::Tesselation: // Tesselation not supported for now
+        spdlog::error("Unsupported shader stage: tessellation");
     default:
-        return vk::ShaderStageFlagBits::eAll;
+        spdlog::error("Unknown shader stage");
+        return static_cast<vk::ShaderStageFlagBits>(0);
     }
 }
 

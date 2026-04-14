@@ -7,7 +7,6 @@
 #include "Public/Swapchain.hpp"
 #include "Public/Buffer.hpp"
 #include "Public/Shader.hpp"
-#include <fstream>
 
 int main()
 {

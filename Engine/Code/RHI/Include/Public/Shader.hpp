@@ -7,9 +7,11 @@
 #include <slang.h>
 #include <slang-com-ptr.h>
 #include <slang-com-helper.h>
+#include <iosfwd>
 
 #include "Utils/Export.hpp"
 #include "Utils/Memory.hpp"
+#include "Utils/File.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -60,6 +62,9 @@ private:
 	void WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const;
 	std::vector<Descriptor> ReadDescriptors(std::ifstream& in) const;
 
+    template <typename T>
+    bool CheckIsFileOpenOrValid(T& file, const std::string& name) const;
+
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;
     Slang::ComPtr<slang::ISession> m_session;
 };
@@ -77,5 +82,17 @@ protected:
     ShaderStage m_type{};
 	std::vector<Descriptor> m_descriptors{};
 };
+
+template <typename T>
+bool ShaderCompiler::CheckIsFileOpenOrValid(T& file, const std::string& name) const
+{
+    static_assert((std::is_base_of<std::ifstream, T>::value || std::is_base_of<std::ofstream, T>::value || std::is_base_of<std::fstream, T>::value), "File object is not of right type. Right types are: std::ifstream, std::ofstream and std::fstream");
+
+    if (Core::IsFileOpenOrValid<T>(file))
+        return true;
+
+    spdlog::error("Failed to open shader file: {}", name);
+    return false;
+}
 
 END_NAMESPACE_RHI
