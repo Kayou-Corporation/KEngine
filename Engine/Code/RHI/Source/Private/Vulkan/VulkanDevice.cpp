@@ -170,6 +170,7 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 
 	shader->SetModule(VK_CHECK_RESULT(m_handle.createShaderModule(createInfo), "Failed to create shader module"));
 	shader->SetShaderStage(sStage);
+	shader->SetDescriptors(bin.descriptors);
 
 	return shader;
 }

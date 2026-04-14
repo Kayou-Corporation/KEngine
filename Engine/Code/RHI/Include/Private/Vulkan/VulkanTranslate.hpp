@@ -573,6 +573,7 @@ inline vk::ShaderStageFlagBits TranslateToVulkan(ShaderStage stage)
         return vk::ShaderStageFlagBits::eGeometry;
     case ShaderStage::Tesselation: // Tesselation not supported for now
         spdlog::error("Unsupported shader stage: tessellation");
+        return static_cast<vk::ShaderStageFlagBits>(0);
     default:
         spdlog::error("Unknown shader stage");
         return static_cast<vk::ShaderStageFlagBits>(0);

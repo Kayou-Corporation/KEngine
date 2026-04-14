@@ -77,6 +77,7 @@ public:
     virtual ShaderStage GetShaderStage() const { return m_type; }
 
     virtual void SetShaderStage(const ShaderStage& type) { m_type = type; }
+    virtual void SetDescriptors(const std::vector<Descriptor>& descriptors) { m_descriptors = descriptors; }
 
 protected:
     ShaderStage m_type{};

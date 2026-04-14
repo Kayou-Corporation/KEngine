@@ -3,6 +3,7 @@
 #include "Core.hpp"
 
 #include <fstream>
+#include <type_traits>
 
 BEGIN_NAMESPACE_CORE
 

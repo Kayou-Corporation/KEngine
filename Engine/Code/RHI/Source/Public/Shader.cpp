@@ -253,21 +253,19 @@ std::vector<Descriptor> ShaderCompiler::Reflect(slang::ProgramLayout* layout, co
 {
     const auto globals = layout->getGlobalParamsTypeLayout();
 
+    const uint32_t count = globals->getFieldCount();
     const uint32_t descCount = static_cast<uint32_t>(globals->getBindingRangeCount());
 
     std::vector<Descriptor> descriptors;
     descriptors.resize(descCount);
 
-    for (uint32_t i = 0; i < descCount; ++i)
+    for (uint32_t i = 0; i < count; ++i)
     {
-        descriptors[i].index = i;
-
         slang::VariableLayoutReflection* field = globals->getFieldByIndex(i);
 
         uint32_t set = field->getBindingSpace();
         const uint32_t bindingIndex = field->getBindingIndex();
         slang::TypeLayoutReflection* typeLayout = field->getTypeLayout();
-		typeLayout->getKind();
 
         uint32_t descriptorCount = 1;
 
@@ -275,6 +273,8 @@ std::vector<Descriptor> ShaderCompiler::Reflect(slang::ProgramLayout* layout, co
         {
             descriptorCount = static_cast<uint32_t>(typeLayout->getElementCount());
         }
+
+        descriptors[i].index = set;
 
         Binding binding;
         binding.index = bindingIndex;
