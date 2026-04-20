@@ -281,36 +281,47 @@ inline std::vector<vk::Format> TranslateToVulkan(const std::vector<Format>& form
 
         case Format::Float32_2:
             formatsOut.push_back(vk::Format::eR32G32Sfloat);
+            break;
 
         case Format::Float32_3:
             formatsOut.push_back(vk::Format::eR32G32B32Sfloat);
+            break;
 
         case Format::Float32_4:
             formatsOut.push_back(vk::Format::eR32G32B32A32Sfloat);
+            break;
 
         case Format::Int32_1:
             formatsOut.push_back(vk::Format::eR32Sint);
+            break;
 
         case Format::Int32_2:
             formatsOut.push_back(vk::Format::eR32G32Sint);
+            break;
 
         case Format::Int32_3:
             formatsOut.push_back(vk::Format::eR32G32B32Sint);
+            break;
 
         case Format::Int32_4:
             formatsOut.push_back(vk::Format::eR32G32B32A32Sint);
+            break;
 
         case Format::Uint32_1:
             formatsOut.push_back(vk::Format::eR32Uint);
+            break;
 
         case Format::Uint32_2:
             formatsOut.push_back(vk::Format::eR32G32Uint);
+            break;
 
         case Format::Uint32_3:
             formatsOut.push_back(vk::Format::eR32G32B32Uint);
+            break;
 
         case Format::Uint32_4:
             formatsOut.push_back(vk::Format::eR32G32B32A32Uint);
+            break;
 
         case Format::Undefined:
         default:
