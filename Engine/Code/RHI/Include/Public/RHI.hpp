@@ -79,6 +79,19 @@ enum class Format
 	D32_SFLOAT_S8_UINT, // Some basic depth formats
 	D24_UNORM_S8_UINT,  // 
 
+	Float32_1,     // float
+	Float32_2,     // vec2
+	Float32_3,     // vec3
+	Float32_4,     // vec4
+	Int32_1,       // int
+	Int32_2,       // ivec2
+	Int32_3,       // ivec3
+	Int32_4,       // ivec4
+	Uint32_1,      // uint
+	Uint32_2,      // uvec2
+	Uint32_3,      // uvec3
+	Uint32_4,      // uvec4
+
 	Undefined
 };
 
@@ -291,5 +304,11 @@ constexpr const char* ShaderStageToEntry(ShaderStage sType)
 
 	return "main";
 }
+
+enum class VertexInputRate : uint8_t
+{
+	PerVertex,
+	PerInstance
+};
 
 END_NAMESPACE_RHI

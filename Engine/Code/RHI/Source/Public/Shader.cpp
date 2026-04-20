@@ -265,7 +265,7 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
 
             for (const Kayou::RHI::VertexAttributeLayout& attribute : bin.vertexAttributes)
             {
-                binding.stride += GetVertexFormatSize(attribute.format);
+                binding.stride += GetFormatSize(attribute.format);
             }
 
             bin.vertexBindings.push_back(binding);
@@ -346,24 +346,23 @@ std::vector<VertexAttributeLayout> ShaderCompiler::ReflectVertexInputs(slang::Pr
         if (!field)
             continue;
 
-        const char* semantic = field->getSemanticName();
-
-        uint32_t location = i;
-
         slang::TypeLayoutReflection* fieldTypeLayout = field->getTypeLayout();
         if (!fieldTypeLayout)
             continue;
+
+        const char* semantic = field->getSemanticName();
+        uint32_t location = i;
 
         VertexAttributeLayout attr;
         attr.location = location;
         attr.binding = 0;
         attr.offset = currentOffset;
-        attr.format = GetVertexFormatFromSlangType(fieldTypeLayout);
+        attr.format = GetFormatFromSlangType(fieldTypeLayout);
         attr.name = field->getName();
 
         attributes.push_back(attr);
 
-        currentOffset += GetVertexFormatSize(attr.format);
+        currentOffset += GetFormatSize(attr.format);
     }
 
     return attributes;
