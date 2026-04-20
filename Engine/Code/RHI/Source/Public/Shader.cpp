@@ -282,6 +282,7 @@ std::vector<Descriptor> ShaderCompiler::Reflect(slang::ProgramLayout* layout, co
         binding.shape = typeLayout->getType()->getResourceShape();
 		binding.count = descriptorCount;
         binding.stage = stage;
+        binding.name = field->getName();
         descriptors[i].bindings.push_back(binding);
     }
 
@@ -305,6 +306,13 @@ void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Desc
 			Core::Write(out, binding.count);
 			Core::Write(out, binding.type);
 			Core::Write(out, binding.shape);
+            const char* name = binding.name.c_str();
+            size_t nameLen = strlen(name);
+            Core::Write(out, nameLen);
+            for (size_t i = 0; i < nameLen; ++i)
+            {
+                Core::Write(out, name[i]);
+            }
 		}
     }
 }
@@ -330,6 +338,14 @@ std::vector<Descriptor> ShaderCompiler::ReadDescriptors(std::ifstream& in) const
 			Core::Read(in, descriptors[i].bindings[j].count);
 			Core::Read(in, descriptors[i].bindings[j].type);
 			Core::Read(in, descriptors[i].bindings[j].shape);
+            size_t nameLen;
+            Core::Read(in, nameLen);
+            for (size_t k = 0; k < nameLen; ++k)
+            {
+                char nameChar;
+                Core::Read(in, nameChar);
+                descriptors[i].bindings[j].name += nameChar;
+            }
 		}
 	}
 	return descriptors;

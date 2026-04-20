@@ -8,6 +8,7 @@
 #include <slang-com-ptr.h>
 #include <slang-com-helper.h>
 #include <iosfwd>
+#include <string>
 
 #include "Utils/Export.hpp"
 #include "Utils/Memory.hpp"
@@ -22,6 +23,7 @@ struct Binding
 	SlangResourceShape shape = SLANG_RESOURCE_UNKNOWN;
     ShaderStage stage{};
     uint32_t count = 0;
+    std::string name = "";
 };
 
 struct Descriptor
