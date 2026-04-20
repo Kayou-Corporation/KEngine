@@ -443,7 +443,7 @@ inline vk::ImageAspectFlagBits TranslateToVulkan(ImageViewAspect aspect)
         return vk::ImageAspectFlagBits::eColor;
 
     case ImageViewAspect::Depth:
-        return vk::ImageAspectFlagBits::eDepth;
+        return vk::ImageAspectFlagBits::eColor;
 
     case ImageViewAspect::Undefined:
     default:
@@ -507,15 +507,6 @@ inline vk::PresentModeKHR TranslateToVulkan(PresentMode mode)
 inline vk::Extent2D TranslateToVulkan(const Extent2D& extent)
 {
     return vk::Extent2D
-    {
-        extent.x,
-        extent.y
-    };
-}
-
-inline vk::Offset2D TranslateToVulkan(const Offset2D& extent)
-{
-    return vk::Offset2D
     {
         extent.x,
         extent.y
@@ -645,8 +636,6 @@ inline vk::PipelineStageFlagBits TranslateToVulkan(PipelineStage stage)
     case PipelineStage::Transfer:
         return vk::PipelineStageFlagBits::eTransfer;
 
-    case PipelineStage::ColorOutput:
-        return vk::PipelineStageFlagBits::eColorAttachmentOutput;
     case PipelineStage::None:
     default:
         return vk::PipelineStageFlagBits::eNone;
@@ -793,36 +782,6 @@ inline vk::CullModeFlags TranslateToVulkan(CullMode mode)
         return vk::CullModeFlagBits::eBack;
     default:
         return vk::CullModeFlagBits::eNone;
-inline vk::AttachmentStoreOp TranslateToVulkan(StoreOp storeOp)
-{
-    switch (storeOp)
-    {
-    case StoreOp::Store:
-        return vk::AttachmentStoreOp::eStore;
-
-    case StoreOp::DontCare:
-        return vk::AttachmentStoreOp::eDontCare;
-
-    default:
-        return vk::AttachmentStoreOp::eNone;
-    }
-}
-
-inline vk::AttachmentLoadOp TranslateToVulkan(LoadOp storeOp)
-{
-    switch (storeOp)
-    {
-    case LoadOp::Load:
-        return vk::AttachmentLoadOp::eLoad;
-
-    case LoadOp::DontCare:
-        return vk::AttachmentLoadOp::eDontCare;
-
-    case LoadOp::Clear:
-        return vk::AttachmentLoadOp::eClear;
-
-    default:
-        return vk::AttachmentLoadOp::eNone;
     }
 }
 

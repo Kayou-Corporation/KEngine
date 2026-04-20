@@ -80,15 +80,9 @@ public:
 	void WaitIdle();
 
 	TrackedCommandBufferPtr GetOrCreateCommandBuffer(vk::Device& device);
-	void Submit(TrackedCommandBufferPtr cmdBuffer, vk::PipelineStageFlags waitStages);
+	void Submit(TrackedCommandBufferPtr cmdBuffer);
 
-	void PushSignalSemaphore(const vk::Semaphore& semaphore, uint64_t value); //{ signalSemaprhores.push_back(semaphore); }
-	void PushSignalSemaphores(const std::vector<vk::Semaphore>& semaphores, const std::vector<uint64_t>& values); // { signalSemaprhores.insert(signalSemaprhores.end(), semaphores.begin(), semaphores.end()); }
-
-	void PushWaitSemaphore(const vk::Semaphore& semaphore, uint64_t value);// { waitSemaprhores.push_back(semaphore); }
-	void PushWaitSemaphores(const std::vector<vk::Semaphore>& semaphores, const std::vector<uint64_t>& values);// { waitSemaprhores.insert(waitSemaprhores.end(), semaphores.begin(), semaphores.end()); }
-
-	void RunGarbageCollector(vk::Device& device);
+	void RunGarbageCollector(Core::RefCountPtr<VulkanDevice>& device);
 
 	void SetAllocator(VmaAllocator allocator) { m_memoryAllocator = allocator; }
 
@@ -99,10 +93,8 @@ private:
 	VmaAllocator m_memoryAllocator;
 
 	vk::Semaphore m_trackingSemaphore;
-	std::vector<vk::Semaphore> m_signalSemaprhores;
-	std::vector<uint64_t> m_signalSemaphoresValues;
-	std::vector<vk::Semaphore> m_waitSemaprhores;
-	std::vector<uint64_t> m_waitSemaprhoresValues;
+	//std::vector<vk::Semaphore> waitSemaprhores;
+	//std::vector<vk::Semaphore> signalSemaprhores;
 
 	std::list<TrackedCommandBufferPtr> m_commandBuffersPool;
 	std::list<TrackedCommandBufferPtr> m_inFlightCommandBuffersPool;
