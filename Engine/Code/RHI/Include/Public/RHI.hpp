@@ -244,6 +244,7 @@ enum class PipelineStage
 	ComputeShader,
 	GeometryShader,
 	Transfer,
+	ColorOutput,
 	None
 };
 
@@ -286,7 +287,53 @@ enum class PrimitiveTopology
 	TriangleStrip
 };
 
-constexpr const char* ShaderStageToEntry(ShaderStage sType)
+enum class LoadOp
+{
+	Load,
+	Clear,
+	DontCare
+};
+
+enum class StoreOp
+{
+	Store,
+	DontCare
+};
+
+struct Offset2D
+{
+	Offset2D() = default;
+
+	Offset2D(int inX, int inY) { x = inX; y = inY; }
+	int x = 0;
+	int y = 0;
+};
+
+struct ClearValue
+{
+	ClearValue() = default;
+
+	ClearValue(float inX, float inY, float inZ, float inDepthStencil)
+	{
+		x = inX;
+		y = inY;
+		z = inZ;
+		depthStencil = inDepthStencil;
+	};
+
+	float x = 0.f;
+	float y = 0.f;
+	float z = 0.f;
+	float depthStencil = 1.0f;
+};
+
+enum class SemaphoreType
+{
+	Binary,
+	Timeline
+};
+
+constexpr const char* ShaderTypeToEntry(ShaderType sType)
 {
 	switch (sType)
 	{
@@ -300,6 +347,8 @@ constexpr const char* ShaderStageToEntry(ShaderStage sType)
 		return "gsMain";
 	case ShaderStage::Tesselation:
 		return "tsMain";
+		default:
+			return "";
 	}
 
 	return "main";

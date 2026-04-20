@@ -3,16 +3,11 @@
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanDevice.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
-
-DISABLE_WARNINGS
-
-#define VMA_IMPLEMENTATION
-#include <vk_mem_alloc.h>
-
-RESTORE_WARNINGS
+#include "Private/Vulkan/VulkanRenderpass.hpp"
 
 BEGIN_NAMESPACE_RHI
 
+//----------- Open / Close --------------//
 void VulkanCommandList::Open()
 {
 	vk::CommandBufferBeginInfo beginInfo{};
@@ -26,22 +21,51 @@ void VulkanCommandList::Close()
 	VK_CHECK_VOID(m_handle->cmdBuffer.end(),"Can't end command buffer");
 }
 
-void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset)
+//----------- Dynamic Rendering --------------//
+void VulkanCommandList::BeginRendering(const RenderingInfo& RHIRenderingInfo)
 {
-	ASSERT((size + offset) <= buffer->GetSize(), "Data is too large");
+	vk::RenderingInfo info{};
+	info.renderArea.offset = TranslateToVulkan(RHIRenderingInfo.offset);
+	info.renderArea.extent = TranslateToVulkan(RHIRenderingInfo.extent);
+	info.layerCount = RHIRenderingInfo.layerCount;
+	info.colorAttachmentCount = RHIRenderingInfo.colorAttachmentCount;
 
-	Core::RefCountPtr<VulkanBuffer> vulkanBuffer = buffer.CastAs<VulkanBuffer>();
+	std::vector<vk::RenderingAttachmentInfo> colorAttachments;
+	for (uint32_t i = 0; i < RHIRenderingInfo.colorAttachments.size(); ++i)
+	{
+		vk::RenderingAttachmentInfo colorAttachment = VulkanRenderpass::GetRenderingAttachmentInfo(RHIRenderingInfo.colorAttachments[i]);
+		colorAttachments.push_back(colorAttachment);
+	}
+	info.pColorAttachments = colorAttachments.data();
+
+	vk::RenderingAttachmentInfo depthAttachment = VulkanRenderpass::GetRenderingAttachmentInfo(RHIRenderingInfo.depthAttachment);
+	info.pDepthAttachment = &depthAttachment;
+
+	m_handle->cmdBuffer.beginRendering(info);
+}
+
+void VulkanCommandList::EndRendering()
+{
+	m_handle->cmdBuffer.endRendering();
+}
+
+//----------- Set Buffer / Image Data --------------//
+void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void* data, uint32_t size, uint32_t offset)
+{
+	ASSERT((size + offset) <= RHIBuffer->GetSize(), "Data is too large");
+
+	Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer = RHIBuffer.CastAs<VulkanBuffer>();
 
 	VmaAllocator memoryAllocator = m_handle->memoryAllocator;
 
-	VmaAllocation bufferAllocation = vulkanBuffer->GetAllocation();
-	vk::PipelineStageFlagBits pipelineStage = vulkanBuffer->GetPipelineStage();
-	vk::Buffer bufferHandle = vulkanBuffer->GetHandle();
-	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(vulkanBuffer->GetUsage());
+	VmaAllocation bufferAllocation = RHIVulkanBuffer->GetAllocation();
+	vk::PipelineStageFlagBits pipelineStage = RHIVulkanBuffer->GetPipelineStage();
+	vk::Buffer bufferHandle = RHIVulkanBuffer->GetHandle();
+	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(RHIVulkanBuffer->GetUsage());
 
 	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
 
-	if (buffer->GetIsGpuOnly())
+	if (RHIVulkanBuffer->GetIsGpuOnly())
 	{
 #pragma region C-Style VMA
 		VkBufferCreateInfo stagingCreateInfo{};
@@ -114,11 +138,11 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> buffer, void* da
 	}
 }
 
-void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size)
+void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* data, uint32_t size)
 {
-	Core::RefCountPtr<VulkanImage> vulkanImage = image.CastAs<VulkanImage>();
+	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
 
-	if (vulkanImage->GetSource() == ImageSource::Gpu)
+	if (RHIVulkanImage->GetSource() == ImageSource::Gpu)
 	{
 		spdlog::error("Be carefull you tried to pass CPU data into a only GPU image");
 		return;
@@ -158,11 +182,27 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data,
 
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eHost, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, bufferMemBarrier, nullptr);
 
-	uint32_t layers = vulkanImage->GetLayersCount();
-	uint32_t mips = vulkanImage->GetMipLevels();
-	uint32_t bytesPerPixel = vulkanImage->GetBytesPerPixel();
-	vk::Extent3D extent = vulkanImage->GetExtent();
-	vk::ImageAspectFlags aspect = vulkanImage->GetAspect();
+	uint32_t layers = RHIVulkanImage->GetLayersCount();
+	uint32_t mips = RHIVulkanImage->GetMipLevels();
+	uint32_t bytesPerPixel = RHIVulkanImage->GetBytesPerPixel();
+	vk::Extent3D extent = RHIVulkanImage->GetExtent();
+	vk::ImageAspectFlags aspect = RHIVulkanImage->GetAspect();
+
+	vk::ImageMemoryBarrier transitionToCopyLayout{};
+	transitionToCopyLayout.oldLayout = vk::ImageLayout::eUndefined;
+	transitionToCopyLayout.newLayout = vk::ImageLayout::eTransferDstOptimal;
+	transitionToCopyLayout.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+	transitionToCopyLayout.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+	transitionToCopyLayout.image = RHIVulkanImage->GetHandle();
+	transitionToCopyLayout.subresourceRange.aspectMask = aspect;
+	transitionToCopyLayout.subresourceRange.baseMipLevel = 0;
+	transitionToCopyLayout.subresourceRange.levelCount = mips;
+	transitionToCopyLayout.subresourceRange.baseArrayLayer = 0;
+	transitionToCopyLayout.subresourceRange.layerCount = layers;
+	transitionToCopyLayout.srcAccessMask = vk::AccessFlagBits::eNone;
+	transitionToCopyLayout.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+
+	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, nullptr, transitionToCopyLayout);
 
 	std::vector<vk::BufferImageCopy> regions;
 	vk::DeviceSize copyOffset = 0;
@@ -193,7 +233,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data,
 		}
 	}
 
-	cmdBuffer.copyBufferToImage(stagingBuf, vulkanImage->GetHandle(), vk::ImageLayout::eTransferDstOptimal, regions);
+	cmdBuffer.copyBufferToImage(stagingBuf, RHIVulkanImage->GetHandle(), vk::ImageLayout::eTransferDstOptimal, regions);
 
 
 	// --------------------  GETTING RID OF THE STAGING BUFFER ----------------------- // 
@@ -207,7 +247,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data,
 
 
 	// --------------------  TRANSITION TO FINAL LAYOUT FOR USE ----------------------- // 
-	vk::ImageLayout finalLayout = vulkanImage->GetLayout();
+	vk::ImageLayout finalLayout = RHIVulkanImage->GetFinalLayout();
 
 
 	// A little bit "hardcode" but this function should only be use with a final layout = transitionToFinalLayout
@@ -216,7 +256,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data,
 	transitionToFinalLayout.newLayout = finalLayout;
 	transitionToFinalLayout.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
 	transitionToFinalLayout.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-	transitionToFinalLayout.image = vulkanImage->GetHandle();
+	transitionToFinalLayout.image = RHIVulkanImage->GetHandle();
 	transitionToFinalLayout.subresourceRange.aspectMask = aspect;
 	transitionToFinalLayout.subresourceRange.baseMipLevel = 0;
 	transitionToFinalLayout.subresourceRange.levelCount = mips;
@@ -228,5 +268,63 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> image, void* data,
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, nullptr, nullptr, transitionToFinalLayout);
 }
 
+//----------- Transition Image Layout --------------//
+void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> RHIImage, Layout RHIDstLayout)
+{
+	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
+
+	vk::ImageLayout oldLayout = RHIVulkanImage->GetLayout();
+	vk::ImageLayout newLayout = TranslateToVulkan(RHIDstLayout);
+
+	vk::ImageMemoryBarrier barrier{};
+	barrier.oldLayout = RHIVulkanImage->GetLayout();
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = RHIVulkanImage->GetHandle();
+
+	if (newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+	{
+		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth;
+	}
+	else 
+	{
+		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+	}
+
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+
+	vk::PipelineStageFlags srcStage;
+	vk::PipelineStageFlags dstStage;
+
+	if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eColorAttachmentOptimal) 
+	{
+		barrier.srcAccessMask = vk::AccessFlags();
+		barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+		srcStage = vk::PipelineStageFlagBits::eTopOfPipe;
+		dstStage = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+	}
+	else if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal) 
+	{
+		barrier.srcAccessMask = vk::AccessFlags();
+		barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+		srcStage = vk::PipelineStageFlagBits::eTopOfPipe;
+		dstStage = vk::PipelineStageFlagBits::eEarlyFragmentTests;
+	}
+	else if (oldLayout == vk::ImageLayout::eColorAttachmentOptimal && newLayout == vk::ImageLayout::ePresentSrcKHR)
+	{
+		barrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+		barrier.dstAccessMask = vk::AccessFlags();
+		srcStage = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+		dstStage = vk::PipelineStageFlagBits::eBottomOfPipe;
+	}
+
+	m_handle->cmdBuffer.pipelineBarrier(srcStage, dstStage, vk::DependencyFlags(), nullptr, nullptr, barrier);	
+	
+	RHIVulkanImage->SetLayout(newLayout);
+}
 
 END_NAMESPACE_RHI

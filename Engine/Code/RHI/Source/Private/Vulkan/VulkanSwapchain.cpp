@@ -67,8 +67,14 @@ vk::SwapchainCreateInfoKHR VulkanSwapchain::GetCreateInfo(const PhysicalDeviceCo
 	m_colorImageFormat = surfaceFormat.format;
 	m_bIsDepthEnable = bIsDepthEnable;
 	m_depthImageFormat = requestedDepthFormat;
+	m_imageExtent = extent;
 
 	return createInfo;
+}
+
+void VulkanSwapchain::SwapImages()
+{
+	m_currentImageIndex = (m_currentImageIndex + 1) % m_imageCount;
 }
 
 #pragma region Compatibility

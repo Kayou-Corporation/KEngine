@@ -8,14 +8,16 @@ vk::ImageCreateInfo VulkanImage::GetCreateInfo(const ImageSpecs& specs)
 	// Important for later 
 	m_source = specs.source;
 
+	m_targetLayout = TranslateToVulkan(specs.targetLayout);
 	m_finalLayout = TranslateToVulkan(specs.finalLayout);
+	m_layout = vk::ImageLayout::eUndefined;
 	m_imageFormat = TranslateToVulkan(specs.format);
 	m_imageExtent = TranslateToVulkan(specs.extent);
 	m_layersCount = specs.layersCount;
 	m_mipLevels = specs.mipLevels;
 	m_bytesPerPixel = GetFormatSize(m_imageFormat);
 
-	vk::ImageCreateInfo createInfo;
+	vk::ImageCreateInfo createInfo{};
 	createInfo.imageType = TranslateToVulkan(specs.type);
 	createInfo.format = m_imageFormat;
 	createInfo.extent = m_imageExtent;
@@ -29,7 +31,7 @@ vk::ImageCreateInfo VulkanImage::GetCreateInfo(const ImageSpecs& specs)
 	 // Usage for Color Image for defered : Color & Sampled
 	 // Usage for Color Image for defered : Depth & Sampled
 	 // Usage Texture Image for defered : TransferDst & Sampled
-	vk::ImageUsageFlags usages;
+	vk::ImageUsageFlags usages = {};
 	for (uint32_t i = 0; i < specs.usages.size(); ++i)
 	{
 		usages |= TranslateToVulkan(specs.usages[i]);
@@ -44,11 +46,87 @@ vk::ImageCreateInfo VulkanImage::GetCreateInfo(const ImageSpecs& specs)
 
 vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfo(const ImageSpecs& specs)
 {
-	(void)specs;
-
 	m_imageAspects = TranslateToVulkan(specs.viewAspect);
 
-	vk::ImageViewCreateInfo createInfo;
+	vk::ImageViewCreateInfo createInfo{};
+	createInfo.image = m_handle;
+	createInfo.viewType = TranslateToVulkan(specs.viewType);
+	createInfo.format = m_imageFormat;
+	createInfo.subresourceRange.aspectMask = m_imageAspects;
+	createInfo.subresourceRange.baseMipLevel = 0;
+	createInfo.subresourceRange.levelCount = m_mipLevels;
+	createInfo.subresourceRange.baseArrayLayer = 0;
+	createInfo.subresourceRange.layerCount = m_layersCount;
+
+	return createInfo;
+}
+
+vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfoForPresentation(vk::Format format, vk::Extent3D extent)
+{
+	m_source = ImageSource::Gpu;
+
+	m_targetLayout = vk::ImageLayout::eColorAttachmentOptimal;
+	m_finalLayout = vk::ImageLayout::ePresentSrcKHR;
+	m_imageFormat = format;
+	m_imageExtent = extent;
+	m_layersCount = 1;
+	m_mipLevels = 1;
+	m_bytesPerPixel = GetFormatSize(m_imageFormat);
+
+	m_imageAspects = vk::ImageAspectFlagBits::eColor;
+
+	vk::ImageViewCreateInfo createInfo{};
+	createInfo.image = m_handle;
+	createInfo.viewType = vk::ImageViewType::e2D;
+	createInfo.format = m_imageFormat;
+	createInfo.subresourceRange.aspectMask = m_imageAspects;
+	createInfo.subresourceRange.baseMipLevel = 0;
+	createInfo.subresourceRange.levelCount = m_mipLevels;
+	createInfo.subresourceRange.baseArrayLayer = 0;
+	createInfo.subresourceRange.layerCount = m_layersCount;
+
+	return createInfo;
+}
+
+vk::ImageCreateInfo VulkanImage::GetCreateInfoForSwapchain(SwapchainImageSpecs specs, vk::Format format, vk::Extent3D extent)
+{
+	m_source = ImageSource::Gpu;
+
+	m_targetLayout = TranslateToVulkan(specs.targetLayout);
+	m_finalLayout = TranslateToVulkan(specs.finalLayout);
+	m_imageFormat = format;
+	m_imageExtent = extent;
+	m_layersCount = 1;
+	m_mipLevels = 1;
+	m_bytesPerPixel = GetFormatSize(m_imageFormat);
+
+	vk::ImageCreateInfo createInfo{};
+	createInfo.imageType = TranslateToVulkan(specs.type);
+	createInfo.format = m_imageFormat;
+	createInfo.extent = m_imageExtent;
+	createInfo.mipLevels = m_mipLevels;
+	createInfo.arrayLayers = 1;
+	createInfo.samples = vk::SampleCountFlagBits::e1;
+	createInfo.tiling = vk::ImageTiling::eOptimal;
+
+	vk::ImageUsageFlags usages = {};
+	for (uint32_t i = 0; i < specs.usages.size(); ++i)
+	{
+		usages |= TranslateToVulkan(specs.usages[i]);
+	}
+	createInfo.usage = usages;
+
+	createInfo.sharingMode = vk::SharingMode::eExclusive;
+	createInfo.initialLayout = vk::ImageLayout::eUndefined;
+
+	return createInfo;
+}
+
+vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfoForSwapchain(SwapchainImageSpecs specs)
+{
+	m_imageAspects = TranslateToVulkan(specs.viewAspect);
+
+	vk::ImageViewCreateInfo createInfo{};
 	createInfo.image = m_handle;
 	createInfo.viewType = TranslateToVulkan(specs.viewType);
 	createInfo.format = m_imageFormat;

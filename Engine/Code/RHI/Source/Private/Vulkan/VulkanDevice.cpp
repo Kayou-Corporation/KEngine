@@ -2,18 +2,21 @@
 
 #include "Private/Vulkan/VulkanSurface.hpp"
 #include "Private/Vulkan/VulkanUtils.hpp"
-#include "Private/Vulkan/VulkanQueue.hpp"
 #include "Private/Vulkan/VulkanTranslate.hpp"
 #include "Private/Vulkan/VulkanSwapchain.hpp"
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
 #include "Private/Vulkan/VulkanShader.hpp"
 #include "Private/Vulkan/VulkanPipeline.hpp"
+#include "Private/Vulkan/VulkanCommandList.hpp"
+#include "Private/Vulkan/VulkanSyncronisation.hpp"
 
 #include <map>
 #include <set>
 #include <string>
 #include <spdlog/spdlog.h>
+
+// TODO : Maybe do more cleanup (Review extension system and constant validation for format usage)
 
 DISABLE_WARNINGS
 
@@ -24,6 +27,8 @@ RESTORE_WARNINGS
 
 BEGIN_NAMESPACE_RHI
 
+// PUBLIC : 
+
 VulkanDevice::VulkanDevice()
 {
 	m_shaderCompiler.Initialize();
@@ -31,58 +36,242 @@ VulkanDevice::VulkanDevice()
 	m_memoryAllocator = nullptr;
 }
 
+//----------- Queue / Command --------------//
+Core::RefCountPtr<CommandList> VulkanDevice::GetCommandList(QueueType RHIQueueType)
+{
+	Core::RefCountPtr<VulkanCommandList> RHIVulkanCommandList = Core::CreateRefPtr<VulkanCommandList>();
+
+	TrackedCommandBufferPtr commandBuffer = m_queues[RHIQueueType].GetOrCreateCommandBuffer(m_handle);
+
+	RHIVulkanCommandList->SetHandle(commandBuffer);
+	RHIVulkanCommandList->SetOwnerQueueType(RHIQueueType);
+
+	return RHIVulkanCommandList;
+}
+
+void VulkanDevice::SubmitCommandList(Core::RefCountPtr<CommandList> RHICommandList, const SubmitInfo& RHISubmitInfo)
+{
+	Core::RefCountPtr<VulkanCommandList> RHIVulkanCommandList = RHICommandList.CastAs<VulkanCommandList>();
+	
+	TrackedCommandBufferPtr commandBuffer = RHIVulkanCommandList->GetHandle();
+	QueueType RHICommandBufferQueue = RHIVulkanCommandList->GetOwnerQueueType();
+
+	std::vector<vk::Semaphore> signalSemaphores;
+	for (uint32_t i = 0; i < RHISubmitInfo.signalSemaphores.size(); ++i)
+	{
+		Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISubmitInfo.signalSemaphores[i].CastAs<VulkanSemaphore>();
+
+		vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
+
+		signalSemaphores.push_back(semaphore);
+	}
+	m_queues[RHICommandBufferQueue].PushSignalSemaphores(signalSemaphores, RHISubmitInfo.signalSemaphoresValues);
+
+	std::vector<vk::Semaphore> waitSemaphores;
+	for (uint32_t i = 0; i < RHISubmitInfo.waitSemaphores.size(); ++i)
+	{
+		Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISubmitInfo.waitSemaphores[i].CastAs<VulkanSemaphore>();
+
+		vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
+
+		waitSemaphores.push_back(semaphore);
+	}
+	m_queues[RHICommandBufferQueue].PushWaitSemaphores(waitSemaphores, RHISubmitInfo.waitSemaphoresValues);
+
+	vk::PipelineStageFlagBits stage = TranslateToVulkan(RHISubmitInfo.stage);
+
+	m_queues[RHICommandBufferQueue].Submit(commandBuffer, stage);
+}
+
 void VulkanDevice::WaitIdle()
 {
 	VK_CHECK_VOID(m_handle.waitIdle(), "Device can't wait idle");
 }
 
-void VulkanDevice::QueueWaitIdle(QueueType type)
+void VulkanDevice::QueueWaitIdle(QueueType queueType)
 {
-	m_queues[type].WaitIdle();
+	m_queues[queueType].WaitIdle();
 }
 
-Core::RefCountPtr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainSpecs& specs)
+void VulkanDevice::RunGarbageCollector()
 {
-	Core::RefCountPtr<VulkanSwapchain> swapchain = Core::CreateRefPtr<VulkanSwapchain>();
+	for (auto& [type, queue] : m_queues)
+	{
+		queue.RunGarbageCollector(m_handle);
+	}
+}
+
+//----------- Syncronisation --------------// 
+Core::RefCountPtr<Semaphore> VulkanDevice::CreateSemaphore(const SemaphoreSpecs& RHISpecs)
+{
+	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = Core::CreateRefPtr<VulkanSemaphore>();
+
+	vk::SemaphoreCreateInfo createInfo{};
+	vk::SemaphoreTypeCreateInfo typeInfo{};
+
+	if (RHISpecs.type == SemaphoreType::Timeline)
+	{
+		typeInfo.semaphoreType = vk::SemaphoreType::eTimeline;
+		typeInfo.initialValue = RHISpecs.timelineValue;
+		createInfo.pNext = &typeInfo;
+	}
+
+	vk::Semaphore semaphore = VK_CHECK_RESULT(m_handle.createSemaphore(createInfo), "Coudn't create semaphore");
+
+	RHIVulkanSemaphore->SetHandle(semaphore);
+
+	return RHIVulkanSemaphore;
+}
+
+void VulkanDevice::DestroySemaphore(Core::RefCountPtr<Semaphore> RHISemaphore)
+{
+	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISemaphore.CastAs<VulkanSemaphore>();
+
+	vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandleRef();
+
+	m_handle.destroySemaphore(semaphore);
+}
+
+void VulkanDevice::WaitForSemaphore(Core::RefCountPtr<Semaphore> RHISemaphore, uint64_t waitValue)
+{
+	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISemaphore.CastAs<VulkanSemaphore>();
+
+	vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
+
+	vk::SemaphoreWaitInfo waitInfo{};
+	waitInfo.flags = vk::SemaphoreWaitFlagBits::eAny;
+	waitInfo.semaphoreCount = 1;
+	waitInfo.pSemaphores = &semaphore;
+	waitInfo.pValues = &waitValue;
+
+	VK_CHECK_VOID(m_handle.waitSemaphores(waitInfo, UINT64_MAX), "Can't wait semaphore");
+}
+
+Core::RefCountPtr<Fence> VulkanDevice::CreateFence()
+{
+	Core::RefCountPtr<VulkanFence> RHIVulkanFence = Core::CreateRefPtr<VulkanFence>();
+
+	vk::FenceCreateInfo createInfo{};
+	createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
+	vk::Fence fence = VK_CHECK_RESULT(m_handle.createFence(createInfo), "Coudn't create fence");
+
+	RHIVulkanFence->SetHandle(fence);
+
+	return RHIVulkanFence;
+}
+
+void VulkanDevice::DestroyFence(Core::RefCountPtr<Fence> RHIFence)
+{
+	Core::RefCountPtr<VulkanFence> RHIVulkanFence = RHIFence.CastAs<VulkanFence>();
+
+	vk::Fence fence = RHIVulkanFence->GetHandleRef();
+
+	m_handle.destroyFence(fence);
+}
+
+void VulkanDevice::WaitForFence(Core::RefCountPtr<Fence> RHIFence)
+{
+	Core::RefCountPtr<VulkanFence> RHIVulkanFence = RHIFence.CastAs<VulkanFence>();
+
+	vk::Fence fence = RHIVulkanFence->GetHandle();
+
+	VK_CHECK_VOID(m_handle.waitForFences({ fence }, VK_TRUE, UINT64_MAX), "can't wait for fence");
+}
+
+void VulkanDevice::ResetFence(Core::RefCountPtr<Fence> RHIFence)
+{
+	Core::RefCountPtr<VulkanFence> RHIVulkanFence = RHIFence.CastAs<VulkanFence>();
+
+	vk::Fence fence = RHIVulkanFence->GetHandle();
+
+	VK_CHECK_VOID(m_handle.resetFences({ fence }), "Can't reset for fence");
+}
+
+//----------- Swapchain --------------// 
+// TODO (Eliott) : Do some cleanup on GetCreateInfo
+Core::RefCountPtr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainSpecs& RHISpecs)
+{
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = Core::CreateRefPtr<VulkanSwapchain>();
 
 	std::unordered_map<int, int> map;
 
-	vk::SurfaceKHR& surface = specs.surface.CastAs<VulkanSurface>()->GetHandleRef();
+	vk::SurfaceKHR& surface = RHISpecs.surface.CastAs<VulkanSurface>()->GetHandleRef();
 
 	uint32_t graphicsQueueIndex = m_queueFamily.GetQueues().at(QueueType::Graphics).value();
 	uint32_t presentQueueIndex = m_queueFamily.GetPresentQueueIndex();
 
-	vk::Format requestedFormat = TranslateToVulkan(specs.imageFormat);
-	vk::Format requestedDepthFormat = TranslateToVulkan(specs.depthImageFormat);
+	vk::Format requestedFormat = TranslateToVulkan(RHISpecs.imageFormat);
+	vk::Format requestedDepthFormat = TranslateToVulkan(RHISpecs.depthImageFormat);
 
-	vk::PresentModeKHR requestedpresentMode = TranslateToVulkan(specs.presentMode);
+	vk::Format depthFormat = CheckFormatCompatibility(requestedDepthFormat, vk::ImageTiling::eOptimal, vk::FormatFeatureFlagBits::eDepthStencilAttachment);
 
-	vk::Extent2D requestedExtent = TranslateToVulkan(specs.extent);
+	vk::PresentModeKHR requestedpresentMode = TranslateToVulkan(RHISpecs.presentMode);
 
-	vk::SwapchainCreateInfoKHR createInfo = swapchain->GetCreateInfo(m_compatibility, surface, graphicsQueueIndex, presentQueueIndex, specs.imageCount, requestedFormat, specs.isDepthEnable, requestedDepthFormat, requestedpresentMode, requestedExtent);
+	vk::Extent2D requestedExtent = TranslateToVulkan(RHISpecs.extent);
 
-	vk::SwapchainKHR vkSwapchain = VK_CHECK_RESULT(m_handle.createSwapchainKHR(createInfo), "Can't create swapchain");
+	vk::SwapchainCreateInfoKHR createInfo = RHIVulkanSwapchain->GetCreateInfo(m_compatibility, surface, graphicsQueueIndex, presentQueueIndex, RHISpecs.imageCount, requestedFormat, RHISpecs.isDepthEnable, depthFormat, requestedpresentMode, requestedExtent);
 
-	swapchain->SetHandle(vkSwapchain);
+	vk::SwapchainKHR swapchain = VK_CHECK_RESULT(m_handle.createSwapchainKHR(createInfo), "Can't create swapchain");
 
-	return swapchain;
+	RHIVulkanSwapchain->SetHandle(swapchain);
+
+	return RHIVulkanSwapchain;
 }
 
-void VulkanDevice::DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain)
+void VulkanDevice::DestroySwapchain(Core::RefCountPtr<Swapchain> RHISwapchain)
 {
-	auto vkSwapchain = swapchain.CastAs<VulkanSwapchain>();
-	
-	m_handle.destroySwapchainKHR(vkSwapchain->GetHandle());
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = RHISwapchain.CastAs<VulkanSwapchain>();
+
+	m_handle.destroySwapchainKHR(RHIVulkanSwapchain->GetHandle());
 }
 
-Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
+uint32_t VulkanDevice::AcquirreNextImage(Core::RefCountPtr<Swapchain> RHISwapchain, Core::RefCountPtr<Semaphore> RHISemaphore)
 {
-	Core::RefCountPtr<VulkanBuffer> buffer = Core::CreateRefPtr<VulkanBuffer>();
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = RHISwapchain.CastAs<VulkanSwapchain>();
+	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISemaphore.CastAs<VulkanSemaphore>();
 
-	VkBufferCreateInfo bufferInfo = buffer->GetCreateInfo(specs);
+	vk::SwapchainKHR swapchain = RHIVulkanSwapchain->GetHandle();
+	vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
 
-	VmaAllocationCreateInfo allocInfo = TranslateToVulkan(specs.memoryAccess);
-	if (buffer->GetIsPersistentMapped())
+	uint32_t imageIndex = VK_CHECK_RESULT(m_handle.acquireNextImageKHR(swapchain, UINT64_MAX, semaphore), "Failed to acquired next image");
+
+	return imageIndex;
+}
+
+void VulkanDevice::Present(const PresentInfo& RHIPresentInfo)
+{
+	std::vector<vk::Semaphore> waitSemaphores;
+	for (uint32_t i = 0; i < RHIPresentInfo.waitSemaphores.size(); ++i)
+	{
+		Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHIPresentInfo.waitSemaphores[i].CastAs<VulkanSemaphore>();
+
+		vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
+
+		waitSemaphores.push_back(semaphore);
+	}
+
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = RHIPresentInfo.swapchain.CastAs<VulkanSwapchain>();
+	vk::SwapchainKHR swapchain = RHIVulkanSwapchain->GetHandle();
+
+	vk::PresentInfoKHR presentInfo;
+	presentInfo.waitSemaphoreCount = waitSemaphores.size();
+	presentInfo.pWaitSemaphores = waitSemaphores.data();
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = &swapchain;
+	presentInfo.pImageIndices = &RHIPresentInfo.imageIndex;
+
+	VK_CHECK_VOID(m_presentQueue.presentKHR(presentInfo), "Can't present");
+}
+
+//-------------- Buffer --------------// 
+Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs)
+{
+	Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer = Core::CreateRefPtr<VulkanBuffer>();
+
+	VkBufferCreateInfo bufferInfo = RHIVulkanBuffer->GetCreateInfo(RHISpecs);
+
+	VmaAllocationCreateInfo allocInfo = TranslateToVulkan(RHISpecs.memoryAccess);
+	if (RHIVulkanBuffer->GetIsPersistentMapped())
 		allocInfo.flags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
 	VkBuffer buf;
@@ -90,64 +279,158 @@ Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& specs)
 	VmaAllocationInfo allocationInfo;
 	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateBuffer(m_memoryAllocator, &bufferInfo, &allocInfo, &buf, &allocation, &allocationInfo)), "Failed to create buffer");
 
-	buffer->SetHandle(static_cast<vk::Buffer>(buf));
-	buffer->SetAllocation(allocation);
-	buffer->SetAllocationInfo(allocationInfo);
+	RHIVulkanBuffer->SetHandle(static_cast<vk::Buffer>(buf));
+	RHIVulkanBuffer->SetAllocation(allocation);
+	RHIVulkanBuffer->SetAllocationInfo(allocationInfo);
 
-	if (specs.memoryAccess == MemoryAccess::GPU_Only)
-		buffer->SetIsGpuOnly(true);
+	if (RHISpecs.memoryAccess == MemoryAccess::GPU_Only)
+		RHIVulkanBuffer->SetIsGpuOnly(true);
 
-	return buffer;
+	return RHIVulkanBuffer;
 }
 
-void VulkanDevice::DestroyBuffer(Core::RefCountPtr<Buffer> buffer)
+void VulkanDevice::DestroyBuffer(Core::RefCountPtr<Buffer> RHIBuffer)
 {
-	auto vkBuffer = buffer.CastAs<VulkanBuffer>();
+	Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer = RHIBuffer.CastAs<VulkanBuffer>();
 
-	VkBuffer rawBuffer = static_cast<VkBuffer>(vkBuffer->GetHandle());
-	VmaAllocation bufferAllocation = vkBuffer->GetAllocation();
+	VkBuffer rawBuffer = static_cast<VkBuffer>(RHIVulkanBuffer->GetHandle());
+	VmaAllocation bufferAllocation = RHIVulkanBuffer->GetAllocation();
 
 	vmaDestroyBuffer(m_memoryAllocator, rawBuffer, bufferAllocation);
 }
 
-void VulkanDevice::DestroyBuffer(vk::Buffer buffer, VmaAllocation allocation)
+//-------------- Image --------------// 
+Core::RefCountPtr<Image> VulkanDevice::CreateImage(const ImageSpecs& RHISpecs)
 {
-	vmaDestroyBuffer(m_memoryAllocator, buffer, allocation);
-}
+	Core::RefCountPtr<VulkanImage> RHIVulkanImage = Core::CreateRefPtr<VulkanImage>();
 
-Core::RefCountPtr<Image> VulkanDevice::CreateImage(const ImageSpecs& specs)
-{
-	Core::RefCountPtr<VulkanImage> image = Core::CreateRefPtr<VulkanImage>();
+	VkImageCreateInfo imageCreateInfo = static_cast<VkImageCreateInfo>(RHIVulkanImage->GetCreateInfo(RHISpecs));
 
-	vk::ImageCreateInfo imageCreateInfo = image->GetCreateInfo(specs);
+	VkImage image;
 
-	vk::ImageViewCreateInfo imageViewCreateInfo = image->GetViewCreateInfo(specs);
-
-	VkImage im;
-
-	VmaAllocationCreateInfo allocInfo;
+	VmaAllocationCreateInfo allocInfo{};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+	allocInfo.flags = 0;
 	VmaAllocation allocation;
 	VmaAllocationInfo allocationInfo;
 
-	const VkImageCreateInfo cImageCreateInfo = static_cast<VkImageCreateInfo>(imageCreateInfo);
-	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, &cImageCreateInfo, &allocInfo, &im, &allocation, &allocationInfo)), "Failed to create image");
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, &imageCreateInfo, &allocInfo, &image, &allocation, &allocationInfo)), "Failed to create image");
+
+	RHIVulkanImage->SetHandle(image);
+
+	vk::ImageViewCreateInfo imageViewCreateInfo = RHIVulkanImage->GetViewCreateInfo(RHISpecs);
+	vk::ImageView imageView = VK_CHECK_RESULT(m_handle.createImageView(imageViewCreateInfo, nullptr), "Failed to create image");
+
+	RHIVulkanImage->SetAllocation(allocation);
+	RHIVulkanImage->SetAllocationInfo(allocationInfo);
+
+	RHIVulkanImage->SetHandleView(imageView);
+
+	return RHIVulkanImage;
+}
+
+void VulkanDevice::DestroyImage(Core::RefCountPtr<Image> RHIImage)
+{
+	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
+
+	vk::Image image = RHIVulkanImage->GetHandleRef();
+	vk::ImageView imageView = RHIVulkanImage->GetHandleViewRef();
+	VmaAllocation imageAllocation = RHIVulkanImage->GetAllocation();
+
+	m_handle.destroyImageView(imageView);
+
+	vmaDestroyImage(m_memoryAllocator, image, imageAllocation);
+}
+
+std::vector<Core::RefCountPtr<Image>> VulkanDevice::CreatePresentationImages(Core::RefCountPtr<Swapchain> RHISwapchain)
+{
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = RHISwapchain.CastAs<VulkanSwapchain>();
+	uint32_t swapchainImageCount = RHIVulkanSwapchain->GetImageCount();
+
+	std::vector<Core::RefCountPtr<Image>> RHIImages(swapchainImageCount);
+
+	vk::SwapchainKHR swapchain = RHIVulkanSwapchain->GetHandle();
+	std::vector<vk::Image> swapchainImages = VK_CHECK_RESULT(m_handle.getSwapchainImagesKHR(swapchain), "Coudn't extract images from swapchain");
+
+	ASSERT(swapchainImageCount == RHIImages.size(), "Swapchain images count don't match acquired images");
+
+	vk::Format colorImageFormat = RHIVulkanSwapchain->GetColorImageFormat();
+	vk::Extent2D imageExtent = RHIVulkanSwapchain->GetImageExtent();
+
+	for (uint32_t i = 0; i < RHIImages.size(); ++i)
+	{
+		Core::RefCountPtr<VulkanImage> RHIVulkanImage = Core::CreateRefPtr<VulkanImage>();
+
+		RHIVulkanImage->SetHandle(swapchainImages[i]);
+
+		vk::ImageViewCreateInfo imageViewCreateInfo = RHIVulkanImage->GetViewCreateInfoForPresentation(colorImageFormat, { imageExtent.width, imageExtent.height, 0 });
+
+		vk::ImageView imageView = VK_CHECK_RESULT(m_handle.createImageView(imageViewCreateInfo, nullptr), "Failed to create image");
+
+
+		RHIVulkanImage->SetHandleView(imageView);
+
+		RHIImages[i] = RHIVulkanImage;
+	}
+
+	return RHIImages;
+}
+
+void VulkanDevice::DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> RHIPresentationImages)
+{
+	// With swapchain images you only destroy their vk::ImageView and not the vk::Image
+	for (uint32_t i = 0; i < RHIPresentationImages.size(); ++i)
+	{
+		Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIPresentationImages[i].CastAs<VulkanImage>();
+
+		vk::ImageView imageViewHandle = RHIVulkanImage->GetHandleViewRef();
+
+		m_handle.destroyImageView(imageViewHandle);
+	}
+}
+
+Core::RefCountPtr<Image> VulkanDevice::CreateImagesWithSwapchain(const SwapchainImageSpecs& RHISpecs, Core::RefCountPtr<Swapchain> RHISwapchain)
+{
+	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = RHISwapchain.CastAs<VulkanSwapchain>();
+	[[maybe_unused]] uint32_t swapchainImageCount = RHIVulkanSwapchain->GetImageCount();
+
+	Core::RefCountPtr<VulkanImage> RHIVulkanImage = Core::CreateRefPtr<VulkanImage>();
+
+	vk::Format imageFormat;
+	if (RHISpecs.imageType == SwapchainImageType::Color)
+	{
+		imageFormat = RHIVulkanSwapchain->GetColorImageFormat();
+	}
+	else
+	{
+		imageFormat = RHIVulkanSwapchain->GetDepthImageFormat();
+	}
+	vk::Extent2D imageExtent = RHIVulkanSwapchain->GetImageExtent();
+
+	VkImageCreateInfo imageCreateInfo = static_cast<VkImageCreateInfo>(RHIVulkanImage->GetCreateInfoForSwapchain(RHISpecs, imageFormat, { imageExtent.width, imageExtent.height, 1 }));
+
+	VkImage image;
+
+	VmaAllocationCreateInfo allocInfo{};
+	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+	allocInfo.flags = 0;
+	VmaAllocation allocation;
+	VmaAllocationInfo allocationInfo;
+
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateImage(m_memoryAllocator, &imageCreateInfo, &allocInfo, &image, &allocation, &allocationInfo)), "Failed to create image");
+
+	RHIVulkanImage->SetHandle(image);
+
+	vk::ImageViewCreateInfo imageViewCreateInfo = RHIVulkanImage->GetViewCreateInfoForSwapchain(RHISpecs);
 
 	vk::ImageView imView = VK_CHECK_RESULT(m_handle.createImageView(imageViewCreateInfo, nullptr), "Failed to create image");
 
-	image->SetAllocation(allocation);
-	image->SetAllocationInfo(allocationInfo);
+	RHIVulkanImage->SetAllocation(allocation);
+	RHIVulkanImage->SetAllocationInfo(allocationInfo);
 
-	image->SetHandle(im);
+	RHIVulkanImage->SetHandleView(imView);
 
-	image->SetHandleView(imView);
-
-	return image;
-}
-
-void VulkanDevice::DestroyImage(Core::RefCountPtr<Image> image)
-{
-	(void)image;
+	return RHIVulkanImage;
 }
 
 Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage)
@@ -211,6 +494,7 @@ void VulkanDevice::DestroyPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
 	m_handle.destroyPipeline(pipeline);
 }
 
+// Public Vulkan:
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
 {
 	m_bSearchPresent = searchPresentQueue;
@@ -257,6 +541,116 @@ void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::v
 	}
 }
 
+void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& extensions)
+{
+	m_extensions = extensions;
+
+	std::unordered_set<uint32_t> uniqueFamilies;
+	for (const auto& [queueType, familyIndexOpt] : m_queueFamily.GetQueues())
+	{
+		if (familyIndexOpt.has_value())
+		{
+			uniqueFamilies.insert(familyIndexOpt.value());
+		}
+	}
+
+	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
+
+	float queuePriority = 1.0f;
+	for (const auto& queueIndex : uniqueFamilies)
+	{
+		vk::DeviceQueueCreateInfo queueCreateInfo;
+		queueCreateInfo.queueFamilyIndex = queueIndex;
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+		queueCreateInfos.push_back(queueCreateInfo);
+	}
+
+	vk::DeviceCreateInfo createInfo;
+	// Queues informations
+	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+	createInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+	// debug layers informations
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(m_extensions.size());
+	createInfo.ppEnabledExtensionNames = m_extensions.data();
+
+	// Enable extensions features
+	BuildFeaturesChain();
+	createInfo.pNext = &m_featuresChain;
+
+	m_handle = VK_CHECK_RESULT(m_pDevice.createDevice(createInfo), "Coudn't create device");
+
+	// Queue setup
+	for (auto& [type, index] : m_queueFamily.GetQueues())
+	{
+		Queue queue;
+
+		vk::QueueFlagBits vkType = TranslateToVulkan(type);
+		vk::Queue vkQueue = m_handle.getQueue(index.value(), 0);
+
+		queue.Create(m_handle, vkQueue, index.value(), vkType);
+
+		m_queues.insert(std::make_pair(type, queue));
+	}
+
+	if (m_bSearchPresent)
+	{
+		uint32_t presentQueueIndex = m_queueFamily.GetPresentQueueIndex();
+
+		m_presentQueue = m_handle.getQueue(presentQueueIndex, 0);
+	}
+}
+
+void VulkanDevice::CreateMemoryAllocator(const vk::Instance& instance)
+{
+	VmaAllocatorCreateInfo allocatorCreateInfo = {};
+	allocatorCreateInfo.instance = instance;
+	allocatorCreateInfo.physicalDevice = m_pDevice;
+	allocatorCreateInfo.device = m_handle;
+
+	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateAllocator(&allocatorCreateInfo, &m_memoryAllocator)), "Failed to create memory allocator");
+
+	for (auto& [type, index] : m_queues)
+	{
+		m_queues[type].SetAllocator(m_memoryAllocator);
+	}
+}
+
+void VulkanDevice::Destroy()
+{
+	WaitIdle();
+
+	vmaDestroyAllocator(m_memoryAllocator);
+
+	for (auto& [type, queue] : m_queues)
+	{
+		queue.Destroy(m_handle);
+	}
+
+	m_handle.destroy();
+}
+
+void VulkanDevice::DestroyBuffer(vk::Buffer buffer, VmaAllocation allocation)
+{
+	vmaDestroyBuffer(m_memoryAllocator, buffer, allocation);
+}
+
+vk::Format VulkanDevice::CheckFormatCompatibility(vk::Format requestedFormat, vk::ImageTiling tiling, vk::FormatFeatureFlags requiredFeatures)
+{
+	vk::FormatProperties props = m_pDevice.getFormatProperties(requestedFormat);
+
+	vk::FormatFeatureFlags availableFeatures = (tiling == vk::ImageTiling::eOptimal) ? props.optimalTilingFeatures : props.linearTilingFeatures;
+
+	if ((availableFeatures & requiredFeatures) == requiredFeatures)
+	{
+		return requestedFormat;
+	}
+
+	return vk::Format::eUndefined;
+}
+
+// Private Vulkan
 PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physicalDevice, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, const std::vector<const char*>& requiredExtensions)
 {
 	PhysicalDevice device;
@@ -295,96 +689,6 @@ PhysicalDevice VulkanDevice::RatePhysicalDevice(const vk::PhysicalDevice& physic
 	return device;
 }
 
-void VulkanDevice::CreateLogicalDevice(std::vector<const char*>& extensions)
-{
-	m_extensions = extensions;
-
-	std::unordered_set<uint32_t> uniqueFamilies;
-	for (const auto& [queueType, familyIndexOpt] : m_queueFamily.GetQueues())
-	{
-		if (familyIndexOpt.has_value())
-		{
-			uniqueFamilies.insert(familyIndexOpt.value());
-		}
-	}
-
-	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
-	
-	float queuePriority = 1.0f;
-	for (const auto& queueIndex : uniqueFamilies)
-	{
-		vk::DeviceQueueCreateInfo queueCreateInfo;
-		queueCreateInfo.queueFamilyIndex = queueIndex;
-		queueCreateInfo.queueCount = 1;
-		queueCreateInfo.pQueuePriorities = &queuePriority;
-		queueCreateInfos.push_back(queueCreateInfo);
-	}
-
-	vk::DeviceCreateInfo createInfo;
-	// Queues informations
-	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-	createInfo.pQueueCreateInfos = queueCreateInfos.data();
-	
-	// debug layers informations
-	createInfo.enabledExtensionCount = static_cast<uint32_t>(m_extensions.size());
-	createInfo.ppEnabledExtensionNames = m_extensions.data();
-
-	// Enable extensions features
-	BuildFeaturesChain();
-	createInfo.pNext = &m_featuresChain;
-
-	m_handle = VK_CHECK_RESULT(m_pDevice.createDevice(createInfo), "Coudn't create device");
-
-	// Queue setup
-	for (auto& [type, index] : m_queueFamily.GetQueues())
-	{
-		Queue queue;
-		
-		vk::QueueFlagBits vkType = TranslateToVulkan(type);
-		vk::Queue vkQueue = m_handle.getQueue(index.value(), 0);
-
-		queue.Create(m_handle, vkQueue, index.value(), vkType);
-
-		m_queues.insert(std::make_pair(type, queue));
-	}
-
-	if (m_bSearchPresent)
-	{
-		uint32_t presentQueueIndex =  m_queueFamily.GetPresentQueueIndex();
-
-		m_presentQueue = m_handle.getQueue(presentQueueIndex, 0);
-	}
-}
-
-void VulkanDevice::CreateMemoryAllocator(const vk::Instance& instance)
-{
-	VmaAllocatorCreateInfo allocatorCreateInfo = {};
-	allocatorCreateInfo.instance = instance;
-	allocatorCreateInfo.physicalDevice = m_pDevice;
-	allocatorCreateInfo.device = m_handle;
-
-	VK_CHECK_VOID(static_cast<vk::Result>(vmaCreateAllocator(&allocatorCreateInfo, &m_memoryAllocator)), "Failed to create memory allocator");
-
-	for (auto& [type, index] : m_queues)
-	{
-		m_queues[type].SetAllocator(m_memoryAllocator);
-	}
-}
-
-void VulkanDevice::Destroy()
-{
-	WaitIdle();
-
-	vmaDestroyAllocator(m_memoryAllocator);
-
-	for (auto& [type, queue] : m_queues)
-	{
-		queue.Destroy(m_handle);
-	}
-
-	m_handle.destroy();
-}
-
 void VulkanDevice::BuildFeaturesChain()
 {
 	m_featuresChain = vk::PhysicalDeviceFeatures2{};
@@ -400,6 +704,13 @@ void VulkanDevice::BuildFeaturesChain()
 
 			features.timelineSemaphore.pNext = currentPNext;
 			currentPNext = &features.timelineSemaphore;
+		}
+		else if (name == VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)
+		{
+			features.sync2Features.synchronization2 = VK_TRUE;
+
+			features.sync2Features.pNext = currentPNext;
+			currentPNext = &features.sync2Features;
 		}
 	}
 
