@@ -79,6 +79,19 @@ enum class Format
 	D32_SFLOAT_S8_UINT, // Some basic depth formats
 	D24_UNORM_S8_UINT,  // 
 
+	Float32_1,     // float
+	Float32_2,     // vec2
+	Float32_3,     // vec3
+	Float32_4,     // vec4
+	Int32_1,       // int
+	Int32_2,       // ivec2
+	Int32_3,       // ivec3
+	Int32_4,       // ivec4
+	Uint32_1,      // uint
+	Uint32_2,      // uvec2
+	Uint32_3,      // uvec3
+	Uint32_4,      // uvec4
+
 	Undefined
 };
 
@@ -235,13 +248,43 @@ enum class PipelineStage
 	None
 };
 
-enum class ShaderType
+enum class ShaderStage
 {
 	Vertex,
 	Fragment,
 	Compute,
 	Geometry,
 	Tesselation
+};
+
+enum class PipelineType
+{
+	Graphics,
+	Compute
+};
+
+enum class DynamicState
+{
+	ViewPort,
+	Scissor
+};
+
+enum class CullMode
+{
+	Front,
+	Back
+};
+
+enum class FrontFace
+{
+	ClockWise,
+	CounterClockWise
+};
+
+enum class PrimitiveTopology
+{
+	TriangleList,
+	TriangleStrip
 };
 
 enum class LoadOp
@@ -290,23 +333,31 @@ enum class SemaphoreType
 	Timeline
 };
 
-constexpr const char* ShaderTypeToEntry(ShaderType sType)
+constexpr const char* ShaderStageToEntry(ShaderStage sType)
 {
 	switch (sType)
 	{
-	case ShaderType::Vertex:
+	case ShaderStage::Vertex:
 		return "vsMain";
-	case ShaderType::Fragment:
+	case ShaderStage::Fragment:
 		return "fsMain";
-	case ShaderType::Compute:
+	case ShaderStage::Compute:
 		return "csMain";
-	case ShaderType::Geometry:
+	case ShaderStage::Geometry:
 		return "gsMain";
-	case ShaderType::Tesselation:
+	case ShaderStage::Tesselation:
 		return "tsMain";
 		default:
 			return "";
 	}
+
+	return "main";
 }
+
+enum class VertexInputRate : uint8_t
+{
+	PerVertex,
+	PerInstance
+};
 
 END_NAMESPACE_RHI

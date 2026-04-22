@@ -6,12 +6,15 @@
 #include "Private/Vulkan/VulkanSwapchain.hpp"
 #include "Private/Vulkan/VulkanBuffer.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
+#include "Private/Vulkan/VulkanShader.hpp"
+#include "Private/Vulkan/VulkanPipeline.hpp"
 #include "Private/Vulkan/VulkanCommandList.hpp"
 #include "Private/Vulkan/VulkanSyncronisation.hpp"
 
 #include <map>
 #include <set>
 #include <string>
+#include <spdlog/spdlog.h>
 
 // TODO : Maybe do more cleanup (Review extension system and constant validation for format usage)
 
@@ -24,7 +27,15 @@ RESTORE_WARNINGS
 
 BEGIN_NAMESPACE_RHI
 
+
 // PUBLIC : 
+
+VulkanDevice::VulkanDevice()
+{
+	m_shaderCompiler.Initialize();
+	m_queueFamily = QueueFamily();
+	m_memoryAllocator = nullptr;
+}
 
 //----------- Queue / Command --------------//
 Core::RefCountPtr<CommandList> VulkanDevice::GetCommandList(QueueType RHIQueueType)
@@ -423,7 +434,70 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImagesWithSwapchain(const Swapchain
 	return RHIVulkanImage;
 }
 
+
+Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage)
+{
+	Core::RefCountPtr<VulkanShader> shader = Core::CreateRefPtr<VulkanShader>();
+
+	ShaderData bin = m_shaderCompiler.Load(file, sStage);
+
+	size_t size = bin.spirv.size();
+
+	if (size % 4 != 0 || size == 0)
+	{
+		spdlog::error("SPIR-V size not multiple of 4 for: {}", file);
+		return {};
+	}
+
+	vk::ShaderModuleCreateInfo createInfo;
+	createInfo.codeSize = size;
+	createInfo.pCode = reinterpret_cast<const uint32_t*>(bin.spirv.data());
+
+	shader->SetModule(VK_CHECK_RESULT(m_handle.createShaderModule(createInfo), "Failed to create shader module"));
+	shader->SetShaderStage(sStage);
+	shader->SetDescriptors(bin.descriptors);
+
+	return shader;
+}
+
+void VulkanDevice::DestroyShader(Core::RefCountPtr<Shader> shader)
+{
+	vk::ShaderModule shaderModule = shader.CastAs<VulkanShader>()->GetModule();
+
+	m_handle.destroyShaderModule(shaderModule);
+}
+
+Core::RefCountPtr<Pipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& RHISpecs)
+{
+	Core::RefCountPtr<VulkanPipeline> RHIVulkanPipeline = Core::CreateRefPtr<VulkanPipeline>();
+
+	if (RHISpecs.type == PipelineType::Graphics)
+	{
+		vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
+		vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+		RHIVulkanPipeline->SetHandle(pipeline);
+	}
+	else
+	{
+		vk::ComputePipelineCreateInfo createInfo = RHIVulkanPipeline->GetComputeCreateInfo(RHISpecs);
+		vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create compute pipeline");
+		RHIVulkanPipeline->SetHandle(pipeline);
+	}
+
+	return RHIVulkanPipeline;
+}
+
+void VulkanDevice::DestroyPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
+{
+	Core::RefCountPtr<VulkanPipeline> RHIVulkanPipeline = RHIPipeline.CastAs<VulkanPipeline>();
+
+	vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();
+
+	m_handle.destroyPipeline(pipeline);
+}
+
 // Public Vulkan:
+
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)
 {
 	m_bSearchPresent = searchPresentQueue;

@@ -8,6 +8,11 @@ DISABLE_WARNINGS
 
 RESTORE_WARNINGS
 
+#include <slang.h>
+#include <slang-com-ptr.h>
+#include <slang-com-helper.h>
+#include <spdlog/spdlog.h>
+
 #include "Public/RHI.hpp"
 
 BEGIN_NAMESPACE_RHI
@@ -188,10 +193,143 @@ inline vk::Format TranslateToVulkan(Format format)
     case Format::D24_UNORM_S8_UINT:
         return vk::Format::eD24UnormS8Uint;
 
+    case Format::Float32_1:
+        return vk::Format::eR32Sfloat;
+
+    case Format::Float32_2:
+        return vk::Format::eR32G32Sfloat;
+
+    case Format::Float32_3:
+        return vk::Format::eR32G32B32Sfloat;
+
+    case Format::Float32_4:
+        return vk::Format::eR32G32B32A32Sfloat;
+
+    case Format::Int32_1:
+        return vk::Format::eR32Sint;
+
+    case Format::Int32_2:
+        return vk::Format::eR32G32Sint;
+
+    case Format::Int32_3:
+        return vk::Format::eR32G32B32Sint;
+
+    case Format::Int32_4:
+        return vk::Format::eR32G32B32A32Sint;
+
+    case Format::Uint32_1:
+        return vk::Format::eR32Uint;
+
+    case Format::Uint32_2:
+        return vk::Format::eR32G32Uint;
+
+    case Format::Uint32_3:
+        return vk::Format::eR32G32B32Uint;
+
+    case Format::Uint32_4:
+        return vk::Format::eR32G32B32A32Uint;
+
     case Format::Undefined:
     default:
         return vk::Format::eUndefined;
     }
+}
+
+inline std::vector<vk::Format> TranslateToVulkan(const std::vector<Format>& formatsIn)
+{
+    std::vector<vk::Format> formatsOut;
+    formatsOut.reserve(formatsIn.size());
+
+    for (const auto& f : formatsIn)
+    {
+        switch (f)
+        {
+        case Format::BGRA8_SRGB:
+            formatsOut.push_back(vk::Format::eB8G8R8A8Srgb);
+            break;
+
+        case Format::RGBA8_SRGB:
+            formatsOut.push_back(vk::Format::eR8G8B8A8Srgb);
+            break;
+
+        case Format::RGB8_SRGB:
+            formatsOut.push_back(vk::Format::eR8G8B8Srgb);
+            break;
+
+        case Format::RGBA8_UNORM:
+            formatsOut.push_back(vk::Format::eR8G8B8A8Unorm);
+            break;
+
+        case Format::RGB8_UNORM:
+            formatsOut.push_back(vk::Format::eR8G8B8Unorm);
+            break;
+
+        case Format::D32_SFLOAT:
+            formatsOut.push_back(vk::Format::eD32Sfloat);
+            break;
+
+        case Format::D32_SFLOAT_S8_UINT:
+            formatsOut.push_back(vk::Format::eD32SfloatS8Uint);
+            break;
+
+        case Format::D24_UNORM_S8_UINT:
+            formatsOut.push_back(vk::Format::eD24UnormS8Uint);
+            break;
+
+        case Format::Float32_1:
+            formatsOut.push_back(vk::Format::eR32Sfloat);
+
+        case Format::Float32_2:
+            formatsOut.push_back(vk::Format::eR32G32Sfloat);
+            break;
+
+        case Format::Float32_3:
+            formatsOut.push_back(vk::Format::eR32G32B32Sfloat);
+            break;
+
+        case Format::Float32_4:
+            formatsOut.push_back(vk::Format::eR32G32B32A32Sfloat);
+            break;
+
+        case Format::Int32_1:
+            formatsOut.push_back(vk::Format::eR32Sint);
+            break;
+
+        case Format::Int32_2:
+            formatsOut.push_back(vk::Format::eR32G32Sint);
+            break;
+
+        case Format::Int32_3:
+            formatsOut.push_back(vk::Format::eR32G32B32Sint);
+            break;
+
+        case Format::Int32_4:
+            formatsOut.push_back(vk::Format::eR32G32B32A32Sint);
+            break;
+
+        case Format::Uint32_1:
+            formatsOut.push_back(vk::Format::eR32Uint);
+            break;
+
+        case Format::Uint32_2:
+            formatsOut.push_back(vk::Format::eR32G32Uint);
+            break;
+
+        case Format::Uint32_3:
+            formatsOut.push_back(vk::Format::eR32G32B32Uint);
+            break;
+
+        case Format::Uint32_4:
+            formatsOut.push_back(vk::Format::eR32G32B32A32Uint);
+            break;
+
+        case Format::Undefined:
+        default:
+            formatsOut.push_back(vk::Format::eUndefined);
+            break;
+        }
+    }
+    return formatsOut;
 }
 
 // ImageUsage
@@ -513,6 +651,151 @@ inline vk::PipelineStageFlagBits TranslateToVulkan(PipelineStage stage)
     default:
         return vk::PipelineStageFlagBits::eNone;
     }
+}
+
+inline vk::ShaderStageFlagBits TranslateToVulkan(ShaderStage stage)
+{
+    switch (stage)
+    {
+    case ShaderStage::Vertex:
+        return vk::ShaderStageFlagBits::eVertex;
+    case ShaderStage::Fragment:
+        return vk::ShaderStageFlagBits::eFragment;
+    case ShaderStage::Compute:
+        return vk::ShaderStageFlagBits::eCompute;
+    case ShaderStage::Geometry:
+        return vk::ShaderStageFlagBits::eGeometry;
+    case ShaderStage::Tesselation: // Tesselation not supported for now
+        spdlog::error("Unsupported shader stage: tessellation");
+        return static_cast<vk::ShaderStageFlagBits>(0);
+    default:
+        spdlog::error("Unknown shader stage");
+        return static_cast<vk::ShaderStageFlagBits>(0);
+    }
+}
+
+inline vk::VertexInputRate TranslateToVulkan(VertexInputRate rate)
+{
+    switch (rate)
+    {
+    case VertexInputRate::PerVertex:
+        return vk::VertexInputRate::eVertex;
+    case VertexInputRate::PerInstance:
+        return vk::VertexInputRate::eInstance;
+    default:
+        return vk::VertexInputRate::eVertex;
+    }
+}
+
+inline vk::DescriptorType TranslateToVulkan(const slang::BindingType bindingType, const SlangResourceShape shape)
+{
+    switch (bindingType)
+    {
+    case slang::BindingType::ConstantBuffer:
+    case slang::BindingType::ParameterBlock:
+        return vk::DescriptorType::eUniformBuffer;
+
+    case slang::BindingType::Sampler:
+        return vk::DescriptorType::eSampler;
+
+    case slang::BindingType::Texture:
+    {
+        switch (shape)
+        {
+        case SLANG_TEXTURE_1D:
+        case SLANG_TEXTURE_2D:
+        case SLANG_TEXTURE_3D:
+        case SLANG_TEXTURE_CUBE:
+        case SLANG_TEXTURE_1D_ARRAY:
+        case SLANG_TEXTURE_2D_ARRAY:
+        case SLANG_TEXTURE_CUBE_ARRAY:
+            return vk::DescriptorType::eSampledImage;
+
+        default:
+            return vk::DescriptorType::eSampledImage;
+        }
+    }
+
+    case slang::BindingType::CombinedTextureSampler:
+        return vk::DescriptorType::eCombinedImageSampler;
+
+    case slang::BindingType::MutableTexture:
+    case slang::BindingType::RawBuffer:
+    case slang::BindingType::TypedBuffer:
+    case slang::BindingType::MutableTypedBuffer:
+    case slang::BindingType::MutableRawBuffer:
+        return vk::DescriptorType::eStorageBuffer;
+
+    case slang::BindingType::RayTracingAccelerationStructure:
+        return vk::DescriptorType::eAccelerationStructureKHR;
+
+    default:
+        spdlog::error("Unsupported Slang binding type");
+        return vk::DescriptorType::eUniformBuffer;
+    }
+}
+
+inline vk::PrimitiveTopology TranslateToVulkan(PrimitiveTopology topology)
+{
+    switch (topology)
+    {
+    case PrimitiveTopology::TriangleList:
+        return vk::PrimitiveTopology::eTriangleList;
+
+    case PrimitiveTopology::TriangleStrip:
+        return vk::PrimitiveTopology::eTriangleStrip;
+
+    default:
+        return vk::PrimitiveTopology::eTriangleList;
+    }
+}
+
+inline std::vector<vk::DynamicState> TranslateToVulkan(const std::vector<DynamicState>& statesIn)
+{
+    std::vector<vk::DynamicState> statesOut;
+    statesOut.reserve(statesIn.size());
+
+    for (const auto& s : statesIn)
+    {
+        switch (s)
+        {
+        case DynamicState::ViewPort:
+            statesOut.push_back(vk::DynamicState::eViewport);
+            break;
+        case DynamicState::Scissor:
+            statesOut.push_back(vk::DynamicState::eScissor);
+            break;
+        }
+    }
+    return statesOut;
+}
+
+inline vk::FrontFace TranslateToVulkan(FrontFace face)
+{
+    switch (face)
+    {
+    case FrontFace::ClockWise:
+        return vk::FrontFace::eClockwise;
+    case FrontFace::CounterClockWise:
+        return vk::FrontFace::eCounterClockwise;
+    default:
+        return vk::FrontFace::eCounterClockwise;
+    }
+}
+
+inline vk::CullModeFlags TranslateToVulkan(CullMode mode)
+{
+    switch (mode)
+    {
+    case CullMode::Front:
+        return vk::CullModeFlagBits::eFront;
+    case CullMode::Back:
+        return vk::CullModeFlagBits::eBack;
+    default:
+        return vk::CullModeFlagBits::eNone;
+    }
+    
+    return vk::CullModeFlagBits::eNone; 
 }
 
 inline vk::AttachmentStoreOp TranslateToVulkan(StoreOp storeOp)

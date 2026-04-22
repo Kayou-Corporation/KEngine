@@ -54,7 +54,7 @@ class VulkanDevice : public Device
 {
 // Public
 public:
-    VulkanDevice() = default;
+    VulkanDevice();
     virtual ~VulkanDevice() override = default;
 
     //----------- Queue / Command --------------//
@@ -93,6 +93,12 @@ public:
     virtual std::vector<Core::RefCountPtr<Image>> CreatePresentationImages(Core::RefCountPtr<Swapchain> swapchain) override;
     virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) override;
     virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) override;
+
+    virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage) override;
+    virtual void DestroyShader(Core::RefCountPtr<Shader> shader) override;
+
+    virtual Core::RefCountPtr<Pipeline> CreatePipeline(const PipelineSpecs& specs) override;
+    virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) override;
 
 
 // Public vulkan

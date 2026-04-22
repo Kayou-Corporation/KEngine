@@ -6,6 +6,7 @@
 #include "Utils/Export.hpp"
 
 #include "Public/RHI.hpp"
+#include "Public/Shader.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -27,6 +28,9 @@ class Semaphore;
 struct SemaphoreSpecs;
 class Fence;
 struct SubmitInfo;
+
+class Pipeline;
+struct PipelineSpecs;
 
 struct DeviceSpecs
 {
@@ -89,6 +93,17 @@ public:
 	KENGINE_API virtual std::vector<Core::RefCountPtr<Image>> CreatePresentationImages(Core::RefCountPtr<Swapchain> swapchain) = 0;
 	KENGINE_API virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) = 0;
 	KENGINE_API virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) = 0; // Use classic Destroy
+
+	// -------------- Shader -------------- // 
+	KENGINE_API virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage) = 0;
+	KENGINE_API virtual void DestroyShader(Core::RefCountPtr<Shader> shader) = 0;
+
+	// -------------- Pipeline -------------- // 
+	KENGINE_API virtual Core::RefCountPtr<Pipeline> CreatePipeline(const PipelineSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) = 0;
+
+protected:
+	ShaderCompiler m_shaderCompiler;
 };
 
 END_NAMESPACE_RHI

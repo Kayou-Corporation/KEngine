@@ -161,6 +161,9 @@ int main()
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
 
+    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderStage::Vertex);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment);
+
     uint64_t frameCounter = 0;
     
     while (!window->ShouldClose())
@@ -239,8 +242,11 @@ int main()
     }
     
     device->WaitIdle();
-    device->ClearQueues();
+    //device->ClearQueues();
     //device->DestroyBuffer(testBuffer);
+
+    device->DestroyShader(unlitFrag);
+    device->DestroyShader(baseVert);
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
     {

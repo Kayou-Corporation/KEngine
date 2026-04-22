@@ -7,22 +7,62 @@
 #include <slang.h>
 #include <slang-com-ptr.h>
 #include <slang-com-helper.h>
+#include <iosfwd>
+#include <string>
+
+#include "Utils/Export.hpp"
+#include "Utils/Memory.hpp"
+#include "Utils/File.hpp"
 
 BEGIN_NAMESPACE_RHI
 
-struct ShaderBinary
+struct VertexAttributeLayout
 {
-    std::vector<uint8_t> spirv;
+    uint32_t location = 0;
+    uint32_t binding = 0;
+    uint32_t offset = 0;
+    Format format = Format::Float32_1;
+    std::string name = "";
+};
+
+struct VertexBindingLayout
+{
+    uint32_t binding = 0;
+    uint32_t stride = 0;
+    VertexInputRate inputRate = VertexInputRate::PerVertex;
+};
+
+struct Binding
+{
+    uint32_t index = -1;
+	slang::BindingType type = slang::BindingType::Unknown;
+	SlangResourceShape shape = SLANG_RESOURCE_UNKNOWN;
+    ShaderStage stage{};
+    uint32_t count = 0;
+    std::string name = "";
+};
+
+struct Descriptor
+{
+    uint32_t index = -1;
+    std::vector<Binding> bindings{};
+};
+
+struct ShaderData
+{
+    std::vector<uint8_t> spirv{};
 #if defined(_WIN32)
-    std::vector<uint8_t> dxil;
+    std::vector<uint8_t> dxil{};
 #endif
+    std::vector<Descriptor> descriptors{};
+    std::vector<VertexAttributeLayout> vertexAttributes{};
+    std::vector<VertexBindingLayout> vertexBindings{};
 };
 
 std::string GetShaderName(const std::string& path);
 
-inline std::string CacheShaderPath(const std::string& hash, const std::string& file, const char* ext)
+inline std::string CacheShaderPath(const std::string& hash, const std::string& name, const char* ext)
 {
-    std::string name = GetShaderName(file);
     return "Cache/Shaders/" + name + '.' + hash + ext;
 }
 
@@ -33,13 +73,134 @@ class ShaderCompiler
 public:
     void Initialize();
 
-    ShaderBinary Load(const std::string& file, const ShaderType& sType);
+    ShaderData Load(const std::string& file, const ShaderStage& stage) const;
 
 private:
-    ShaderBinary Compile(const std::string& file, const std::string& content, const std::string& entry);
+    ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage) const;
+    static ShaderData Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage);
+    static std::vector<VertexAttributeLayout> ReflectVertexInputs(slang::ProgramLayout* layout);
+
+    static inline Format GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout);
+    static inline uint32_t GetFormatSize(Format format);
+
+	void WriteReflectionData(std::ofstream& out, const ShaderData& bin) const;
+	void WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const;
+	void WriteVertexAttributes(std::ofstream& out, const std::vector<VertexAttributeLayout>& vertexAttributeLayouts) const;
+	void WriteVertexBindings(std::ofstream& out, const std::vector<VertexBindingLayout>& vertexBindingLayouts) const;
+
+	void ReadReflectionData(std::ifstream& in, ShaderData& bin) const;
+	std::vector<Descriptor> ReadDescriptors(std::ifstream& in) const;
+	std::vector<VertexAttributeLayout> ReadVertexAttributes(std::ifstream& in) const;
+	std::vector<VertexBindingLayout> ReadVertexBindings(std::ifstream& in) const;
+
+    template <typename T>
+    bool CheckIsFileOpenOrValid(T& file, const std::string& name) const;
 
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;
     Slang::ComPtr<slang::ISession> m_session;
 };
+
+class Shader : public virtual Core::IResource
+{
+public:
+	virtual ~Shader() = default;
+
+    virtual ShaderStage GetShaderStage() const { return m_type; }
+
+    virtual void SetShaderStage(const ShaderStage& type) { m_type = type; }
+    virtual void SetDescriptors(const std::vector<Descriptor>& descriptors) { m_descriptors = descriptors; }
+
+protected:
+    ShaderStage m_type{};
+	std::vector<Descriptor> m_descriptors{};
+};
+
+inline Format ShaderCompiler::GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout)
+{
+    if (!typeLayout)
+        return Format::Float32_1;
+
+    auto kind = typeLayout->getKind();
+    auto scalarType = typeLayout->getScalarType();
+
+    uint32_t elementCount = 1;
+    if (kind == slang::TypeReflection::Kind::Vector)
+    {
+        elementCount = static_cast<uint32_t>(typeLayout->getElementCount());
+    }
+
+    if (scalarType == slang::TypeReflection::ScalarType::Float32)
+    {
+        switch (elementCount)
+        {
+        case 1: return Format::Float32_1;
+        case 2: return Format::Float32_2;
+        case 3: return Format::Float32_3;
+        case 4: return Format::Float32_4;
+        default: return Format::Float32_1;
+        }
+    }
+    else if (scalarType == slang::TypeReflection::ScalarType::Int32)
+    {
+        switch (elementCount)
+        {
+        case 1: return Format::Int32_1;
+        case 2: return Format::Int32_2;
+        case 3: return Format::Int32_3;
+        case 4: return Format::Int32_4;
+        default: return Format::Int32_1;
+        }
+    }
+    else if (scalarType == slang::TypeReflection::ScalarType::UInt32)
+    {
+        switch (elementCount)
+        {
+        case 1: return Format::Uint32_1;
+        case 2: return Format::Uint32_2;
+        case 3: return Format::Uint32_3;
+        case 4: return Format::Uint32_4;
+        default: return Format::Uint32_1;
+        }
+    }
+
+    return Format::Float32_1;
+}
+
+inline uint32_t ShaderCompiler::GetFormatSize(Format format)
+{
+    switch (format)
+    {
+    case Format::Float32_1:
+    case Format::Int32_1:
+    case Format::Uint32_1:
+        return 4;
+    case Format::Float32_2:
+    case Format::Int32_2:
+    case Format::Uint32_2:
+        return 8;
+    case Format::Float32_3:
+    case Format::Int32_3:
+    case Format::Uint32_3:
+        return 12;
+    case Format::Float32_4:
+    case Format::Int32_4:
+    case Format::Uint32_4:
+        return 16;
+    default:
+        return 0;
+    }
+}
+
+template <typename T>
+bool ShaderCompiler::CheckIsFileOpenOrValid(T& file, const std::string& name) const
+{
+    static_assert((std::is_base_of<std::ifstream, T>::value || std::is_base_of<std::ofstream, T>::value || std::is_base_of<std::fstream, T>::value), "File object is not of right type. Right types are: std::ifstream, std::ofstream and std::fstream");
+
+    if (Core::IsFileOpenOrValid<T>(file))
+        return true;
+
+    spdlog::error("Failed to open shader file: {}", name);
+    return false;
+}
 
 END_NAMESPACE_RHI
