@@ -521,4 +521,14 @@ std::vector<VertexBindingLayout> ShaderCompiler::ReadVertexBindings(std::ifstrea
     return bindings;
 }
 
+Shader::~Shader()
+{
+    for (Descriptor desc : m_descriptors)
+        desc.bindings.clear();
+
+    m_descriptors.clear();
+    m_vertexAttributes.clear();
+    m_vertexBindings.clear();
+}
+
 END_NAMESPACE_RHI

@@ -103,16 +103,23 @@ private:
 class Shader : public virtual Core::IResource
 {
 public:
-	virtual ~Shader() = default;
+    virtual ~Shader();
 
     virtual ShaderStage GetShaderStage() const { return m_type; }
+    virtual const std::vector<Descriptor>& GetDescriptors() const { return m_descriptors; }
+    virtual const std::vector<VertexAttributeLayout>& GetVertexAttributes() const { return m_vertexAttributes; }
+    virtual const std::vector<VertexBindingLayout>& GetVertexBindings() const { return m_vertexBindings; }
 
     virtual void SetShaderStage(const ShaderStage& type) { m_type = type; }
     virtual void SetDescriptors(const std::vector<Descriptor>& descriptors) { m_descriptors = descriptors; }
+    virtual void SetVertexAttributes(const std::vector<VertexAttributeLayout>& vertexAttributes) { m_vertexAttributes = vertexAttributes; }
+    virtual void SetVertexBindings(const std::vector<VertexBindingLayout>& vertexBindings) { m_vertexBindings = vertexBindings; }
 
 protected:
     ShaderStage m_type{};
 	std::vector<Descriptor> m_descriptors{};
+    std::vector<VertexAttributeLayout> m_vertexAttributes{};
+    std::vector<VertexBindingLayout> m_vertexBindings{};
 };
 
 inline Format ShaderCompiler::GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout)
