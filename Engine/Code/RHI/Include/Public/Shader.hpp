@@ -21,7 +21,7 @@ struct VertexAttributeLayout
     uint32_t location = 0;
     uint32_t binding = 0;
     uint32_t offset = 0;
-    Format format = Format::Float32_1;
+    ShaderDataType format = ShaderDataType::Float32_1;
     std::string name = "";
 };
 
@@ -80,8 +80,8 @@ private:
     static ShaderData Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage);
     static std::vector<VertexAttributeLayout> ReflectVertexInputs(slang::ProgramLayout* layout);
 
-    static inline Format GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout);
-    static inline uint32_t GetFormatSize(Format format);
+    static inline ShaderDataType GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout);
+    static inline uint32_t GetFormatSize(ShaderDataType format);
 
 	void WriteReflectionData(std::ofstream& out, const ShaderData& bin) const;
 	void WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const;
@@ -122,10 +122,10 @@ protected:
     std::vector<VertexBindingLayout> m_vertexBindings{};
 };
 
-inline Format ShaderCompiler::GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout)
+inline ShaderDataType ShaderCompiler::GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout)
 {
     if (!typeLayout)
-        return Format::Float32_1;
+        return ShaderDataType::Float32_1;
 
     auto kind = typeLayout->getKind();
     auto scalarType = typeLayout->getScalarType();
@@ -140,58 +140,58 @@ inline Format ShaderCompiler::GetFormatFromSlangType(slang::TypeLayoutReflection
     {
         switch (elementCount)
         {
-        case 1: return Format::Float32_1;
-        case 2: return Format::Float32_2;
-        case 3: return Format::Float32_3;
-        case 4: return Format::Float32_4;
-        default: return Format::Float32_1;
+        case 1: return ShaderDataType::Float32_1;
+        case 2: return ShaderDataType::Float32_2;
+        case 3: return ShaderDataType::Float32_3;
+        case 4: return ShaderDataType::Float32_4;
+        default: return ShaderDataType::Float32_1;
         }
     }
     else if (scalarType == slang::TypeReflection::ScalarType::Int32)
     {
         switch (elementCount)
         {
-        case 1: return Format::Int32_1;
-        case 2: return Format::Int32_2;
-        case 3: return Format::Int32_3;
-        case 4: return Format::Int32_4;
-        default: return Format::Int32_1;
+        case 1: return ShaderDataType::Int32_1;
+        case 2: return ShaderDataType::Int32_2;
+        case 3: return ShaderDataType::Int32_3;
+        case 4: return ShaderDataType::Int32_4;
+        default: return ShaderDataType::Int32_1;
         }
     }
     else if (scalarType == slang::TypeReflection::ScalarType::UInt32)
     {
         switch (elementCount)
         {
-        case 1: return Format::Uint32_1;
-        case 2: return Format::Uint32_2;
-        case 3: return Format::Uint32_3;
-        case 4: return Format::Uint32_4;
-        default: return Format::Uint32_1;
+        case 1: return ShaderDataType::Uint32_1;
+        case 2: return ShaderDataType::Uint32_2;
+        case 3: return ShaderDataType::Uint32_3;
+        case 4: return ShaderDataType::Uint32_4;
+        default: return ShaderDataType::Uint32_1;
         }
     }
 
-    return Format::Float32_1;
+    return ShaderDataType::Float32_1;
 }
 
-inline uint32_t ShaderCompiler::GetFormatSize(Format format)
+inline uint32_t ShaderCompiler::GetFormatSize(ShaderDataType type)
 {
-    switch (format)
+    switch (type)
     {
-    case Format::Float32_1:
-    case Format::Int32_1:
-    case Format::Uint32_1:
+    case ShaderDataType::Float32_1:
+    case ShaderDataType::Int32_1:
+    case ShaderDataType::Uint32_1:
         return 4;
-    case Format::Float32_2:
-    case Format::Int32_2:
-    case Format::Uint32_2:
+    case ShaderDataType::Float32_2:
+    case ShaderDataType::Int32_2:
+    case ShaderDataType::Uint32_2:
         return 8;
-    case Format::Float32_3:
-    case Format::Int32_3:
-    case Format::Uint32_3:
+    case ShaderDataType::Float32_3:
+    case ShaderDataType::Int32_3:
+    case ShaderDataType::Uint32_3:
         return 12;
-    case Format::Float32_4:
-    case Format::Int32_4:
-    case Format::Uint32_4:
+    case ShaderDataType::Float32_4:
+    case ShaderDataType::Int32_4:
+    case ShaderDataType::Uint32_4:
         return 16;
     default:
         return 0;

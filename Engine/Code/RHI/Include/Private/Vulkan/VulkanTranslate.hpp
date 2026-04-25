@@ -193,42 +193,6 @@ inline vk::Format TranslateToVulkan(Format format)
     case Format::D24_UNORM_S8_UINT:
         return vk::Format::eD24UnormS8Uint;
 
-    case Format::Float32_1:
-        return vk::Format::eR32Sfloat;
-
-    case Format::Float32_2:
-        return vk::Format::eR32G32Sfloat;
-
-    case Format::Float32_3:
-        return vk::Format::eR32G32B32Sfloat;
-
-    case Format::Float32_4:
-        return vk::Format::eR32G32B32A32Sfloat;
-
-    case Format::Int32_1:
-        return vk::Format::eR32Sint;
-
-    case Format::Int32_2:
-        return vk::Format::eR32G32Sint;
-
-    case Format::Int32_3:
-        return vk::Format::eR32G32B32Sint;
-
-    case Format::Int32_4:
-        return vk::Format::eR32G32B32A32Sint;
-
-    case Format::Uint32_1:
-        return vk::Format::eR32Uint;
-
-    case Format::Uint32_2:
-        return vk::Format::eR32G32Uint;
-
-    case Format::Uint32_3:
-        return vk::Format::eR32G32B32Uint;
-
-    case Format::Uint32_4:
-        return vk::Format::eR32G32B32A32Uint;
-
     case Format::Undefined:
     default:
         return vk::Format::eUndefined;
@@ -276,53 +240,6 @@ inline std::vector<vk::Format> TranslateToVulkan(const std::vector<Format>& form
             formatsOut.push_back(vk::Format::eD24UnormS8Uint);
             break;
 
-        case Format::Float32_1:
-            formatsOut.push_back(vk::Format::eR32Sfloat);
-
-        case Format::Float32_2:
-            formatsOut.push_back(vk::Format::eR32G32Sfloat);
-            break;
-
-        case Format::Float32_3:
-            formatsOut.push_back(vk::Format::eR32G32B32Sfloat);
-            break;
-
-        case Format::Float32_4:
-            formatsOut.push_back(vk::Format::eR32G32B32A32Sfloat);
-            break;
-
-        case Format::Int32_1:
-            formatsOut.push_back(vk::Format::eR32Sint);
-            break;
-
-        case Format::Int32_2:
-            formatsOut.push_back(vk::Format::eR32G32Sint);
-            break;
-
-        case Format::Int32_3:
-            formatsOut.push_back(vk::Format::eR32G32B32Sint);
-            break;
-
-        case Format::Int32_4:
-            formatsOut.push_back(vk::Format::eR32G32B32A32Sint);
-            break;
-
-        case Format::Uint32_1:
-            formatsOut.push_back(vk::Format::eR32Uint);
-            break;
-
-        case Format::Uint32_2:
-            formatsOut.push_back(vk::Format::eR32G32Uint);
-            break;
-
-        case Format::Uint32_3:
-            formatsOut.push_back(vk::Format::eR32G32B32Uint);
-            break;
-
-        case Format::Uint32_4:
-            formatsOut.push_back(vk::Format::eR32G32B32A32Uint);
-            break;
-
         case Format::Undefined:
         default:
             formatsOut.push_back(vk::Format::eUndefined);
@@ -330,6 +247,52 @@ inline std::vector<vk::Format> TranslateToVulkan(const std::vector<Format>& form
         }
     }
     return formatsOut;
+}
+
+inline vk::Format TranslateToVulkan(ShaderDataType type)
+{
+    switch (type)
+    {
+    case ShaderDataType::Float32_1:
+        return vk::Format::eR32Sfloat;
+
+    case ShaderDataType::Float32_2:
+        return vk::Format::eR32G32Sfloat;
+
+    case ShaderDataType::Float32_3:
+        return vk::Format::eR32G32B32Sfloat;
+
+    case ShaderDataType::Float32_4:
+        return vk::Format::eR32G32B32A32Sfloat;
+
+    case ShaderDataType::Int32_1:
+        return vk::Format::eR32Sint;
+
+    case ShaderDataType::Int32_2:
+        return vk::Format::eR32G32Sint;
+
+    case ShaderDataType::Int32_3:
+        return vk::Format::eR32G32B32Sint;
+
+    case ShaderDataType::Int32_4:
+        return vk::Format::eR32G32B32A32Sint;
+
+    case ShaderDataType::Uint32_1:
+        return vk::Format::eR32Uint;
+
+    case ShaderDataType::Uint32_2:
+        return vk::Format::eR32G32Uint;
+
+    case ShaderDataType::Uint32_3:
+        return vk::Format::eR32G32B32Uint;
+
+    case ShaderDataType::Uint32_4:
+        return vk::Format::eR32G32B32A32Uint;
+
+    case ShaderDataType::Undefined:
+    default:
+        return vk::Format::eUndefined;
+    }
 }
 
 // ImageUsage

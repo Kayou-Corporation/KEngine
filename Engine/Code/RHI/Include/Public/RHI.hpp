@@ -79,6 +79,11 @@ enum class Format
 	D32_SFLOAT_S8_UINT, // Some basic depth formats
 	D24_UNORM_S8_UINT,  // 
 
+	Undefined
+};
+
+enum class ShaderDataType
+{
 	Float32_1,     // float
 	Float32_2,     // vec2
 	Float32_3,     // vec3
