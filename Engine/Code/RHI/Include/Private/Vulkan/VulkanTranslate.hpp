@@ -794,4 +794,49 @@ inline vk::AttachmentLoadOp TranslateToVulkan(LoadOp storeOp)
     }
 }
 
+inline vk::DescriptorType TranslateToVulkan(slang::BindingType bindingType)
+{
+    switch (bindingType)
+    {
+    case slang::BindingType::Sampler:
+        return vk::DescriptorType::eSampler;
+
+    case slang::BindingType::Texture:
+        return vk::DescriptorType::eSampledImage;
+
+    case slang::BindingType::CombinedTextureSampler:
+        return vk::DescriptorType::eCombinedImageSampler;
+
+    case slang::BindingType::ConstantBuffer:
+    case slang::BindingType::ParameterBlock:
+        return vk::DescriptorType::eUniformBuffer;
+
+    case slang::BindingType::RawBuffer:
+    case slang::BindingType::TypedBuffer:
+        return vk::DescriptorType::eStorageBuffer;
+
+    case slang::BindingType::MutableTexture:
+        return vk::DescriptorType::eStorageImage;
+
+    case slang::BindingType::MutableRawBuffer:
+    case slang::BindingType::MutableTypedBuffer:
+        return vk::DescriptorType::eStorageBuffer;
+
+    case slang::BindingType::InputRenderTarget:
+        return vk::DescriptorType::eInputAttachment;
+
+    case slang::BindingType::InlineUniformData:
+        return vk::DescriptorType::eInlineUniformBlockEXT;
+
+    case slang::BindingType::RayTracingAccelerationStructure:
+        return vk::DescriptorType::eAccelerationStructureKHR;
+
+    case slang::BindingType::PushConstant:
+    case slang::BindingType::VaryingInput:
+    case slang::BindingType::VaryingOutput:
+    default:
+        return vk::DescriptorType::eSampler;
+    }
+}
+
 END_NAMESPACE_RHI

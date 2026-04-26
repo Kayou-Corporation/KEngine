@@ -531,4 +531,20 @@ Shader::~Shader()
     m_vertexBindings.clear();
 }
 
+const VertexAttributeLayout Shader::GetVertexAttributeLayout(const std::string name) const
+{
+    for (const VertexAttributeLayout& Attribute : m_vertexAttributes)
+    {
+        if (Attribute.name == name)
+        {
+            return Attribute;
+        }
+    }
+
+    VertexAttributeLayout fallback;
+    fallback.name = "Empty";
+
+    return fallback;
+}
+
 END_NAMESPACE_RHI

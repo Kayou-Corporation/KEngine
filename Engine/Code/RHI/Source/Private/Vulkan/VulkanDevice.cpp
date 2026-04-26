@@ -475,6 +475,30 @@ Core::RefCountPtr<Pipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& RH
 
 	if (RHISpecs.type == PipelineType::Graphics)
 	{
+		std::vector<Descriptor> RHIDescriptors;
+		for (const auto& RHIShader : RHISpecs.shaders)
+		{
+			Core::RefCountPtr<VulkanShader> RHIVulkanShader = RHIShader.CastAs<VulkanShader>();
+
+			std::vector<Descriptor> localRHIDescriptor = RHIVulkanShader->GetDescriptors();
+			RHIDescriptors.insert(RHIDescriptors.end(), localRHIDescriptor.begin(), localRHIDescriptor.end());
+		}
+		std::sort(RHIDescriptors.begin(), RHIDescriptors.end());
+		RHIDescriptors.erase(std::unique(RHIDescriptors.begin(), RHIDescriptors.end()), RHIDescriptors.end());
+
+		std::vector<vk::DescriptorSetLayoutCreateInfo> descriptorsCreateInfos = RHIVulkanPipeline->GetDescriptorSetLayoutCreateInfo(RHIDescriptors);
+
+		for (const vk::DescriptorSetLayoutCreateInfo& DescriptorSetCreateInfo : descriptorsCreateInfos)
+		{
+			vk::DescriptorSetLayout descriptor;
+			descriptor = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(DescriptorSetCreateInfo), "Failed to create descriptor set layouyt");
+			RHIVulkanPipeline->AddDescriptor(descriptor);
+		}
+
+		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = RHIVulkanPipeline->GetPipelineLayoutCreateInfo();
+		vk::PipelineLayout layout = VK_CHECK_RESULT(m_handle.createPipelineLayout(pipelineLayoutCreateInfo), "Failed to create layout");
+		RHIVulkanPipeline->SetLayout(layout);
+
 		vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
 		vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
 		RHIVulkanPipeline->SetHandle(pipeline);

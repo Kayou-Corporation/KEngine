@@ -23,6 +23,40 @@ struct VertexAttributeLayout
     uint32_t offset = 0;
     ShaderDataType format = ShaderDataType::Float32_1;
     std::string name = "";
+
+    bool operator==(const VertexAttributeLayout& other) const
+    {
+        if (name != other.name)
+            return false;
+
+        if (location != other.location)
+            return false;
+
+        if (binding != other.binding)
+            return false;
+
+        if (offset != other.offset)
+            return false;
+
+        if (format != other.format)
+            return false;
+
+        return true;
+    }
+
+    bool operator<(const VertexAttributeLayout& other) const 
+    {
+        if (location != other.location) 
+            return location < other.location;
+
+        if (binding != other.binding) 
+            return binding < other.binding;
+
+        if (offset != other.offset) 
+            return offset < other.offset;
+
+        return name < other.name;
+    }
 };
 
 struct VertexBindingLayout
@@ -30,6 +64,24 @@ struct VertexBindingLayout
     uint32_t binding = 0;
     uint32_t stride = 0;
     VertexInputRate inputRate = VertexInputRate::PerVertex;
+
+    bool operator==(const VertexBindingLayout& other) const 
+    {
+        return binding == other.binding &&
+            stride == other.stride &&
+            inputRate == other.inputRate;
+    }
+
+    bool operator<(const VertexBindingLayout& other) const 
+    {
+        if (binding != other.binding) 
+            return binding < other.binding;
+
+        if (stride != other.stride) 
+            return stride < other.stride;
+
+        return static_cast<int>(inputRate) < static_cast<int>(other.inputRate);
+    }
 };
 
 struct Binding
@@ -46,6 +98,16 @@ struct Descriptor
 {
     uint32_t index = -1;
     std::vector<Binding> bindings{};
+
+    bool operator==(const Descriptor& other) const
+    {
+        return index == other.index;
+    }
+
+    bool operator<(const Descriptor& other) const
+    {
+        return index < other.index;
+    }
 };
 
 struct ShaderData
@@ -109,6 +171,8 @@ public:
     virtual const std::vector<Descriptor>& GetDescriptors() const { return m_descriptors; }
     virtual const std::vector<VertexAttributeLayout>& GetVertexAttributes() const { return m_vertexAttributes; }
     virtual const std::vector<VertexBindingLayout>& GetVertexBindings() const { return m_vertexBindings; }
+
+    virtual const VertexAttributeLayout GetVertexAttributeLayout(const std::string name) const;
 
     virtual void SetShaderStage(const ShaderStage& type) { m_type = type; }
     virtual void SetDescriptors(const std::vector<Descriptor>& descriptors) { m_descriptors = descriptors; }

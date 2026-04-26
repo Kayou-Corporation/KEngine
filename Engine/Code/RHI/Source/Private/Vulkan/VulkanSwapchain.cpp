@@ -1,5 +1,6 @@
 #include "Private/Vulkan/VulkanSwapchain.hpp"
 #include "Private/Vulkan/VulkanDevice.hpp"
+#include "Private/Vulkan/RHITranslate.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -68,6 +69,9 @@ vk::SwapchainCreateInfoKHR VulkanSwapchain::GetCreateInfo(const PhysicalDeviceCo
 	m_bIsDepthEnable = bIsDepthEnable;
 	m_depthImageFormat = requestedDepthFormat;
 	m_imageExtent = extent;
+
+	m_RHIcolorFormat = TranslateFromVulkan(m_colorImageFormat);
+	m_RHIdepthFormat = TranslateFromVulkan(m_depthImageFormat);
 
 	return createInfo;
 }
