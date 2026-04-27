@@ -492,7 +492,7 @@ Core::RefCountPtr<Pipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& RH
 		std::vector<Descriptor> RHIDescriptors;
 		for (size_t i = 0; i < recordedSets.size(); ++i)
 		{
-			uint32_t setIndex = i;
+			uint32_t setIndex = recordedSets[i];
 			Descriptor RHIDescriptor{};
 			RHIDescriptor.index = setIndex;
 
