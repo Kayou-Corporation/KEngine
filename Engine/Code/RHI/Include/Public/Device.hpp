@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 #include "Utils/Memory.hpp"
 #include "Utils/Export.hpp"
@@ -104,6 +105,7 @@ public:
 
 protected:
 	ShaderCompiler m_shaderCompiler;
+	std::unordered_map<std::string, Core::RefCountPtr<Shader>> m_compiledShaders{};
 };
 
 END_NAMESPACE_RHI
