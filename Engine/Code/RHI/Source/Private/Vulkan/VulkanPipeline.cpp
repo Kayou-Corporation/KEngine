@@ -4,15 +4,9 @@
 
 BEGIN_NAMESPACE_RHI
 
-vk::GraphicsPipelineCreateInfo VulkanPipeline::GetGraphicsCreateInfo(const PipelineSpecs& specs)
+VulkanGraphicsPipelineSpecs VulkanPipeline::GetGraphicsCreateInfo(const PipelineSpecs& specs)
 {
-	vk::GraphicsPipelineCreateInfo createInfo{};
-
-	std::vector<vk::Format> colorAttachmentFormats = TranslateToVulkan(specs.colorAttachmentFormats);
-	vk::PipelineRenderingCreateInfo renderingInfo{};
-	renderingInfo.colorAttachmentCount = specs.colorAttachmentCount;
-	renderingInfo.pColorAttachmentFormats = colorAttachmentFormats.data();
-	renderingInfo.depthAttachmentFormat = TranslateToVulkan(specs.depthAttachment);
+	VulkanGraphicsPipelineSpecs createInfo{};
 
 	std::vector<vk::PipelineShaderStageCreateInfo> shaderStageInfos{};
 	shaderStageInfos.reserve(specs.shaders.size());
@@ -23,12 +17,11 @@ vk::GraphicsPipelineCreateInfo VulkanPipeline::GetGraphicsCreateInfo(const Pipel
 	{
 		Core::RefCountPtr<VulkanShader> RHIVulkanShader = RHIShader.CastAs<VulkanShader>();
 		ShaderStage stage = RHIShader->GetShaderStage();
-		const char* entryName = ShaderStageToEntry(stage);
 
 		vk::PipelineShaderStageCreateInfo shaderStageCreateInfo{};
 		shaderStageCreateInfo.stage = TranslateToVulkan(stage);
 		shaderStageCreateInfo.module = RHIVulkanShader->GetModule();
-		shaderStageCreateInfo.pName = entryName;
+		shaderStageCreateInfo.pName = "main";
 
 		shaderStageInfos.push_back(shaderStageCreateInfo);
 
@@ -74,15 +67,6 @@ vk::GraphicsPipelineCreateInfo VulkanPipeline::GetGraphicsCreateInfo(const Pipel
 		}
 	}
 
-	// Descriptors : 
-
-	// TODO : Probably should deduce with shaders, for now empty
-	vk::PipelineVertexInputStateCreateInfo vertexInputInfo{};
-	vertexInputInfo.vertexBindingDescriptionCount = bindingDescriptions.size();
-	vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
-	vertexInputInfo.vertexAttributeDescriptionCount = AttributeDescriptions.size();
-	vertexInputInfo.pVertexAttributeDescriptions = AttributeDescriptions.data();
-
 	vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
 	inputAssemblyInfo.topology = TranslateToVulkan(specs.topology);
 
@@ -111,23 +95,55 @@ vk::GraphicsPipelineCreateInfo VulkanPipeline::GetGraphicsCreateInfo(const Pipel
 	colorBlendingInfo.pAttachments = &colorBlendAttachment;
 
 	std::vector<vk::DynamicState> dynamicStates = TranslateToVulkan(specs.dynamicStates);
-	vk::PipelineDynamicStateCreateInfo dynamicStateInfo{};
-	dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
-	dynamicStateInfo.pDynamicStates = dynamicStates.data();
+	std::vector<vk::Format> colorAttachmentFormats = TranslateToVulkan(specs.colorAttachmentFormats);
 
-	createInfo.pNext = &renderingInfo;
-	createInfo.stageCount = shaderStageInfos.size();
-	createInfo.pStages = shaderStageInfos.data();
-	createInfo.pVertexInputState = &vertexInputInfo;
-	createInfo.pInputAssemblyState = &inputAssemblyInfo;
-	createInfo.pViewportState = &viewportStateInfo;
-	createInfo.pRasterizationState = &rasterizationInfo;
-	createInfo.pMultisampleState = &multisamplingInfo;
-	createInfo.pColorBlendState = &colorBlendingInfo;
-	createInfo.pDynamicState = &dynamicStateInfo;
+	createInfo.colorAttachmentCount = specs.colorAttachmentCount;
+	createInfo.colorAttachmentFormats = colorAttachmentFormats;
+	createInfo.depthAttachment = TranslateToVulkan(specs.depthAttachment);
+	createInfo.stages = shaderStageInfos;
+	createInfo.vertexInputBindingDescriptions = bindingDescriptions;
+	createInfo.vertexInputAttributeDescriptions = AttributeDescriptions;
+	createInfo.inputAssemblyState = inputAssemblyInfo;
+	createInfo.viewportState = viewportStateInfo;
+	createInfo.rasterizationState = rasterizationInfo;
+	createInfo.multisampleState = multisamplingInfo;
+	createInfo.colorBlendState = colorBlendingInfo;
+	createInfo.dynamicStates = dynamicStates;
 	createInfo.layout = m_layout;
 	createInfo.renderPass = nullptr; // Always null for now
 
+
+	return createInfo;
+}
+
+vk::GraphicsPipelineCreateInfo VulkanPipeline::GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs)
+{
+	vk::GraphicsPipelineCreateInfo createInfo{};
+
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.vertexBindingDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.size();
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.pVertexBindingDescriptions = vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.data();
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.vertexAttributeDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.size();
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.pVertexAttributeDescriptions = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.data();
+
+	vulkanGraphicsPipelineSpecs.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.dynamicStates.size());
+	vulkanGraphicsPipelineSpecs.dynamicStateInfo.pDynamicStates = vulkanGraphicsPipelineSpecs.dynamicStates.data();
+
+	vulkanGraphicsPipelineSpecs.renderingInfo.colorAttachmentCount = vulkanGraphicsPipelineSpecs.colorAttachmentCount;
+	vulkanGraphicsPipelineSpecs.renderingInfo.pColorAttachmentFormats = vulkanGraphicsPipelineSpecs.colorAttachmentFormats.data();
+	vulkanGraphicsPipelineSpecs.renderingInfo.depthAttachmentFormat = vulkanGraphicsPipelineSpecs.depthAttachment;
+
+	createInfo.pNext = &vulkanGraphicsPipelineSpecs.renderingInfo;
+	createInfo.stageCount = vulkanGraphicsPipelineSpecs.stages.size();
+	createInfo.pStages = vulkanGraphicsPipelineSpecs.stages.data();
+	createInfo.pVertexInputState = &vulkanGraphicsPipelineSpecs.vertexInputInfo;
+	createInfo.pInputAssemblyState = &vulkanGraphicsPipelineSpecs.inputAssemblyState;
+	createInfo.pViewportState = &vulkanGraphicsPipelineSpecs.viewportState;
+	createInfo.pRasterizationState = &vulkanGraphicsPipelineSpecs.rasterizationState;
+	createInfo.pMultisampleState = &vulkanGraphicsPipelineSpecs.multisampleState;
+	createInfo.pColorBlendState = &vulkanGraphicsPipelineSpecs.colorBlendState;
+	createInfo.pDynamicState = &vulkanGraphicsPipelineSpecs.dynamicStateInfo;
+	createInfo.layout = vulkanGraphicsPipelineSpecs.layout;
+	createInfo.renderPass = vulkanGraphicsPipelineSpecs.renderPass;
 
 	return createInfo;
 }
@@ -180,13 +196,13 @@ vk::VertexInputAttributeDescription VulkanPipeline::GetAttributeDescriptor(const
 	return attributeDescription;
 }
 
-std::vector<vk::DescriptorSetLayoutCreateInfo> VulkanPipeline::GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors)
+std::vector<VulkanDescriptorSetLayoutSpecs> VulkanPipeline::GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors)
 {
-	std::vector<vk::DescriptorSetLayoutCreateInfo> layoutsInfo{};
-	layoutsInfo.reserve(RHIDescriptors.size());
+	std::vector<VulkanDescriptorSetLayoutSpecs> layoutsSpecs{};
+	layoutsSpecs.reserve(RHIDescriptors.size());
 	for (const Descriptor& RHIDescriptor : RHIDescriptors)
 	{
-		vk::DescriptorSetLayoutCreateInfo layoutInfo{};
+		VulkanDescriptorSetLayoutSpecs layoutSpec{};
 		std::vector<vk::DescriptorSetLayoutBinding> bindings;
 		for (const Binding& RHIBinding : RHIDescriptor.bindings)
 		{
@@ -196,11 +212,26 @@ std::vector<vk::DescriptorSetLayoutCreateInfo> VulkanPipeline::GetDescriptorSetL
 			binding.descriptorCount = RHIBinding.count;
 			binding.stageFlags = TranslateToVulkan(RHIBinding.stage);
 
-			bindings.push_back(binding);
+			layoutSpec.bindings.push_back(binding);
 		}
 
-		layoutInfo.bindingCount = bindings.size();
-		layoutInfo.pBindings = bindings.data();
+		layoutsSpecs.push_back(layoutSpec);
+	}
+
+	return layoutsSpecs;
+}
+
+std::vector<vk::DescriptorSetLayoutCreateInfo> VulkanPipeline::GetVulkanDescriptorSetLayoutCreateInfo(std::vector<VulkanDescriptorSetLayoutSpecs>& RHIVulkanDescriptorSetLayoutSpecs)
+{
+	std::vector<vk::DescriptorSetLayoutCreateInfo> layoutsInfo{};
+
+	for (const auto& layoutSpec : RHIVulkanDescriptorSetLayoutSpecs)
+	{
+		vk::DescriptorSetLayoutCreateInfo layoutInfo{};
+		layoutInfo.bindingCount = layoutSpec.bindings.size();
+		layoutInfo.pBindings = layoutSpec.bindings.data();
+
+		layoutsInfo.push_back(layoutInfo);
 	}
 
 	return layoutsInfo;
