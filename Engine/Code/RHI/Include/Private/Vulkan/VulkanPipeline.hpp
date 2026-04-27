@@ -20,7 +20,7 @@ struct VulkanGraphicsPipelineSpecs
 	vk::PipelineRasterizationStateCreateInfo rasterizationState{};
 	vk::PipelineMultisampleStateCreateInfo multisampleState{};
 	vk::PipelineColorBlendStateCreateInfo colorBlendState{};
-	vk::PipelineDynamicStateCreateInfo dynamicState{};
+	std::vector<vk::DynamicState> dynamicStates{};
 	vk::PipelineLayout layout{};
 	vk::RenderPass renderPass{};
 };

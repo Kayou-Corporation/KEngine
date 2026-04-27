@@ -95,9 +95,6 @@ VulkanGraphicsPipelineSpecs VulkanPipeline::GetGraphicsCreateInfo(const Pipeline
 	colorBlendingInfo.pAttachments = &colorBlendAttachment;
 
 	std::vector<vk::DynamicState> dynamicStates = TranslateToVulkan(specs.dynamicStates);
-	vk::PipelineDynamicStateCreateInfo dynamicStateInfo{};
-	dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
-	dynamicStateInfo.pDynamicStates = dynamicStates.data();
 
 	createInfo.colorAttachmentCount = specs.colorAttachmentCount;
 	createInfo.colorAttachmentFormats = TranslateToVulkan(specs.colorAttachmentFormats);
@@ -110,7 +107,7 @@ VulkanGraphicsPipelineSpecs VulkanPipeline::GetGraphicsCreateInfo(const Pipeline
 	createInfo.rasterizationState = rasterizationInfo;
 	createInfo.multisampleState = multisamplingInfo;
 	createInfo.colorBlendState = colorBlendingInfo;
-	createInfo.dynamicState = dynamicStateInfo;
+	createInfo.dynamicStates = dynamicStates;
 	createInfo.layout = m_layout;
 	createInfo.renderPass = nullptr; // Always null for now
 
@@ -133,6 +130,10 @@ vk::GraphicsPipelineCreateInfo VulkanPipeline::GetVulkanGraphicsCreateInfo(const
 	vertexInputInfo.vertexAttributeDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.size();
 	vertexInputInfo.pVertexAttributeDescriptions = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.data();
 
+	vk::PipelineDynamicStateCreateInfo dynamicStateInfo{};
+	dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.dynamicStates.size());
+	dynamicStateInfo.pDynamicStates = vulkanGraphicsPipelineSpecs.dynamicStates.data();
+
 	createInfo.pNext = &renderingInfo;
 	createInfo.stageCount = vulkanGraphicsPipelineSpecs.stages.size();
 	createInfo.pStages = vulkanGraphicsPipelineSpecs.stages.data();
@@ -142,7 +143,7 @@ vk::GraphicsPipelineCreateInfo VulkanPipeline::GetVulkanGraphicsCreateInfo(const
 	createInfo.pRasterizationState = &vulkanGraphicsPipelineSpecs.rasterizationState;
 	createInfo.pMultisampleState = &vulkanGraphicsPipelineSpecs.multisampleState;
 	createInfo.pColorBlendState = &vulkanGraphicsPipelineSpecs.colorBlendState;
-	createInfo.pDynamicState = &vulkanGraphicsPipelineSpecs.dynamicState;
+	createInfo.pDynamicState = &dynamicStateInfo;
 	createInfo.layout = vulkanGraphicsPipelineSpecs.layout;
 	createInfo.renderPass = vulkanGraphicsPipelineSpecs.renderPass;
 
