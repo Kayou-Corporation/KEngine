@@ -548,6 +548,13 @@ void VulkanDevice::DestroyPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
 	vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();
 
 	m_handle.destroyPipeline(pipeline);
+
+	vk::PipelineLayout pipelineLayout = RHIVulkanPipeline->GetLayout();
+	m_handle.destroyPipelineLayout(pipelineLayout);
+
+	std::vector<vk::DescriptorSetLayout> descriptorSetLayouts = RHIVulkanPipeline->GetDescriptors();
+	for (const auto& descriptorSetLayout : descriptorSetLayouts)
+		m_handle.destroyDescriptorSetLayout(descriptorSetLayout);
 }
 
 // Public Vulkan:

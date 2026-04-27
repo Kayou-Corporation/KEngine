@@ -23,6 +23,12 @@ struct VulkanGraphicsPipelineSpecs
 	std::vector<vk::DynamicState> dynamicStates{};
 	vk::PipelineLayout layout{};
 	vk::RenderPass renderPass{};
+
+	// Do not manually set the members below
+
+	vk::PipelineRenderingCreateInfo renderingInfo{}; // Do not manually set
+	vk::PipelineVertexInputStateCreateInfo vertexInputInfo{}; // Do not manually set
+	vk::PipelineDynamicStateCreateInfo dynamicStateInfo{}; // Do not manually set
 };
 
 struct VulkanDescriptorSetLayoutSpecs
@@ -38,7 +44,7 @@ public:
 
 public:
 	VulkanGraphicsPipelineSpecs GetGraphicsCreateInfo(const PipelineSpecs& specs);
-	vk::GraphicsPipelineCreateInfo GetVulkanGraphicsCreateInfo(const VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs);
+	vk::GraphicsPipelineCreateInfo GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs);
 	vk::ComputePipelineCreateInfo GetComputeCreateInfo(const PipelineSpecs& specs);
 
 	vk::PipelineLayoutCreateInfo GetPipelineLayoutCreateInfo();
@@ -49,7 +55,7 @@ public:
 	vk::VertexInputAttributeDescription GetAttributeDescriptor(const VertexAttributeLayout& RHiAttributeLayout);
 
 	vk::Pipeline GetHandle() const { return m_handle; }
-	vk::PipelineLayout Getlayout() const { return m_layout; }
+	vk::PipelineLayout GetLayout() const { return m_layout; }
 	std::vector<vk::DescriptorSetLayout> GetDescriptors() const { return m_descriptors; }
 
 	void SetHandle(vk::Pipeline handle) { m_handle = handle; }

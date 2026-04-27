@@ -95,9 +95,10 @@ VulkanGraphicsPipelineSpecs VulkanPipeline::GetGraphicsCreateInfo(const Pipeline
 	colorBlendingInfo.pAttachments = &colorBlendAttachment;
 
 	std::vector<vk::DynamicState> dynamicStates = TranslateToVulkan(specs.dynamicStates);
+	std::vector<vk::Format> colorAttachmentFormats = TranslateToVulkan(specs.colorAttachmentFormats);
 
 	createInfo.colorAttachmentCount = specs.colorAttachmentCount;
-	createInfo.colorAttachmentFormats = TranslateToVulkan(specs.colorAttachmentFormats);
+	createInfo.colorAttachmentFormats = colorAttachmentFormats;
 	createInfo.depthAttachment = TranslateToVulkan(specs.depthAttachment);
 	createInfo.stages = shaderStageInfos;
 	createInfo.vertexInputBindingDescriptions = bindingDescriptions;
@@ -115,35 +116,32 @@ VulkanGraphicsPipelineSpecs VulkanPipeline::GetGraphicsCreateInfo(const Pipeline
 	return createInfo;
 }
 
-vk::GraphicsPipelineCreateInfo VulkanPipeline::GetVulkanGraphicsCreateInfo(const VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs)
+vk::GraphicsPipelineCreateInfo VulkanPipeline::GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs)
 {
 	vk::GraphicsPipelineCreateInfo createInfo{};
 
-	vk::PipelineRenderingCreateInfo renderingInfo{};
-	renderingInfo.colorAttachmentCount = vulkanGraphicsPipelineSpecs.colorAttachmentCount;
-	renderingInfo.pColorAttachmentFormats = vulkanGraphicsPipelineSpecs.colorAttachmentFormats.data();
-	renderingInfo.depthAttachmentFormat = vulkanGraphicsPipelineSpecs.depthAttachment;
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.vertexBindingDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.size();
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.pVertexBindingDescriptions = vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.data();
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.vertexAttributeDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.size();
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.pVertexAttributeDescriptions = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.data();
 
-	vk::PipelineVertexInputStateCreateInfo vertexInputInfo{};
-	vertexInputInfo.vertexBindingDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.size();
-	vertexInputInfo.pVertexBindingDescriptions = vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.data();
-	vertexInputInfo.vertexAttributeDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.size();
-	vertexInputInfo.pVertexAttributeDescriptions = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.data();
+	vulkanGraphicsPipelineSpecs.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.dynamicStates.size());
+	vulkanGraphicsPipelineSpecs.dynamicStateInfo.pDynamicStates = vulkanGraphicsPipelineSpecs.dynamicStates.data();
 
-	vk::PipelineDynamicStateCreateInfo dynamicStateInfo{};
-	dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.dynamicStates.size());
-	dynamicStateInfo.pDynamicStates = vulkanGraphicsPipelineSpecs.dynamicStates.data();
+	vulkanGraphicsPipelineSpecs.renderingInfo.colorAttachmentCount = vulkanGraphicsPipelineSpecs.colorAttachmentCount;
+	vulkanGraphicsPipelineSpecs.renderingInfo.pColorAttachmentFormats = vulkanGraphicsPipelineSpecs.colorAttachmentFormats.data();
+	vulkanGraphicsPipelineSpecs.renderingInfo.depthAttachmentFormat = vulkanGraphicsPipelineSpecs.depthAttachment;
 
-	createInfo.pNext = &renderingInfo;
+	createInfo.pNext = &vulkanGraphicsPipelineSpecs.renderingInfo;
 	createInfo.stageCount = vulkanGraphicsPipelineSpecs.stages.size();
 	createInfo.pStages = vulkanGraphicsPipelineSpecs.stages.data();
-	createInfo.pVertexInputState = &vertexInputInfo;
+	createInfo.pVertexInputState = &vulkanGraphicsPipelineSpecs.vertexInputInfo;
 	createInfo.pInputAssemblyState = &vulkanGraphicsPipelineSpecs.inputAssemblyState;
 	createInfo.pViewportState = &vulkanGraphicsPipelineSpecs.viewportState;
 	createInfo.pRasterizationState = &vulkanGraphicsPipelineSpecs.rasterizationState;
 	createInfo.pMultisampleState = &vulkanGraphicsPipelineSpecs.multisampleState;
 	createInfo.pColorBlendState = &vulkanGraphicsPipelineSpecs.colorBlendState;
-	createInfo.pDynamicState = &dynamicStateInfo;
+	createInfo.pDynamicState = &vulkanGraphicsPipelineSpecs.dynamicStateInfo;
 	createInfo.layout = vulkanGraphicsPipelineSpecs.layout;
 	createInfo.renderPass = vulkanGraphicsPipelineSpecs.renderPass;
 
