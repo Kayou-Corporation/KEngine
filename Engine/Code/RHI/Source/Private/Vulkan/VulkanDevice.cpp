@@ -434,7 +434,7 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImagesWithSwapchain(const Swapchain
 	return RHIVulkanImage;
 }
 
-
+//-------------- Shader --------------// 
 Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage)
 {
 	Core::RefCountPtr<VulkanShader> shader = Core::CreateRefPtr<VulkanShader>();
@@ -469,24 +469,51 @@ void VulkanDevice::DestroyShader(Core::RefCountPtr<Shader> shader)
 	m_handle.destroyShaderModule(shaderModule);
 }
 
+//-------------- Pipeline --------------// 
 Core::RefCountPtr<Pipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& RHISpecs)
 {
 	Core::RefCountPtr<VulkanPipeline> RHIVulkanPipeline = Core::CreateRefPtr<VulkanPipeline>();
 
 	if (RHISpecs.type == PipelineType::Graphics)
 	{
-		std::vector<Descriptor> RHIDescriptors;
+		// Get Unique set in shaders
+		std::vector<uint32_t> recordedSets = std::vector<uint32_t>(0);
 		for (const auto& RHIShader : RHISpecs.shaders)
 		{
-			Core::RefCountPtr<VulkanShader> RHIVulkanShader = RHIShader.CastAs<VulkanShader>();
+			for (const auto& RHISet : RHIShader->GetDescriptors())
+			{
+				if (std::find(recordedSets.begin(), recordedSets.end(), RHISet.index) == recordedSets.end())
+				{
+					recordedSets.push_back(RHISet.index);
+				}
+			}
+		}
 
-			std::vector<Descriptor> localRHIDescriptor = RHIVulkanShader->GetDescriptors();
-			RHIDescriptors.insert(RHIDescriptors.end(), localRHIDescriptor.begin(), localRHIDescriptor.end());
+		std::vector<Descriptor> RHIDescriptors;
+		for (size_t i = 0; i < recordedSets.size(); ++i)
+		{
+			uint32_t setIndex = i;
+			Descriptor RHIDescriptor{};
+			RHIDescriptor.index = setIndex;
+
+			for (const auto& RHIShader : RHISpecs.shaders)
+			{
+				for (const auto& RHISet : RHIShader->GetDescriptors())
+				{
+					if (RHISet.index != setIndex)
+						continue;
+
+					for (const auto& RHIBinding : RHISet.bindings)
+						RHIDescriptor.bindings.push_back(RHIBinding);
+				}
+			}
+			RHIDescriptors.push_back(RHIDescriptor);
 		}
 		std::sort(RHIDescriptors.begin(), RHIDescriptors.end());
 		RHIDescriptors.erase(std::unique(RHIDescriptors.begin(), RHIDescriptors.end()), RHIDescriptors.end());
 
-		std::vector<vk::DescriptorSetLayoutCreateInfo> descriptorsCreateInfos = RHIVulkanPipeline->GetDescriptorSetLayoutCreateInfo(RHIDescriptors);
+		std::vector<VulkanDescriptorSetLayoutSpecs> RHIVulkanDescrptorSpecs = RHIVulkanPipeline->GetDescriptorSetLayoutCreateInfo(RHIDescriptors);
+		std::vector<vk::DescriptorSetLayoutCreateInfo> descriptorsCreateInfos = RHIVulkanPipeline->GetVulkanDescriptorSetLayoutCreateInfo(RHIVulkanDescrptorSpecs);
 
 		for (const vk::DescriptorSetLayoutCreateInfo& DescriptorSetCreateInfo : descriptorsCreateInfos)
 		{
@@ -499,7 +526,8 @@ Core::RefCountPtr<Pipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& RH
 		vk::PipelineLayout layout = VK_CHECK_RESULT(m_handle.createPipelineLayout(pipelineLayoutCreateInfo), "Failed to create layout");
 		RHIVulkanPipeline->SetLayout(layout);
 
-		vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
+		VulkanGraphicsPipelineSpecs RHIVulkanGraphicsPipelineCreateInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
+		vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanGraphicsCreateInfo(RHIVulkanGraphicsPipelineCreateInfo);
 		vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
 		RHIVulkanPipeline->SetHandle(pipeline);
 	}
