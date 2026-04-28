@@ -11,9 +11,11 @@ set(KE_TARGET_NAME KEditor)
 #---------------------------------------#
 #               BUILD MODE              #
 #---------------------------------------#
-add_executable(${KE_TARGET_NAME} ${K_EDITOR_SOURCES})
-
-
+if(WIN32)
+    add_executable(${KE_TARGET_NAME} ${K_EDITOR_SOURCES} "Assets/Icons/kayou.rc")
+else()
+    add_executable(${KE_TARGET_NAME} ${K_EDITOR_SOURCES})
+endif()
 
 #---------------------------------------#
 #                INCLUDE                #
