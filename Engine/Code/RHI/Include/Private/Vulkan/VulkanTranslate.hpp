@@ -839,4 +839,16 @@ inline vk::DescriptorType TranslateToVulkan(slang::BindingType bindingType)
     }
 }
 
+inline vk::PipelineBindPoint TranslateToVulkan(PipelineType pipelineType)
+{
+    switch (pipelineType)
+    {
+    case PipelineType::Compute:
+        return vk::PipelineBindPoint::eCompute;
+    case PipelineType::Graphics:
+    default:
+        return vk::PipelineBindPoint::eGraphics;
+    }
+}
+
 END_NAMESPACE_RHI

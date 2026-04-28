@@ -50,6 +50,13 @@ class Pipeline : virtual public Core::IResource
 public:
 	virtual ~Pipeline() = default;
 
+	KENGINE_API void SetType(PipelineType type) { m_type = type; }
+
+	KENGINE_API PipelineType GetType() { return m_type; }
+
+protected:
+	PipelineType m_type;
+
 };
 
 END_NAMESPACE_RHI

@@ -34,6 +34,9 @@ public:
 	//----------- Transition Image Layout --------------//
 	virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) override;
 
+	//----------- Pipeline --------------//
+	virtual void BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline) override;
+
 // Public vulkan
 public:
 	void SetHandle(TrackedCommandBufferPtr& cmdBuffer) { m_handle = cmdBuffer; }

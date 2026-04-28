@@ -17,6 +17,8 @@ struct RenderingInfo;
 class Fence;
 class Semaphore;
 
+class Pipeline;
+
 struct SubmitInfo
 {
 	SubmitInfo() = default;
@@ -54,6 +56,9 @@ public:
 
 	//----------- Transition Image Layout --------------//
 	KENGINE_API virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) = 0;
+
+	//----------- Pipeline --------------//
+	KENGINE_API virtual void BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline) = 0;
 };
 
 END_NAMESPACE_RHI

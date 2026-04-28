@@ -4,6 +4,7 @@
 #include "Private/Vulkan/VulkanDevice.hpp"
 #include "Private/Vulkan/VulkanImage.hpp"
 #include "Private/Vulkan/VulkanRenderpass.hpp"
+#include "Private/Vulkan/VulkanPipeline.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -325,6 +326,15 @@ void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> RHIImage,
 	m_handle->cmdBuffer.pipelineBarrier(srcStage, dstStage, vk::DependencyFlags(), nullptr, nullptr, barrier);	
 	
 	RHIVulkanImage->SetLayout(newLayout);
+}
+
+//----------- Pipeline --------------//
+void VulkanCommandList::BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
+{
+	vk::PipelineBindPoint bindPoint = TranslateToVulkan(RHIPipeline->GetType());
+	vk::Pipeline pipeline = RHIPipeline.CastAs<VulkanPipeline>()->GetHandle();
+
+	m_handle->cmdBuffer.bindPipeline(bindPoint, pipeline);
 }
 
 END_NAMESPACE_RHI

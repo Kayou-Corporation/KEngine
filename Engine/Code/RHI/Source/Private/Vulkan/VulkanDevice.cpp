@@ -545,6 +545,8 @@ Core::RefCountPtr<Pipeline> VulkanDevice::CreatePipeline(const PipelineSpecs& RH
 		RHIVulkanPipeline->SetHandle(pipeline);
 	}
 
+	RHIVulkanPipeline->SetType(RHISpecs.type);
+
 	return RHIVulkanPipeline;
 }
 
