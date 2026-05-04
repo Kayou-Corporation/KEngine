@@ -10,12 +10,6 @@ BEGIN_NAMESPACE_RHI
 class Shader;
 class Swapchain;
 
-struct ShaderAttachment
-{
-	ShaderDataType type;
-	std::string name;
-};
-
 struct PipelineSpecs
 {
 	PipelineType type;
@@ -40,9 +34,6 @@ struct PipelineSpecs
 
 	PrimitiveTopology topology;
 	std::vector<Core::RefCountPtr<Shader>> shaders{};
-
-	std::vector<ShaderAttachment> attachments;
-
 };
 
 class Pipeline : virtual public Core::IResource
