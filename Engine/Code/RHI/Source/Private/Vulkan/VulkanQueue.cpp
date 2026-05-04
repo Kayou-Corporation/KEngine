@@ -19,8 +19,6 @@ QueueFamily QueueFamily::FindQueueFamily(const vk::PhysicalDevice& physicalDevic
         if (requested.find(QueueType::Graphics) != requested.end() && (properties[i].queueFlags & vk::QueueFlagBits::eGraphics))
         {
             family.m_queues[QueueType::Graphics] = i;
-
-            std::cout << properties[i].queueCount << '\n';
         }
 
         //// check for present
