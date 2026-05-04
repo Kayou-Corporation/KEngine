@@ -244,14 +244,14 @@ int main()
         Kayou::RHI::SubmitInfo submitInfo;
         submitInfo.waitSemaphores = { imageAvailablesSemaphores[syncIndex] };
         submitInfo.waitSemaphoresValues = { 0 };
-        submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[syncIndex] };
+        submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[imageIndex] };
         submitInfo.signalSemaphoresValues = { signalValue, 0 };
         submitInfo.stage = Kayou::RHI::PipelineStage::ColorOutput;
 
         device->SubmitCommandList(commandList, submitInfo);
 
         Kayou::RHI::PresentInfo presentInfo;
-        presentInfo.waitSemaphores = { renderFinishedSemaphores[syncIndex] };
+        presentInfo.waitSemaphores = { renderFinishedSemaphores[imageIndex] };
         presentInfo.swapchain = swapchain;
         presentInfo.imageIndex = imageIndex;
 

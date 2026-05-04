@@ -22,7 +22,7 @@
 
 #endif
 
-#if (defined(_DEBUG) || defined(DEBUG) || defined(__DEBUG__) || defined(__DEBUG)) && not defined(NDEGUG)
+#if (defined(_DEBUG) || defined(DEBUG) || defined(__DEBUG__) || defined(__DEBUG)) && not defined(NDEBUG)
 #define KENGINE_DEBUG
 #endif
 
