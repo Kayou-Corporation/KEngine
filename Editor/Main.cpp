@@ -164,6 +164,7 @@ int main()
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Shader> baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderStage::Vertex);
     Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> globalLayout = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex);
 
     Kayou::RHI::PipelineSpecs unlitPipelineSpecs;
     unlitPipelineSpecs.type = Kayou::RHI::PipelineType::Graphics;
@@ -265,9 +266,10 @@ int main()
     //device->DestroyBuffer(testBuffer);
 
     device->DestroyPipeline(unlitPipeline);
-
+    
     device->DestroyShader(unlitFrag);
     device->DestroyShader(baseVert);
+    device->DestroyShader(globalLayout);
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
     {
