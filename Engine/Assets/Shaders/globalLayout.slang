@@ -6,14 +6,20 @@ struct CameraUBO
     float3 CameraPos;
 };
 
-struct FrameDataSet
+struct Light
 {
-    CameraUBO CameraUBO;
-    float4x4 ObjectModel;
-    int ObjectID;
+    float3 pos;
+    float intensity;
 }
 
-ParameterBlock<FrameDataSet> frameDataSet;
+// Set O -- FrameData ---
+[[vk::binding(0, 0)]] ConstantBuffer<CameraUBO> cameraUbo;
+[[vk::binding(1, 0)]] StructuredBuffer<Light> lightSSB0;
+
+// Set 1 -- DrawData
+[[vk::binding(0, 1)]] ConstantBuffer<float4x4> objectModel;
+[[vk::binding(1, 1)]] int ObjectID;
+[[vk::binding(2, 1)]] Sampler2D Texture;
 
 struct VSInput
 {
@@ -27,7 +33,7 @@ struct VSOutput
 VSOutput vsMain(VSInput input)
 {
 
-    
+
     VSOutput o;
     return o;
 }
