@@ -79,7 +79,6 @@ public:
 protected:
 	PipelineType m_type;
 	Core::RefCountPtr<PipelineLayout> m_layout;
-
 };
 
 
