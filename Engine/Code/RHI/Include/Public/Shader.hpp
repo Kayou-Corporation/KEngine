@@ -91,12 +91,13 @@ struct Binding
 	SlangResourceShape shape = SLANG_RESOURCE_UNKNOWN;
     ShaderStage stage{};
     uint32_t count = 0;
-    std::string name = "";
+    std::string name{};
 };
 
 struct Descriptor
 {
     uint32_t index = -1;
+    std::string name{};
     std::vector<Binding> bindings{};
 
     bool operator==(const Descriptor& other) const
@@ -135,11 +136,11 @@ class ShaderCompiler
 public:
     void Initialize();
 
-    ShaderData Load(const std::string& file, const ShaderStage& stage) const;
+    ShaderData Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout) const;
 
 private:
-    ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage) const;
-    static ShaderData Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage);
+    ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage, bool isGlobalLayout) const;
+    static ShaderData Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage, bool isGlobalLayout);
     static std::vector<VertexAttributeLayout> ReflectVertexInputs(slang::ProgramLayout* layout);
 
     static inline ShaderDataType GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout);

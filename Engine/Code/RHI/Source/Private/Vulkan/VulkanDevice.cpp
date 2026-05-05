@@ -435,7 +435,7 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImagesWithSwapchain(const Swapchain
 }
 
 //-------------- Shader --------------// 
-Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage)
+Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout)
 {
 	Core::RefCountPtr<VulkanShader> shader{};
 
@@ -444,7 +444,7 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 
 	shader = Core::CreateRefPtr<VulkanShader>();
 
-	ShaderData bin = m_shaderCompiler.Load(file, sStage);
+	ShaderData bin = m_shaderCompiler.Load(file, sStage, isGlobalLayout);
 
 	size_t size = bin.spirv.size();
 

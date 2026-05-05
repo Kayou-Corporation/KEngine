@@ -259,7 +259,8 @@ enum class ShaderStage
 	Fragment,
 	Compute,
 	Geometry,
-	Tesselation
+	Tesselation,
+	All
 };
 
 enum class PipelineType

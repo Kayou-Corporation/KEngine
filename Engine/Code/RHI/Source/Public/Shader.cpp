@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <spdlog/spdlog.h>
 
 BEGIN_NAMESPACE_RHI
@@ -49,7 +50,7 @@ void ShaderCompiler::Initialize()
     m_globalSession->createSession(desc, m_session.writeRef());
 }
 
-ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage) const
+ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout) const
 {
     ShaderData bin{};
 
@@ -96,7 +97,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
         return bin;
     }
 
-    bin = Compile(fullFile, content, entry, stage);
+    bin = Compile(fullFile, content, entry, stage, isGlobalLayout);
 
     const std::string shaderCacheDir = "Cache/Shaders";
 
@@ -125,7 +126,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     return bin;
 }
 
-ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage) const
+ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage, bool isGlobalLayout) const
 {
     ShaderData bin{};
 
@@ -244,12 +245,12 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
     }
 #endif
 
-	Reflect(bin, linkedProgram->getLayout(), stage);
+	Reflect(bin, linkedProgram->getLayout(), stage, isGlobalLayout);
 
     return bin;
 }
 
-ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage)
+ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage, bool isGlobalLayout)
 {
     // Reflect vertex input layout if this is a vertex shader
     if (stage == ShaderStage::Vertex)
@@ -273,45 +274,79 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
     }
 
     slang::TypeLayoutReflection* const globals = layout->getGlobalParamsTypeLayout();
-
     const uint32_t count = globals->getFieldCount();
-    const uint32_t descCount = static_cast<uint32_t>(globals->getBindingRangeCount());
+    uint32_t trueSetCount = 0;
 
-    std::vector<Descriptor> descriptors;
-    descriptors.resize(descCount);
+    std::map<uint32_t, Descriptor> descriptorMap;
 
     for (uint32_t i = 0; i < count; ++i)
     {
         slang::VariableLayoutReflection* field = globals->getFieldByIndex(i);
         if (!field)
             continue;
-
-        uint32_t set = field->getBindingSpace();
-        const uint32_t bindingIndex = field->getBindingIndex();
+    
         slang::TypeLayoutReflection* typeLayout = field->getTypeLayout();
-
-        uint32_t descriptorCount = 1;
-
-        if (typeLayout->getKind() == slang::TypeReflection::Kind::Array)
+    
+        if (typeLayout->getKind() == slang::TypeReflection::Kind::ParameterBlock)
         {
-            descriptorCount = static_cast<uint32_t>(typeLayout->getElementCount());
+            trueSetCount++;
+
+            uint32_t setIndex = field->getBindingIndex();
+
+            std::string setName = field->getName();
+    
+            Descriptor& descriptorSet = descriptorMap[setIndex];
+            descriptorSet.index = setIndex;
+            descriptorSet.name = setName;
+    
+            slang::TypeLayoutReflection* elementTypeLayout = typeLayout->getElementTypeLayout();
+            const uint32_t bindingCount = elementTypeLayout->getFieldCount();
+
+            descriptorSet.bindings.reserve(bindingCount);
+            for (uint32_t j = 0; j < bindingCount; ++j)
+            {
+                slang::VariableLayoutReflection* subField = elementTypeLayout->getFieldByIndex(j);
+                if (!subField) 
+                    continue;
+
+                slang::TypeLayoutReflection* subTypeLayout = subField->getTypeLayout();
+
+                const uint32_t bindingIndex = subField->getBindingIndex();
+
+                const slang::BindingType bindingType = subTypeLayout->getBindingRangeType(0);
+
+                const SlangResourceShape bindingShape = subTypeLayout->getType()->getResourceShape();
+
+                uint32_t descriptorCount = 1;
+                if (typeLayout->getKind() == slang::TypeReflection::Kind::Array)
+                {
+                    descriptorCount = static_cast<uint32_t>(typeLayout->getElementCount());
+                }
+
+                std::string bindingName = subField->getName();
+
+                Binding binding{};
+                binding.index = bindingIndex;
+                binding.type = bindingType;
+                binding.shape = bindingShape;
+                binding.count = descriptorCount;
+                binding.stage = isGlobalLayout ? ShaderStage::All : stage;
+                binding.name = bindingName;
+
+                descriptorSet.bindings.push_back(binding);
+            }
         }
-
-        descriptors[i].index = set;
-
-        Binding binding;
-        binding.index = bindingIndex;
-        binding.type = typeLayout->getBindingRangeType(0);
-        binding.shape = typeLayout->getType()->getResourceShape();
-		binding.count = descriptorCount;
-        binding.stage = stage;
-        binding.name = field->getName();
-        descriptors[i].bindings.push_back(binding);
     }
 
-    bin.descriptors = descriptors;
+    std::vector<Descriptor> descriptors;
+    descriptors.reserve(trueSetCount);
+    for (auto& [fst, snd] : descriptorMap)
+    {
+        descriptors.push_back(snd);
+    }
 
-	return bin;
+    bin.descriptors = std::move(descriptors);
+    return bin;
 }
 
 std::vector<VertexAttributeLayout> ShaderCompiler::ReflectVertexInputs(slang::ProgramLayout* layout)
@@ -383,6 +418,12 @@ void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Desc
     for (const Descriptor& descriptor : descriptors)
     {
         Core::Write(out, descriptor.index);
+        size_t nameLen = descriptor.name.size();
+        Core::Write(out, nameLen);
+        for (size_t i = 0; i < nameLen; ++i)
+        {
+            Core::Write(out, descriptor.name[i]);
+        }
         uint32_t bindingCount = static_cast<uint32_t>(descriptor.bindings.size());
         Core::Write(out, bindingCount);
 		for (const Binding& binding : descriptor.bindings)
@@ -392,7 +433,7 @@ void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Desc
 			Core::Write(out, binding.count);
 			Core::Write(out, binding.type);
 			Core::Write(out, binding.shape);
-            size_t nameLen = binding.name.size();
+            nameLen = binding.name.size();
             Core::Write(out, nameLen);
             for (size_t i = 0; i < nameLen; ++i)
             {
@@ -453,6 +494,14 @@ std::vector<Descriptor> ShaderCompiler::ReadDescriptors(std::ifstream& in) const
 	for (uint32_t i = 0; i < descriptorCount; ++i)
 	{
 		Core::Read(in, descriptors[i].index);
+        size_t nameLen;
+        Core::Read(in, nameLen);
+        for (size_t k = 0; k < nameLen; ++k)
+        {
+            char nameChar;
+            Core::Read(in, nameChar);
+            descriptors[i].name += nameChar;
+        }
 		uint32_t bindingCount;
 		Core::Read(in, bindingCount);
 		descriptors[i].bindings.resize(bindingCount);
@@ -463,7 +512,6 @@ std::vector<Descriptor> ShaderCompiler::ReadDescriptors(std::ifstream& in) const
 			Core::Read(in, descriptors[i].bindings[j].count);
 			Core::Read(in, descriptors[i].bindings[j].type);
 			Core::Read(in, descriptors[i].bindings[j].shape);
-            size_t nameLen;
             Core::Read(in, nameLen);
             for (size_t k = 0; k < nameLen; ++k)
             {

@@ -1,4 +1,6 @@
+// globalLayoutDefinition.slang
 
+// Set O --- FrameData ---
 struct Camera
 {
     float4x4 CameraVP;
@@ -18,11 +20,9 @@ struct FrameData
     ConstantBuffer<Camera> camera; // UniformBuffer
     StructuredBuffer<Light> lights; // SSBO (StorageBuffer)
 };
-
-// Set O -- FrameData ---
 ParameterBlock<FrameData> frameData;
 
-// Set 1 -- DrawData
+// Set 1 --- DrawData ---
 struct DrawData
 {
     ConstantBuffer<float4x4> model;        // UniformBuffer

@@ -12,6 +12,7 @@
 #include "Public/CommandList.hpp"
 #include "Public/Syncronisation.hpp"
 #include "Public/Pipeline.hpp"
+#include "Private/Vulkan/VulkanTranslate.hpp"
 
 int main()
 {
@@ -162,27 +163,27 @@ int main()
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderStage::Vertex);
-    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment);
-    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> globalLayout = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex);
+    //Kayou::Core::RefCountPtr<Kayou::RHI::Shader> baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderStage::Vertex);
+    //Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> globalLayout = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex, true);
 
-    Kayou::RHI::PipelineSpecs unlitPipelineSpecs;
-    unlitPipelineSpecs.type = Kayou::RHI::PipelineType::Graphics;
-    unlitPipelineSpecs.colorAttachmentCount = 1;
-    unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
-    unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
-    unlitPipelineSpecs.viewportCount = 1;
-    unlitPipelineSpecs.scissorCount = 1;
-    unlitPipelineSpecs.lineWidth = 1;
-    unlitPipelineSpecs.cullmode = Kayou::RHI::CullMode::Back;
-    unlitPipelineSpecs.frontFace = Kayou::RHI::FrontFace::CounterClockWise;
-    unlitPipelineSpecs.SamplesCount = Kayou::RHI::SampleCount::Count1;
-    unlitPipelineSpecs.blendColor = true;
-    unlitPipelineSpecs.dynamicStates = { Kayou::RHI::DynamicState::ViewPort, Kayou::RHI::DynamicState::Scissor };
-    unlitPipelineSpecs.topology = Kayou::RHI::PrimitiveTopology::TriangleList;
-    unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
-
-    Kayou::Core::RefCountPtr<Kayou::RHI::Pipeline> unlitPipeline = device->CreatePipeline(unlitPipelineSpecs);
+    //Kayou::RHI::PipelineSpecs unlitPipelineSpecs;
+    //unlitPipelineSpecs.type = Kayou::RHI::PipelineType::Graphics;
+    //unlitPipelineSpecs.colorAttachmentCount = 1;
+    //unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
+    //unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
+    //unlitPipelineSpecs.viewportCount = 1;
+    //unlitPipelineSpecs.scissorCount = 1;
+    //unlitPipelineSpecs.lineWidth = 1;
+    //unlitPipelineSpecs.cullmode = Kayou::RHI::CullMode::Back;
+    //unlitPipelineSpecs.frontFace = Kayou::RHI::FrontFace::CounterClockWise;
+    //unlitPipelineSpecs.SamplesCount = Kayou::RHI::SampleCount::Count1;
+    //unlitPipelineSpecs.blendColor = true;
+    //unlitPipelineSpecs.dynamicStates = { Kayou::RHI::DynamicState::ViewPort, Kayou::RHI::DynamicState::Scissor };
+    //unlitPipelineSpecs.topology = Kayou::RHI::PrimitiveTopology::TriangleList;
+    //unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
+    //
+    //Kayou::Core::RefCountPtr<Kayou::RHI::Pipeline> unlitPipeline = device->CreatePipeline(unlitPipelineSpecs);
 
     uint64_t frameCounter = 0;
     
@@ -265,10 +266,10 @@ int main()
     //device->ClearQueues();
     //device->DestroyBuffer(testBuffer);
 
-    device->DestroyPipeline(unlitPipeline);
+    //device->DestroyPipeline(unlitPipeline);
     
-    device->DestroyShader(unlitFrag);
-    device->DestroyShader(baseVert);
+    //device->DestroyShader(unlitFrag);
+    //device->DestroyShader(baseVert);
     device->DestroyShader(globalLayout);
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
