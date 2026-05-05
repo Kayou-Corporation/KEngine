@@ -53,4 +53,18 @@ std::vector<vk::DescriptorSetLayoutBinding> VulkanDescriptorSetLayout::GetAllVul
 	return bindings;
 }
 
+VulkanConstant VulkanPushConstantLayout::GetConstant(std::string name)
+{
+	for (const VulkanConstant& constant : m_constants)
+	{
+		if (constant.constantName == name)
+		{
+			return constant;
+		}
+	}
+
+	spdlog::warn("Constant {} doesn't exist in this Push Constant Layout", name);
+	return VulkanConstant();
+}
+
 END_NAMESPACE_RHI

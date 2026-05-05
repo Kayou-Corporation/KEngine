@@ -37,6 +37,17 @@ private:
 	std::vector<VulkanBinding> m_bindings;
 };
 
+struct VulkanConstant
+{
+	VulkanConstant() = default;
+	~VulkanConstant() = default;
+
+	std::string constantName;
+	ShaderStage stage;
+	uint32_t offset;
+	uint32_t size;
+};
+
 class VulkanPushConstantLayout : public PushConstantLayout
 {
 public:
@@ -45,13 +56,12 @@ public:
 
 public:
 	vk::PushConstantRange GetHandle() { return m_pushConstantRange; }
-	std::string GetName() { return m_name; }
-
+	std::vector<VulkanConstant> GetAllConstants() { return m_constants; }
+	VulkanConstant GetConstant(std::string name);
 	void SetHandle(vk::PushConstantRange layout) { m_pushConstantRange = layout; }
-	void SetName(std::string name) { m_name = name; }
 
 private:
-	std::string m_name;
+	std::vector<VulkanConstant> m_constants;
 	vk::PushConstantRange m_pushConstantRange;
 };
 
