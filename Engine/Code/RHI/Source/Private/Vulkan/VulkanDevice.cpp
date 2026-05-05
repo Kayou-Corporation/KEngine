@@ -465,6 +465,8 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 	shader->SetPushConstants(bin.pushConstants);
 	shader->SetVertexAttributes(bin.vertexAttributes);
 	shader->SetVertexBindings(bin.vertexBindings);
+	shader->SetIsGlobalLayout(isGlobalLayout);
+	shader->SetUsesGlobalLayout(usesGlobalLayout);
 
 	m_compiledShaders[file] = shader;
 
