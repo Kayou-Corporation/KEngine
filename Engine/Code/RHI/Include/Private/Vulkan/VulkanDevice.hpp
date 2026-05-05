@@ -106,10 +106,8 @@ public:
     virtual void DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLayout> descriptors) override;
 
     // -------------- PushConstantLayout -------------- // 
-    virtual std::vector<Core::RefCountPtr<PushConstantLayout>> CreatePushConstantsLayouts(Core::RefCountPtr<Shader> shader) override;
-    virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader, std::string name) override;
-    virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;
-    virtual void DestroyPushConstantLayout(Core::RefCountPtr<PushConstantLayout> pushConstant) override;
+    virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader) override;
+    virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) override;
 
     // -------------- Pipeline Layout -------------- // 
     virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;

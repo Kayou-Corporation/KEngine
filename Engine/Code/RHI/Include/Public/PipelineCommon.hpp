@@ -29,18 +29,18 @@ class PushConstantLayout : virtual public Core::IResource
 public:
 	virtual ~PushConstantLayout() = default;
 
-	KENGINE_API std::string GetName() const { return m_constantName; }
+	KENGINE_API std::string GetName() const { return m_name; }
+	KENGINE_API uint32_t GetSize() const { return m_totalSize; }
 	KENGINE_API ShaderStage GetStage() const { return m_stage; }
-	KENGINE_API uint32_t GetSize() const { return m_size; }
 
-	KENGINE_API void SetName(std::string name) { m_constantName = name; }
+	KENGINE_API void SetName(std::string name) { m_name = name; }
+	KENGINE_API void SetSize(uint32_t offset) { m_totalSize = offset; }
 	KENGINE_API void SetStage(ShaderStage stage) { m_stage = stage; }
-	KENGINE_API void SetSize(uint32_t offset) { m_size = offset; }
 
 protected:
-	std::string  m_constantName;
+	std::string  m_name;
 	ShaderStage m_stage;
-	uint32_t m_size;
+	uint32_t m_totalSize;
 };
 
 class PipelineLayout : virtual public Core::IResource

@@ -112,10 +112,8 @@ public:
 	KENGINE_API virtual void DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLayout> descriptors) = 0;
 
 	// -------------- PushConstantLayout -------------- // 
-	KENGINE_API virtual std::vector<Core::RefCountPtr<PushConstantLayout>> CreatePushConstantsLayouts(Core::RefCountPtr<Shader> shader) = 0;
-	KENGINE_API virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader, std::string name) = 0;
-	KENGINE_API virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) = 0;
-	KENGINE_API virtual void DestroyPushConstantLayout(Core::RefCountPtr<PushConstantLayout> pushConstant) = 0;
+	KENGINE_API virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader) = 0;
+	KENGINE_API virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) = 0;
 
 	// -------------- Pipeline Layout -------------- // 
 	KENGINE_API virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) = 0;

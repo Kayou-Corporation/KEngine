@@ -43,7 +43,6 @@ struct VulkanConstant
 	~VulkanConstant() = default;
 
 	std::string constantName;
-	ShaderStage stage;
 	uint32_t offset;
 	uint32_t size;
 };
@@ -58,14 +57,16 @@ public:
 	vk::PushConstantRange GetHandle() { return m_pushConstantRange; }
 	std::vector<VulkanConstant> GetAllConstants() { return m_constants; }
 	VulkanConstant GetConstant(std::string name);
-	void SetHandle(vk::PushConstantRange layout) { m_pushConstantRange = layout; }
+
+	void SetHandle(vk::PushConstantRange range) { m_pushConstantRange = range; }
+	void AddConstant(VulkanConstant constant) { m_constants.push_back(constant); }
 
 private:
 	std::vector<VulkanConstant> m_constants;
 	vk::PushConstantRange m_pushConstantRange;
 };
 
-class VulkanPipelineLayout : virtual PipelineLayout
+class VulkanPipelineLayout : public PipelineLayout
 {
 public:
 	VulkanPipelineLayout() = default;

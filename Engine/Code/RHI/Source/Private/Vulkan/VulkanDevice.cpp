@@ -624,35 +624,86 @@ void VulkanDevice::DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLay
 }
 
 // -------------- PushConstantLayout -------------- // 
-std::vector<Core::RefCountPtr<PushConstantLayout>> VulkanDevice::CreatePushConstantsLayouts(Core::RefCountPtr<Shader> shader)
+Core::RefCountPtr<PushConstantLayout> VulkanDevice::CreatePushConstantLayout(Core::RefCountPtr<Shader> RHIShader)
 {
+	Core::RefCountPtr<VulkanPushConstantLayout> RHIVulkanPushConstants = Core::CreateRefPtr<VulkanPushConstantLayout>();
 
+	std::vector<PushConstant> SLANGShaderPushConstants = RHIShader->GetPushConstants();
+	if (!SLANGShaderPushConstants.empty())
+	{
+		const PushConstant globalStruct = SLANGShaderPushConstants[0];
+		RHIVulkanPushConstants->SetName(globalStruct.name);
+		RHIVulkanPushConstants->SetSize(globalStruct.size);
+		RHIVulkanPushConstants->SetStage(globalStruct.stage);
+
+		for (int i = SLANGShaderPushConstants.size() - 1; i > 0; i--)
+		{
+			VulkanConstant constant;
+			constant.constantName = SLANGShaderPushConstants[i].name;
+			constant.offset = SLANGShaderPushConstants[i].offset;
+			constant.size = SLANGShaderPushConstants[i].size;
+
+			RHIVulkanPushConstants->AddConstant(constant);
+		}
+
+		vk::PushConstantRange pushConstantRange;
+		pushConstantRange.stageFlags = TranslateToVulkan(globalStruct.stage);
+		pushConstantRange.size = globalStruct.size;
+		pushConstantRange.offset = globalStruct.offset;
+
+		RHIVulkanPushConstants->SetHandle(pushConstantRange);
+	}
+
+	return RHIVulkanPushConstants;
 }
 
-Core::RefCountPtr<PushConstantLayout> VulkanDevice::CreatePushConstantLayout(Core::RefCountPtr<Shader> shader, std::string name)
+void VulkanDevice::DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants)
 {
-
-}
-
-void VulkanDevice::DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants)
-{
-
-}
-
-void VulkanDevice::DestroyPushConstantLayout(Core::RefCountPtr<PushConstantLayout> pushConstant)
-{
-
+	// Empty
+	pushConstants.clear();
 }
 
 // -------------- Pipeline Layout -------------- // 
 Core::RefCountPtr<PipelineLayout> VulkanDevice::CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants)
 {
+	Core::RefCountPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = Core::CreateRefPtr<VulkanPipelineLayout>();
 
+	std::vector<vk::DescriptorSetLayout> descriptorSetsLayouts;
+	for (const Core::RefCountPtr<DescriptorSetLayout>& RHIDescriptor : descriptors)
+	{
+		Core::RefCountPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = RHIDescriptor.CastAs<VulkanDescriptorSetLayout>();
+
+		descriptorSetsLayouts.push_back(RHIVulkanDescriptor->GetHandle());
+		RHIVUlkanPipelineLayout->AddDescriptorSetLayout(RHIDescriptor);
+	}
+
+	std::vector<vk::PushConstantRange> pushConstantRanges;
+	for (const Core::RefCountPtr<PushConstantLayout>& RHIPushConstant: pushConstants)
+	{
+		Core::RefCountPtr<VulkanPushConstantLayout> RHIVulkanPushConstant = RHIPushConstant.CastAs<VulkanPushConstantLayout>();
+
+		pushConstantRanges.push_back(RHIVulkanPushConstant->GetHandle());
+		RHIVUlkanPipelineLayout->AddPushConstantLayout(RHIPushConstant);
+	}
+
+	vk::PipelineLayoutCreateInfo createInfo{};
+	createInfo.setLayoutCount = descriptorSetsLayouts.size();
+	createInfo.pSetLayouts = descriptorSetsLayouts.data();
+	createInfo.pushConstantRangeCount = pushConstantRanges.size();
+	createInfo.pPushConstantRanges = pushConstantRanges.data();
+
+	vk::PipelineLayout pipelineLayout = VK_CHECK_RESULT(m_handle.createPipelineLayout(createInfo), "Coudn't create pipeline layout");
+	RHIVUlkanPipelineLayout->SetHandle(pipelineLayout);
+
+	return RHIVUlkanPipelineLayout;
 }
 
-void VulkanDevice::DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout>)
+void VulkanDevice::DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout)
 {
+	Core::RefCountPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
 
+	vk::PipelineLayout layout = RHIVUlkanPipelineLayout->GetHandle();
+	m_handle.destroyPipelineLayout(layout);
 }
 
 //-------------- Pipeline --------------// 
