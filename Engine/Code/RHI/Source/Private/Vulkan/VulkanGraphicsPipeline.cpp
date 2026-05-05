@@ -4,9 +4,9 @@
 
 BEGIN_NAMESPACE_RHI
 
-VulkanGraphicsPipelineSpecs VulkanGraphicsPipeline::GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs)
+VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs)
 {
-	VulkanGraphicsPipelineSpecs createInfo{};
+	VulkanGraphicsPipelineStructs createInfo{};
 
 	std::vector<vk::PipelineShaderStageCreateInfo> shaderStageInfos{};
 	shaderStageInfos.reserve(specs.shaders.size());
@@ -116,7 +116,7 @@ VulkanGraphicsPipelineSpecs VulkanGraphicsPipeline::GetGraphicsCreateInfo(const 
 	return createInfo;
 }
 
-vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs)
+vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineStructs& vulkanGraphicsPipelineSpecs)
 {
 	vk::GraphicsPipelineCreateInfo createInfo{};
 

@@ -35,7 +35,7 @@ public:
 	virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) override;
 
 	//----------- Pipeline --------------//
-	virtual void BindGraphicsPipeline(Core::RefCountPtr<GraphicsPipeline> RHIPipeline) override;
+	virtual void BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline) override;
 
 // Public vulkan
 public:

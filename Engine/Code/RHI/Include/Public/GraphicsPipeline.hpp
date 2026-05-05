@@ -4,6 +4,7 @@
 #include "Utils/Memory.hpp"
 
 #include "RHI.hpp"
+#include "PipelineCommon.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -34,17 +35,9 @@ struct GraphicsPipelineSpecs
 	std::vector<Core::RefCountPtr<Shader>> shaders{};
 };
 
-class GraphicsPipeline : virtual public Core::IResource
+class GraphicsPipeline : public Pipeline
 {
 public:
-	virtual ~GraphicsPipeline() = default;
-
-	KENGINE_API void SetType(PipelineType type) { m_type = type; }
-
-	KENGINE_API PipelineType GetType() { return m_type; }
-
-protected:
-	PipelineType m_type;
 };
 
 END_NAMESPACE_RHI

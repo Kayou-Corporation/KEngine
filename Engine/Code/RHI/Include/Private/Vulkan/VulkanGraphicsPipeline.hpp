@@ -7,7 +7,7 @@
 
 BEGIN_NAMESPACE_RHI
 
-struct VulkanGraphicsPipelineSpecs
+struct VulkanGraphicsPipelineStructs
 {
 	uint32_t colorAttachmentCount = 0;
 	std::vector<vk::Format> colorAttachmentFormats{};
@@ -24,7 +24,7 @@ struct VulkanGraphicsPipelineSpecs
 	vk::PipelineLayout layout{};
 	vk::RenderPass renderPass{};
 
-	// Do not manually set the members below
+	// Do not manually set the members bellow
 
 	vk::PipelineRenderingCreateInfo renderingInfo{}; // Do not manually set
 	vk::PipelineVertexInputStateCreateInfo vertexInputInfo{}; // Do not manually set
@@ -43,8 +43,8 @@ public:
 	virtual ~VulkanGraphicsPipeline() override = default;
 
 public:
-	VulkanGraphicsPipelineSpecs GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs);
-	vk::GraphicsPipelineCreateInfo GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs);
+	VulkanGraphicsPipelineStructs GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs);
+	vk::GraphicsPipelineCreateInfo GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineStructs& vulkanGraphicsPipelineSpecs);
 
 	vk::PipelineLayoutCreateInfo GetPipelineLayoutCreateInfo();
 	std::vector<VulkanDescriptorSetLayoutSpecs> GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors);
@@ -65,6 +65,8 @@ private:
 	vk::Pipeline m_handle;
 	vk::PipelineLayout m_layout;
 	std::vector<vk::DescriptorSetLayout> m_descriptors;
+
+	vk::GraphicsPipelineCreateInfo m_createInfo;
 };
 
 END_NAMESPACE_RHI

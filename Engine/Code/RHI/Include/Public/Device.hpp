@@ -30,6 +30,7 @@ struct SemaphoreSpecs;
 class Fence;
 struct SubmitInfo;
 
+class Pipeline;
 class GraphicsPipeline;
 struct GraphicsPipelineSpecs;
 
@@ -101,7 +102,7 @@ public:
 
 	// -------------- Pipeline -------------- // 
 	KENGINE_API virtual Core::RefCountPtr<GraphicsPipeline> CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyGraphicsPipeline(Core::RefCountPtr<GraphicsPipeline> pipeline) = 0;
+	KENGINE_API virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) = 0;
 
 protected:
 	ShaderCompiler m_shaderCompiler;

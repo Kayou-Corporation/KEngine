@@ -66,6 +66,24 @@ protected:
 	std::vector<Core::RefCountPtr<PushConstantLayout>> m_pushConstantsLayouts;
 };
 
+class Pipeline : virtual public Core::IResource
+{
+public:
+	virtual ~Pipeline() = default;
+
+	KENGINE_API PipelineType GetType() { return m_type; }
+	KENGINE_API Core::RefCountPtr<DescriptorSetLayout> GetLayout() { return m_layout; }
+
+	KENGINE_API void SetType(PipelineType type) { m_type = type; }
+	KENGINE_API void SetLayout(Core::RefCountPtr<DescriptorSetLayout> layout) { m_layout = layout; }
+
+
+protected:
+	PipelineType m_type;
+	Core::RefCountPtr<DescriptorSetLayout> m_layout;
+
+};
+
 
 
 END_NAMESPACE_RHI

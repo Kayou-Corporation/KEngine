@@ -530,7 +530,7 @@ Core::RefCountPtr<GraphicsPipeline> VulkanDevice::CreateGraphicsPipeline(const G
 	vk::PipelineLayout layout = VK_CHECK_RESULT(m_handle.createPipelineLayout(pipelineLayoutCreateInfo), "Failed to create layout");
 	RHIVulkanPipeline->SetLayout(layout);
 
-	VulkanGraphicsPipelineSpecs RHIVulkanGraphicsPipelineCreateInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
+	VulkanGraphicsPipelineStructs RHIVulkanGraphicsPipelineCreateInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
 	vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanGraphicsCreateInfo(RHIVulkanGraphicsPipelineCreateInfo);
 	vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
 	RHIVulkanPipeline->SetHandle(pipeline);
@@ -546,8 +546,9 @@ Core::RefCountPtr<GraphicsPipeline> VulkanDevice::CreateGraphicsPipeline(const G
 	return RHIVulkanPipeline;
 }
 
-void VulkanDevice::DestroyGraphicsPipeline(Core::RefCountPtr<GraphicsPipeline> RHIPipeline)
+void VulkanDevice::DestroyPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
 {
+
 	Core::RefCountPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>();
 
 	vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();

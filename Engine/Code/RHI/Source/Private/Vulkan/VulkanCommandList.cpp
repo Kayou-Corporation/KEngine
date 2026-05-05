@@ -329,10 +329,17 @@ void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> RHIImage,
 }
 
 //----------- Pipeline --------------//
-void VulkanCommandList::BindGraphicsPipeline(Core::RefCountPtr<GraphicsPipeline> RHIPipeline)
+void VulkanCommandList::BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
 {
-	vk::PipelineBindPoint bindPoint = TranslateToVulkan(RHIPipeline->GetType());
-	vk::Pipeline pipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>()->GetHandle();
+	PipelineType RHIType = RHIPipeline->GetType();
+	vk::PipelineBindPoint bindPoint = TranslateToVulkan(RHIType);
+
+	vk::Pipeline pipeline;
+	if (RHIType == PipelineType::Graphics)
+	{
+		pipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>()->GetHandle();
+
+	}
 
 	m_handle->cmdBuffer.bindPipeline(bindPoint, pipeline);
 }

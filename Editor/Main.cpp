@@ -264,7 +264,7 @@ int main()
     //device->ClearQueues();
     //device->DestroyBuffer(testBuffer);
 
-    device->DestroyGraphicsPipeline(unlitPipeline);
+    device->DestroyPipeline(unlitPipeline);
     
     device->DestroyShader(unlitFrag);
     device->DestroyShader(baseVert);
