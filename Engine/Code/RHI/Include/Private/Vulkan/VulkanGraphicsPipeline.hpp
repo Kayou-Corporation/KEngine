@@ -46,27 +46,15 @@ public:
 	VulkanGraphicsPipelineStructs GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs);
 	vk::GraphicsPipelineCreateInfo GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineStructs& vulkanGraphicsPipelineSpecs);
 
-	vk::PipelineLayoutCreateInfo GetPipelineLayoutCreateInfo();
-	std::vector<VulkanDescriptorSetLayoutSpecs> GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors);
-	std::vector<vk::DescriptorSetLayoutCreateInfo> GetVulkanDescriptorSetLayoutCreateInfo(std::vector<VulkanDescriptorSetLayoutSpecs>& RHIVulkanDescriptorSetLayoutSpecs);
-
 	vk::VertexInputBindingDescription GetBindingDescriptor(const VertexBindingLayout& RHIBindingLayout);
 	vk::VertexInputAttributeDescription GetAttributeDescriptor(const VertexAttributeLayout& RHiAttributeLayout);
 
 	vk::Pipeline GetHandle() const { return m_handle; }
-	vk::PipelineLayout GetLayout() const { return m_layout; }
-	std::vector<vk::DescriptorSetLayout> GetDescriptors() const { return m_descriptors; }
 
 	void SetHandle(vk::Pipeline handle) { m_handle = handle; }
-	void SetLayout(vk::PipelineLayout layout) { m_layout = layout; }
-	void AddDescriptor(vk::DescriptorSetLayout descriptor) { m_descriptors.push_back(descriptor); }
 
 private:
 	vk::Pipeline m_handle;
-	vk::PipelineLayout m_layout;
-	std::vector<vk::DescriptorSetLayout> m_descriptors;
-
-	vk::GraphicsPipelineCreateInfo m_createInfo;
 };
 
 END_NAMESPACE_RHI

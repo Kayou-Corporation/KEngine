@@ -10,6 +10,7 @@ BEGIN_NAMESPACE_RHI
 
 class Shader;
 class Swapchain;
+class PipelineLayout;
 
 struct GraphicsPipelineSpecs
 {
@@ -33,6 +34,8 @@ struct GraphicsPipelineSpecs
 
 	PrimitiveTopology topology;
 	std::vector<Core::RefCountPtr<Shader>> shaders{};
+
+	Core::RefCountPtr<PipelineLayout> pipelineLayout;
 };
 
 class GraphicsPipeline : public Pipeline

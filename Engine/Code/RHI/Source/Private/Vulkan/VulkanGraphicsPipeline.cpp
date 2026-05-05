@@ -1,4 +1,5 @@
 #include "Private/Vulkan/VulkanGraphicsPipeline.hpp"
+#include "Private/Vulkan/VulkanPipelineCommon.hpp"
 
 #include "Private/Vulkan/VulkanTranslate.hpp"
 
@@ -109,9 +110,8 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	createInfo.multisampleState = multisamplingInfo;
 	createInfo.colorBlendState = colorBlendingInfo;
 	createInfo.dynamicStates = dynamicStates;
-	createInfo.layout = m_layout;
+	createInfo.layout = m_layout.CastAs<VulkanPipelineLayout>()->GetHandle();
 	createInfo.renderPass = nullptr; // Always null for now
-
 
 	return createInfo;
 }
@@ -146,86 +146,6 @@ vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateIn
 	createInfo.renderPass = vulkanGraphicsPipelineSpecs.renderPass;
 
 	return createInfo;
-}
-
-vk::PipelineLayoutCreateInfo VulkanGraphicsPipeline::GetPipelineLayoutCreateInfo()
-{
-	vk::PipelineLayoutCreateInfo createInfo{};
-
-	if (!m_descriptors.empty())
-	{
-		createInfo.setSetLayoutCount(static_cast<uint32_t>(m_descriptors.size()));
-		createInfo.setPSetLayouts(m_descriptors.data());
-	}
-	else
-	{
-		createInfo.setSetLayoutCount(0);
-		createInfo.setPSetLayouts(nullptr);
-	}
-
-	return createInfo;
-}
-
-vk::VertexInputBindingDescription VulkanGraphicsPipeline::GetBindingDescriptor(const VertexBindingLayout& RHIBindingLayout)
-{
-	vk::VertexInputBindingDescription bindingDescription{};
-	bindingDescription.binding = RHIBindingLayout.binding;
-	bindingDescription.stride = RHIBindingLayout.stride;
-	bindingDescription.inputRate = TranslateToVulkan(RHIBindingLayout.inputRate);
-
-	return bindingDescription;
-}
-
-vk::VertexInputAttributeDescription VulkanGraphicsPipeline::GetAttributeDescriptor(const VertexAttributeLayout& RHiAttributeLayout)
-{
-	vk::VertexInputAttributeDescription attributeDescription{};
-	attributeDescription.binding = RHiAttributeLayout.binding;
-	attributeDescription.location = RHiAttributeLayout.location;
-	attributeDescription.format = TranslateToVulkan(RHiAttributeLayout.format);
-	attributeDescription.offset = RHiAttributeLayout.offset;
-
-	return attributeDescription;
-}
-
-std::vector<VulkanDescriptorSetLayoutSpecs> VulkanGraphicsPipeline::GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors)
-{
-	std::vector<VulkanDescriptorSetLayoutSpecs> layoutsSpecs{};
-	layoutsSpecs.reserve(RHIDescriptors.size());
-	for (const Descriptor& RHIDescriptor : RHIDescriptors)
-	{
-		VulkanDescriptorSetLayoutSpecs layoutSpec{};
-		std::vector<vk::DescriptorSetLayoutBinding> bindings;
-		for (const Binding& RHIBinding : RHIDescriptor.bindings)
-		{
-			vk::DescriptorSetLayoutBinding binding{};
-			binding.binding = RHIBinding.index;
-			binding.descriptorType = TranslateToVulkan(RHIBinding.type);
-			binding.descriptorCount = RHIBinding.count;
-			binding.stageFlags = TranslateToVulkan(RHIBinding.stage);
-
-			layoutSpec.bindings.push_back(binding);
-		}
-
-		layoutsSpecs.push_back(layoutSpec);
-	}
-
-	return layoutsSpecs;
-}
-
-std::vector<vk::DescriptorSetLayoutCreateInfo> VulkanGraphicsPipeline::GetVulkanDescriptorSetLayoutCreateInfo(std::vector<VulkanDescriptorSetLayoutSpecs>& RHIVulkanDescriptorSetLayoutSpecs)
-{
-	std::vector<vk::DescriptorSetLayoutCreateInfo> layoutsInfo{};
-
-	for (const auto& layoutSpec : RHIVulkanDescriptorSetLayoutSpecs)
-	{
-		vk::DescriptorSetLayoutCreateInfo layoutInfo{};
-		layoutInfo.bindingCount = layoutSpec.bindings.size();
-		layoutInfo.pBindings = layoutSpec.bindings.data();
-
-		layoutsInfo.push_back(layoutInfo);
-	}
-
-	return layoutsInfo;
 }
 
 END_NAMESPACE_RHI

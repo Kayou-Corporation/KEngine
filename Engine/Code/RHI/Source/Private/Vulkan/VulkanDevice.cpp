@@ -710,87 +710,29 @@ void VulkanDevice::DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout> RHIPi
 Core::RefCountPtr<GraphicsPipeline> VulkanDevice::CreateGraphicsPipeline(const GraphicsPipelineSpecs& RHISpecs)
 {
 	Core::RefCountPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = Core::CreateRefPtr<VulkanGraphicsPipeline>();
-	// Get Unique set in shaders
-	std::vector<uint32_t> recordedSets = std::vector<uint32_t>(0);
-	for (const auto& RHIShader : RHISpecs.shaders)
-	{
-		for (const auto& RHISet : RHIShader->GetDescriptors())
-		{
-			if (std::find(recordedSets.begin(), recordedSets.end(), RHISet.index) == recordedSets.end())
-			{
-				recordedSets.push_back(RHISet.index);
-			}
-		}
-	}
-
-	std::vector<Descriptor> RHIDescriptors;
-	for (size_t i = 0; i < recordedSets.size(); ++i)
-	{
-		uint32_t setIndex = recordedSets[i];
-		Descriptor RHIDescriptor{};
-		RHIDescriptor.index = setIndex;
-
-		for (const auto& RHIShader : RHISpecs.shaders)
-		{
-			for (const auto& RHISet : RHIShader->GetDescriptors())
-			{
-				if (RHISet.index != setIndex)
-					continue;
-
-				for (const auto& RHIBinding : RHISet.bindings)
-					RHIDescriptor.bindings.push_back(RHIBinding);
-			}
-		}
-		RHIDescriptors.push_back(RHIDescriptor);
-	}
-	std::sort(RHIDescriptors.begin(), RHIDescriptors.end());
-	RHIDescriptors.erase(std::unique(RHIDescriptors.begin(), RHIDescriptors.end()), RHIDescriptors.end());
-
-	std::vector<VulkanDescriptorSetLayoutSpecs> RHIVulkanDescrptorSpecs = RHIVulkanPipeline->GetDescriptorSetLayoutCreateInfo(RHIDescriptors);
-	std::vector<vk::DescriptorSetLayoutCreateInfo> descriptorsCreateInfos = RHIVulkanPipeline->GetVulkanDescriptorSetLayoutCreateInfo(RHIVulkanDescrptorSpecs);
-
-	for (const vk::DescriptorSetLayoutCreateInfo& DescriptorSetCreateInfo : descriptorsCreateInfos)
-	{
-		vk::DescriptorSetLayout descriptor;
-		descriptor = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(DescriptorSetCreateInfo), "Failed to create descriptor set layouyt");
-		RHIVulkanPipeline->AddDescriptor(descriptor);
-	}
-
-	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = RHIVulkanPipeline->GetPipelineLayoutCreateInfo();
-	vk::PipelineLayout layout = VK_CHECK_RESULT(m_handle.createPipelineLayout(pipelineLayoutCreateInfo), "Failed to create layout");
-	RHIVulkanPipeline->SetLayout(layout);
+	RHIVulkanPipeline->SetLayout(RHISpecs.pipelineLayout);
+	RHIVulkanPipeline->SetType(PipelineType::Graphics);
 
 	VulkanGraphicsPipelineStructs RHIVulkanGraphicsPipelineCreateInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
 	vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanGraphicsCreateInfo(RHIVulkanGraphicsPipelineCreateInfo);
 	vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
 	RHIVulkanPipeline->SetHandle(pipeline);
-	//else
-	//{
-	//	vk::ComputePipelineCreateInfo createInfo = RHIVulkanPipeline->GetComputeCreateInfo(RHISpecs);
-	//	vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create compute pipeline");
-	//	RHIVulkanPipeline->SetHandle(pipeline);
-	//}
-	//
-	//RHIVulkanPipeline->SetType(RHISpecs.type);
 
 	return RHIVulkanPipeline;
 }
 
 void VulkanDevice::DestroyPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
 {
+	if (RHIPipeline->GetType() == PipelineType::Graphics)
+	{
+		Core::RefCountPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>();
+		vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();
+		m_handle.destroyPipeline(pipeline);
+	}
+	else
+	{
 
-	Core::RefCountPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>();
-
-	vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();
-
-	m_handle.destroyPipeline(pipeline);
-
-	vk::PipelineLayout pipelineLayout = RHIVulkanPipeline->GetLayout();
-	m_handle.destroyPipelineLayout(pipelineLayout);
-
-	std::vector<vk::DescriptorSetLayout> descriptorSetLayouts = RHIVulkanPipeline->GetDescriptors();
-	for (const auto& descriptorSetLayout : descriptorSetLayouts)
-		m_handle.destroyDescriptorSetLayout(descriptorSetLayout);
+	}
 }
 
 // Public Vulkan:
