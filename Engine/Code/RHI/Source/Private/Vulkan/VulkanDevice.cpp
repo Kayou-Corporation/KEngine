@@ -435,7 +435,7 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImagesWithSwapchain(const Swapchain
 }
 
 //-------------- Shader --------------// 
-Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout)
+Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout)
 {
 	Core::RefCountPtr<VulkanShader> shader{};
 
@@ -444,7 +444,7 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 
 	shader = Core::CreateRefPtr<VulkanShader>();
 
-	ShaderData bin = m_shaderCompiler.Load(file, sStage, isGlobalLayout);
+	ShaderData bin = m_shaderCompiler.Load(file, sStage, isGlobalLayout, usesGlobalLayout);
 
 	size_t size = bin.spirv.size();
 
@@ -461,6 +461,7 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 	shader->SetModule(VK_CHECK_RESULT(m_handle.createShaderModule(createInfo), "Failed to create shader module"));
 	shader->SetShaderStage(sStage);
 	shader->SetDescriptors(bin.descriptors);
+	shader->SetPushConstants(bin.pushConstants);
 	shader->SetVertexAttributes(bin.vertexAttributes);
 	shader->SetVertexBindings(bin.vertexBindings);
 

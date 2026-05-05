@@ -111,6 +111,14 @@ struct Descriptor
     }
 };
 
+struct PushConstant
+{
+    std::string name{};
+    size_t size = 0;
+    uint32_t offset = 0;
+    ShaderStage stage{};
+};
+
 struct ShaderData
 {
     std::vector<uint8_t> spirv{};
@@ -118,6 +126,7 @@ struct ShaderData
     std::vector<uint8_t> dxil{};
 #endif
     std::vector<Descriptor> descriptors{};
+    std::vector<PushConstant> pushConstants{};
     std::vector<VertexAttributeLayout> vertexAttributes{};
     std::vector<VertexBindingLayout> vertexBindings{};
 };
@@ -136,23 +145,25 @@ class ShaderCompiler
 public:
     void Initialize();
 
-    ShaderData Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout) const;
+    ShaderData Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout) const;
 
 private:
-    ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage, bool isGlobalLayout) const;
-    static ShaderData Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage, bool isGlobalLayout);
+    ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout) const;
+    static ShaderData Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout);
     static std::vector<VertexAttributeLayout> ReflectVertexInputs(slang::ProgramLayout* layout);
 
     static inline ShaderDataType GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout);
     static inline uint32_t GetFormatSize(ShaderDataType format);
 
-	void WriteReflectionData(std::ofstream& out, const ShaderData& bin) const;
+	void WriteReflectionData(std::ofstream& out, const ShaderData& bin, bool isGlobalLayout, bool usesGlobalLayout) const;
 	void WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const;
+	void WritePushConstants(std::ofstream& out, const std::vector<PushConstant>& pushConstants) const;
 	void WriteVertexAttributes(std::ofstream& out, const std::vector<VertexAttributeLayout>& vertexAttributeLayouts) const;
 	void WriteVertexBindings(std::ofstream& out, const std::vector<VertexBindingLayout>& vertexBindingLayouts) const;
 
-	void ReadReflectionData(std::ifstream& in, ShaderData& bin) const;
+	void ReadReflectionData(std::ifstream& in, ShaderData& bin, bool isGlobalLayout, bool usesGlobalLayout) const;
 	std::vector<Descriptor> ReadDescriptors(std::ifstream& in) const;
+	std::vector<PushConstant> ReadPushConstants(std::ifstream& in) const;
 	std::vector<VertexAttributeLayout> ReadVertexAttributes(std::ifstream& in) const;
 	std::vector<VertexBindingLayout> ReadVertexBindings(std::ifstream& in) const;
 
@@ -170,21 +181,32 @@ public:
 
     virtual ShaderStage GetShaderStage() const { return m_type; }
     virtual const std::vector<Descriptor>& GetDescriptors() const { return m_descriptors; }
+    virtual const std::vector<PushConstant>& GetPushConstants() const { return m_pushConstants; }
     virtual const std::vector<VertexAttributeLayout>& GetVertexAttributes() const { return m_vertexAttributes; }
     virtual const std::vector<VertexBindingLayout>& GetVertexBindings() const { return m_vertexBindings; }
+
+    virtual bool IsGlobalLayout() const { return m_isGlobalLayout; }
+    virtual bool UsesGlobalLayout() const { return m_usesGlobalLayout; }
 
     virtual const VertexAttributeLayout GetVertexAttributeLayout(const std::string name) const;
 
     virtual void SetShaderStage(const ShaderStage& type) { m_type = type; }
     virtual void SetDescriptors(const std::vector<Descriptor>& descriptors) { m_descriptors = descriptors; }
+    virtual void SetPushConstants(const std::vector<PushConstant>& pushConstants) { m_pushConstants = pushConstants; }
     virtual void SetVertexAttributes(const std::vector<VertexAttributeLayout>& vertexAttributes) { m_vertexAttributes = vertexAttributes; }
     virtual void SetVertexBindings(const std::vector<VertexBindingLayout>& vertexBindings) { m_vertexBindings = vertexBindings; }
+
+    virtual void SetIsGlobalLayout(const bool isGlobalLayout) { m_isGlobalLayout = isGlobalLayout; }
+    virtual void SetUsesGlobalLayout(const bool usesGlobalLayout) { m_usesGlobalLayout = usesGlobalLayout; }
 
 protected:
     ShaderStage m_type{};
 	std::vector<Descriptor> m_descriptors{};
+	std::vector<PushConstant> m_pushConstants{};
     std::vector<VertexAttributeLayout> m_vertexAttributes{};
     std::vector<VertexBindingLayout> m_vertexBindings{};
+    bool m_isGlobalLayout = false;
+    bool m_usesGlobalLayout = false;
 };
 
 inline ShaderDataType ShaderCompiler::GetFormatFromSlangType(slang::TypeLayoutReflection* typeLayout)

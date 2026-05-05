@@ -30,3 +30,12 @@ struct DrawData
     Sampler2D texture2D;
 };
 ParameterBlock<DrawData> drawData;
+
+//struct PushConstants
+//{
+//     int textureID;
+//     int modelID;
+//}
+//
+//[push_constant]
+//ConstantBuffer<PushConstants> pushConstants;

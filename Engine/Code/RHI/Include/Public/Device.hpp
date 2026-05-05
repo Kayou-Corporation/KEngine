@@ -97,7 +97,7 @@ public:
 	KENGINE_API virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) = 0; // Use classic Destroy
 
 	// -------------- Shader -------------- // 
-	KENGINE_API virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout) = 0;
+	KENGINE_API virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout) = 0;
 	KENGINE_API virtual void DestroyShader(Core::RefCountPtr<Shader> shader) = 0;
 
 	// -------------- Pipeline -------------- // 

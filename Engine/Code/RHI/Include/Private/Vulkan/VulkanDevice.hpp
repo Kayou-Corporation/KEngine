@@ -94,7 +94,7 @@ public:
     virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) override;
     virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) override;
 
-    virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout) override;
+    virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout) override;
     virtual void DestroyShader(Core::RefCountPtr<Shader> shader) override;
 
     virtual Core::RefCountPtr<GraphicsPipeline> CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) override;

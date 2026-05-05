@@ -1,13 +1,6 @@
 // base.vert.slang
 
-import "frame";
-import "object";
-
-[[vk::binding(0, 0)]]
-ConstantBuffer<CameraUBO> common_camModel;
-
-[[vk::binding(0, 1)]]
-ConstantBuffer<ObjectUBO> per_objModel;
+import "globalLayoutDefinition";
 
 struct VSInput
 {
@@ -32,20 +25,20 @@ VSOutput vsMain(VSInput input)
     VSOutput o;
 
     // Transform Vertex position into world pos
-    float4 world = mul(per_objModel.model, float4(input.position, 1));
+    float4 world = mul(drawData.model, float4(input.position, 1));
     o.worldPos = world.xyz;
 
     // Transform normal position into world pos
-    o.normal = mul((float3x3)per_objModel.normalMatrix, input.normal);
+    o.normal = mul((float3x3)drawData.normalMatrix, input.normal);
 
     // Don't transform texCord, keep in UV space
     o.uv = input.uv;
 
     // Cam pos for lighting purpose in frag (only lit)
-    o.camPos = common_camModel.camPos;
+    o.camPos = frameData.camera.CameraPos;
 
     // Out pixel pos in screen
-    o.position = mul(common_camModel.viewProj, world);
+    o.position = mul(frameData.camera.CameraVP, world);
 
     return o;
 }

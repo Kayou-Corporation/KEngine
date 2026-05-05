@@ -50,7 +50,7 @@ void ShaderCompiler::Initialize()
     m_globalSession->createSession(desc, m_session.writeRef());
 }
 
-ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout) const
+ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout) const
 {
     ShaderData bin{};
 
@@ -82,7 +82,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     {
         std::ifstream r(reflectionPath, std::ios::binary);
         if (CheckIsFileOpenOrValid(r, reflectionPath))
-            ReadReflectionData(r, bin);
+            ReadReflectionData(r, bin, isGlobalLayout, usesGlobalLayout);
 
         std::ifstream s(spirvPath, std::ios::binary);
         if (CheckIsFileOpenOrValid(s, spirvPath))
@@ -97,7 +97,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
         return bin;
     }
 
-    bin = Compile(fullFile, content, entry, stage, isGlobalLayout);
+    bin = Compile(fullFile, content, entry, stage, isGlobalLayout, usesGlobalLayout);
 
     const std::string shaderCacheDir = "Cache/Shaders";
 
@@ -111,7 +111,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
 
     std::ofstream r(reflectionPath, std::ios::binary);
     if (CheckIsFileOpenOrValid(r, reflectionPath))
-        WriteReflectionData(r, bin);
+        WriteReflectionData(r, bin, isGlobalLayout, usesGlobalLayout);
 
     std::ofstream s(spirvPath, std::ios::binary);
     if (CheckIsFileOpenOrValid(s, spirvPath))
@@ -126,7 +126,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     return bin;
 }
 
-ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage, bool isGlobalLayout) const
+ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout) const
 {
     ShaderData bin{};
 
@@ -245,12 +245,12 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
     }
 #endif
 
-	Reflect(bin, linkedProgram->getLayout(), stage, isGlobalLayout);
+	Reflect(bin, linkedProgram->getLayout(), stage, isGlobalLayout, usesGlobalLayout);
 
     return bin;
 }
 
-ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage, bool isGlobalLayout)
+ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout)
 {
     // Reflect vertex input layout if this is a vertex shader
     if (stage == ShaderStage::Vertex)
@@ -273,11 +273,16 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
         }
     }
 
+    if (!isGlobalLayout && usesGlobalLayout)
+        return bin;
+
     slang::TypeLayoutReflection* const globals = layout->getGlobalParamsTypeLayout();
     const uint32_t count = globals->getFieldCount();
     uint32_t trueSetCount = 0;
 
     std::map<uint32_t, Descriptor> descriptorMap;
+    std::map<uint32_t, PushConstant> pushConstantMap;
+    uint32_t pushConstantIdx = 0;
 
     for (uint32_t i = 0; i < count; ++i)
     {
@@ -294,11 +299,11 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
             uint32_t setIndex = field->getBindingIndex();
 
             std::string setName = field->getName();
-    
+
             Descriptor& descriptorSet = descriptorMap[setIndex];
             descriptorSet.index = setIndex;
             descriptorSet.name = setName;
-    
+
             slang::TypeLayoutReflection* elementTypeLayout = typeLayout->getElementTypeLayout();
             const uint32_t bindingCount = elementTypeLayout->getFieldCount();
 
@@ -306,7 +311,7 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
             for (uint32_t j = 0; j < bindingCount; ++j)
             {
                 slang::VariableLayoutReflection* subField = elementTypeLayout->getFieldByIndex(j);
-                if (!subField) 
+                if (!subField)
                     continue;
 
                 slang::TypeLayoutReflection* subTypeLayout = subField->getTypeLayout();
@@ -336,6 +341,47 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
                 descriptorSet.bindings.push_back(binding);
             }
         }
+        else if (typeLayout->getBindingRangeCount() > 0 && typeLayout->getBindingRangeType(0) == slang::BindingType::PushConstant)
+        {
+            std::string name = field->getName();
+
+            slang::TypeLayoutReflection* elementTypeLayout = typeLayout->getElementTypeLayout();
+            if (!elementTypeLayout)
+                elementTypeLayout = typeLayout;
+
+            uint32_t size = static_cast<uint32_t>(elementTypeLayout->getSize());
+            uint32_t offset = static_cast<uint32_t>(field->getOffset());
+
+            PushConstant& pushConstant = pushConstantMap[pushConstantIdx];
+            pushConstant.name = name;
+            pushConstant.size = size;
+            pushConstant.offset = offset;
+            pushConstant.stage = isGlobalLayout ? ShaderStage::All : stage;
+
+            pushConstantIdx++;
+
+            const uint32_t subFieldCount = elementTypeLayout->getFieldCount();
+            for (uint32_t j = 0; j < subFieldCount; ++j)
+            {
+                slang::VariableLayoutReflection* subField = elementTypeLayout->getFieldByIndex(j);
+                if (!subField) 
+                    continue;
+
+                std::string name = subField->getName();
+
+                uint32_t size = static_cast<uint32_t>(subField->getTypeLayout()->getSize(SLANG_PARAMETER_CATEGORY_UNIFORM));
+
+                uint32_t offset = static_cast<uint32_t>(subField->getOffset(SLANG_PARAMETER_CATEGORY_UNIFORM));
+
+                PushConstant& pushConstant = pushConstantMap[pushConstantIdx];
+                pushConstant.name = name;
+                pushConstant.size = size;
+                pushConstant.offset = offset;
+                pushConstant.stage = isGlobalLayout ? ShaderStage::All : stage;
+
+                pushConstantIdx++;
+            }
+        }
     }
 
     std::vector<Descriptor> descriptors;
@@ -345,7 +391,16 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
         descriptors.push_back(snd);
     }
 
+    std::vector<PushConstant> pushConstants;
+    pushConstants.reserve(pushConstantIdx + 1);
+    for (auto& [fst, snd] : pushConstantMap)
+    {
+        pushConstants.push_back(snd);
+    }
+
     bin.descriptors = std::move(descriptors);
+    bin.pushConstants = std::move(pushConstants);
+
     return bin;
 }
 
@@ -403,11 +458,16 @@ std::vector<VertexAttributeLayout> ShaderCompiler::ReflectVertexInputs(slang::Pr
     return attributes;
 }
 
-void ShaderCompiler::WriteReflectionData(std::ofstream& out, const ShaderData& bin) const
+void ShaderCompiler::WriteReflectionData(std::ofstream& out, const ShaderData& bin, bool isGlobalLayout, bool usesGlobalLayout) const
 {
-    WriteDescriptors(out, bin.descriptors);
     WriteVertexAttributes(out, bin.vertexAttributes);
     WriteVertexBindings(out, bin.vertexBindings);
+
+    if (!isGlobalLayout && usesGlobalLayout)
+        return;
+
+    WriteDescriptors(out, bin.descriptors);
+    WritePushConstants(out, bin.pushConstants);
 }
 
 void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const
@@ -440,6 +500,25 @@ void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Desc
                 Core::Write(out, binding.name[i]);
             }
 		}
+    }
+}
+
+void ShaderCompiler::WritePushConstants(std::ofstream& out, const std::vector<PushConstant>& pushConstants) const
+{
+    uint32_t pushConstantCount = static_cast<uint32_t>(pushConstants.size());
+    Core::Write(out, pushConstantCount);
+
+    for (const PushConstant& pushConstant : pushConstants)
+    {
+        size_t nameLen = pushConstant.name.size();
+        Core::Write(out, nameLen);
+        for (size_t i = 0; i < nameLen; ++i)
+        {
+            Core::Write(out, pushConstant.name[i]);
+        }
+        Core::Write(out, pushConstant.size);
+        Core::Write(out, pushConstant.offset);
+        Core::Write(out, pushConstant.stage);
     }
 }
 
@@ -476,11 +555,16 @@ void ShaderCompiler::WriteVertexBindings(std::ofstream& out, const std::vector<V
     }
 }
 
-void ShaderCompiler::ReadReflectionData(std::ifstream& in, ShaderData& bin) const
+void ShaderCompiler::ReadReflectionData(std::ifstream& in, ShaderData& bin, bool isGlobalLayout, bool usesGlobalLayout) const
 {
-    bin.descriptors = ReadDescriptors(in);
     bin.vertexAttributes = ReadVertexAttributes(in);
     bin.vertexBindings = ReadVertexBindings(in);
+
+    if (!isGlobalLayout && usesGlobalLayout)
+        return;
+
+    bin.descriptors = ReadDescriptors(in);
+    bin.pushConstants = ReadPushConstants(in);
 }
 
 std::vector<Descriptor> ShaderCompiler::ReadDescriptors(std::ifstream& in) const
@@ -522,6 +606,32 @@ std::vector<Descriptor> ShaderCompiler::ReadDescriptors(std::ifstream& in) const
 		}
 	}
 	return descriptors;
+}
+
+std::vector<PushConstant> ShaderCompiler::ReadPushConstants(std::ifstream& in) const
+{
+    std::vector<PushConstant> pushConstants{};
+    uint32_t pushConstantCount;
+
+    Core::Read(in, pushConstantCount);
+
+    pushConstants.resize(pushConstantCount);
+    for (uint32_t i = 0; i < pushConstantCount; ++i)
+    {
+        size_t nameLen;
+        Core::Read(in, nameLen);
+        for (size_t j = 0; j < nameLen; ++j)
+        {
+            char nameChar;
+            Core::Read(in, nameChar);
+            pushConstants[i].name += nameChar;
+        }
+        Core::Read(in, pushConstants[i].size);
+        Core::Read(in, pushConstants[i].offset);
+        Core::Read(in, pushConstants[i].stage);
+    }
+
+    return pushConstants;
 }
 
 std::vector<VertexAttributeLayout> ShaderCompiler::ReadVertexAttributes(std::ifstream& in) const
