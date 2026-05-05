@@ -18,6 +18,7 @@ class Fence;
 class Semaphore;
 
 class Pipeline;
+class GraphicsPipeline;
 
 struct SubmitInfo
 {

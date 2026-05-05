@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Public/Pipeline.hpp"
+#include "Public/GraphicsPipeline.hpp"
 
 #include "VulkanUtils.hpp"
 #include "Private/Vulkan/VulkanShader.hpp"
 
 BEGIN_NAMESPACE_RHI
 
-struct VulkanGraphicsPipelineSpecs
+struct VulkanGraphicsPipelineStructs
 {
 	uint32_t colorAttachmentCount = 0;
 	std::vector<vk::Format> colorAttachmentFormats{};
@@ -24,7 +24,7 @@ struct VulkanGraphicsPipelineSpecs
 	vk::PipelineLayout layout{};
 	vk::RenderPass renderPass{};
 
-	// Do not manually set the members below
+	// Do not manually set the members bellow
 
 	vk::PipelineRenderingCreateInfo renderingInfo{}; // Do not manually set
 	vk::PipelineVertexInputStateCreateInfo vertexInputInfo{}; // Do not manually set
@@ -36,16 +36,15 @@ struct VulkanDescriptorSetLayoutSpecs
 	std::vector<vk::DescriptorSetLayoutBinding> bindings{};
 };
 
-class VulkanPipeline : public Pipeline
+class VulkanGraphicsPipeline : public GraphicsPipeline
 {
 public:
-	VulkanPipeline() = default;
-	virtual ~VulkanPipeline() override = default;
+	VulkanGraphicsPipeline() = default;
+	virtual ~VulkanGraphicsPipeline() override = default;
 
 public:
-	VulkanGraphicsPipelineSpecs GetGraphicsCreateInfo(const PipelineSpecs& specs);
-	vk::GraphicsPipelineCreateInfo GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs);
-	vk::ComputePipelineCreateInfo GetComputeCreateInfo(const PipelineSpecs& specs);
+	VulkanGraphicsPipelineStructs GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs);
+	vk::GraphicsPipelineCreateInfo GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineStructs& vulkanGraphicsPipelineSpecs);
 
 	vk::PipelineLayoutCreateInfo GetPipelineLayoutCreateInfo();
 	std::vector<VulkanDescriptorSetLayoutSpecs> GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors);
@@ -66,6 +65,8 @@ private:
 	vk::Pipeline m_handle;
 	vk::PipelineLayout m_layout;
 	std::vector<vk::DescriptorSetLayout> m_descriptors;
+
+	vk::GraphicsPipelineCreateInfo m_createInfo;
 };
 
 END_NAMESPACE_RHI

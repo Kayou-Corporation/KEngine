@@ -11,8 +11,7 @@
 #include "Public/Renderpass.hpp"
 #include "Public/CommandList.hpp"
 #include "Public/Syncronisation.hpp"
-#include "Public/Pipeline.hpp"
-#include "Private/Vulkan/VulkanTranslate.hpp"
+#include "Public/GraphicsPipeline.hpp"
 
 int main()
 {
@@ -167,8 +166,7 @@ int main()
     //Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment);
     Kayou::Core::RefCountPtr<Kayou::RHI::Shader> globalLayout = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex, true);
 
-    //Kayou::RHI::PipelineSpecs unlitPipelineSpecs;
-    //unlitPipelineSpecs.type = Kayou::RHI::PipelineType::Graphics;
+    //Kayou::RHI::GraphicsPipelineSpecs unlitPipelineSpecs;
     //unlitPipelineSpecs.colorAttachmentCount = 1;
     //unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
     //unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
