@@ -264,10 +264,10 @@ int main()
     //device->ClearQueues();
     //device->DestroyBuffer(testBuffer);
 
-    //device->DestroyPipeline(unlitPipeline);
+    device->DestroyPipeline(unlitPipeline);
     
-    //device->DestroyShader(unlitFrag);
-    //device->DestroyShader(baseVert);
+    device->DestroyShader(unlitFrag);
+    device->DestroyShader(baseVert);
     device->DestroyShader(globalLayout);
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
