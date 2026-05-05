@@ -34,6 +34,10 @@ class Pipeline;
 class GraphicsPipeline;
 struct GraphicsPipelineSpecs;
 
+class DescriptorSetLayout;
+class PushConstantLayout;
+class PipelineLayout;
+
 struct DeviceSpecs
 {
 	GpuType gpuType;
@@ -100,9 +104,29 @@ public:
 	KENGINE_API virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout) = 0;
 	KENGINE_API virtual void DestroyShader(Core::RefCountPtr<Shader> shader) = 0;
 
+	// -------------- DescriptorSetLayout -------------- // 
+	KENGINE_API virtual std::vector<Core::RefCountPtr<DescriptorSetLayout>> CreateDescriptorSetsLayouts(Core::RefCountPtr<Shader> shader) = 0;
+	KENGINE_API virtual Core::RefCountPtr<DescriptorSetLayout> CreateDescriptorSetLayout(Core::RefCountPtr<Shader> shader, std::string name) = 0;
+	KENGINE_API virtual Core::RefCountPtr<DescriptorSetLayout> CreateDescriptorSetLayout(Core::RefCountPtr<Shader> shader, uint32_t index) = 0;
+	KENGINE_API virtual void DestroyDescriptorSetsLayouts(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors) = 0;
+	KENGINE_API virtual void DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLayout> descriptors) = 0;
+
+	// -------------- PushConstantLayout -------------- // 
+	KENGINE_API virtual std::vector<Core::RefCountPtr<PushConstantLayout>> CreatePushConstantsLayouts(Core::RefCountPtr<Shader> shader) = 0;
+	KENGINE_API virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader, std::string name) = 0;
+	KENGINE_API virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) = 0;
+	KENGINE_API virtual void DestroyPushConstantLayout(Core::RefCountPtr<PushConstantLayout> pushConstant) = 0;
+
+	// -------------- Pipeline Layout -------------- // 
+	KENGINE_API virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) = 0;
+	KENGINE_API virtual void DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout>) = 0;
+
 	// -------------- Pipeline -------------- // 
 	KENGINE_API virtual Core::RefCountPtr<GraphicsPipeline> CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) = 0;
+	// TODO : Implment compute pipeline
+	//KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
 	KENGINE_API virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) = 0;
+
 
 protected:
 	ShaderCompiler m_shaderCompiler;

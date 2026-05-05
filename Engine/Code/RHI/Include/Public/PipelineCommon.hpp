@@ -16,6 +16,7 @@ public:
 	KENGINE_API uint32_t GetIndex() const { return m_descriptorIndex; }
 
 	KENGINE_API void SetName(std::string name) { m_descriptorName = name; }
+	KENGINE_API void SetIndex(uint32_t index) { m_descriptorIndex = index; }
 
 protected:
 	std::string m_descriptorName;

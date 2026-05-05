@@ -94,10 +94,31 @@ public:
     virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) override;
     virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) override;
 
+    // -------------- Shader -------------- // 
     virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout) override;
     virtual void DestroyShader(Core::RefCountPtr<Shader> shader) override;
 
+    // -------------- DescriptorSetLayout -------------- // 
+    virtual std::vector<Core::RefCountPtr<DescriptorSetLayout>> CreateDescriptorSetsLayouts(Core::RefCountPtr<Shader> shader) override;
+    virtual Core::RefCountPtr<DescriptorSetLayout> CreateDescriptorSetLayout(Core::RefCountPtr<Shader> shader, std::string name) override;
+    virtual Core::RefCountPtr<DescriptorSetLayout> CreateDescriptorSetLayout(Core::RefCountPtr<Shader> shader, uint32_t index) override;
+    virtual void DestroyDescriptorSetsLayouts(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors) override;
+    virtual void DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLayout> descriptors) override;
+
+    // -------------- PushConstantLayout -------------- // 
+    virtual std::vector<Core::RefCountPtr<PushConstantLayout>> CreatePushConstantsLayouts(Core::RefCountPtr<Shader> shader) override;
+    virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader, std::string name) override;
+    virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;
+    virtual void DestroyPushConstantLayout(Core::RefCountPtr<PushConstantLayout> pushConstant) override;
+
+    // -------------- Pipeline Layout -------------- // 
+    virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;
+    virtual void DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout>) override;
+
+    // -------------- Pipeline -------------- // 
     virtual Core::RefCountPtr<GraphicsPipeline> CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) override;
+    // TODO : Implment compute pipeline
+    //KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
     virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) override;
 
 

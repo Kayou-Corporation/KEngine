@@ -12,11 +12,7 @@ struct VulkanBinding
 	~VulkanBinding() = default;
 
 	std::string name;
-	uint32_t setIndex;
-	uint32_t bindingIndex;
-	vk::ShaderStageFlagBits stage;
-	vk::DescriptorType type;
-	uint32_t count;
+	vk::DescriptorSetLayoutBinding binding;
 };
 
 class VulkanDescriptorSetLayout : public DescriptorSetLayout
@@ -31,6 +27,7 @@ public:
 	VulkanBinding GetBinding(uint32_t bindingIndex);
 	std::vector<std::string> GetAllBindingsNames();
 	std::vector<VulkanBinding> GetAllBindings() { return m_bindings; }
+	std::vector<vk::DescriptorSetLayoutBinding> GetAllVulkanBindings();
 
 	void SetHandle(vk::DescriptorSetLayout layout) { m_descriptorSetLayout = layout; }
 	void AddBinding(VulkanBinding binding) { m_bindings.push_back(binding); }
@@ -48,10 +45,13 @@ public:
 
 public:
 	vk::PushConstantRange GetHandle() { return m_pushConstantRange; }
+	std::string GetName() { return m_name; }
 
 	void SetHandle(vk::PushConstantRange layout) { m_pushConstantRange = layout; }
+	void SetName(std::string name) { m_name = name; }
 
 private:
+	std::string m_name;
 	vk::PushConstantRange m_pushConstantRange;
 };
 
