@@ -166,6 +166,10 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment, false, true);
     Kayou::Core::RefCountPtr<Kayou::RHI::Shader> globalLayout = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex, true, true);
 
+    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout>> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayout);
+
+    Kayou::Core::RefCountPtr<Kayou::RHI::PipelineLayout> globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
+
     Kayou::RHI::GraphicsPipelineSpecs unlitPipelineSpecs;
     unlitPipelineSpecs.colorAttachmentCount = 1;
     unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
@@ -180,6 +184,7 @@ int main()
     unlitPipelineSpecs.dynamicStates = { Kayou::RHI::DynamicState::ViewPort, Kayou::RHI::DynamicState::Scissor };
     unlitPipelineSpecs.topology = Kayou::RHI::PrimitiveTopology::TriangleList;
     unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
+    unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
     
     Kayou::Core::RefCountPtr<Kayou::RHI::Pipeline> unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
 
@@ -265,6 +270,8 @@ int main()
     //device->DestroyBuffer(testBuffer);
 
     device->DestroyPipeline(unlitPipeline);
+    device->DestroyPipelineLayout(globalPipelineLayout);
+    device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
     
     device->DestroyShader(unlitFrag);
     device->DestroyShader(baseVert);

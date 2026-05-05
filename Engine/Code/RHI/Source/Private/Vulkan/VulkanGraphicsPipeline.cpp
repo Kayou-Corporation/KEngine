@@ -148,4 +148,25 @@ vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateIn
 	return createInfo;
 }
 
+vk::VertexInputBindingDescription VulkanGraphicsPipeline::GetBindingDescriptor(const VertexBindingLayout& RHIBindingLayout)
+{
+	vk::VertexInputBindingDescription bindingDescription{};
+	bindingDescription.binding = RHIBindingLayout.binding;
+	bindingDescription.stride = RHIBindingLayout.stride;
+	bindingDescription.inputRate = TranslateToVulkan(RHIBindingLayout.inputRate);
+
+	return bindingDescription;
+}
+
+vk::VertexInputAttributeDescription VulkanGraphicsPipeline::GetAttributeDescriptor(const VertexAttributeLayout& RHiAttributeLayout)
+{
+	vk::VertexInputAttributeDescription attributeDescription{};
+	attributeDescription.binding = RHiAttributeLayout.binding;
+	attributeDescription.location = RHiAttributeLayout.location;
+	attributeDescription.format = TranslateToVulkan(RHiAttributeLayout.format);
+	attributeDescription.offset = RHiAttributeLayout.offset;
+
+	return attributeDescription;
+}
+
 END_NAMESPACE_RHI

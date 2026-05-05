@@ -3,6 +3,7 @@
 #include <atomic>
 #include <spdlog/spdlog.h>
 #include "Utils/Core.hpp"
+#include <concepts>
 
 BEGIN_NAMESPACE_CORE
 

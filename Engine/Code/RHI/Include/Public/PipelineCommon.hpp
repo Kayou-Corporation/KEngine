@@ -70,7 +70,7 @@ public:
 	virtual ~Pipeline() = default;
 
 	KENGINE_API PipelineType GetType() { return m_type; }
-	KENGINE_API Core::RefCountPtr<DescriptorSetLayout> GetLayout() { return m_layout; }
+	KENGINE_API Core::RefCountPtr<PipelineLayout> GetLayout() { return m_layout; }
 
 	KENGINE_API void SetType(PipelineType type) { m_type = type; }
 	KENGINE_API void SetLayout(Core::RefCountPtr<PipelineLayout> layout) { m_layout = layout; }
