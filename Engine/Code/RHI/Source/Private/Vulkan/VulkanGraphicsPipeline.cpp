@@ -1,10 +1,10 @@
-#include "Private/Vulkan/VulkanPipeline.hpp"
+#include "Private/Vulkan/VulkanGraphicsPipeline.hpp"
 
 #include "Private/Vulkan/VulkanTranslate.hpp"
 
 BEGIN_NAMESPACE_RHI
 
-VulkanGraphicsPipelineSpecs VulkanPipeline::GetGraphicsCreateInfo(const PipelineSpecs& specs)
+VulkanGraphicsPipelineSpecs VulkanGraphicsPipeline::GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs)
 {
 	VulkanGraphicsPipelineSpecs createInfo{};
 
@@ -116,7 +116,7 @@ VulkanGraphicsPipelineSpecs VulkanPipeline::GetGraphicsCreateInfo(const Pipeline
 	return createInfo;
 }
 
-vk::GraphicsPipelineCreateInfo VulkanPipeline::GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs)
+vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs)
 {
 	vk::GraphicsPipelineCreateInfo createInfo{};
 
@@ -148,16 +148,7 @@ vk::GraphicsPipelineCreateInfo VulkanPipeline::GetVulkanGraphicsCreateInfo(Vulka
 	return createInfo;
 }
 
-vk::ComputePipelineCreateInfo VulkanPipeline::GetComputeCreateInfo(const PipelineSpecs& specs)
-{
-	// Not Implemented yet
-	(void)specs;
-	vk::ComputePipelineCreateInfo createInfo{};
-
-	return createInfo;
-}
-
-vk::PipelineLayoutCreateInfo VulkanPipeline::GetPipelineLayoutCreateInfo()
+vk::PipelineLayoutCreateInfo VulkanGraphicsPipeline::GetPipelineLayoutCreateInfo()
 {
 	vk::PipelineLayoutCreateInfo createInfo{};
 
@@ -175,7 +166,7 @@ vk::PipelineLayoutCreateInfo VulkanPipeline::GetPipelineLayoutCreateInfo()
 	return createInfo;
 }
 
-vk::VertexInputBindingDescription VulkanPipeline::GetBindingDescriptor(const VertexBindingLayout& RHIBindingLayout)
+vk::VertexInputBindingDescription VulkanGraphicsPipeline::GetBindingDescriptor(const VertexBindingLayout& RHIBindingLayout)
 {
 	vk::VertexInputBindingDescription bindingDescription{};
 	bindingDescription.binding = RHIBindingLayout.binding;
@@ -185,7 +176,7 @@ vk::VertexInputBindingDescription VulkanPipeline::GetBindingDescriptor(const Ver
 	return bindingDescription;
 }
 
-vk::VertexInputAttributeDescription VulkanPipeline::GetAttributeDescriptor(const VertexAttributeLayout& RHiAttributeLayout)
+vk::VertexInputAttributeDescription VulkanGraphicsPipeline::GetAttributeDescriptor(const VertexAttributeLayout& RHiAttributeLayout)
 {
 	vk::VertexInputAttributeDescription attributeDescription{};
 	attributeDescription.binding = RHiAttributeLayout.binding;
@@ -196,7 +187,7 @@ vk::VertexInputAttributeDescription VulkanPipeline::GetAttributeDescriptor(const
 	return attributeDescription;
 }
 
-std::vector<VulkanDescriptorSetLayoutSpecs> VulkanPipeline::GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors)
+std::vector<VulkanDescriptorSetLayoutSpecs> VulkanGraphicsPipeline::GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors)
 {
 	std::vector<VulkanDescriptorSetLayoutSpecs> layoutsSpecs{};
 	layoutsSpecs.reserve(RHIDescriptors.size());
@@ -221,7 +212,7 @@ std::vector<VulkanDescriptorSetLayoutSpecs> VulkanPipeline::GetDescriptorSetLayo
 	return layoutsSpecs;
 }
 
-std::vector<vk::DescriptorSetLayoutCreateInfo> VulkanPipeline::GetVulkanDescriptorSetLayoutCreateInfo(std::vector<VulkanDescriptorSetLayoutSpecs>& RHIVulkanDescriptorSetLayoutSpecs)
+std::vector<vk::DescriptorSetLayoutCreateInfo> VulkanGraphicsPipeline::GetVulkanDescriptorSetLayoutCreateInfo(std::vector<VulkanDescriptorSetLayoutSpecs>& RHIVulkanDescriptorSetLayoutSpecs)
 {
 	std::vector<vk::DescriptorSetLayoutCreateInfo> layoutsInfo{};
 

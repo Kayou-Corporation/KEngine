@@ -10,11 +10,9 @@ BEGIN_NAMESPACE_RHI
 class Shader;
 class Swapchain;
 
-struct PipelineSpecs
+struct GraphicsPipelineSpecs
 {
-	PipelineType type;
-
-	// vk::PipelineRenderingCreateInfo
+	// vk::PipelineRenderingCreateInfo	
 	std::vector<Format> colorAttachmentFormats;
 	uint32_t colorAttachmentCount;
 	Format depthAttachment;
@@ -36,10 +34,10 @@ struct PipelineSpecs
 	std::vector<Core::RefCountPtr<Shader>> shaders{};
 };
 
-class Pipeline : virtual public Core::IResource
+class GraphicsPipeline : virtual public Core::IResource
 {
 public:
-	virtual ~Pipeline() = default;
+	virtual ~GraphicsPipeline() = default;
 
 	KENGINE_API void SetType(PipelineType type) { m_type = type; }
 
@@ -47,7 +45,6 @@ public:
 
 protected:
 	PipelineType m_type;
-
 };
 
 END_NAMESPACE_RHI

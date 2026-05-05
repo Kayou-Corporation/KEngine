@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Public/Pipeline.hpp"
+#include "Public/GraphicsPipeline.hpp"
 
 #include "VulkanUtils.hpp"
 #include "Private/Vulkan/VulkanShader.hpp"
@@ -36,16 +36,15 @@ struct VulkanDescriptorSetLayoutSpecs
 	std::vector<vk::DescriptorSetLayoutBinding> bindings{};
 };
 
-class VulkanPipeline : public Pipeline
+class VulkanGraphicsPipeline : public GraphicsPipeline
 {
 public:
-	VulkanPipeline() = default;
-	virtual ~VulkanPipeline() override = default;
+	VulkanGraphicsPipeline() = default;
+	virtual ~VulkanGraphicsPipeline() override = default;
 
 public:
-	VulkanGraphicsPipelineSpecs GetGraphicsCreateInfo(const PipelineSpecs& specs);
+	VulkanGraphicsPipelineSpecs GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs);
 	vk::GraphicsPipelineCreateInfo GetVulkanGraphicsCreateInfo(VulkanGraphicsPipelineSpecs& vulkanGraphicsPipelineSpecs);
-	vk::ComputePipelineCreateInfo GetComputeCreateInfo(const PipelineSpecs& specs);
 
 	vk::PipelineLayoutCreateInfo GetPipelineLayoutCreateInfo();
 	std::vector<VulkanDescriptorSetLayoutSpecs> GetDescriptorSetLayoutCreateInfo(std::vector<Descriptor>& RHIDescriptors);

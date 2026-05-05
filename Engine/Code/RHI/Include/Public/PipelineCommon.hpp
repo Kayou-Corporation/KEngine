@@ -52,11 +52,11 @@ public:
 
 	KENGINE_API Core::RefCountPtr<DescriptorSetLayout> GetDescriptorSetLayout(std::string name) const;
 	KENGINE_API Core::RefCountPtr<DescriptorSetLayout> GetDescriptorSetLayout(uint32_t index) const;
-	KENGINE_API std::vector<Core::RefCountPtr<DescriptorSetLayout>>& GetAllDescriptorSetsLayouts() const { return m_descriptorsLayouts; }
+	KENGINE_API std::vector<Core::RefCountPtr<DescriptorSetLayout>>& GetAllDescriptorSetsLayouts() { return m_descriptorsLayouts; }
 	KENGINE_API std::vector<std::string> GetAllDescriptorSetsLayoutsNames()const;
 
 	KENGINE_API Core::RefCountPtr<PushConstantLayout> GetPushConstantLayouts(std::string name) const;
-	KENGINE_API std::vector<Core::RefCountPtr<PushConstantLayout>>& GetAllPushConstantsLayouts() const { return m_pushConstantsLayouts; }
+	KENGINE_API std::vector<Core::RefCountPtr<PushConstantLayout>>& GetAllPushConstantsLayouts() { return m_pushConstantsLayouts; }
 
 	KENGINE_API void AddDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLayout> layout) { m_descriptorsLayouts.push_back(layout); }
 	KENGINE_API void AddPushConstantLayout(Core::RefCountPtr<PushConstantLayout> layout) { m_pushConstantsLayouts.push_back(layout); }
@@ -65,5 +65,7 @@ protected:
 	std::vector<Core::RefCountPtr<DescriptorSetLayout>> m_descriptorsLayouts;
 	std::vector<Core::RefCountPtr<PushConstantLayout>> m_pushConstantsLayouts;
 };
+
+
 
 END_NAMESPACE_RHI
