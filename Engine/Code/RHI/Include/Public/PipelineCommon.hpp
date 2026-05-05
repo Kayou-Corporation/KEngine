@@ -16,6 +16,7 @@ public:
 	KENGINE_API uint32_t GetIndex() const { return m_descriptorIndex; }
 
 	KENGINE_API void SetName(std::string name) { m_descriptorName = name; }
+	KENGINE_API void SetIndex(uint32_t index) { m_descriptorIndex = index; }
 
 protected:
 	std::string m_descriptorName;
@@ -30,18 +31,15 @@ public:
 
 	KENGINE_API std::string GetName() const { return m_constantName; }
 	KENGINE_API ShaderStage GetStage() const { return m_stage; }
-	KENGINE_API uint32_t GetOffset() const { return m_offset; }
 	KENGINE_API uint32_t GetSize() const { return m_size; }
 
 	KENGINE_API void SetName(std::string name) { m_constantName = name; }
 	KENGINE_API void SetStage(ShaderStage stage) { m_stage = stage; }
-	KENGINE_API void SetOffset(uint32_t size) { m_offset = size; }
 	KENGINE_API void SetSize(uint32_t offset) { m_size = offset; }
 
 protected:
 	std::string  m_constantName;
 	ShaderStage m_stage;
-	uint32_t m_offset;
 	uint32_t m_size;
 };
 

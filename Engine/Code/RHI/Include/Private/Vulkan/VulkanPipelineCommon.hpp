@@ -12,11 +12,7 @@ struct VulkanBinding
 	~VulkanBinding() = default;
 
 	std::string name;
-	uint32_t setIndex;
-	uint32_t bindingIndex;
-	vk::ShaderStageFlagBits stage;
-	vk::DescriptorType type;
-	uint32_t count;
+	vk::DescriptorSetLayoutBinding binding;
 };
 
 class VulkanDescriptorSetLayout : public DescriptorSetLayout
@@ -31,6 +27,7 @@ public:
 	VulkanBinding GetBinding(uint32_t bindingIndex);
 	std::vector<std::string> GetAllBindingsNames();
 	std::vector<VulkanBinding> GetAllBindings() { return m_bindings; }
+	std::vector<vk::DescriptorSetLayoutBinding> GetAllVulkanBindings();
 
 	void SetHandle(vk::DescriptorSetLayout layout) { m_descriptorSetLayout = layout; }
 	void AddBinding(VulkanBinding binding) { m_bindings.push_back(binding); }
@@ -38,6 +35,17 @@ public:
 private:
 	vk::DescriptorSetLayout m_descriptorSetLayout;
 	std::vector<VulkanBinding> m_bindings;
+};
+
+struct VulkanConstant
+{
+	VulkanConstant() = default;
+	~VulkanConstant() = default;
+
+	std::string constantName;
+	ShaderStage stage;
+	uint32_t offset;
+	uint32_t size;
 };
 
 class VulkanPushConstantLayout : public PushConstantLayout
@@ -48,10 +56,12 @@ public:
 
 public:
 	vk::PushConstantRange GetHandle() { return m_pushConstantRange; }
-
+	std::vector<VulkanConstant> GetAllConstants() { return m_constants; }
+	VulkanConstant GetConstant(std::string name);
 	void SetHandle(vk::PushConstantRange layout) { m_pushConstantRange = layout; }
 
 private:
+	std::vector<VulkanConstant> m_constants;
 	vk::PushConstantRange m_pushConstantRange;
 };
 

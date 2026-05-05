@@ -20,7 +20,7 @@ VulkanBinding VulkanDescriptorSetLayout::GetBinding(uint32_t bindingIndex)
 {
 	for (const VulkanBinding& binding : m_bindings)
 	{
-		if (binding.bindingIndex == bindingIndex)
+		if (binding.binding.binding == bindingIndex)
 		{
 			return binding;
 		}
@@ -40,4 +40,31 @@ std::vector<std::string> VulkanDescriptorSetLayout::GetAllBindingsNames()
 
 	return allDescriptorSetsLayoutsNames;
 }
+
+std::vector<vk::DescriptorSetLayoutBinding> VulkanDescriptorSetLayout::GetAllVulkanBindings()
+{
+	std::vector<vk::DescriptorSetLayoutBinding> bindings;
+
+	for (const VulkanBinding& vulkanBinding : m_bindings)
+	{
+		bindings.push_back(vulkanBinding.binding);
+	}
+
+	return bindings;
+}
+
+VulkanConstant VulkanPushConstantLayout::GetConstant(std::string name)
+{
+	for (const VulkanConstant& constant : m_constants)
+	{
+		if (constant.constantName == name)
+		{
+			return constant;
+		}
+	}
+
+	spdlog::warn("Constant {} doesn't exist in this Push Constant Layout", name);
+	return VulkanConstant();
+}
+
 END_NAMESPACE_RHI
