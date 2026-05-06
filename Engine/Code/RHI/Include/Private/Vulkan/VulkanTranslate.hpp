@@ -853,4 +853,48 @@ inline vk::PipelineBindPoint TranslateToVulkan(PipelineType pipelineType)
     }
 }
 
+inline vk::DescriptorType TranslateToVulkan(DescriptorType type)
+{
+    switch (type)
+    {
+    case DescriptorType::Sampler:
+        return vk::DescriptorType::eSampler;
+
+    case DescriptorType::CombinedImageSampler:
+        return vk::DescriptorType::eCombinedImageSampler;
+
+    case DescriptorType::SampledImage:
+        return vk::DescriptorType::eSampledImage;
+
+    case DescriptorType::StorageImage:
+        return vk::DescriptorType::eStorageImage;
+
+    case DescriptorType::UniformTexelBuffer:
+        return vk::DescriptorType::eUniformTexelBuffer;
+
+    case DescriptorType::StorageTexelBuffer:
+        return vk::DescriptorType::eStorageTexelBuffer;
+
+    case DescriptorType::UniformBuffer:
+        return vk::DescriptorType::eUniformBuffer;
+
+    case DescriptorType::StorageBuffer:
+        return vk::DescriptorType::eStorageBuffer;
+
+    case DescriptorType::UniformBufferDynamic:
+        return vk::DescriptorType::eUniformBufferDynamic;
+
+    case DescriptorType::StorageBufferDynamic:
+        return vk::DescriptorType::eStorageBufferDynamic;
+
+    case DescriptorType::InputAttachment:
+        return vk::DescriptorType::eInputAttachment;
+
+    case DescriptorType::AccelerationStructure:
+        return vk::DescriptorType::eAccelerationStructureKHR;
+    }
+
+    return vk::DescriptorType::eSampler;
+}
+
 END_NAMESPACE_RHI

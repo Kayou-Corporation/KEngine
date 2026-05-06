@@ -109,6 +109,10 @@ public:
     virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader) override;
     virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) override;
 
+    // -------------- Descriptor Set -------------- // 
+    KENGINE_API virtual Core::RefCountPtr<DescriptorSet> CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) override;
+    KENGINE_API virtual void DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> descriptorSet) override;
+
     // -------------- Pipeline Layout -------------- // 
     virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;
     virtual void DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout>) override;

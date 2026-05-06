@@ -38,6 +38,8 @@ class DescriptorSetLayout;
 class PushConstantLayout;
 class PipelineLayout;
 
+class DescriptorSet;
+
 struct DeviceSpecs
 {
 	GpuType gpuType;
@@ -114,6 +116,10 @@ public:
 	// -------------- PushConstantLayout -------------- // 
 	KENGINE_API virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader) = 0;
 	KENGINE_API virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) = 0;
+
+	// -------------- Descriptor Set -------------- // 
+	KENGINE_API virtual Core::RefCountPtr<DescriptorSet> CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) = 0;
+	KENGINE_API virtual void DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> descriptorSet) = 0;
 
 	// -------------- Pipeline Layout -------------- // 
 	KENGINE_API virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) = 0;

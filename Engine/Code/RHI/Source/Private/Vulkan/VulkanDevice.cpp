@@ -11,6 +11,7 @@
 #include "Private/Vulkan/VulkanGraphicsPipeline.hpp"
 #include "Private/Vulkan/VulkanCommandList.hpp"
 #include "Private/Vulkan/VulkanSyncronisation.hpp"
+#include "Private/Vulkan/VulkanDescriptorSet.hpp"
 
 #include <map>
 #include <set>
@@ -661,6 +662,53 @@ void VulkanDevice::DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<Pus
 {
 	// Empty
 	pushConstants.clear();
+}
+
+// -------------- Descriptor Set -------------- // 
+Core::RefCountPtr<DescriptorSet> VulkanDevice::CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> RHILayout)
+{
+	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::CreateRefPtr<VulkanDescriptorSet>();
+
+	Core::RefCountPtr<VulkanDescriptorSetLayout> RHIVulkanLayout = RHILayout.CastAs<VulkanDescriptorSetLayout>();
+
+	std::vector<VulkanBinding> bindings = RHIVulkanLayout->GetAllBindings();
+
+	std::map<vk::DescriptorType, uint32_t> descriptors;
+	uint32_t totalDescriptorsCount = 0;
+	for (const VulkanBinding& binding : bindings)
+	{
+		if (descriptors.find(binding.binding.descriptorType) != descriptors.end())
+		{
+			descriptors[binding.binding.descriptorType] += binding.binding.descriptorCount;
+		}
+		else
+		{
+			descriptors.emplace(binding.binding.descriptorType, binding.binding.descriptorCount);
+		}
+		totalDescriptorsCount += binding.binding.descriptorCount;
+	}
+	RHIVulkanDescriptorSet->SetBindings(bindings);
+
+	vk::DescriptorPoolCreateInfo poolCreateInfo = RHIVulkanDescriptorSet->GetPoolCreateInfo(descriptors, totalDescriptorsCount);
+	vk::DescriptorPool pool = VK_CHECK_RESULT(m_handle.createDescriptorPool(poolCreateInfo), "Coundn't create Descriptor pool");
+	RHIVulkanDescriptorSet->SetPool(pool);
+
+	vk::DescriptorSetAllocateInfo allocInfo = RHIVulkanDescriptorSet->GetAllocInfo(RHIVulkanLayout->GetHandle());
+
+	std::vector<vk::DescriptorSet> descriptorSet = VK_CHECK_RESULT(m_handle.allocateDescriptorSets(allocInfo), "Coundn't allocate descriptor sets");
+	
+	RHIVulkanDescriptorSet->SetHanlde(descriptorSet[0]);
+
+	return RHIVulkanDescriptorSet;
+}
+
+void VulkanDevice::DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet)
+{
+	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
+
+	vk::DescriptorPool pool = RHIVulkanDescriptorSet->GetPool();
+
+	m_handle.destroyDescriptorPool(pool);
 }
 
 // -------------- Pipeline Layout -------------- // 

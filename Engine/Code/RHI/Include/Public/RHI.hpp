@@ -366,4 +366,20 @@ enum class VertexInputRate : uint8_t
 	PerInstance
 };
 
+enum class DescriptorType
+{
+	Sampler,
+	CombinedImageSampler,
+	SampledImage,
+	StorageImage,
+	UniformTexelBuffer,
+	StorageTexelBuffer,
+	UniformBuffer,
+	StorageBuffer,
+	UniformBufferDynamic,
+	StorageBufferDynamic,
+	InputAttachment,
+	AccelerationStructure
+};
+
 END_NAMESPACE_RHI
