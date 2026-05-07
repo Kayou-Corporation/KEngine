@@ -62,7 +62,7 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 	VmaAllocation bufferAllocation = RHIVulkanBuffer->GetAllocation();
 	vk::PipelineStageFlagBits pipelineStage = RHIVulkanBuffer->GetPipelineStage();
 	vk::Buffer bufferHandle = RHIVulkanBuffer->GetHandle();
-	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(RHIVulkanBuffer->GetUsage());
+	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(RHIVulkanBuffer->GetPrimaryUsage());
 
 	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
 
@@ -120,7 +120,7 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 		trackedStagingBuffer->allocation = stagingAlloc;
 		trackedStagingBuffer->allocationInfo = stagingAllocInfo;
 
-		m_handle->trackedStagingBuffer = trackedStagingBuffer;
+		m_handle->trackedStagingBuffers.push_back(trackedStagingBuffer);
 	}
 	else
 	{
@@ -244,12 +244,11 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 	trackedStagingBuffer->handle = stagingBuf;
 	trackedStagingBuffer->allocation = stagingAlloc;
 	trackedStagingBuffer->allocationInfo = stagingAllocInfo;
-	m_handle->trackedStagingBuffer = trackedStagingBuffer;
+	m_handle->trackedStagingBuffers.push_back(trackedStagingBuffer);
 
 
 	// --------------------  TRANSITION TO FINAL LAYOUT FOR USE ----------------------- // 
 	vk::ImageLayout finalLayout = RHIVulkanImage->GetFinalLayout();
-
 
 	// A little bit "hardcode" but this function should only be use with a final layout = transitionToFinalLayout
 	vk::ImageMemoryBarrier transitionToFinalLayout{};

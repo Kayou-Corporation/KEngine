@@ -13,6 +13,35 @@
 #include "Public/Syncronisation.hpp"
 #include "Public/GraphicsPipeline.hpp"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4309) // Pour MSVC
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmicrosoft-enum-value"
+#endif
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#include <glm/glm.hpp>
+
+struct Vertex
+{
+    glm::vec3 pos;
+    glm::vec3 normal;
+    glm::vec2 uv;
+};
+
 int main()
 {
 #ifdef KENGINE_DEBUG
@@ -25,6 +54,76 @@ int main()
     //
     //compiler.Load("Engine/Assets/Shaders/hello-world.compute.slang", Kayou::RHI::ShaderType::Compute);
 
+    // Read base mesh 
+
+#pragma region Mesh
+    std::string meshPath = "D:/Projets/KEngine/Engine/Assets/Meshes/viking_room.obj";
+    Assimp::Importer t_importer{};
+    const aiScene* t_scene = t_importer.ReadFile(meshPath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_FindDegenerates | aiProcess_FindInvalidData | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_GenSmoothNormals | aiProcess_FixInfacingNormals);
+    if (!t_scene || !t_scene->mRootNode)
+    {
+        spdlog::error("coudn't find path");
+    }
+    std::string t_directory = meshPath.substr(0, meshPath.find_last_of('/'));
+
+    std::vector<Vertex> meshVertices;
+    std::vector<int> meshIndices;
+	for (unsigned int i = 0; i < t_scene->mNumMeshes; ++i)
+	{
+		const aiMesh* mesh = t_scene->mMeshes[i];
+
+		uint32_t vertexOffset = static_cast<uint32_t>(meshVertices.size());
+
+		for (unsigned int v = 0; v < mesh->mNumVertices; ++v)
+		{
+			Vertex vertex;
+
+			if (mesh->HasPositions())
+			{
+				vertex.pos = glm::vec3(
+					mesh->mVertices[v].x,
+					mesh->mVertices[v].y,
+					mesh->mVertices[v].z
+				);
+			}
+
+			if (mesh->HasNormals())
+			{
+				vertex.normal = glm::vec3(
+					mesh->mNormals[v].x,
+					mesh->mNormals[v].y,
+					mesh->mNormals[v].z
+				);
+			}
+
+			if (mesh->HasTextureCoords(0))
+			{
+				vertex.uv = glm::vec2(
+					mesh->mTextureCoords[0][v].x,
+					1.f - mesh->mTextureCoords[0][v].y // Flip Y pour Vulkan
+				);
+			}
+			else
+			{
+				vertex.uv = glm::vec2(0.0f, 0.0f);
+			}
+
+			meshVertices.push_back(vertex);
+		}
+
+		for (unsigned int f = 0; f < mesh->mNumFaces; ++f)
+		{
+			const aiFace& face = mesh->mFaces[f];
+
+			for (unsigned int indexIdx = 0; indexIdx < face.mNumIndices; ++indexIdx)
+			{
+				meshIndices.push_back(face.mIndices[indexIdx] + vertexOffset);
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region Setup 
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
 
     Kayou::Core::WindowSpecs specs;
@@ -68,18 +167,46 @@ int main()
     sSpecs.depthImageFormat = Kayou::RHI::Format::D32_SFLOAT;
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
+#pragma endregion
 
-    //Kayou::RHI::BufferSpecs bufferSpecs{};
-    //bufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Vertex;
-    //bufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
-    //bufferSpecs.size = 65536;
-    //bufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
-    //bufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
-    //
-    //Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> testBuffer = device->CreateBuffer(bufferSpecs);
+    auto copyBufferDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+    copyBufferDataCommandList->Open();
 
+    // Vertex Buffer 
+    Kayou::RHI::BufferSpecs vertexbufferSpecs{};
+    vertexbufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Vertex;
+    vertexbufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
+    vertexbufferSpecs.size = meshVertices.size() * sizeof(Vertex);
+    vertexbufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
+    vertexbufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
+    
+    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
+    copyBufferDataCommandList->SetBufferData(vertexBuffer, meshVertices.data(), meshVertices.size() * sizeof(Vertex), 0);
+    
+    // Index Buffer
+    Kayou::RHI::BufferSpecs indexBufferSpecs{};
+    indexBufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Index;
+    indexBufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
+    indexBufferSpecs.size = meshIndices.size() * sizeof(int);
+    indexBufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
+    indexBufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
+    
+    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> indexBuffer = device->CreateBuffer(indexBufferSpecs);
+    copyBufferDataCommandList->SetBufferData(indexBuffer, meshIndices.data(), meshIndices.size() * sizeof(int), 0);
+    
+    copyBufferDataCommandList->Close();
+    
+    Kayou::RHI::SubmitInfo submitInfo;
+    submitInfo.stage = Kayou::RHI::PipelineStage::Transfer;
+    
+    device->SubmitCommandList(copyBufferDataCommandList, submitInfo);
+
+
+    
+    // Presentation images
     std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Image>> presentationImages = device->CreatePresentationImages(swapchain);
-
+    
+    // depth images
     Kayou::RHI::SwapchainImageSpecs depthImageSpecs; 
     depthImageSpecs.imageType = Kayou::RHI::SwapchainImageType::Depth;
     depthImageSpecs.targetLayout = Kayou::RHI::Layout::DepthStencilAttachment;
@@ -121,25 +248,6 @@ int main()
 
     uint32_t windowWidth = window->GetWidth();
     uint32_t windowHeight = window->GetHeight();
-
-    //std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Fence>> inFlightFences;
-    //std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> imageAvailablesSemaphore;
-    //std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> renderFinishedSemaphores;
-
-    //for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
-    //{
-    //    Kayou::Core::RefCountPtr<Kayou::RHI::Fence> fence = device->CreateFence();
-    //    inFlightFences.push_back(fence);
-    //
-    //    Kayou::RHI::SemaphoreSpecs semaphoreSpecs;
-    //    semaphoreSpecs.type = Kayou::RHI::SemaphoreType::Timeline;
-    //
-    //    Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> semaphore = device->CreateSemaphore(semaphoreSpecs);
-    //    renderFinishedSemaphores.push_back(semaphore);
-    //
-    //    Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> availableSemaphore = device->CreateSemaphore(semaphoreSpecs);
-    //    imageAvailablesSemaphore.push_back(availableSemaphore);
-    //}
 
     // Timeline
     Kayou::RHI::SemaphoreSpecs timelineSpecs;
@@ -187,6 +295,13 @@ int main()
     unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
     
     Kayou::Core::RefCountPtr<Kayou::RHI::Pipeline> unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
+
+    // Vertex & index buffer
+
+
+    // need vertex & index buffer 
+    // need texture
+    // need uniform camera
 
     uint64_t frameCounter = 0;
     
@@ -269,6 +384,9 @@ int main()
     //device->ClearQueues();
     //device->DestroyBuffer(testBuffer);
 
+    device->DestroyBuffer(vertexBuffer);
+    device->DestroyBuffer(indexBuffer);
+
     device->DestroyPipeline(unlitPipeline);
     device->DestroyPipelineLayout(globalPipelineLayout);
     device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
@@ -300,6 +418,8 @@ int main()
     instance->Destroy();
 
     window->Destroy();
+
+    t_importer.FreeScene();
 
     return 0;
 }

@@ -94,6 +94,10 @@ public:
     virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) override;
     virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) override;
 
+    // -------------- Sampler -------------- // 
+    virtual Core::RefCountPtr<Sampler> CreateSampler(const SamplerSpecs& specs) override;
+    virtual void DestroySampler(Core::RefCountPtr<Sampler> sampler) override;
+
     // -------------- Shader -------------- // 
     virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout) override;
     virtual void DestroyShader(Core::RefCountPtr<Shader> shader) override;
@@ -112,6 +116,10 @@ public:
     // -------------- Descriptor Set -------------- // 
     KENGINE_API virtual Core::RefCountPtr<DescriptorSet> CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) override;
     KENGINE_API virtual void DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> descriptorSet) override;
+    virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> buffer) override;
+    virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> buffer) override;
+    virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
+    virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
 
     // -------------- Pipeline Layout -------------- // 
     virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;

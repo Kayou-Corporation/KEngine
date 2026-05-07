@@ -62,7 +62,7 @@ public:
 
 	uint64_t submissionId;
 
-	TrackedStagingBufferPtr trackedStagingBuffer;
+	std::vector<TrackedStagingBufferPtr> trackedStagingBuffers;
 	VmaAllocator memoryAllocator;
 };
 typedef Core::RefCountPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;

@@ -897,4 +897,90 @@ inline vk::DescriptorType TranslateToVulkan(DescriptorType type)
     return vk::DescriptorType::eSampler;
 }
 
+inline vk::Filter TranslateToVulkan(Filter filter)
+{
+    switch (filter)
+    {
+    case Filter::Nearest:
+        return vk::Filter::eNearest;
+    case Filter::Linear:
+    default:
+        return vk::Filter::eLinear;
+    }
+}
+
+inline vk::SamplerMipmapMode TranslateToVulkan(SamplerMipmapMode mode)
+{
+    switch (mode)
+    {
+    case SamplerMipmapMode::Nearest:
+        return vk::SamplerMipmapMode::eNearest;
+    case SamplerMipmapMode::Linear:
+    default:
+        return vk::SamplerMipmapMode::eLinear;
+    }
+}
+
+inline vk::SamplerAddressMode TranslateToVulkan(SamplerAddressMode mode)
+{
+    switch (mode)
+    {
+    case SamplerAddressMode::MirroredRepeat:
+        return vk::SamplerAddressMode::eMirroredRepeat;
+    case SamplerAddressMode::ClampToEdge:
+        return vk::SamplerAddressMode::eClampToEdge;
+    case SamplerAddressMode::ClampToBorder:
+        return vk::SamplerAddressMode::eClampToBorder;
+    case SamplerAddressMode::MirrorClampToEdge:
+        return vk::SamplerAddressMode::eMirrorClampToEdge;
+    case SamplerAddressMode::Repeat:
+    default:
+        return vk::SamplerAddressMode::eRepeat;
+    }
+}
+
+inline vk::CompareOp TranslateToVulkan(CompareOp op)
+{
+    switch (op)
+    {
+    case CompareOp::Never:          
+        return vk::CompareOp::eNever;
+    case CompareOp::Less:           
+        return vk::CompareOp::eLess;
+    case CompareOp::Equal:          
+        return vk::CompareOp::eEqual;
+    case CompareOp::LessOrEqual:    
+        return vk::CompareOp::eLessOrEqual;
+    case CompareOp::Greater:        
+        return vk::CompareOp::eGreater;
+    case CompareOp::NotEqual:       
+        return vk::CompareOp::eNotEqual;
+    case CompareOp::GreaterOrEqual: 
+        return vk::CompareOp::eGreaterOrEqual;
+    case CompareOp::Always:
+    default:                        
+        return vk::CompareOp::eAlways;
+    }
+}
+
+inline vk::BorderColor TranslateToVulkan(BorderColor color)
+{
+    switch (color)
+    {
+    case BorderColor::FloatTransparentBlack: 
+        return vk::BorderColor::eFloatTransparentBlack;
+    case BorderColor::IntTransparentBlack:   
+        return vk::BorderColor::eIntTransparentBlack;
+    case BorderColor::FloatOpaqueBlack:      
+        return vk::BorderColor::eFloatOpaqueBlack;
+    case BorderColor::FloatOpaqueWhite:      
+        return vk::BorderColor::eFloatOpaqueWhite;
+    case BorderColor::IntOpaqueWhite:        
+        return vk::BorderColor::eIntOpaqueWhite;
+    case BorderColor::IntOpaqueBlack:
+    default:                                 
+        return vk::BorderColor::eIntOpaqueBlack;
+    }
+}
+
 END_NAMESPACE_RHI

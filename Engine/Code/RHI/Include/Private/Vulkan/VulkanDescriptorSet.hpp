@@ -15,12 +15,6 @@ public:
 	VulkanDescriptorSet() = default;
 	virtual ~VulkanDescriptorSet() override = default;
 
-	virtual void SetBuffer(uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> buffer) override;
-	virtual void SetBuffer(std::string name, DescriptorType type, Core::RefCountPtr<Buffer> buffer) override;
-
-	virtual void SetImage(std::string name, DescriptorType type, Core::RefCountPtr<Image> image) override;
-	virtual void SetImage(uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image) override;
-
 public:
 	vk::DescriptorSetAllocateInfo GetAllocInfo(vk::DescriptorSetLayout layout);
 	vk::DescriptorPoolCreateInfo GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t totalCount);
@@ -31,6 +25,7 @@ public:
 
 	vk::DescriptorSet GetHandle() { return m_handle; }
 	vk::DescriptorPool GetPool() { return m_pool; }
+	std::vector<VulkanBinding> GetAllBindings() { return m_bindings; }
 
 private:
 	vk::DescriptorSet m_handle;

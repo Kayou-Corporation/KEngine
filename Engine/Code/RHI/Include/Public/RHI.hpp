@@ -382,4 +382,47 @@ enum class DescriptorType
 	AccelerationStructure
 };
 
+enum class Filter 
+{
+	Nearest,
+	Linear
+};
+
+enum class SamplerAddressMode 
+{
+	Repeat,
+	MirroredRepeat,
+	ClampToEdge,
+	ClampToBorder,
+	MirrorClampToEdge
+};
+
+enum class SamplerMipmapMode 
+{
+	Nearest,
+	Linear
+};
+
+enum class BorderColor 
+{
+	FloatTransparentBlack,
+	IntTransparentBlack,
+	FloatOpaqueBlack,
+	IntOpaqueBlack,
+	FloatOpaqueWhite,
+	IntOpaqueWhite
+};
+
+enum class CompareOp 
+{
+	Never,
+	Less,
+	Equal,
+	LessOrEqual,
+	Greater,
+	NotEqual,
+	GreaterOrEqual,
+	Always
+};
+
 END_NAMESPACE_RHI

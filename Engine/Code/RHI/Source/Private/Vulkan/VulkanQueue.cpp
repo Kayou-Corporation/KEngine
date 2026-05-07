@@ -96,12 +96,14 @@ void Queue::Destroy(vk::Device& device)
         device.freeCommandBuffers(cmdBuffer->cmdPool, cmdBuffer->cmdBuffer);
         device.destroyCommandPool(cmdBuffer->cmdPool);
 
-        TrackedStagingBufferPtr trackedStagingBuffer = cmdBuffer->trackedStagingBuffer;
-        if (trackedStagingBuffer)
+        for (TrackedStagingBufferPtr trackedStagingBuffer : cmdBuffer->trackedStagingBuffers)
         {
-            vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
-            cmdBuffer->trackedStagingBuffer = {};
+            if (trackedStagingBuffer)
+            {
+                vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
+            }
         }
+        cmdBuffer->trackedStagingBuffers.clear();
     }
 
     for (const auto& cmdBuffer : m_inFlightCommandBuffersPool)
@@ -109,12 +111,14 @@ void Queue::Destroy(vk::Device& device)
         device.freeCommandBuffers(cmdBuffer->cmdPool, cmdBuffer->cmdBuffer);
         device.destroyCommandPool(cmdBuffer->cmdPool);
 
-        TrackedStagingBufferPtr trackedStagingBuffer = cmdBuffer->trackedStagingBuffer;
-        if (trackedStagingBuffer)
+        for (TrackedStagingBufferPtr trackedStagingBuffer : cmdBuffer->trackedStagingBuffers)
         {
-            vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
-            cmdBuffer->trackedStagingBuffer = {};
+            if (trackedStagingBuffer)
+            {
+                vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
+            }
         }
+        cmdBuffer->trackedStagingBuffers.clear();
     }
 
     device.destroySemaphore(m_trackingSemaphore);
@@ -249,13 +253,14 @@ void Queue::RunGarbageCollector(vk::Device& device)
             cmd->submissionId = 0;
             VK_CHECK_VOID(cmd->cmdBuffer.reset(), "Can't reset command buffer");
 
-            TrackedStagingBufferPtr trackedStagingBuffer = cmd->trackedStagingBuffer;
-            if (trackedStagingBuffer)
+            for (TrackedStagingBufferPtr trackedStagingBuffer : cmd->trackedStagingBuffers)
             {
-                vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
-                cmd->trackedStagingBuffer = {};
+                if (trackedStagingBuffer)
+                {
+                    vmaDestroyBuffer(m_memoryAllocator, trackedStagingBuffer->handle, trackedStagingBuffer->allocation);
+                }
             }
-
+            cmd->trackedStagingBuffers.clear();
             m_commandBuffersPool.push_back(cmd);
         }
         else
