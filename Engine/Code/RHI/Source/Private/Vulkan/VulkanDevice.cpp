@@ -534,9 +534,10 @@ std::vector<Core::RefCountPtr<DescriptorSetLayout>> VulkanDevice::CreateDescript
 			RHIVulkanDescriptor->AddBinding(binding);
 		}
 
-		std::vector<vk::DescriptorSetLayoutBinding> allBindings = RHIVulkanDescriptor->GetAllVulkanBindings();
+		std::vector<vk::DescriptorSetLayoutBinding>& allBindings = RHIVulkanDescriptor->GetAllVulkanBindings();
 
 		vk::DescriptorSetLayoutCreateInfo createInfo{};
+		createInfo.flags = {};
 		createInfo.bindingCount = allBindings.size();
 		createInfo.pBindings = allBindings.data();
 
@@ -719,7 +720,9 @@ Core::RefCountPtr<DescriptorSet> VulkanDevice::CreateDescriptorSet(Core::RefCoun
 	vk::DescriptorPool pool = VK_CHECK_RESULT(m_handle.createDescriptorPool(poolCreateInfo), "Coundn't create Descriptor pool");
 	RHIVulkanDescriptorSet->SetPool(pool);
 
-	vk::DescriptorSetAllocateInfo allocInfo = RHIVulkanDescriptorSet->GetAllocInfo(RHIVulkanLayout->GetHandle());
+	vk::DescriptorSetLayout layout = RHIVulkanLayout->GetHandle();
+	vk::DescriptorSetAllocateInfo allocInfo = RHIVulkanDescriptorSet->GetAllocInfo(layout);
+	allocInfo.pSetLayouts = &layout;
 
 	std::vector<vk::DescriptorSet> descriptorSet = VK_CHECK_RESULT(m_handle.allocateDescriptorSets(allocInfo), "Coundn't allocate descriptor sets");
 	
@@ -794,7 +797,7 @@ void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDe
 			write.descriptorCount = 1;
 			write.pBufferInfo = &bufferInfo;
 
-			m_handle.updateDescriptorSets(write, { descriptorSet });
+			m_handle.updateDescriptorSets(write, nullptr);
 
 			break;
 		}

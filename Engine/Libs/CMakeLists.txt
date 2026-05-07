@@ -52,3 +52,8 @@ set(ASSIMP_BUILD_ASSBIN_EXPORTER OFF CACHE BOOL "Disable ASSBIN exporter")
 set(ASSIMP_BUILD_ASSXML_EXPORTER OFF CACHE BOOL "Disable ASSXML exporter")
 
 add_subdirectory(Assimp)
+
+# ----------- Assimp ----------- #
+add_library(stb INTERFACE)
+target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Stbimage")
+

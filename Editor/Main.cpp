@@ -12,10 +12,13 @@
 #include "Public/CommandList.hpp"
 #include "Public/Syncronisation.hpp"
 #include "Public/GraphicsPipeline.hpp"
+#include "Public/Sampler.hpp"
+#include "Public/DescriptorSet.hpp"
+#include "Public/RHI.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4309) // Pour MSVC
+#pragma warning(disable : 4309)
 #endif
 
 #ifdef __clang__
@@ -33,7 +36,12 @@
 #pragma warning(pop)
 #endif
 
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 struct Vertex
 {
@@ -42,22 +50,41 @@ struct Vertex
     glm::vec2 uv;
 };
 
+struct Camera
+{
+    glm::mat4 vp;
+    glm::vec3 pos;
+};
+
 int main()
 {
 #ifdef KENGINE_DEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-    //Kayou::RHI::ShaderCompiler compiler{};
-    //
-    //compiler.Initialize();
-    //
-    //compiler.Load("Engine/Assets/Shaders/hello-world.compute.slang", Kayou::RHI::ShaderType::Compute);
+    glm::vec3 cameraPos = glm::vec3(2.0f, 2.0f, 2.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
 
-    // Read base mesh 
+    float fov = glm::radians(45.0f);
+    float aspectRatio = 1920.0f / 1080.0f;
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+    glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
+    proj[1][1] *= -1;
+
+    Camera camera;
+    camera.vp = proj * view;
+    camera.pos = cameraPos;
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+    model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 
 #pragma region Mesh
-    std::string meshPath = "D:/Projets/KEngine/Engine/Assets/Meshes/viking_room.obj";
+    std::string meshPath = "Engine/Assets/Meshes/viking_room.obj";
     Assimp::Importer t_importer{};
     const aiScene* t_scene = t_importer.ReadFile(meshPath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_FindDegenerates | aiProcess_FindInvalidData | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_GenSmoothNormals | aiProcess_FixInfacingNormals);
     if (!t_scene || !t_scene->mRootNode)
@@ -123,6 +150,14 @@ int main()
 	}
 #pragma endregion
 
+#pragma region Texture
+
+    std::string texturePath = "Engine/Assets/Textures/viking_room.png";
+    int t_texWidth, t_texHeight, t_texChannels;
+    stbi_uc* texturePixels = stbi_load(texturePath.c_str(), &t_texWidth, &t_texHeight, &t_texChannels, STBI_rgb_alpha);
+   
+#pragma endregion
+
 #pragma region Setup 
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
 
@@ -169,8 +204,6 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
 #pragma endregion
 
-    auto copyBufferDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
-    copyBufferDataCommandList->Open();
 
     // Vertex Buffer 
     Kayou::RHI::BufferSpecs vertexbufferSpecs{};
@@ -179,9 +212,7 @@ int main()
     vertexbufferSpecs.size = meshVertices.size() * sizeof(Vertex);
     vertexbufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
     vertexbufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
-    
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
-    copyBufferDataCommandList->SetBufferData(vertexBuffer, meshVertices.data(), meshVertices.size() * sizeof(Vertex), 0);
     
     // Index Buffer
     Kayou::RHI::BufferSpecs indexBufferSpecs{};
@@ -190,19 +221,91 @@ int main()
     indexBufferSpecs.size = meshIndices.size() * sizeof(int);
     indexBufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
     indexBufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
-    
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> indexBuffer = device->CreateBuffer(indexBufferSpecs);
+
+    // Base Texture
+    Kayou::RHI::ImageSpecs textureImageSpecs;
+    textureImageSpecs.source = Kayou::RHI::ImageSource::Cpu;
+    textureImageSpecs.format = Kayou::RHI::Format::RGBA8_SRGB;
+    textureImageSpecs.targetLayout = Kayou::RHI::Layout::ShaderReadOnly;
+    textureImageSpecs.finalLayout = Kayou::RHI::Layout::ShaderReadOnly;
+    textureImageSpecs.type = Kayou::RHI::ImageType::Image2D;
+    textureImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
+    textureImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Color;
+    textureImageSpecs.usages = { Kayou::RHI::ImageUsage::TransferDst, Kayou::RHI::ImageUsage::ShaderSampled };
+    textureImageSpecs.extent = { static_cast<uint32_t>(t_texWidth), static_cast<uint32_t>(t_texHeight), 1 };
+    Kayou::Core::RefCountPtr<Kayou::RHI::Image> textureImage = device->CreateImage(textureImageSpecs);
+
+    // Base Sampler
+    Kayou::RHI::SamplerSpecs samplerSpecs;
+    samplerSpecs.magFilter = Kayou::RHI::Filter::Linear;
+    samplerSpecs.minFilter = Kayou::RHI::Filter::Linear;
+    samplerSpecs.mipmapMode = Kayou::RHI::SamplerMipmapMode::Linear;
+    samplerSpecs.addressU = Kayou::RHI::SamplerAddressMode::Repeat;
+    samplerSpecs.addressV = Kayou::RHI::SamplerAddressMode::Repeat;
+    samplerSpecs.addressW = Kayou::RHI::SamplerAddressMode::Repeat;
+    samplerSpecs.mipLodBias = 0.0f;
+    samplerSpecs.anisotropyEnable = false;
+    samplerSpecs.maxAnisotropy = 1.0f;
+    samplerSpecs.compareEnable = false;
+    samplerSpecs.compareOp = Kayou::RHI::CompareOp::Always;
+    samplerSpecs.minLod = 0.0f;
+    samplerSpecs.maxLod = 0.0f;
+    samplerSpecs.borderColor = Kayou::RHI::BorderColor::IntOpaqueBlack;
+    samplerSpecs.unnormalizedCoordinates = false;
+
+    Kayou::Core::RefCountPtr<Kayou::RHI::Sampler> sampler = device->CreateSampler(samplerSpecs);
+
+
+    auto copyBufferDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+
+    copyBufferDataCommandList->Open();
+    
+    copyBufferDataCommandList->SetBufferData(vertexBuffer, meshVertices.data(), meshVertices.size() * sizeof(Vertex), 0);
+    
     copyBufferDataCommandList->SetBufferData(indexBuffer, meshIndices.data(), meshIndices.size() * sizeof(int), 0);
     
+    copyBufferDataCommandList->SetImageData(textureImage, texturePixels, t_texWidth * t_texHeight * 4);
+
     copyBufferDataCommandList->Close();
     
-    Kayou::RHI::SubmitInfo submitInfo;
-    submitInfo.stage = Kayou::RHI::PipelineStage::Transfer;
+    Kayou::RHI::SubmitInfo submitInfocopyBufferData;
+    submitInfocopyBufferData.stage = Kayou::RHI::PipelineStage::Transfer;
     
-    device->SubmitCommandList(copyBufferDataCommandList, submitInfo);
+    device->SubmitCommandList(copyBufferDataCommandList, submitInfocopyBufferData);
+
+    // Uniform buffer camera
+    Kayou::RHI::BufferSpecs uniformCameraSpecs{};
+    uniformCameraSpecs.primaryUsage = Kayou::RHI::BufferUsage::Uniform;
+    uniformCameraSpecs.size = sizeof(Camera);
+    uniformCameraSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
+    uniformCameraSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
+    uniformCameraSpecs.isPersistentMapped = true;
+    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> uniformCamera = device->CreateBuffer(uniformCameraSpecs);
 
 
-    
+    // Uniform buffer modelMatrix
+    Kayou::RHI::BufferSpecs uniformModelSpecs{};
+    uniformModelSpecs.primaryUsage = Kayou::RHI::BufferUsage::Uniform;
+    uniformModelSpecs.size = sizeof(glm::mat4);
+    uniformModelSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
+    uniformModelSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
+    uniformCameraSpecs.isPersistentMapped = true;
+    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> uniformModel = device->CreateBuffer(uniformModelSpecs);
+
+    auto copyUniformDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+    copyUniformDataCommandList->Open();
+
+    copyUniformDataCommandList->SetBufferData(uniformCamera, &camera, sizeof(Camera), 0);
+    copyUniformDataCommandList->SetBufferData(uniformModel, &model, sizeof(glm::mat4), 0);
+
+    copyUniformDataCommandList->Close();
+
+    Kayou::RHI::SubmitInfo submitInfocopyUniformData;
+    submitInfocopyUniformData.stage = Kayou::RHI::PipelineStage::Transfer;
+
+    device->SubmitCommandList(copyUniformDataCommandList, submitInfocopyUniformData);
+
     // Presentation images
     std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Image>> presentationImages = device->CreatePresentationImages(swapchain);
     
@@ -217,34 +320,6 @@ int main()
     depthImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Depth;
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Image> depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
-
-    //Kayou::RHI::RenderingAttachment colorAttachment;
-    //colorAttachment.
-
-    //Kayou::RHI::ImageSpecs textureImageSpecs;
-    //textureImageSpecs.source = Kayou::RHI::ImageSource::Cpu;
-    //textureImageSpecs.format = Kayou::RHI::Format::RGBA8_SRGB;
-    //textureImageSpecs.targetLayout = Kayou::RHI::Layout::ShaderReadOnly;
-    //textureImageSpecs.finalLayout = Kayou::RHI::Layout::ShaderReadOnly;
-    //textureImageSpecs.type = Kayou::RHI::ImageType::Image2D;
-    //textureImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
-    //textureImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Color;
-    //textureImageSpecs.usages = { Kayou::RHI::ImageUsage::TransferDst, Kayou::RHI::ImageUsage::ShaderSampled };
-    //textureImageSpecs.extent = { 1024, 1024, 1};
-    //
-    //Kayou::Core::RefCountPtr<Kayou::RHI::Image> textureImage = device->CreateImage(textureImageSpecs);
-    //
-    //Kayou::Core::RefCountPtr<Kayou::RHI::CommandList> commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
-    //
-    //std::vector<uint32_t> data(1024 * 1024, 0xFF0000FF);
-    //
-    //commandList->Open();
-    //
-    //commandList->SetImageData(textureImage, data.data(), data.size() * sizeof(uint32_t));
-    //
-    //commandList->Close();
-    //
-    //device->SubmitCommandList(commandList);
 
     uint32_t windowWidth = window->GetWidth();
     uint32_t windowHeight = window->GetHeight();
@@ -272,9 +347,9 @@ int main()
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Shader> baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderStage::Vertex, false, true);
     Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment, false, true);
-    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> globalLayout = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex, true, true);
+    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> globalLayoutShader = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex, true, true);
 
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout>> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayout);
+    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout>> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
 
     Kayou::Core::RefCountPtr<Kayou::RHI::PipelineLayout> globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
 
@@ -296,12 +371,17 @@ int main()
     
     Kayou::Core::RefCountPtr<Kayou::RHI::Pipeline> unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
 
-    // Vertex & index buffer
+    // DescriptorSet
+    Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout> frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
+    Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout> drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
 
+    Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
+    Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
-    // need vertex & index buffer 
-    // need texture
-    // need uniform camera
+    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera);
+    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "model", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel);
+    device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, sampler);
+
 
     uint64_t frameCounter = 0;
     
@@ -386,6 +466,13 @@ int main()
 
     device->DestroyBuffer(vertexBuffer);
     device->DestroyBuffer(indexBuffer);
+    device->DestroyImage(textureImage);
+    device->DestroySampler(sampler);
+    device->DestroyBuffer(uniformCamera);
+    device->DestroyBuffer(uniformModel);
+
+    device->DestroyDescriptorSet(frameDataDescriptorSet);
+    device->DestroyDescriptorSet(drawDataDescriptorSet);
 
     device->DestroyPipeline(unlitPipeline);
     device->DestroyPipelineLayout(globalPipelineLayout);
@@ -393,7 +480,7 @@ int main()
     
     device->DestroyShader(unlitFrag);
     device->DestroyShader(baseVert);
-    device->DestroyShader(globalLayout);
+    device->DestroyShader(globalLayoutShader);
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
     {
@@ -420,6 +507,7 @@ int main()
     window->Destroy();
 
     t_importer.FreeScene();
+    stbi_image_free(texturePixels);
 
     return 0;
 }

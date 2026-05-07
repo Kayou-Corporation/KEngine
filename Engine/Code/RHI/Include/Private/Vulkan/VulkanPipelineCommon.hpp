@@ -27,7 +27,7 @@ public:
 	VulkanBinding GetBinding(uint32_t bindingIndex);
 	std::vector<std::string> GetAllBindingsNames();
 	std::vector<VulkanBinding> GetAllBindings() { return m_bindings; }
-	std::vector<vk::DescriptorSetLayoutBinding> GetAllVulkanBindings();
+	std::vector<vk::DescriptorSetLayoutBinding>& GetAllVulkanBindings();
 
 	void SetHandle(vk::DescriptorSetLayout layout) { m_descriptorSetLayout = layout; }
 	void AddBinding(VulkanBinding binding) { m_bindings.push_back(binding); }
@@ -35,6 +35,7 @@ public:
 private:
 	vk::DescriptorSetLayout m_descriptorSetLayout;
 	std::vector<VulkanBinding> m_bindings;
+	std::vector<vk::DescriptorSetLayoutBinding> m_vulkanBindings;
 };
 
 struct VulkanConstant

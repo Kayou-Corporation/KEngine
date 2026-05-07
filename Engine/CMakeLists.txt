@@ -56,8 +56,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(Code/Core)
 add_subdirectory(Code/RHI)
+target_link_libraries(${K_TARGET_NAME} PUBLIC stb)
 
-target_link_libraries(${K_TARGET_NAME} PUBLIC Core)
+#target_include_directories(${K_TARGET_NAME} "Libs/Stbimage")
 
 if (LINK_RHI)
     target_link_libraries(${K_TARGET_NAME} PUBLIC RHI)

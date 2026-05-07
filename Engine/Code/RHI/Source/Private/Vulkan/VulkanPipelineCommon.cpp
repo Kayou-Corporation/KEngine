@@ -41,16 +41,17 @@ std::vector<std::string> VulkanDescriptorSetLayout::GetAllBindingsNames()
 	return allDescriptorSetsLayoutsNames;
 }
 
-std::vector<vk::DescriptorSetLayoutBinding> VulkanDescriptorSetLayout::GetAllVulkanBindings()
+std::vector<vk::DescriptorSetLayoutBinding>& VulkanDescriptorSetLayout::GetAllVulkanBindings()
 {
-	std::vector<vk::DescriptorSetLayoutBinding> bindings;
-
-	for (const VulkanBinding& vulkanBinding : m_bindings)
+	if (m_vulkanBindings.empty())
 	{
-		bindings.push_back(vulkanBinding.binding);
+		for (const VulkanBinding& vulkanBinding : m_bindings)
+		{
+			m_vulkanBindings.push_back(vulkanBinding.binding);
+		}
 	}
 
-	return bindings;
+	return m_vulkanBindings;
 }
 
 VulkanConstant VulkanPushConstantLayout::GetConstant(std::string name)
