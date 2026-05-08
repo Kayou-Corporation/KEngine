@@ -69,7 +69,7 @@ int main()
 #endif
 
     glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
 
@@ -305,7 +305,7 @@ int main()
     uniformModelSpecs.size = sizeof(Model);
     uniformModelSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
     uniformModelSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
-    uniformCameraSpecs.isPersistentMapped = true;
+    uniformModelSpecs.isPersistentMapped = true;
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> uniformModel = device->CreateBuffer(uniformModelSpecs);
 
     auto copyUniformDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
