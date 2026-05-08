@@ -13,6 +13,6 @@ struct FSInput
 [shader("fragment")]
 float4 fsMain(FSInput input) : SV_Target
 {
-    float4 albedo = drawData.texture2D.Sample(input.uv);
+    float4 albedo = drawData.texture2D.Sample(drawData.sampler, input.uv);
     return albedo;
 }

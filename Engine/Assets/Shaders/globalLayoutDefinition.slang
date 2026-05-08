@@ -27,7 +27,8 @@ struct DrawData
 {
     ConstantBuffer<float4x4> model;        // UniformBuffer
     ConstantBuffer<float4x4> normalMatrix; // UniformBuffer
-    Sampler2D texture2D;
+    Texture2D texture2D;
+    SamplerState sampler;
 };
 ParameterBlock<DrawData> drawData;
 
