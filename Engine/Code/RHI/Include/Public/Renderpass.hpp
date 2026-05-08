@@ -17,7 +17,8 @@ struct RenderingAttachment
 	LoadOp loadOp;
 	StoreOp storeOp;
 	
-	ClearValue clearValue;
+	ClearValue clearValueColor;
+	ClearValue clearValueDepth;
 }; 
 
 struct RenderingInfo

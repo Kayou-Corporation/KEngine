@@ -20,6 +20,7 @@ struct VulkanGraphicsPipelineStructs
 	vk::PipelineRasterizationStateCreateInfo rasterizationState{};
 	vk::PipelineMultisampleStateCreateInfo multisampleState{};
 	vk::PipelineColorBlendStateCreateInfo colorBlendState{};
+	vk::PipelineDepthStencilStateCreateInfo depthStencilCreateInfo{};
 	std::vector<vk::DynamicState> dynamicStates{};
 	vk::PipelineLayout layout{};
 	vk::RenderPass renderPass{};
@@ -29,6 +30,7 @@ struct VulkanGraphicsPipelineStructs
 	vk::PipelineRenderingCreateInfo renderingInfo{}; // Do not manually set
 	vk::PipelineVertexInputStateCreateInfo vertexInputInfo{}; // Do not manually set
 	vk::PipelineDynamicStateCreateInfo dynamicStateInfo{}; // Do not manually set
+	vk::PipelineColorBlendAttachmentState colorBlend{};
 };
 
 struct VulkanDescriptorSetLayoutSpecs

@@ -68,7 +68,7 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-    glm::vec3 cameraPos = glm::vec3(2.0f, 2.0f, 2.0f);
+    glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
     glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
@@ -81,18 +81,19 @@ int main()
     proj[1][1] *= -1;
 
     Camera camera;
-    camera.vp = proj * view;
+    camera.vp = glm::transpose(proj * view);
     camera.pos = cameraPos;
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-    model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
+    model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 
-    glm::mat3 normalMatrix = glm::mat4(glm::transpose(glm::inverse(glm::mat3(model))));
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
 
     Model mdl;
-    mdl.model = model;
+    mdl.model = glm::transpose(model);;
     mdl.normal = normalMatrix;
 
 #pragma region Mesh
@@ -106,7 +107,7 @@ int main()
     std::string t_directory = meshPath.substr(0, meshPath.find_last_of('/'));
 
     std::vector<Vertex> meshVertices;
-    std::vector<int> meshIndices;
+    std::vector<uint32_t> meshIndices;
 	for (unsigned int i = 0; i < t_scene->mNumMeshes; ++i)
 	{
 		const aiMesh* mesh = t_scene->mMeshes[i];
@@ -230,7 +231,7 @@ int main()
     Kayou::RHI::BufferSpecs indexBufferSpecs{};
     indexBufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Index;
     indexBufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
-    indexBufferSpecs.size = meshIndices.size() * sizeof(int);
+    indexBufferSpecs.size = meshIndices.size() * sizeof(uint32_t);
     indexBufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
     indexBufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> indexBuffer = device->CreateBuffer(indexBufferSpecs);
@@ -275,7 +276,7 @@ int main()
     
     copyBufferDataCommandList->SetBufferData(vertexBuffer, meshVertices.data(), meshVertices.size() * sizeof(Vertex), 0);
     
-    copyBufferDataCommandList->SetBufferData(indexBuffer, meshIndices.data(), meshIndices.size() * sizeof(int), 0);
+    copyBufferDataCommandList->SetBufferData(indexBuffer, meshIndices.data(), meshIndices.size() * sizeof(uint32_t), 0);
     
     copyBufferDataCommandList->SetImageData(textureImage, texturePixels, t_texWidth * t_texHeight * 4);
 
@@ -378,6 +379,9 @@ int main()
     unlitPipelineSpecs.frontFace = Kayou::RHI::FrontFace::CounterClockWise;
     unlitPipelineSpecs.SamplesCount = Kayou::RHI::SampleCount::Count1;
     unlitPipelineSpecs.blendColor = true;
+    unlitPipelineSpecs.depthTest = true;
+    unlitPipelineSpecs.depthWrite = true;
+    unlitPipelineSpecs.depthCompare = Kayou::RHI::CompareOp::LessOrEqual;
     unlitPipelineSpecs.dynamicStates = { Kayou::RHI::DynamicState::ViewPort, Kayou::RHI::DynamicState::Scissor };
     unlitPipelineSpecs.topology = Kayou::RHI::PrimitiveTopology::TriangleList;
     unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
@@ -393,10 +397,12 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
     device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
-    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "model", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(glm::mat4));
-    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "normalMatrix", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, sizeof(glm::mat4), sizeof(glm::mat4));
+    //device->SetDescriptorSetBuffer(drawDataDescriptorSet, "model", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(glm::mat4));
+    //device->SetDescriptorSetBuffer(drawDataDescriptorSet, "normalMatrix", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, sizeof(glm::mat4), sizeof(glm::mat4));
+    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Kayou::RHI::DescriptorType::Sampler, sampler);
+
 
 
     uint64_t frameCounter = 0;
@@ -423,14 +429,14 @@ int main()
         colorAttachment.layout = Kayou::RHI::Layout::ColorAttachment;
         colorAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
         colorAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-        colorAttachment.clearValue = Kayou::RHI::ClearValue(1.0f, 0.0f, 0.0f, 1.0f);
+        colorAttachment.clearValueColor = Kayou::RHI::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
 
         Kayou::RHI::RenderingAttachment depthAttachment;
         depthAttachment.image = depthImage;
         depthAttachment.layout = Kayou::RHI::Layout::DepthStencilAttachment;
         depthAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
         depthAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-        depthAttachment.clearValue = Kayou::RHI::ClearValue(1.0f, 0.f, 0.f, 0.f);
+        depthAttachment.clearValueDepth = Kayou::RHI::ClearValue(1.0f, 0.f, 0.f, 0.f);
 
         Kayou::RHI::RenderingInfo renderingInfo;
         renderingInfo.offset = { 0, 0 };
@@ -444,7 +450,6 @@ int main()
         commandList->Open();
 
         commandList->TransitionImageLayout(presentationImages[imageIndex], Kayou::RHI::Layout::ColorAttachment);
-
         commandList->TransitionImageLayout(depthImage, Kayou::RHI::Layout::DepthStencilAttachment);
 
         commandList->BeginRendering(renderingInfo);

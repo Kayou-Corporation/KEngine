@@ -22,11 +22,17 @@ struct FrameData
 };
 ParameterBlock<FrameData> frameData;
 
+struct Object
+{
+    float4x4 model;
+    float4x4 normalMatrix;
+}
 // Set 1 --- DrawData ---
 struct DrawData
 {
-    ConstantBuffer<float4x4> model;        // UniformBuffer
-    ConstantBuffer<float4x4> normalMatrix; // UniformBuffer
+    ConstantBuffer<Object> object;
+    //ConstantBuffer<float4x4> model;        // UniformBuffer
+    //ConstantBuffer<float4x4> normalMatrix; // UniformBuffer
     Texture2D texture2D;
     SamplerState sampler;
 };

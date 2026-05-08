@@ -755,7 +755,9 @@ inline vk::CullModeFlags TranslateToVulkan(CullMode mode)
     case CullMode::Front:
         return vk::CullModeFlagBits::eFront;
     case CullMode::Back:
-        return vk::CullModeFlagBits::eBack;
+        return vk::CullModeFlagBits::eBack;    
+    case CullMode::None:
+        return vk::CullModeFlagBits::eNone;
     default:
         return vk::CullModeFlagBits::eNone;
     }

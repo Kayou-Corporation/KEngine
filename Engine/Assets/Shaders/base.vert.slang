@@ -25,11 +25,11 @@ VSOutput vsMain(VSInput input)
     VSOutput o;
 
     // Transform Vertex position into world pos
-    float4 world = mul(drawData.model, float4(input.position, 1));
+    float4 world = mul(drawData.object.model, float4(input.position, 1));
     o.worldPos = world.xyz;
 
     // Transform normal position into world pos
-    o.normal = mul((float3x3)drawData.normalMatrix, input.normal);
+    o.normal = mul((float3x3)drawData.object.normalMatrix, input.normal).xyz;
 
     // Don't transform texCord, keep in UV space
     o.uv = input.uv;

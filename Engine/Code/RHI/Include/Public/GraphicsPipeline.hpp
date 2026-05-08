@@ -33,6 +33,11 @@ struct GraphicsPipelineSpecs
 	std::vector<DynamicState> dynamicStates;
 
 	PrimitiveTopology topology;
+
+	bool depthTest;
+	bool depthWrite;
+	CompareOp depthCompare;
+
 	std::vector<Core::RefCountPtr<Shader>> shaders{};
 
 	Core::RefCountPtr<PipelineLayout> pipelineLayout;

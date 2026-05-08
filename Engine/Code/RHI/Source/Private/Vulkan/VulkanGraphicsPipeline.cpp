@@ -95,6 +95,14 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	colorBlendingInfo.attachmentCount = 1;
 	colorBlendingInfo.pAttachments = &colorBlendAttachment;
 
+	vk::PipelineDepthStencilStateCreateInfo depthStencilCreateInfo{};
+	depthStencilCreateInfo.depthTestEnable = specs.depthTest;
+	depthStencilCreateInfo.depthWriteEnable = specs.depthWrite;
+	depthStencilCreateInfo.depthCompareOp = TranslateToVulkan(specs.depthCompare); 
+	depthStencilCreateInfo.depthBoundsTestEnable = VK_FALSE;
+	depthStencilCreateInfo.stencilTestEnable = VK_FALSE;
+
+
 	std::vector<vk::DynamicState> dynamicStates = TranslateToVulkan(specs.dynamicStates);
 	std::vector<vk::Format> colorAttachmentFormats = TranslateToVulkan(specs.colorAttachmentFormats);
 
@@ -109,10 +117,11 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	createInfo.rasterizationState = rasterizationInfo;
 	createInfo.multisampleState = multisamplingInfo;
 	createInfo.colorBlendState = colorBlendingInfo;
+	createInfo.depthStencilCreateInfo = depthStencilCreateInfo;
 	createInfo.dynamicStates = dynamicStates;
 	createInfo.layout = m_layout.CastAs<VulkanPipelineLayout>()->GetHandle();
+	createInfo.colorBlend = colorBlendAttachment;
 	createInfo.renderPass = nullptr; // Always null for now
-
 	return createInfo;
 }
 
@@ -141,6 +150,7 @@ vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateIn
 	createInfo.pRasterizationState = &vulkanGraphicsPipelineSpecs.rasterizationState;
 	createInfo.pMultisampleState = &vulkanGraphicsPipelineSpecs.multisampleState;
 	createInfo.pColorBlendState = &vulkanGraphicsPipelineSpecs.colorBlendState;
+	createInfo.pDepthStencilState = &vulkanGraphicsPipelineSpecs.depthStencilCreateInfo;
 	createInfo.pDynamicState = &vulkanGraphicsPipelineSpecs.dynamicStateInfo;
 	createInfo.layout = vulkanGraphicsPipelineSpecs.layout;
 	createInfo.renderPass = vulkanGraphicsPipelineSpecs.renderPass;

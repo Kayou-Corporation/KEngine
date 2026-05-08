@@ -285,7 +285,8 @@ enum class DynamicState
 enum class CullMode
 {
 	Front,
-	Back
+	Back,
+	None
 };
 
 enum class FrontFace
@@ -322,23 +323,23 @@ struct Offset2D
 	int y = 0;
 };
 
-struct ClearValue
-{
-	ClearValue() = default;
-
-	ClearValue(float inX, float inY, float inZ, float inDepthStencil)
+	struct ClearValue
 	{
-		x = inX;
-		y = inY;
-		z = inZ;
-		depthStencil = inDepthStencil;
-	};
+		ClearValue() = default;
 
-	float x = 0.f;
-	float y = 0.f;
-	float z = 0.f;
-	float depthStencil = 1.0f;
-};
+		ClearValue(float inX, float inY, float inZ, float inA)
+		{
+			x = inX;
+			y = inY;
+			z = inZ;
+			a = inA;
+		};
+
+		float x = 0.f;
+		float y = 0.f;
+		float z = 0.f;
+		float a = 0.f;
+	};
 
 enum class SemaphoreType
 {
