@@ -127,10 +127,12 @@ public:
 	// -------------- Descriptor Set -------------- // 
 	KENGINE_API virtual Core::RefCountPtr<DescriptorSet> CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) = 0;
 	KENGINE_API virtual void DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> descriptorSet) = 0;
-	KENGINE_API virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> buffer) = 0;
-	KENGINE_API virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> buffer) = 0;
+	KENGINE_API virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> buffer, uint32_t offset, uint32_t range) = 0;
+	KENGINE_API virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> buffer, uint32_t offset, uint32_t range) = 0;
 	KENGINE_API virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) = 0;
 	KENGINE_API virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> sampler) = 0;
 
 	// -------------- Pipeline Layout -------------- // 
 	KENGINE_API virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) = 0;

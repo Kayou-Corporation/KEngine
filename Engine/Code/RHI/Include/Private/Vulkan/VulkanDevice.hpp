@@ -114,12 +114,14 @@ public:
     virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) override;
 
     // -------------- Descriptor Set -------------- // 
-    KENGINE_API virtual Core::RefCountPtr<DescriptorSet> CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) override;
-    KENGINE_API virtual void DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> descriptorSet) override;
-    virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> buffer) override;
-    virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> buffer) override;
+    virtual Core::RefCountPtr<DescriptorSet> CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) override;
+    virtual void DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> descriptorSet) override;
+    virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> buffer, uint32_t offset, uint32_t range) override;
+    virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> buffer, uint32_t offset, uint32_t range) override;
     virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
     virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
+    virtual void SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> sampler) override;
+    virtual void SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> sampler) override;
 
     // -------------- Pipeline Layout -------------- // 
     virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;

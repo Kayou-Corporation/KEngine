@@ -25,6 +25,16 @@ public:
 	virtual void BeginRendering(const RenderingInfo& renderingInfo) override;
 	virtual void EndRendering() override;
 
+	//----------- Bind --------------//
+	virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, std::string layoutName, Core::RefCountPtr<DescriptorSet> DescriptorSet, PipelineBindPoint bindPoint) override;
+	virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, uint32_t layoutIndex, Core::RefCountPtr<DescriptorSet> descriptorSet, PipelineBindPoint bindPoint) override;
+	virtual void BindVertexBuffer(Core::RefCountPtr<Buffer> vertexBuffer, uint32_t offset) override;
+	virtual void BindIndexBuffer(Core::RefCountPtr<Buffer> indexBuffer, uint32_t offset) override;
+
+	//----------- Draw --------------//
+	virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+	virtual void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+	virtual void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) override;
 
 	//----------- Set Buffer / Image Data --------------//
 	virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) override;

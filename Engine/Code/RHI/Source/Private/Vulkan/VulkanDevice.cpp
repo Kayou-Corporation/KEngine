@@ -740,7 +740,7 @@ void VulkanDevice::DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> RHIDesc
 	m_handle.destroyDescriptorPool(pool);
 }
 
-void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> RHIBuffer)
+void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> RHIBuffer, uint32_t offset, uint32_t range)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -754,8 +754,8 @@ void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDe
 		{
 			vk::DescriptorBufferInfo bufferInfo{};
 			bufferInfo.buffer = updateBuffer;
-			bufferInfo.offset = 0;
-			bufferInfo.range = VK_WHOLE_SIZE;
+			bufferInfo.offset = offset;
+			bufferInfo.range = range;
 
 			vk::WriteDescriptorSet write{};
 			write.dstSet = descriptorSet;
@@ -765,14 +765,14 @@ void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDe
 			write.descriptorCount = 1;
 			write.pBufferInfo = &bufferInfo;
 
-			m_handle.updateDescriptorSets(write, {descriptorSet});
+			m_handle.updateDescriptorSets(write, nullptr);
 
 			break;
 		}
 	}
 }
 
-void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> RHIBuffer)
+void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> RHIBuffer, uint32_t offset, uint32_t range)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -786,8 +786,8 @@ void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDe
 		{
 			vk::DescriptorBufferInfo bufferInfo{};
 			bufferInfo.buffer = updateBuffer;
-			bufferInfo.offset = 0;
-			bufferInfo.range = VK_WHOLE_SIZE;
+			bufferInfo.offset = offset;
+			bufferInfo.range = range;
 
 			vk::WriteDescriptorSet write{};
 			write.dstSet = descriptorSet;
@@ -812,17 +812,27 @@ void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDes
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::ImageView updateImageView = RHIVulkanImage->GetHandleView();
-	vk::Sampler updateSampler = RHISampler.CastAs<VulkanSampler>()->GetHandle();
+
+	vk::Sampler updateSampler;
+	if (RHISampler)
+	{
+		updateSampler = RHISampler.CastAs<VulkanSampler>()->GetHandle();
+	}
 	std::vector<VulkanBinding> vulkanBindings = RHIVulkanDescriptorSet->GetAllBindings();
+
+	vk::DescriptorType vkType = TranslateToVulkan(type);
 
 	for (const VulkanBinding& vulkanBinding : vulkanBindings)
 	{
-		if (vulkanBinding.name == name && vulkanBinding.binding.descriptorType == TranslateToVulkan(type))
+		if (vulkanBinding.name == name && vulkanBinding.binding.descriptorType == vkType)
 		{
 			vk::DescriptorImageInfo imageInfo{};
 			imageInfo.imageView = updateImageView;
 			imageInfo.imageLayout = RHIVulkanImage->GetLayout();
-			imageInfo.sampler = updateSampler;
+			if (vkType == vk::DescriptorType::eCombinedImageSampler)
+			{
+				imageInfo.sampler = updateSampler;
+			}
 
 			vk::WriteDescriptorSet write{};
 			write.dstSet = descriptorSet;
@@ -832,7 +842,7 @@ void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDes
 			write.descriptorCount = 1;
 			write.pImageInfo = &imageInfo;
 
-			m_handle.updateDescriptorSets(write, { descriptorSet });
+			m_handle.updateDescriptorSets(write, nullptr);
 
 			break;
 		}
@@ -847,8 +857,14 @@ void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDes
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::ImageView updateImageView = RHIVulkanImage->GetHandleView();
-	vk::Sampler updateSampler = RHISampler.CastAs<VulkanSampler>()->GetHandle();
+	vk::Sampler updateSampler;
+	if (RHISampler)
+	{
+		updateSampler = RHISampler.CastAs<VulkanSampler>()->GetHandle();
+	}
 	std::vector<VulkanBinding> vulkanBindings = RHIVulkanDescriptorSet->GetAllBindings();
+
+	vk::DescriptorType vkType = TranslateToVulkan(type);
 
 	for (const VulkanBinding& vulkanBinding : vulkanBindings)
 	{
@@ -857,6 +873,69 @@ void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDes
 			vk::DescriptorImageInfo imageInfo{};
 			imageInfo.imageView = updateImageView;
 			imageInfo.imageLayout = RHIVulkanImage->GetLayout();
+			if (vkType == vk::DescriptorType::eCombinedImageSampler)
+			{
+				imageInfo.sampler = updateSampler;
+			}
+
+			vk::WriteDescriptorSet write{};
+			write.dstSet = descriptorSet;
+			write.dstBinding = vulkanBinding.binding.binding;
+			write.dstArrayElement = 0;
+			write.descriptorType = vulkanBinding.binding.descriptorType;
+			write.descriptorCount = 1;
+			write.pImageInfo = &imageInfo;
+
+			m_handle.updateDescriptorSets(write, nullptr);
+
+			break;
+		}
+	}
+}
+
+void VulkanDevice::SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> RHISampler)
+{
+	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
+
+	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
+	vk::Sampler updateSampler = RHISampler.CastAs<VulkanSampler>()->GetHandle();
+	std::vector<VulkanBinding> vulkanBindings = RHIVulkanDescriptorSet->GetAllBindings();
+
+	for (const VulkanBinding& vulkanBinding : vulkanBindings)
+	{
+		if (vulkanBinding.name == name && vulkanBinding.binding.descriptorType == TranslateToVulkan(type))
+		{
+			vk::DescriptorImageInfo imageInfo{};
+			imageInfo.sampler = updateSampler;
+
+			vk::WriteDescriptorSet write{};
+			write.dstSet = descriptorSet;
+			write.dstBinding = vulkanBinding.binding.binding;
+			write.dstArrayElement = 0;
+			write.descriptorType = vulkanBinding.binding.descriptorType;
+			write.descriptorCount = 1;
+			write.pImageInfo = &imageInfo;
+
+			m_handle.updateDescriptorSets(write, nullptr);
+
+			break;
+		}
+	}
+}
+
+void VulkanDevice::SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> RHISampler)
+{
+	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
+
+	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
+	vk::Sampler updateSampler = RHISampler.CastAs<VulkanSampler>()->GetHandle();
+	std::vector<VulkanBinding> vulkanBindings = RHIVulkanDescriptorSet->GetAllBindings();
+
+	for (const VulkanBinding& vulkanBinding : vulkanBindings)
+	{
+		if (vulkanBinding.binding.binding == index && vulkanBinding.binding.descriptorType == TranslateToVulkan(type))
+		{
+			vk::DescriptorImageInfo imageInfo{};
 			imageInfo.sampler = updateSampler;
 
 			vk::WriteDescriptorSet write{};

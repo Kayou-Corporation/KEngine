@@ -56,6 +56,12 @@ struct Camera
     glm::vec3 pos;
 };
 
+struct Model
+{
+    glm::mat4 model;
+    glm::mat4 normal;
+};
+
 int main()
 {
 #ifdef KENGINE_DEBUG
@@ -82,6 +88,12 @@ int main()
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
     model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+
+    glm::mat3 normalMatrix = glm::mat4(glm::transpose(glm::inverse(glm::mat3(model))));
+
+    Model mdl;
+    mdl.model = model;
+    mdl.normal = normalMatrix;
 
 #pragma region Mesh
     std::string meshPath = "Engine/Assets/Meshes/viking_room.obj";
@@ -267,6 +279,8 @@ int main()
     
     copyBufferDataCommandList->SetImageData(textureImage, texturePixels, t_texWidth * t_texHeight * 4);
 
+    copyBufferDataCommandList->TransitionImageLayout(textureImage,Kayou::RHI::Layout::ShaderReadOnly);
+
     copyBufferDataCommandList->Close();
     
     Kayou::RHI::SubmitInfo submitInfocopyBufferData;
@@ -287,7 +301,7 @@ int main()
     // Uniform buffer modelMatrix
     Kayou::RHI::BufferSpecs uniformModelSpecs{};
     uniformModelSpecs.primaryUsage = Kayou::RHI::BufferUsage::Uniform;
-    uniformModelSpecs.size = sizeof(glm::mat4);
+    uniformModelSpecs.size = sizeof(Model);
     uniformModelSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
     uniformModelSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
     uniformCameraSpecs.isPersistentMapped = true;
@@ -297,7 +311,7 @@ int main()
     copyUniformDataCommandList->Open();
 
     copyUniformDataCommandList->SetBufferData(uniformCamera, &camera, sizeof(Camera), 0);
-    copyUniformDataCommandList->SetBufferData(uniformModel, &model, sizeof(glm::mat4), 0);
+    copyUniformDataCommandList->SetBufferData(uniformModel, &mdl, sizeof(Model), 0);
 
     copyUniformDataCommandList->Close();
 
@@ -378,9 +392,11 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
-    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera);
-    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "model", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel);
-    device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, sampler);
+    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
+    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "model", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(glm::mat4));
+    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "normalMatrix", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, sizeof(glm::mat4), sizeof(glm::mat4));
+    device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, nullptr);
+    device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Kayou::RHI::DescriptorType::Sampler, sampler);
 
 
     uint64_t frameCounter = 0;
@@ -433,6 +449,19 @@ int main()
 
         commandList->BeginRendering(renderingInfo);
 
+        commandList->SetViewport(0, 0, windowWidth, windowHeight);
+        commandList->SetScissor(0, 0, windowWidth, windowHeight);
+
+        commandList->BindPipeline(unlitPipeline);
+
+        commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Kayou::RHI::PipelineBindPoint::Graphics);
+        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Kayou::RHI::PipelineBindPoint::Graphics);
+
+        commandList->BindVertexBuffer(vertexBuffer, 0);
+        commandList->BindIndexBuffer(indexBuffer, 0);
+        
+        commandList->DrawIndexed(meshIndices.size(), 1, 0, 0, 0);
+
         commandList->EndRendering();
 
         commandList->TransitionImageLayout(presentationImages[imageIndex], Kayou::RHI::Layout::Present);
@@ -461,8 +490,6 @@ int main()
     }
     
     device->WaitIdle();
-    //device->ClearQueues();
-    //device->DestroyBuffer(testBuffer);
 
     device->DestroyBuffer(vertexBuffer);
     device->DestroyBuffer(indexBuffer);

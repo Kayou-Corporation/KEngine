@@ -983,4 +983,19 @@ inline vk::BorderColor TranslateToVulkan(BorderColor color)
     }
 }
 
+inline vk::PipelineBindPoint TranslateToVulkan(PipelineBindPoint point)
+{
+    switch (point)
+    {
+    case PipelineBindPoint::Graphics:
+        return vk::PipelineBindPoint::eGraphics;
+    case PipelineBindPoint::Compute:
+        return vk::PipelineBindPoint::eCompute;
+    case PipelineBindPoint::RayTracing:
+        return vk::PipelineBindPoint::eRayTracingKHR;
+    default:                                 
+        return vk::PipelineBindPoint::eGraphics;
+    }
+}
+
 END_NAMESPACE_RHI

@@ -269,6 +269,13 @@ enum class PipelineType
 	Compute
 };
 
+enum class PipelineBindPoint
+{
+	Graphics,
+	Compute,
+	RayTracing
+};
+
 enum class DynamicState
 {
 	ViewPort,

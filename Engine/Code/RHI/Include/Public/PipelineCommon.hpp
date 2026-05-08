@@ -52,6 +52,7 @@ public:
 	KENGINE_API Core::RefCountPtr<DescriptorSetLayout> GetDescriptorSetLayout(uint32_t index) const;
 	KENGINE_API std::vector<Core::RefCountPtr<DescriptorSetLayout>>& GetAllDescriptorSetsLayouts() { return m_descriptorsLayouts; }
 	KENGINE_API std::vector<std::string> GetAllDescriptorSetsLayoutsNames()const;
+	KENGINE_API uint32_t GetDescriptorSetLayoutIndex(std::string name) const;
 
 	KENGINE_API Core::RefCountPtr<PushConstantLayout> GetPushConstantLayouts(std::string name) const;
 	KENGINE_API std::vector<Core::RefCountPtr<PushConstantLayout>>& GetAllPushConstantsLayouts() { return m_pushConstantsLayouts; }

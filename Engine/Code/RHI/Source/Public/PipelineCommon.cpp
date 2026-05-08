@@ -45,6 +45,20 @@ std::vector<std::string> PipelineLayout::GetAllDescriptorSetsLayoutsNames() cons
 	return allDescriptorSetsLayoutsNames;
 }
 
+uint32_t PipelineLayout::GetDescriptorSetLayoutIndex(std::string name) const
+{
+	for (const Core::RefCountPtr<DescriptorSetLayout>& DescriptorSetLayout : m_descriptorsLayouts)
+	{
+		if (DescriptorSetLayout->GetName() == name)
+		{
+			return DescriptorSetLayout->GetIndex();
+		}
+	}
+
+	spdlog::warn("DescriptorSetLayout {} doesn't exist in this pipeline layout", name);
+	return 0;
+}
+
 Core::RefCountPtr<PushConstantLayout> PipelineLayout::GetPushConstantLayouts(std::string name) const
 {
 	for (const Core::RefCountPtr<PushConstantLayout>& PushConstantLayout : m_pushConstantsLayouts)

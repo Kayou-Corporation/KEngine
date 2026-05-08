@@ -5,6 +5,8 @@
 #include "Private/Vulkan/VulkanImage.hpp"
 #include "Private/Vulkan/VulkanRenderpass.hpp"
 #include "Private/Vulkan/VulkanGraphicsPipeline.hpp"
+#include"Private/Vulkan/VulkanPipelineCommon.hpp"
+#include"Private/Vulkan/VulkanDescriptorSet.hpp"
 
 BEGIN_NAMESPACE_RHI
 
@@ -48,6 +50,80 @@ void VulkanCommandList::BeginRendering(const RenderingInfo& RHIRenderingInfo)
 void VulkanCommandList::EndRendering()
 {
 	m_handle->cmdBuffer.endRendering();
+}
+
+//----------- Bind --------------//
+void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout, std::string layoutName, Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
+{
+	Core::RefCountPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
+	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
+
+	vk::PipelineLayout pipelineLayout = RHVulkanIPipelineLayout->GetHandle();
+	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
+	vk::PipelineBindPoint bindPoint = TranslateToVulkan(RHIBindPoint);
+	uint32_t layoutIndex = RHVulkanIPipelineLayout->GetDescriptorSetLayoutIndex(layoutName);
+
+	m_handle->cmdBuffer.bindDescriptorSets(bindPoint, pipelineLayout, layoutIndex, 1,&descriptorSet, 0, nullptr);
+}
+
+void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout, uint32_t layoutIndex, Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
+{
+	Core::RefCountPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
+	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
+
+	vk::PipelineLayout pipelineLayout = RHVulkanIPipelineLayout->GetHandle();
+	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
+	vk::PipelineBindPoint bindPoint = TranslateToVulkan(RHIBindPoint);
+
+	m_handle->cmdBuffer.bindDescriptorSets(bindPoint, pipelineLayout, layoutIndex, 1, &descriptorSet, 0, nullptr);
+}
+
+void VulkanCommandList::BindVertexBuffer(Core::RefCountPtr<Buffer> RHIVertexBuffer, uint32_t offset)
+{
+	Core::RefCountPtr<VulkanBuffer> RHVulkanVertexBuffer = RHIVertexBuffer.CastAs<VulkanBuffer>();
+	
+	vk::Buffer buffer = RHVulkanVertexBuffer->GetHandle();
+	vk::DeviceSize vkOffset = static_cast<vk::DeviceSize>(offset);
+
+	m_handle->cmdBuffer.bindVertexBuffers(0, { buffer }, { vkOffset });
+}
+
+void VulkanCommandList::BindIndexBuffer(Core::RefCountPtr<Buffer> RHIIndexBuffer, uint32_t offset)
+{
+	Core::RefCountPtr<VulkanBuffer> RHVulkanIndexBuffer = RHIIndexBuffer.CastAs<VulkanBuffer>();
+
+	vk::Buffer buffer = RHVulkanIndexBuffer->GetHandle();
+	vk::DeviceSize vkOffset = static_cast<vk::DeviceSize>(offset);
+
+	m_handle->cmdBuffer.bindIndexBuffer(buffer, vkOffset, vk::IndexType::eUint32);
+}
+
+//----------- Draw --------------//
+void VulkanCommandList::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+{
+	vk::Viewport viewport{};
+	viewport.x = x;
+	viewport.y = y;
+	viewport.width = width;
+	viewport.height = height;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+
+	m_handle->cmdBuffer.setViewport(0, 1, &viewport);
+}
+
+void VulkanCommandList::SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+{
+	vk::Rect2D scissor{};
+	scissor.offset = vk::Offset2D{ static_cast<int32_t>(x), static_cast<int32_t>(y) };
+	scissor.extent = vk::Extent2D{ width, height };
+
+	m_handle->cmdBuffer.setScissor(0, 1, &scissor);
+}
+
+void VulkanCommandList::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
+{
+	m_handle->cmdBuffer.drawIndexed(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 //----------- Set Buffer / Image Data --------------//
