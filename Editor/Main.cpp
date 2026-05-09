@@ -207,7 +207,7 @@ int main()
 
     Kayou::RHI::SwapchainSpecs sSpecs;
     sSpecs.surface = surface;
-    sSpecs.extent = Kayou::RHI::Extent2D(window->GetHeight(), window->GetWidth());
+    sSpecs.extent = Kayou::RHI::Extent2D(window->GetWidth(), window->GetHeight());
     sSpecs.imageCount = 2;
     sSpecs.presentMode = Kayou::RHI::PresentMode::Mailbox;
     sSpecs.imageFormat = Kayou::RHI::Format::BGRA8_SRGB;
@@ -296,6 +296,7 @@ int main()
     uniformCameraSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
     uniformCameraSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
     uniformCameraSpecs.isPersistentMapped = true;
+    uniformCameraSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> uniformCamera = device->CreateBuffer(uniformCameraSpecs);
 
 
@@ -306,6 +307,7 @@ int main()
     uniformModelSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
     uniformModelSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
     uniformModelSpecs.isPersistentMapped = true;
+    uniformModelSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> uniformModel = device->CreateBuffer(uniformModelSpecs);
 
     auto copyUniformDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
@@ -403,7 +405,7 @@ int main()
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Kayou::RHI::DescriptorType::Sampler, sampler);
 
-
+    device->WaitIdle();
 
     uint64_t frameCounter = 0;
     
