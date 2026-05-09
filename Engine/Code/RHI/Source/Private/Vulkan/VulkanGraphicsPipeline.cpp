@@ -87,6 +87,9 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	vk::PipelineColorBlendAttachmentState colorBlendAttachment{};
 	colorBlendAttachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 	colorBlendAttachment.blendEnable = VK_FALSE;
+	colorBlendAttachment.srcColorBlendFactor = vk::BlendFactor::eOne;
+	colorBlendAttachment.dstColorBlendFactor = vk::BlendFactor::eZero;
+	colorBlendAttachment.colorBlendOp = vk::BlendOp::eAdd;
 	if (specs.blendColor)
 	{
 		colorBlendAttachment.blendEnable = VK_TRUE;
@@ -149,6 +152,9 @@ vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateIn
 	createInfo.pViewportState = &vulkanGraphicsPipelineSpecs.viewportState;
 	createInfo.pRasterizationState = &vulkanGraphicsPipelineSpecs.rasterizationState;
 	createInfo.pMultisampleState = &vulkanGraphicsPipelineSpecs.multisampleState;
+
+	vulkanGraphicsPipelineSpecs.colorBlendState.attachmentCount = 1;
+	vulkanGraphicsPipelineSpecs.colorBlendState.pAttachments = &vulkanGraphicsPipelineSpecs.colorBlend;
 	createInfo.pColorBlendState = &vulkanGraphicsPipelineSpecs.colorBlendState;
 	createInfo.pDepthStencilState = &vulkanGraphicsPipelineSpecs.depthStencilCreateInfo;
 	createInfo.pDynamicState = &vulkanGraphicsPipelineSpecs.dynamicStateInfo;

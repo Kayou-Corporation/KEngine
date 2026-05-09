@@ -380,7 +380,7 @@ int main()
     unlitPipelineSpecs.cullmode = Kayou::RHI::CullMode::Back;
     unlitPipelineSpecs.frontFace = Kayou::RHI::FrontFace::CounterClockWise;
     unlitPipelineSpecs.SamplesCount = Kayou::RHI::SampleCount::Count1;
-    unlitPipelineSpecs.blendColor = true;
+    unlitPipelineSpecs.blendColor = false;
     unlitPipelineSpecs.depthTest = true;
     unlitPipelineSpecs.depthWrite = true;
     unlitPipelineSpecs.depthCompare = Kayou::RHI::CompareOp::LessOrEqual;

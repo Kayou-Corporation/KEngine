@@ -14,5 +14,6 @@ struct FSInput
 float4 fsMain(FSInput input) : SV_Target
 {
     float4 albedo = drawData.texture2D.Sample(drawData.sampler, input.uv);
+    //float4 albedo = float4(input.normal, 1.f);
     return albedo;
 }
