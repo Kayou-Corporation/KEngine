@@ -151,8 +151,8 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
 
     Kayou::Core::WindowSpecs specs;
-    specs.width = 720;
-    specs.height = 480;
+    specs.width = 1920;
+    specs.height = 1080;
     specs.name = "KEngine";
     specs.allowResize = true;
     specs.rendererAPI = Kayou::Core::RendererAPI::Vulkan;
@@ -160,12 +160,12 @@ int main()
     window->Create(specs);
 
     glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
 
-    float fov = glm::radians(45.0f);
-    float aspectRatio = window->GetWidth() / window->GetHeight();
+    float fov = glm::radians(45.f);
+    float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
     float nearPlane = 0.1f;
     float farPlane = 100.0f;
     glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
@@ -184,7 +184,7 @@ int main()
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
 
     Model mdl;
-    mdl.model = glm::transpose(model);;
+    mdl.model = glm::transpose(model);
     mdl.normal = normalMatrix;
 
 
@@ -342,9 +342,6 @@ int main()
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Image> depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
 
-    uint32_t windowWidth = window->GetWidth();
-    uint32_t windowHeight = window->GetHeight();
-
     // Timeline
     Kayou::RHI::SemaphoreSpecs timelineSpecs;
     timelineSpecs.type = Kayou::RHI::SemaphoreType::Timeline;
@@ -403,8 +400,6 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
     device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
-    //device->SetDescriptorSetBuffer(drawDataDescriptorSet, "model", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(glm::mat4));
-    //device->SetDescriptorSetBuffer(drawDataDescriptorSet, "normalMatrix", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, sizeof(glm::mat4), sizeof(glm::mat4));
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Kayou::RHI::DescriptorType::Sampler, sampler);
@@ -430,13 +425,43 @@ int main()
             device->UpdateCompatibility(surface);
 
             // Recreate everything.
-            sSpecs.extent = Kayou::RHI::Extent2D(window->GetWidth(), window->GetHeight());
+            uint32_t tWidth = window->GetWidth();
+            uint32_t tHeight = window->GetHeight();
+            sSpecs.extent = Kayou::RHI::Extent2D(tWidth, tHeight);
             swapchain = device->CreateSwapchain(sSpecs);
             presentationImages = device->CreatePresentationImages(swapchain);
             depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
 
             window->ResizeComplete();
             gpuResizeRequest = false;
+
+            glm::vec3 cameraPos2 = glm::vec3(0, 0, 5.0f);
+            glm::vec3 cameraTarget2 = glm::vec3(0.0f, 0.0f, 0.0f);
+            glm::vec3 upVector2 = glm::vec3(0.0f, 1.0f, 0.0f);
+            glm::mat4 view2 = glm::lookAt(cameraPos2, cameraTarget2, upVector2);
+
+            float fov2 = glm::radians(45.f);
+            float aspectRatio2 = static_cast<float>(tWidth) / static_cast<float>(tHeight);
+            float nearPlane2 = 0.1f;
+            float farPlane2 = 100.0f;
+            glm::mat4 proj2 = glm::perspective(fov2, aspectRatio2, nearPlane2, farPlane2);
+            proj2[1][1] *= -1;
+
+            Camera camera2;
+            camera2.vp = glm::transpose(proj2 * view2);
+            camera2.pos = cameraPos;
+            
+            auto commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+            commandList->Open();
+            commandList->SetBufferData(uniformCamera, &camera2, sizeof(Camera), 0);
+            commandList->Close();
+            
+            Kayou::RHI::SubmitInfo submitTransfer;
+            Kayou::RHI::SubmitInfo submitInfo;
+            submitInfo.stage = Kayou::RHI::PipelineStage::None;
+            
+            device->SubmitCommandList(commandList, submitTransfer);
+            //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
         }
 
         uint32_t maxFramesInFlight = swapchain->GetImageCount();
@@ -482,8 +507,8 @@ int main()
     
         commandList->BeginRendering(renderingInfo);
     
-        commandList->SetViewport(0, 0, windowWidth, windowHeight);
-        commandList->SetScissor(0, 0, windowWidth, windowHeight);
+        commandList->SetViewport(0, 0, window->GetWidth(), window->GetHeight());
+        commandList->SetScissor(0, 0, window->GetWidth(), window->GetHeight());
     
         commandList->BindPipeline(unlitPipeline);
     

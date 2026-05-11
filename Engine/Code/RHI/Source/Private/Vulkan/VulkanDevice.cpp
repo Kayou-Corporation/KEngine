@@ -45,12 +45,18 @@ Core::RefCountPtr<CommandList> VulkanDevice::GetCommandList(QueueType RHIQueueTy
 {
 	Core::RefCountPtr<VulkanCommandList> RHIVulkanCommandList = Core::CreateRefPtr<VulkanCommandList>();
 
-	TrackedCommandBufferPtr commandBuffer = m_queues[RHIQueueType].GetOrCreateCommandBuffer(m_handle);
+	if (m_queues.find(RHIQueueType) != m_queues.end())
+	{
+		TrackedCommandBufferPtr commandBuffer = m_queues[RHIQueueType].GetOrCreateCommandBuffer(m_handle);
 
-	RHIVulkanCommandList->SetHandle(commandBuffer);
-	RHIVulkanCommandList->SetOwnerQueueType(RHIQueueType);
+		RHIVulkanCommandList->SetHandle(commandBuffer);
+		RHIVulkanCommandList->SetOwnerQueueType(RHIQueueType);
 
-	return RHIVulkanCommandList;
+		return RHIVulkanCommandList;
+	}
+
+	spdlog::error("Queue requested doesn't exist");
+	return nullptr;
 }
 
 void VulkanDevice::SubmitCommandList(Core::RefCountPtr<CommandList> RHICommandList, const SubmitInfo& RHISubmitInfo)
