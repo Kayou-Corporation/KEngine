@@ -90,13 +90,15 @@ add_custom_command(
 )
 
 # Copy slang-compiler.dll to the output directory after target is built
-add_custom_command(
-        TARGET ${K_TARGET_NAME} 
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_CURRENT_SOURCE_DIR}/Libs/Slang/build/Release/bin/slang-compiler.dll"
-        "${OUTPUT_DIR_BASE}/"
-)
+if (WIN32)
+    add_custom_command(
+            TARGET ${K_TARGET_NAME} 
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_CURRENT_SOURCE_DIR}/Libs/Slang/build/Release/bin/slang-compiler.dll"
+            "${OUTPUT_DIR_BASE}/"
+    )
+endif()
 
 # Ensure Assets are also present in the general binary dir (for IDEs like Visual Studio)
 add_custom_target(CopyAssets ALL
