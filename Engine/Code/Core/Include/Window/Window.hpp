@@ -33,15 +33,20 @@ public:
 	KENGINE_API virtual bool ShouldClose() = 0;
 	KENGINE_API virtual void PollEvents() = 0;
 
+	void ResizeComplete() { m_HasResize = false; }
+
 	uint32_t GetWidth() const { return m_width; }
 	uint32_t GetHeight() const { return m_height; }
 	std::string GetName() const { return m_windowName; }
+	bool GetHasResize() const { return m_HasResize; }
 
 	RefCountPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
 
 protected:
 	uint32_t m_width = 0u;
 	uint32_t m_height = 0u;
+
+	bool m_HasResize = false;
 
 	std::string m_windowName;
 

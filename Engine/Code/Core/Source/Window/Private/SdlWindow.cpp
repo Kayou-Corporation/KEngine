@@ -57,6 +57,14 @@ void SDLWindow::PollEvents()
 		{
 			m_isRunning = false;
 		}
+		else if (event.type == SDL_EVENT_WINDOW_RESIZED)
+		{
+			m_width = event.window.data1;
+			m_height = event.window.data2;
+
+			m_HasResize = true;
+			break;
+		}
 	}
 }
 

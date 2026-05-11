@@ -412,38 +412,57 @@ int main()
     device->WaitIdle();
 
     uint64_t frameCounter = 0;
-    
+    bool gpuResizeRequest = false;
     while (!window->ShouldClose())
     {
         window->PollEvents();
+         
+        if (window->GetHasResize() || gpuResizeRequest)
+        {
+            device->WaitIdle();
+
+            // Destroy everything.
+            device->DestroyPresentationImages(presentationImages);
+            device->DestroyImage(depthImage);
+            device->DestroySwapchain(swapchain);
+
+            // Recreate everything.
+            sSpecs.extent = Kayou::RHI::Extent2D(window->GetWidth(), window->GetHeight());
+            swapchain = device->CreateSwapchain(sSpecs);
+            presentationImages = device->CreatePresentationImages(swapchain);
+            depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+
+            window->ResizeComplete();
+            gpuResizeRequest = false;
+        }
 
         uint32_t maxFramesInFlight = swapchain->GetImageCount();
         uint32_t syncIndex = frameCounter % maxFramesInFlight;
-
+    
         if (frameCounter >= maxFramesInFlight)
         {
             uint64_t waitValue = frameCounter - maxFramesInFlight + 1;
             device->WaitForSemaphore(frameTimelineSemaphore, waitValue);
         }
-
+    
         uint32_t imageIndex = device->AcquirreNextImage(swapchain, imageAvailablesSemaphores[syncIndex]);
-
+    
         device->RunGarbageCollector();
-
+    
         Kayou::RHI::RenderingAttachment colorAttachment;
         colorAttachment.image = presentationImages[imageIndex];
         colorAttachment.layout = Kayou::RHI::Layout::ColorAttachment;
         colorAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
         colorAttachment.storeOp = Kayou::RHI::StoreOp::Store;
         colorAttachment.clearValueColor = Kayou::RHI::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
-
+    
         Kayou::RHI::RenderingAttachment depthAttachment;
         depthAttachment.image = depthImage;
         depthAttachment.layout = Kayou::RHI::Layout::DepthStencilAttachment;
         depthAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
         depthAttachment.storeOp = Kayou::RHI::StoreOp::Store;
         depthAttachment.clearValueDepth = Kayou::RHI::ClearValue(1.0f, 0.f, 0.f, 0.f);
-
+    
         Kayou::RHI::RenderingInfo renderingInfo;
         renderingInfo.offset = { 0, 0 };
         renderingInfo.extent = { windowWidth, windowHeight };
@@ -451,52 +470,57 @@ int main()
         renderingInfo.colorAttachmentCount = 1;
         renderingInfo.colorAttachments = { colorAttachment };
         renderingInfo.depthAttachment = depthAttachment;
-
+    
         auto commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
         commandList->Open();
-
+    
         commandList->TransitionImageLayout(presentationImages[imageIndex], Kayou::RHI::Layout::ColorAttachment);
         commandList->TransitionImageLayout(depthImage, Kayou::RHI::Layout::DepthStencilAttachment);
-
+    
         commandList->BeginRendering(renderingInfo);
-
+    
         commandList->SetViewport(0, 0, windowWidth, windowHeight);
         commandList->SetScissor(0, 0, windowWidth, windowHeight);
-
+    
         commandList->BindPipeline(unlitPipeline);
-
+    
         commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Kayou::RHI::PipelineBindPoint::Graphics);
         commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Kayou::RHI::PipelineBindPoint::Graphics);
-
+    
         commandList->BindVertexBuffer(vertexBuffer, 0);
         commandList->BindIndexBuffer(indexBuffer, 0);
         
         commandList->DrawIndexed(meshIndices.size(), 1, 0, 0, 0);
-
+    
         commandList->EndRendering();
-
+    
         commandList->TransitionImageLayout(presentationImages[imageIndex], Kayou::RHI::Layout::Present);
-
+    
         commandList->Close();
-
+    
         uint64_t signalValue = frameCounter + 1;
-
+    
         Kayou::RHI::SubmitInfo submitInfo;
         submitInfo.waitSemaphores = { imageAvailablesSemaphores[syncIndex] };
         submitInfo.waitSemaphoresValues = { 0 };
         submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[imageIndex] };
         submitInfo.signalSemaphoresValues = { signalValue, 0 };
         submitInfo.stage = Kayou::RHI::PipelineStage::ColorOutput;
-
+    
         device->SubmitCommandList(commandList, submitInfo);
-
+    
         Kayou::RHI::PresentInfo presentInfo;
         presentInfo.waitSemaphores = { renderFinishedSemaphores[imageIndex] };
         presentInfo.swapchain = swapchain;
         presentInfo.imageIndex = imageIndex;
-
-        device->Present(presentInfo);
-
+    
+        bool sucess = device->Present(presentInfo);
+    
+        if (!sucess)
+        {
+            gpuResizeRequest = true;
+        }
+    
         frameCounter++;
     }
     

@@ -90,7 +90,7 @@ public:
 	KENGINE_API virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) = 0;
 	KENGINE_API virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) = 0;
 	KENGINE_API virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, Core::RefCountPtr<Semaphore> Semaphore) = 0;
-	KENGINE_API virtual void Present(const PresentInfo& presentInfo) = 0;
+	KENGINE_API virtual bool Present(const PresentInfo& presentInfo) = 0;
 
 
 	//-------------- Buffer --------------// 

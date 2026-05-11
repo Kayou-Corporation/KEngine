@@ -15,9 +15,10 @@ BEGIN_NAMESPACE_RHI
 
 struct PhysicalDevice 
 {
+public:
     vk::PhysicalDevice physicalDevice;
     QueueFamily family;
-    uint32_t score;
+    uint32_t score = 0;
 
     bool operator>(const PhysicalDevice& other) const
     {
@@ -79,7 +80,7 @@ public:
     virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
     virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) override;
     virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, Core::RefCountPtr<Semaphore> Semaphore) override;
-    virtual void Present(const PresentInfo& presentInfo) override;
+    virtual bool Present(const PresentInfo& presentInfo) override;
 
 
     //-------------- Buffer --------------// 

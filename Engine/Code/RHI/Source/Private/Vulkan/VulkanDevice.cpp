@@ -242,7 +242,7 @@ uint32_t VulkanDevice::AcquirreNextImage(Core::RefCountPtr<Swapchain> RHISwapcha
 	return imageIndex;
 }
 
-void VulkanDevice::Present(const PresentInfo& RHIPresentInfo)
+bool VulkanDevice::Present(const PresentInfo& RHIPresentInfo)
 {
 	std::vector<vk::Semaphore> waitSemaphores;
 	for (uint32_t i = 0; i < RHIPresentInfo.waitSemaphores.size(); ++i)
@@ -264,7 +264,14 @@ void VulkanDevice::Present(const PresentInfo& RHIPresentInfo)
 	presentInfo.pSwapchains = &swapchain;
 	presentInfo.pImageIndices = &RHIPresentInfo.imageIndex;
 
-	VK_CHECK_VOID(m_presentQueue.presentKHR(presentInfo), "Can't present");
+	vk::Result result = m_presentQueue.presentKHR(presentInfo);
+	
+	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 //-------------- Buffer --------------// 
@@ -1040,6 +1047,10 @@ void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::v
 	{
 		PhysicalDevice Device = RatePhysicalDevice(pd, queues, searchPresentQueue, surface, gpuType, extensions);
 		candidates.push_back(Device);
+
+		vk::PhysicalDeviceProperties properties = pd.getProperties();
+		std::string gpuName = properties.deviceName;
+		spdlog::info(gpuName);
 	}
 
 	std::sort(candidates.begin(), candidates.end(), 
