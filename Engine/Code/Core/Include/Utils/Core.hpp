@@ -32,7 +32,10 @@
 DO_PRAGMA(GCC diagnostic push) \
 DO_PRAGMA(GCC diagnostic ignored "-Wunused-parameter") \
 DO_PRAGMA(GCC diagnostic ignored "-Wunused-variable") \
-DO_PRAGMA(GCC diagnostic ignored "-Wmissing-field-initializers")
+DO_PRAGMA(GCC diagnostic ignored "-Wmissing-field-initializers") \
+DO_PRAGMA(GCC diagnostic ignored "-Wuninitialized") \
+DO_PRAGMA(GCC diagnostic ignored "-Wmaybe-uninitialized") \
+DO_PRAGMA(GCC diagnostic ignored "-Winit-self")
 
 #define RESTORE_WARNINGS DO_PRAGMA(GCC diagnostic pop)
 

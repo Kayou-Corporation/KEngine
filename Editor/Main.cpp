@@ -16,6 +16,8 @@
 #include "Public/DescriptorSet.hpp"
 #include "Public/RHI.hpp"
 
+DISABLE_WARNINGS
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4309)
@@ -35,6 +37,8 @@
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+
+RESTORE_WARNINGS
 
 
 #define STB_IMAGE_IMPLEMENTATION

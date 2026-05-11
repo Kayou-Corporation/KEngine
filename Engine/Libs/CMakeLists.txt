@@ -53,6 +53,14 @@ set(ASSIMP_BUILD_ASSXML_EXPORTER OFF CACHE BOOL "Disable ASSXML exporter")
 
 add_subdirectory(Assimp)
 
+if(TARGET assimp)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(assimp PRIVATE -Wno-error=maybe-uninitialized -Wno-maybe-uninitialized -Wno-error=uninitialized -Wno-uninitialized)
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(assimp PRIVATE -Wno-error=uninitialized -Wno-uninitialized)
+    endif()
+endif()
+
 # ----------- Assimp ----------- #
 add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Stbimage")
