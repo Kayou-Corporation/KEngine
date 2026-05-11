@@ -17,20 +17,25 @@ vk::SwapchainCreateInfoKHR VulkanSwapchain::GetCreateInfo(const PhysicalDeviceCo
 	const vk::Extent2D extent = VulkanSwapchain::FindSuitableExtent(compatibility.capabilities, requestedExtent);
 
 	uint32_t imageCount = 0;
-	if (requestedImageCount <= 0)
+	uint32_t minImageCount = compatibility.capabilities.minImageCount;
+	uint32_t maxImageCount = compatibility.capabilities.maxImageCount;
+	if (requestedImageCount < minImageCount)
 	{
-		imageCount = compatibility.capabilities.minImageCount + 1;
+		imageCount = minImageCount + 1;
 
-		if (compatibility.capabilities.maxImageCount > 0 && imageCount > compatibility.capabilities.maxImageCount)
+		if (maxImageCount > 0 && imageCount > maxImageCount)
 		{
-			imageCount = compatibility.capabilities.maxImageCount;
+			imageCount = maxImageCount;
 		}
-		spdlog::warn("The requested number of image for the swapchain is not available, default value use");
+		spdlog::warn("The requested number of image for the swapchain is not available, default value used: {}", imageCount);
+	}
+	else if (requestedImageCount > maxImageCount)
+	{
+		imageCount = maxImageCount;
+		spdlog::warn("The requested number of image for the swapchain is not available, default value used: {}", imageCount);
 	}
 	else
-	{
 		imageCount = requestedImageCount;
-	}
 
 	vk::SharingMode sharingMode = vk::SharingMode::eExclusive;
 	uint32_t queueFamilyCount = 0;
