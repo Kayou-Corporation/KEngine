@@ -72,34 +72,6 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-    glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
-
-    float fov = glm::radians(45.0f);
-    float aspectRatio = 1920.0f / 1080.0f;
-    float nearPlane = 0.1f;
-    float farPlane = 100.0f;
-    glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
-    proj[1][1] *= -1;
-
-    Camera camera;
-    camera.vp = glm::transpose(proj * view);
-    camera.pos = cameraPos;
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-    model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
-    model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-
-    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-
-    Model mdl;
-    mdl.model = glm::transpose(model);;
-    mdl.normal = normalMatrix;
-
 #pragma region Mesh
     std::string meshPath = "Engine/Assets/Meshes/viking_room.obj";
     Assimp::Importer t_importer{};
@@ -186,6 +158,34 @@ int main()
     specs.rendererAPI = Kayou::Core::RendererAPI::Vulkan;
     
     window->Create(specs);
+
+    glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
+
+    float fov = glm::radians(45.0f);
+    float aspectRatio = window->GetWidth() / window->GetHeight();
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+    glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
+    proj[1][1] *= -1;
+
+    Camera camera;
+    camera.vp = glm::transpose(proj * view);
+    camera.pos = cameraPos;
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+    model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
+    model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
+
+    Model mdl;
+    mdl.model = glm::transpose(model);;
+    mdl.normal = normalMatrix;
 
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Instance> instance = Kayou::RHI::RendererInterface::InitRenderer(Kayou::Core::RendererAPI::Vulkan);
@@ -426,6 +426,9 @@ int main()
             device->DestroyImage(depthImage);
             device->DestroySwapchain(swapchain);
 
+            // Update everything
+            device->UpdateCompatibility(surface);
+
             // Recreate everything.
             sSpecs.extent = Kayou::RHI::Extent2D(window->GetWidth(), window->GetHeight());
             swapchain = device->CreateSwapchain(sSpecs);
@@ -465,7 +468,7 @@ int main()
     
         Kayou::RHI::RenderingInfo renderingInfo;
         renderingInfo.offset = { 0, 0 };
-        renderingInfo.extent = { windowWidth, windowHeight };
+        renderingInfo.extent = { window->GetWidth(), window->GetHeight()};
         renderingInfo.layerCount = 1;
         renderingInfo.colorAttachmentCount = 1;
         renderingInfo.colorAttachments = { colorAttachment };

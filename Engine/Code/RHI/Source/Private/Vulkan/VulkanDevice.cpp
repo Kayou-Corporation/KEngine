@@ -1032,6 +1032,21 @@ void VulkanDevice::DestroyPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
 	}
 }
 
+void VulkanDevice::UpdateCompatibility(Core::RefCountPtr<Surface> RHISurface)
+{
+	Core::RefCountPtr<VulkanSurface> RHIVulkanSurface = RHISurface.CastAs<VulkanSurface>();
+
+	vk::SurfaceKHR surface = RHIVulkanSurface->GetHandle();
+
+	m_compatibility.capabilities = VK_CHECK_RESULT(m_pDevice.getSurfaceCapabilitiesKHR(surface), "Coudn't get surface capabilities");
+
+	m_compatibility.formats = VK_CHECK_RESULT(m_pDevice.getSurfaceFormatsKHR(surface), "Coudn't get surface format");
+	ASSERT(m_compatibility.formats.size() != 0, "No surface formats available");
+
+	m_compatibility.presentModes = VK_CHECK_RESULT(m_pDevice.getSurfacePresentModesKHR(surface), "Coudn't get surface present mode");
+	ASSERT(m_compatibility.presentModes.size() != 0, "No surface present mode available");
+}
+
 // Public Vulkan:
 
 void VulkanDevice::PickPhysicalDevice(const vk::Instance& instance, const std::vector<QueueType>& queues, bool searchPresentQueue, const vk::SurfaceKHR& surface, vk::PhysicalDeviceType gpuType, std::vector<const char*> extensions)

@@ -134,6 +134,7 @@ public:
     //KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
     virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) override;
 
+    virtual void UpdateCompatibility(Core::RefCountPtr<Surface> surface) override;
 
 // Public vulkan
 public:

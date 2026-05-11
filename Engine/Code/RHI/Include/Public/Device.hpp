@@ -144,6 +144,8 @@ public:
 	//KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
 	KENGINE_API virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) = 0;
 
+	KENGINE_API virtual void UpdateCompatibility(Core::RefCountPtr<Surface> surface) = 0;
+
 
 protected:
 	ShaderCompiler m_shaderCompiler;
