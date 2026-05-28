@@ -54,10 +54,10 @@ struct Vertex
     glm::vec2 uv;
 };
 
-struct Camera
+struct CameraData
 {
-    glm::mat4 vp;
-    glm::vec3 pos;
+    glm::mat4 cameraVP;
+    glm::vec3 cameraPos;
 };
 
 struct Model
@@ -171,9 +171,9 @@ int main()
     glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
     proj[1][1] *= -1;
 
-    Camera camera;
-    camera.vp = glm::transpose(proj * view);
-    camera.pos = cameraPos;
+    CameraData initCam;
+    initCam.cameraVP = glm::transpose(proj * view);
+    initCam.cameraPos = cameraPos;
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
@@ -296,7 +296,7 @@ int main()
     // Uniform buffer camera
     Kayou::RHI::BufferSpecs uniformCameraSpecs{};
     uniformCameraSpecs.primaryUsage = Kayou::RHI::BufferUsage::Uniform;
-    uniformCameraSpecs.size = sizeof(Camera);
+    uniformCameraSpecs.size = sizeof(CameraData);
     uniformCameraSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
     uniformCameraSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
     uniformCameraSpecs.isPersistentMapped = true;
@@ -317,7 +317,7 @@ int main()
     auto copyUniformDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
     copyUniformDataCommandList->Open();
 
-    copyUniformDataCommandList->SetBufferData(uniformCamera, &camera, sizeof(Camera), 0);
+    copyUniformDataCommandList->SetBufferData(uniformCamera, &initCam, sizeof(CameraData), 0);
     copyUniformDataCommandList->SetBufferData(uniformModel, &mdl, sizeof(Model), 0);
 
     copyUniformDataCommandList->Close();
@@ -399,7 +399,7 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
-    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
+    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Kayou::RHI::DescriptorType::Sampler, sampler);
@@ -447,13 +447,13 @@ int main()
             glm::mat4 proj2 = glm::perspective(fov2, aspectRatio2, nearPlane2, farPlane2);
             proj2[1][1] *= -1;
 
-            Camera camera2;
-            camera2.vp = glm::transpose(proj2 * view2);
-            camera2.pos = cameraPos;
+            CameraData resizeCam;
+            resizeCam.cameraVP = glm::transpose(proj2 * view2);
+            resizeCam.cameraPos = cameraPos;
             
             auto commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
             commandList->Open();
-            commandList->SetBufferData(uniformCamera, &camera2, sizeof(Camera), 0);
+            commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
             commandList->Close();
             
             Kayou::RHI::SubmitInfo submitTransfer;

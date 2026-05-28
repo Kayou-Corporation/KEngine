@@ -3,8 +3,8 @@
 // Set O --- FrameData ---
 struct Camera
 {
-    float4x4 CameraVP;
-    float3 CameraPos;
+    float4x4 cameraVP;
+    float3 cameraPos;
 };
 
 struct Light
