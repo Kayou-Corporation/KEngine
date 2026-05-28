@@ -30,8 +30,8 @@ namespace Kayou::Core
         glm::vec3 GetUp() const;
 
 
-    protected:
         void RecalculateMatrices() const;
+    protected:
         void MarkDirty() const;
 
         glm::vec3 m_position { 0.0f };

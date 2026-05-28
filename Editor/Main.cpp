@@ -14,6 +14,7 @@
 #include "Public/GraphicsPipeline.hpp"
 #include "Public/Sampler.hpp"
 #include "Public/DescriptorSet.hpp"
+#include "Public/Camera/EditorCamera.hpp"
 #include "Public/RHI.hpp"
 
 DISABLE_WARNINGS
@@ -159,21 +160,34 @@ int main()
     
     window->Create(specs);
 
-    glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
-
-    float fov = glm::radians(45.f);
     float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
-    float nearPlane = 0.1f;
-    float farPlane = 100.0f;
-    glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
-    proj[1][1] *= -1;
+
+    Kayou::Core::EditorCamera editorCamera;
+    editorCamera.SetPosition(glm::vec3(0, 0, 10.0f));
+    editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
+    editorCamera.SetFov(glm::radians(45.f));
+    editorCamera.SetAspectRatio(aspectRatio);
+    editorCamera.SetNearPlane(0.1f);
+    editorCamera.SetFarPlane(100.0f);
+
+    editorCamera.RecalculateMatrices();
+
+
+    //glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
+    //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    //glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
+    //glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
+    //
+    //float fov = glm::radians(45.f);
+    //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
+    //float nearPlane = 0.1f;
+    //float farPlane = 100.0f;
+    //glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
+    //proj[1][1] *= -1;
 
     CameraData initCam;
-    initCam.cameraVP = glm::transpose(proj * view);
-    initCam.cameraPos = cameraPos;
+    initCam.cameraVP = editorCamera.GetViewProjectionMatrix();
+    initCam.cameraPos = editorCamera.GetPosition();
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
@@ -435,21 +449,12 @@ int main()
             window->ResizeComplete();
             gpuResizeRequest = false;
 
-            glm::vec3 cameraPos2 = glm::vec3(0, 0, 5.0f);
-            glm::vec3 cameraTarget2 = glm::vec3(0.0f, 0.0f, 0.0f);
-            glm::vec3 upVector2 = glm::vec3(0.0f, 1.0f, 0.0f);
-            glm::mat4 view2 = glm::lookAt(cameraPos2, cameraTarget2, upVector2);
-
-            float fov2 = glm::radians(45.f);
-            float aspectRatio2 = static_cast<float>(tWidth) / static_cast<float>(tHeight);
-            float nearPlane2 = 0.1f;
-            float farPlane2 = 100.0f;
-            glm::mat4 proj2 = glm::perspective(fov2, aspectRatio2, nearPlane2, farPlane2);
-            proj2[1][1] *= -1;
+            editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
+            editorCamera.RecalculateMatrices();
 
             CameraData resizeCam;
-            resizeCam.cameraVP = glm::transpose(proj2 * view2);
-            resizeCam.cameraPos = cameraPos;
+            resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
+            resizeCam.cameraPos = editorCamera.GetPosition();
             
             auto commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
             commandList->Open();

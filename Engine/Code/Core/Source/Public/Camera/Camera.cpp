@@ -122,7 +122,7 @@ namespace Kayou::Core
         m_viewMatrix = glm::lookAt(m_position, m_position + forward, up);
         m_projectionMatrix = glm::perspective(m_fov, m_aspectRatio, m_nearPlane, m_farPlane);
         m_projectionMatrix[1][1] *= -1.0f; // Vulkan patch
-        m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
+        m_viewProjectionMatrix = glm::transpose(m_projectionMatrix * m_viewMatrix);
 
         m_dirty = false;
     }
