@@ -163,7 +163,7 @@ int main()
     float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
 
     Kayou::Core::EditorCamera editorCamera;
-    editorCamera.SetPosition(glm::vec3(0, 0, 10.0f));
+    editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
     editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
     editorCamera.SetFov(glm::radians(45.f));
     editorCamera.SetAspectRatio(aspectRatio);
