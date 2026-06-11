@@ -142,7 +142,25 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 
 	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
 
-	if (RHIVulkanBuffer->GetIsGpuOnly())
+	VkMemoryPropertyFlags memPropFlags;
+	vmaGetAllocationMemoryProperties(memoryAllocator, bufferAllocation, &memPropFlags);
+
+	if (memPropFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
+	{
+		VK_CHECK_VOID(static_cast<vk::Result>(vmaCopyMemoryToAllocation(memoryAllocator, data, bufferAllocation, offset, size)), "Failed to copy memory to buffer");
+
+		vk::BufferMemoryBarrier bufferMemBarrier{};
+		bufferMemBarrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
+		bufferMemBarrier.dstAccessMask = bufferAccessFlags;
+		bufferMemBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+		bufferMemBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+		bufferMemBarrier.buffer = bufferHandle;
+		bufferMemBarrier.offset = offset;
+		bufferMemBarrier.size = size;
+
+		cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eHost, pipelineStage, {}, nullptr, bufferMemBarrier, nullptr);
+	}
+	else
 	{
 #pragma region C-Style VMA
 		VkBufferCreateInfo stagingCreateInfo{};
@@ -197,21 +215,6 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 		trackedStagingBuffer->allocationInfo = stagingAllocInfo;
 
 		m_handle->trackedStagingBuffers.push_back(trackedStagingBuffer);
-	}
-	else
-	{
-		VK_CHECK_VOID(static_cast<vk::Result>(vmaCopyMemoryToAllocation(memoryAllocator, data, bufferAllocation, offset, size)), "Failed to copy memory to buffer");
-
-		vk::BufferMemoryBarrier bufferMemBarrier{};
-		bufferMemBarrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
-		bufferMemBarrier.dstAccessMask = bufferAccessFlags;
-		bufferMemBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-		bufferMemBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-		bufferMemBarrier.buffer = bufferHandle;
-		bufferMemBarrier.offset = offset;
-		bufferMemBarrier.size = size;
-
-		cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eHost, pipelineStage, {}, nullptr, bufferMemBarrier, nullptr);
 	}
 }
 
