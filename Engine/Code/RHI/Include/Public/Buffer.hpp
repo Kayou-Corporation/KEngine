@@ -16,7 +16,8 @@ struct BufferSpecs
 	std::vector<BufferUsage> additionalUsages;
 	MemoryAccess memoryAccess;
 	PipelineStage pipelineStage;
-	bool isPersistentMapped = false;
+	// isPersistentMapped is not relevant for GpuOnly buffer !
+	bool isPersistentMapped = true;
 };
 
 class Buffer : public virtual Core::IResource

@@ -288,7 +288,7 @@ Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs
 	VkBufferCreateInfo bufferInfo = RHIVulkanBuffer->GetCreateInfo(RHISpecs);
 
 	VmaAllocationCreateInfo allocInfo = TranslateToVulkan(RHISpecs.memoryAccess);
-	if (RHIVulkanBuffer->GetIsPersistentMapped())
+	if (RHIVulkanBuffer->GetIsPersistentMapped() && RHISpecs.memoryAccess != MemoryAccess::GpuOnly)
 		allocInfo.flags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
 	VkBuffer buf;
@@ -300,7 +300,7 @@ Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs
 	RHIVulkanBuffer->SetAllocation(allocation);
 	RHIVulkanBuffer->SetAllocationInfo(allocationInfo);
 
-	if (RHISpecs.memoryAccess == MemoryAccess::GpuOnly)
+	if (RHISpecs.memoryAccess == MemoryAccess::GpuOnly || RHISpecs.memoryAccess == MemoryAccess::Dynamic)
 		RHIVulkanBuffer->SetIsGpuOnly(true);
 
 	return RHIVulkanBuffer;
