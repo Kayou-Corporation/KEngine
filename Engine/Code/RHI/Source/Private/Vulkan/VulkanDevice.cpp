@@ -300,7 +300,7 @@ Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs
 	RHIVulkanBuffer->SetAllocation(allocation);
 	RHIVulkanBuffer->SetAllocationInfo(allocationInfo);
 
-	if (RHISpecs.memoryAccess == MemoryAccess::GPU_Only)
+	if (RHISpecs.memoryAccess == MemoryAccess::GpuOnly)
 		RHIVulkanBuffer->SetIsGpuOnly(true);
 
 	return RHIVulkanBuffer;

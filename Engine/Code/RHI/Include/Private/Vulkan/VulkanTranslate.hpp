@@ -566,20 +566,26 @@ inline VmaAllocationCreateInfo TranslateToVulkan(MemoryAccess access)
 {
     VmaAllocationCreateInfo createInfo{};
 
+    createInfo.usage = VMA_MEMORY_USAGE_AUTO;
     switch (access)
     {
-    case MemoryAccess::CPU_Read:
-        createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
-        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+    case MemoryAccess::GpuOnly:
+        createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
         break;
 
-    case MemoryAccess::CPU_Write:
+    case MemoryAccess::Upload:
         createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
         createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         break;
 
-    case MemoryAccess::GPU_Only:
-        createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+    case MemoryAccess::Readback:
+        createInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
+        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+        break;
+
+    case MemoryAccess::Dynamic:
+        createInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT;;
+        break;
     }
 
     return createInfo;

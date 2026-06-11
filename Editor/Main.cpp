@@ -241,7 +241,7 @@ int main()
     vertexbufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Vertex;
     vertexbufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
     vertexbufferSpecs.size = meshVertices.size() * sizeof(Vertex);
-    vertexbufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
+    vertexbufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GpuOnly;
     vertexbufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
     
@@ -250,7 +250,7 @@ int main()
     indexBufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Index;
     indexBufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
     indexBufferSpecs.size = meshIndices.size() * sizeof(uint32_t);
-    indexBufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GPU_Only;
+    indexBufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GpuOnly;
     indexBufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
     Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> indexBuffer = device->CreateBuffer(indexBufferSpecs);
 
@@ -311,7 +311,7 @@ int main()
     Kayou::RHI::BufferSpecs uniformCameraSpecs{};
     uniformCameraSpecs.primaryUsage = Kayou::RHI::BufferUsage::Uniform;
     uniformCameraSpecs.size = sizeof(CameraData);
-    uniformCameraSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
+    uniformCameraSpecs.memoryAccess = Kayou::RHI::MemoryAccess::Upload;
     uniformCameraSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
     uniformCameraSpecs.isPersistentMapped = true;
     uniformCameraSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
@@ -322,7 +322,7 @@ int main()
     Kayou::RHI::BufferSpecs uniformModelSpecs{};
     uniformModelSpecs.primaryUsage = Kayou::RHI::BufferUsage::Uniform;
     uniformModelSpecs.size = sizeof(Model);
-    uniformModelSpecs.memoryAccess = Kayou::RHI::MemoryAccess::CPU_Write;
+    uniformModelSpecs.memoryAccess = Kayou::RHI::MemoryAccess::Upload;
     uniformModelSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
     uniformModelSpecs.isPersistentMapped = true;
     uniformModelSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };

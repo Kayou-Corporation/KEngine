@@ -236,9 +236,10 @@ enum class BufferUsage
 
 enum class MemoryAccess
 {
-	CPU_Read,
-	CPU_Write,
-	GPU_Only
+	GpuOnly,
+	Upload,
+	Readback,
+	Dynamic
 };
 
 enum class PipelineStage
