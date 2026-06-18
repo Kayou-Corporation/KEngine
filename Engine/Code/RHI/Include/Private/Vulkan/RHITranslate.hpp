@@ -39,4 +39,40 @@ inline Format TranslateFromVulkan(vk::Format format)
     }
 }
 
+inline Layout TranslateFromVulkan(vk::ImageLayout layout)
+{
+    switch (layout)
+    {
+    case vk::ImageLayout::ePresentSrcKHR:
+        return Layout::Present;
+
+    case vk::ImageLayout::eColorAttachmentOptimal:
+        return Layout::ColorAttachment;    
+
+    case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+        return Layout::DepthStencilAttachment;
+
+    case vk::ImageLayout::eShaderReadOnlyOptimal:
+        return Layout::ShaderReadOnly;
+
+    case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
+        return Layout::DepthStencilReadOnly;
+
+    case vk::ImageLayout::eTransferSrcOptimal:
+        return Layout::TransferSrc;
+
+    case vk::ImageLayout::eTransferDstOptimal:
+        return Layout::TransferDst;
+
+    case vk::ImageLayout::eUndefined:
+    default:
+        return Layout::Undefined;
+    }
+}
+
+inline Extent3D TranslateFromVulkan(vk::Extent3D extent)
+{
+    return Extent3D(extent.width, extent.height, extent.depth);
+}
+
 END_NAMESPACE_RHI

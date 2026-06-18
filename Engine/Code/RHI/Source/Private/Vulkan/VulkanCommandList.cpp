@@ -222,12 +222,6 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 {
 	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
 
-	if (RHIVulkanImage->GetSource() == ImageSource::Gpu)
-	{
-		spdlog::error("Be carefull you tried to pass CPU data into a only GPU image");
-		return;
-	}
-
 	VmaAllocator allocator = m_handle->memoryAllocator;
 
 	// -------------------- STAGING BUFFER ----------------------- // 
@@ -265,7 +259,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 	uint32_t layers = RHIVulkanImage->GetLayersCount();
 	uint32_t mips = RHIVulkanImage->GetMipLevels();
 	uint32_t bytesPerPixel = RHIVulkanImage->GetBytesPerPixel();
-	vk::Extent3D extent = RHIVulkanImage->GetExtent();
+	vk::Extent3D extent = RHIVulkanImage->GetVulkanExtent();
 	vk::ImageAspectFlags aspect = RHIVulkanImage->GetAspect();
 
 	vk::ImageMemoryBarrier transitionToCopyLayout{};
@@ -327,7 +321,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 
 
 	// --------------------  TRANSITION TO FINAL LAYOUT FOR USE ----------------------- // 
-	vk::ImageLayout finalLayout = RHIVulkanImage->GetFinalLayout();
+	vk::ImageLayout finalLayout = RHIVulkanImage->GetVulkanTargetLayout();
 
 	// A little bit "hardcode" but this function should only be use with a final layout = transitionToFinalLayout
 	vk::ImageMemoryBarrier transitionToFinalLayout{};
@@ -352,11 +346,11 @@ void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> RHIImage,
 {
 	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
 
-	vk::ImageLayout oldLayout = RHIVulkanImage->GetLayout();
+	vk::ImageLayout oldLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 	vk::ImageLayout newLayout = TranslateToVulkan(RHIDstLayout);
 
 	vk::ImageMemoryBarrier barrier{};
-	barrier.oldLayout = RHIVulkanImage->GetLayout();
+	barrier.oldLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 	barrier.newLayout = newLayout;
 	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -403,7 +397,7 @@ void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> RHIImage,
 
 	m_handle->cmdBuffer.pipelineBarrier(srcStage, dstStage, vk::DependencyFlags(), nullptr, nullptr, barrier);	
 	
-	RHIVulkanImage->SetLayout(newLayout);
+	RHIVulkanImage->SetCurrentLayout(newLayout);
 }
 
 //----------- Pipeline --------------//

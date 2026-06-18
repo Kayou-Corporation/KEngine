@@ -1,18 +1,19 @@
 #include "Private/Vulkan/VulkanImage.hpp"
 
+#include "Private/Vulkan/RHITranslate.hpp"
 
 BEGIN_NAMESPACE_RHI
 
 vk::ImageCreateInfo VulkanImage::GetCreateInfo(const ImageSpecs& specs)
 {
-	// Important for later 
-	m_source = specs.source;
+	// Important for later, store in RHI parent class
+	m_rhiExtent = specs.extent;
+	m_rhiFormat = specs.format;
+	m_rhiTargetLayout = specs.targetLayout;
 
-	m_targetLayout = TranslateToVulkan(specs.targetLayout);
-	m_finalLayout = TranslateToVulkan(specs.finalLayout);
-	m_layout = vk::ImageLayout::eUndefined;
 	m_imageFormat = TranslateToVulkan(specs.format);
 	m_imageExtent = TranslateToVulkan(specs.extent);
+	m_targetLayout = TranslateToVulkan(specs.targetLayout);
 	m_layersCount = specs.layersCount;
 	m_mipLevels = specs.mipLevels;
 	m_bytesPerPixel = GetFormatSize(m_imageFormat);
@@ -61,14 +62,18 @@ vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfo(const ImageSpecs& specs)
 	return createInfo;
 }
 
+// Color Attachment optimal
 vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfoForPresentation(vk::Format format, vk::Extent3D extent)
 {
-	m_source = ImageSource::Gpu;
+	// Parent class setup
+	m_rhiExtent = TranslateFromVulkan(extent);
+	m_rhiFormat = TranslateFromVulkan(format);
+	m_rhiTargetLayout = TranslateFromVulkan(vk::ImageLayout::ePresentSrcKHR);
 
-	m_targetLayout = vk::ImageLayout::eColorAttachmentOptimal;
-	m_finalLayout = vk::ImageLayout::ePresentSrcKHR;
-	m_imageFormat = format;
 	m_imageExtent = extent;
+	m_imageFormat = format;
+	m_targetLayout = vk::ImageLayout::ePresentSrcKHR;
+
 	m_layersCount = 1;
 	m_mipLevels = 1;
 	m_bytesPerPixel = GetFormatSize(m_imageFormat);
@@ -90,12 +95,15 @@ vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfoForPresentation(vk::Format
 
 vk::ImageCreateInfo VulkanImage::GetCreateInfoForSwapchain(SwapchainImageSpecs specs, vk::Format format, vk::Extent3D extent)
 {
-	m_source = ImageSource::Gpu;
+	// Parent class setup
+	m_rhiExtent = TranslateFromVulkan(extent);
+	m_rhiFormat = TranslateFromVulkan(format);
+	m_rhiTargetLayout = specs.targetLayout;
 
-	m_targetLayout = TranslateToVulkan(specs.targetLayout);
-	m_finalLayout = TranslateToVulkan(specs.finalLayout);
-	m_imageFormat = format;
 	m_imageExtent = extent;
+	m_imageFormat = format;
+	m_targetLayout = TranslateToVulkan(specs.targetLayout);
+
 	m_layersCount = 1;
 	m_mipLevels = 1;
 	m_bytesPerPixel = GetFormatSize(m_imageFormat);
@@ -137,6 +145,18 @@ vk::ImageViewCreateInfo VulkanImage::GetViewCreateInfoForSwapchain(SwapchainImag
 	createInfo.subresourceRange.layerCount = m_layersCount;
 
 	return createInfo;
+}
+
+void VulkanImage::SetCurrentLayout(vk::ImageLayout layout)
+{
+	m_imageLayout = layout;
+	m_rhiCurrentLayout = TranslateFromVulkan(layout);
+}
+
+void VulkanImage::SetTargetLayout(vk::ImageLayout layout)
+{
+	m_targetLayout = layout;
+	m_rhiTargetLayout = TranslateFromVulkan(layout);
 }
 
 uint32_t VulkanImage::GetFormatSize(vk::Format format)

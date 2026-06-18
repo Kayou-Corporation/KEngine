@@ -9,11 +9,8 @@ BEGIN_NAMESPACE_RHI
 
 struct ImageSpecs
 {
-	ImageSource source;
-
 	Format format;
 	Layout targetLayout;
-	Layout finalLayout;
 
 	ImageType type;
 	ImageViewType viewType;
@@ -41,7 +38,6 @@ struct SwapchainImageSpecs
 	SwapchainImageType imageType;
 
 	Layout targetLayout;
-	Layout finalLayout;
 
 	ImageType type;
 	ImageViewType viewType;
@@ -54,10 +50,17 @@ class Image : virtual public Core::IResource
 public:
 	virtual ~Image() = default;
 
-	KENGINE_API ImageSource GetSource() { return m_source; }
+	KENGINE_API Extent3D GetExtent() { return m_rhiExtent; }
+	KENGINE_API Format GetFormat() { return m_rhiFormat; }
+	KENGINE_API Layout GetCurrentLayout() { return m_rhiCurrentLayout; }
+	KENGINE_API Layout GetTargetLayout() { return m_rhiTargetLayout; }
 
 protected:
-	ImageSource m_source;
+	Extent3D m_rhiExtent;
+	Format m_rhiFormat;
+	Layout m_rhiTargetLayout;
+
+	Layout m_rhiCurrentLayout = Layout::Undefined;
 };
 
 END_NAMESPACE_RHI

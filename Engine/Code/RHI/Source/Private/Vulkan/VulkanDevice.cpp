@@ -841,7 +841,7 @@ void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDes
 		{
 			vk::DescriptorImageInfo imageInfo{};
 			imageInfo.imageView = updateImageView;
-			imageInfo.imageLayout = RHIVulkanImage->GetLayout();
+			imageInfo.imageLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 			if (vkType == vk::DescriptorType::eCombinedImageSampler)
 			{
 				imageInfo.sampler = updateSampler;
@@ -885,7 +885,7 @@ void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDes
 		{
 			vk::DescriptorImageInfo imageInfo{};
 			imageInfo.imageView = updateImageView;
-			imageInfo.imageLayout = RHIVulkanImage->GetLayout();
+			imageInfo.imageLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 			if (vkType == vk::DescriptorType::eCombinedImageSampler)
 			{
 				imageInfo.sampler = updateSampler;

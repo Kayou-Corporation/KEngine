@@ -256,10 +256,8 @@ int main()
 
     // Base Texture
     Kayou::RHI::ImageSpecs textureImageSpecs;
-    textureImageSpecs.source = Kayou::RHI::ImageSource::Cpu;
     textureImageSpecs.format = Kayou::RHI::Format::RGBA8_SRGB;
     textureImageSpecs.targetLayout = Kayou::RHI::Layout::ShaderReadOnly;
-    textureImageSpecs.finalLayout = Kayou::RHI::Layout::ShaderReadOnly;
     textureImageSpecs.type = Kayou::RHI::ImageType::Image2D;
     textureImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
     textureImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Color;
@@ -348,7 +346,6 @@ int main()
     Kayou::RHI::SwapchainImageSpecs depthImageSpecs; 
     depthImageSpecs.imageType = Kayou::RHI::SwapchainImageType::Depth;
     depthImageSpecs.targetLayout = Kayou::RHI::Layout::DepthStencilAttachment;
-    depthImageSpecs.finalLayout = Kayou::RHI::Layout::DepthStencilAttachment;
     depthImageSpecs.type = Kayou::RHI::ImageType::Image2D;
     depthImageSpecs.usages = { Kayou::RHI::ImageUsage::DepthStencilAttachment };
     depthImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
