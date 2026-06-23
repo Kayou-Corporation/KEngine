@@ -218,6 +218,90 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 	}
 }
 
+void VulkanCommandList::CopyBufferToBuffer(Core::RefCountPtr<Buffer> RHISrcBuffer, uint32_t srcOffset, Core::RefCountPtr<Buffer> RHIDstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage, bool returnDstBufferToInitialStage)
+{
+	Core::RefCountPtr<VulkanBuffer> RHIVulkanSrcBuffer = RHISrcBuffer.CastAs<VulkanBuffer>();
+	Core::RefCountPtr<VulkanBuffer> RHIVulkanDstBuffer = RHIDstBuffer.CastAs<VulkanBuffer>();
+
+	vk::Buffer srcBuffer = RHIVulkanSrcBuffer->GetHandle();
+	vk::Buffer dstBuffer = RHIVulkanDstBuffer->GetHandle();
+
+	ASSERT((srcOffset + size) <= RHIVulkanSrcBuffer->GetSize(), "Src data is to large with the offset");
+	ASSERT((dstOffset + size) <= RHIVulkanDstBuffer->GetSize(), "Dst data is to large with the offset");
+
+	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
+
+	// -------------------- WE NEED TO PREPARE SRC BUFFER SO DST BUFFER CAN READ IT ----------------------- //
+	vk::BufferMemoryBarrier srcBufferPreparationBarrier{};
+	srcBufferPreparationBarrier.srcAccessMask = RHIVulkanSrcBuffer->GetAccessMask();
+	srcBufferPreparationBarrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
+	srcBufferPreparationBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+	srcBufferPreparationBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+	srcBufferPreparationBarrier.buffer = srcBuffer;
+	srcBufferPreparationBarrier.offset = srcOffset;
+	srcBufferPreparationBarrier.size = size;
+
+	vk::PipelineStageFlags srcStageMask = srcBufferPreparationBarrier.srcAccessMask == vk::AccessFlagBits::eHostWrite ? vk::PipelineStageFlagBits::eHost : RHIVulkanSrcBuffer->GetPipelineStage();
+	cmdBuffer.pipelineBarrier(srcStageMask, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, srcBufferPreparationBarrier, nullptr);
+
+	// -------------------- WE NEED TO PREPARE DST BUFFER IT CAN READ SRC BUFFER ----------------------- //
+	vk::BufferMemoryBarrier dstBufferPreparationBarrier{};
+	dstBufferPreparationBarrier.srcAccessMask = RHIVulkanDstBuffer->GetAccessMask();
+	dstBufferPreparationBarrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+	dstBufferPreparationBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+	dstBufferPreparationBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+	dstBufferPreparationBarrier.buffer = dstBuffer;
+	dstBufferPreparationBarrier.offset = dstOffset;
+	dstBufferPreparationBarrier.size = size;
+
+	vk::PipelineStageFlags dstBufferSrcStageMask = dstBufferPreparationBarrier.srcAccessMask == vk::AccessFlagBits::eHostWrite ? vk::PipelineStageFlagBits::eHost : RHIVulkanDstBuffer->GetPipelineStage();
+	cmdBuffer.pipelineBarrier(dstBufferSrcStageMask, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, dstBufferPreparationBarrier, nullptr);
+
+	// -------------------- ACTUAL COPY ----------------------- //
+	vk::BufferCopy bufferCopy{};
+	bufferCopy.srcOffset = srcOffset;
+	bufferCopy.dstOffset = dstOffset;
+	bufferCopy.size = vk::DeviceSize(size);
+
+	cmdBuffer.copyBuffer(srcBuffer, dstBuffer, bufferCopy);
+
+	// -------------------- REVERT SRC BUFFER TO INITIAL ACCESS MASK ----------------------- //
+	if (returnSrcBufferToInitialStage)
+	{
+		vk::BufferMemoryBarrier srcBufferPostCopyBarrier{};
+		srcBufferPostCopyBarrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
+		srcBufferPostCopyBarrier.dstAccessMask = RHIVulkanSrcBuffer->GetAccessMask();
+		srcBufferPostCopyBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+		srcBufferPostCopyBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+		srcBufferPostCopyBarrier.buffer = srcBuffer;
+		srcBufferPostCopyBarrier.offset = srcOffset;
+		srcBufferPostCopyBarrier.size = size;
+
+		vk::PipelineStageFlags srcPostCopySrcStageMask = vk::PipelineStageFlagBits::eTransfer;
+		vk::PipelineStageFlags srcPostCopyDstStageMask = RHIVulkanSrcBuffer->GetPipelineStage();
+
+		cmdBuffer.pipelineBarrier(srcPostCopySrcStageMask, srcPostCopyDstStageMask, {}, nullptr, srcBufferPostCopyBarrier, nullptr);
+	}
+
+	// -------------------- REVERT DST BUFFER TO INITIAL ACCESS MASK ----------------------- //
+	if (returnDstBufferToInitialStage)
+	{
+		vk::BufferMemoryBarrier dstBufferPostCopyBarrier{};
+		dstBufferPostCopyBarrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+		dstBufferPostCopyBarrier.dstAccessMask = RHIVulkanDstBuffer->GetAccessMask();
+		dstBufferPostCopyBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+		dstBufferPostCopyBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+		dstBufferPostCopyBarrier.buffer = dstBuffer;
+		dstBufferPostCopyBarrier.offset = dstOffset;
+		dstBufferPostCopyBarrier.size = size;
+
+		vk::PipelineStageFlags dstPostCopySrcStageMask = vk::PipelineStageFlagBits::eTransfer;
+		vk::PipelineStageFlags dstPostCopyDstStageMask = RHIVulkanDstBuffer->GetPipelineStage();
+
+		cmdBuffer.pipelineBarrier(dstPostCopySrcStageMask, dstPostCopyDstStageMask, {}, nullptr, dstBufferPostCopyBarrier, nullptr);
+	}
+}
+
 void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* data, uint32_t size)
 {
 	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
@@ -308,7 +392,6 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 	}
 
 	cmdBuffer.copyBufferToImage(stagingBuf, RHIVulkanImage->GetHandle(), vk::ImageLayout::eTransferDstOptimal, regions);
-
 
 	// --------------------  GETTING RID OF THE STAGING BUFFER ----------------------- // 
 

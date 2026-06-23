@@ -29,6 +29,7 @@ public:
 	KENGINE_API virtual void* GetMappedData() const = 0;
 
 	virtual bool GetIsGpuOnly() const { return m_isGpuOnly; }
+	virtual MemoryAccess GetMemoryAccess() const { return m_access; }
 
 	virtual uint32_t GetSize() const { return m_size; }
 
@@ -36,6 +37,7 @@ public:
 
 protected:
 	uint32_t m_size;
+	MemoryAccess m_access;
 	bool m_isGpuOnly = false;
 	bool m_isPersistentMapped = false;
 };

@@ -38,8 +38,8 @@ public:
 
 	//----------- Set Buffer / Image Data --------------//
 	virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) override;
+	virtual void CopyBufferToBuffer(Core::RefCountPtr<Buffer> srcBuffer, uint32_t srcOffset, Core::RefCountPtr<Buffer> dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) override;
 	virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) override;
-
 
 	//----------- Transition Image Layout --------------//
 	virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) override;

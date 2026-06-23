@@ -402,11 +402,11 @@ int main()
     unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
     
     Kayou::Core::RefCountPtr<Kayou::RHI::Pipeline> unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
-
+    
     // DescriptorSet
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout> frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout> drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
-
+    
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
@@ -414,7 +414,7 @@ int main()
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Kayou::RHI::DescriptorType::Sampler, sampler);
-
+    
     device->WaitIdle();
 
     uint64_t frameCounter = 0;
@@ -426,15 +426,15 @@ int main()
         if (window->GetHasResize() || gpuResizeRequest)
         {
             device->WaitIdle();
-
+    
             // Destroy everything.
             device->DestroyPresentationImages(presentationImages);
             device->DestroyImage(depthImage);
             device->DestroySwapchain(swapchain);
-
+    
             // Update everything
             device->UpdateCompatibility(surface);
-
+    
             // Recreate everything.
             uint32_t tWidth = window->GetWidth();
             uint32_t tHeight = window->GetHeight();
@@ -442,13 +442,13 @@ int main()
             swapchain = device->CreateSwapchain(sSpecs);
             presentationImages = device->CreatePresentationImages(swapchain);
             depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
-
+    
             window->ResizeComplete();
             gpuResizeRequest = false;
-
+    
             editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
             editorCamera.RecalculateMatrices();
-
+    
             CameraData resizeCam;
             resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
             resizeCam.cameraPos = editorCamera.GetPosition();
@@ -465,7 +465,7 @@ int main()
             device->SubmitCommandList(commandList, submitTransfer);
             //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
         }
-
+    
         uint32_t maxFramesInFlight = swapchain->GetImageCount();
         uint32_t syncIndex = frameCounter % maxFramesInFlight;
     

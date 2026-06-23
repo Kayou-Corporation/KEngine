@@ -9,6 +9,7 @@ vk::BufferCreateInfo VulkanBuffer::GetCreateInfo(const BufferSpecs& specs)
 	uint32_t size = specs.size;
 
 	m_primaryUsage = primaryUsage;
+	m_access = specs.memoryAccess;
 	m_usage = usage;
 	m_size = specs.size;
 	m_pipelineStage = TranslateToVulkan(specs.pipelineStage);
@@ -19,6 +20,23 @@ vk::BufferCreateInfo VulkanBuffer::GetCreateInfo(const BufferSpecs& specs)
 	bufferCreateInfo.size = size;
 
 	return bufferCreateInfo;
+}
+
+vk::AccessFlags VulkanBuffer::GetAccessMask()
+{
+    if (!m_isGpuOnly && GetMappedData() != nullptr)
+    {
+        return vk::AccessFlagBits::eHostWrite;
+    }
+
+    vk::AccessFlags writeFlags = GetWriteAccessFlagsFromUsage(m_primaryUsage);
+
+    if (writeFlags)
+    {
+        return writeFlags;
+    }
+
+    return vk::AccessFlags{};
 }
 
 END_NAMESPACE_RHI

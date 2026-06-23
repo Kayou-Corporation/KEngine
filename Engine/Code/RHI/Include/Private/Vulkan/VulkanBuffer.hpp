@@ -22,6 +22,8 @@ public:
 	virtual void* GetMappedData() const override { return m_allocationInfo.pMappedData; }
 
 public:
+	vk::AccessFlags GetAccessMask();
+
 	void SetHandle(vk::Buffer buffer) { m_handle = buffer; }
 
 	void SetAllocation(VmaAllocation allocation) { m_allocation = allocation; }
@@ -73,6 +75,19 @@ inline vk::AccessFlags GetAccessFlagsFromUsage(vk::BufferUsageFlags usage)
 
 	if (usage & vk::BufferUsageFlagBits::eTransferSrc)
 		flags |= vk::AccessFlagBits::eTransferRead;
+
+	if (usage & vk::BufferUsageFlagBits::eTransferDst)
+		flags |= vk::AccessFlagBits::eTransferWrite;
+
+	return flags;
+}
+
+inline vk::AccessFlags GetWriteAccessFlagsFromUsage(vk::BufferUsageFlags usage)
+{
+	vk::AccessFlags flags{};
+
+	if (usage & vk::BufferUsageFlagBits::eStorageBuffer)
+		flags |= vk::AccessFlagBits::eShaderWrite;
 
 	if (usage & vk::BufferUsageFlagBits::eTransferDst)
 		flags |= vk::AccessFlagBits::eTransferWrite;
