@@ -150,7 +150,7 @@ int main()
 
 #pragma region Setup 
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
-
+ 
     Kayou::Core::WindowSpecs specs;
     specs.width = 1920;
     specs.height = 1080;

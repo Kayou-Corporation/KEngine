@@ -67,7 +67,7 @@ public:
 	KENGINE_API virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) = 0;
 	KENGINE_API virtual void CopyBufferToBuffer(Core::RefCountPtr<Buffer> srcBuffer, uint32_t srcOffset, Core::RefCountPtr<Buffer> dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) = 0;
 	KENGINE_API virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) = 0;
-	//KENGINE_API virtual void CopyImageToImage(Core::RefCountPtr<Image> srcImage, Core::RefCountPtr<Image> dstImage);	
+	KENGINE_API virtual void CopyImageToImage(Core::RefCountPtr<Image> srcImage, Core::RefCountPtr<Image> dstImage, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) = 0;
 	//KENGINE_API virtual void CopyImageToBuffer(Core::RefCountPtr<Image> srcImage, Core::RefCountPtr<Buffer> dstBuffer);	
 	//KENGINE_API virtual void CopyBufferToImage(Core::RefCountPtr<Buffer> srcBuffer, Core::RefCountPtr<Image> dstImage);
 

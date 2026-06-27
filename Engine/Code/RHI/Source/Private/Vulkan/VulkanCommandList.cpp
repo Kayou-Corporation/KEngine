@@ -424,6 +424,64 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, nullptr, nullptr, transitionToFinalLayout);
 }
 
+void VulkanCommandList::CopyImageToImage(Core::RefCountPtr<Image> RHISrcImage, Core::RefCountPtr<Image> RHIDstImage, bool returnSrcImageToInitialStage, bool returnDstImageToInitialStage)
+{
+	Core::RefCountPtr<VulkanImage> VulkanSrcImage = RHISrcImage.CastAs<VulkanImage>();
+	Core::RefCountPtr<VulkanImage> VulkanDstImage = RHIDstImage.CastAs<VulkanImage>();
+	
+	vk::ImageLayout srcImageLayout = VulkanSrcImage->GetVulkanCurrentLayout();
+	vk::AccessFlags srcCurrentAccessMask = GetSrcAccessMask(srcImageLayout);
+	
+	vk::ImageLayout dstImageLayout = VulkanDstImage->GetVulkanCurrentLayout();
+	vk::AccessFlags dstCurrentAccessMask = GetSrcAccessMask(dstImageLayout);
+	
+	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
+	
+	//----------- Prepae Src image for transfer --------------//
+	vk::ImageMemoryBarrier srcPreparationBarrier = GetImageMemoryBarrier(VulkanSrcImage, vk::ImageLayout::eTransferSrcOptimal, srcCurrentAccessMask, vk::AccessFlagBits::eTransferRead);
+
+	//----------- Prepae Dst image for transfer --------------//
+	vk::ImageMemoryBarrier dstPreparationBarrier = GetImageMemoryBarrier(VulkanDstImage, vk::ImageLayout::eTransferDstOptimal, dstCurrentAccessMask, vk::AccessFlagBits::eTransferWrite);
+
+	//----------- Apply Preparation --------------//
+	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, nullptr, { srcPreparationBarrier, dstPreparationBarrier });
+
+	//----------- Actual Copy --------------//
+	//srcBarrier.oldLayout = srcImageLayout;
+	//srcBarrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;
+	//srcBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	//srcBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	//srcBarrier.image = srcImage;
+	//srcBarrier.subresourceRange.aspectMask = VulkanSrcImage->GetAspect();
+	//srcBarrier.subresourceRange.baseMipLevel = 0;
+	//srcBarrier.subresourceRange.levelCount = VulkanSrcImage->GetMipLevels();
+	//srcBarrier.subresourceRange.baseArrayLayer = 0;
+	//srcBarrier.subresourceRange.layerCount = VulkanSrcImage->GetLayersCount();
+	//srcBarrier.srcAccessMask = srcAccessMask;
+	//srcBarrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
+	//
+	////cmdBuffer.pipelineBarrier(srcAccessMask, vk::AccessFlagBits::eTransferRead, )
+	//
+	//
+	////vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
+	//
+	//vk::ImageCopy copy;
+	////VkImageCopy
+	////cmdBuffer.copyImage(srcImage, srcImageLayout, dstImage, dstImageLayout,);
+
+	//----------- Prepare Src image to return to initial stage --------------//
+	if (returnSrcImageToInitialStage)
+	{
+
+	}
+
+	//----------- Prepare Dst image to return to initial stage --------------//
+	if (returnDstImageToInitialStage)
+	{
+
+	}
+}
+
 //----------- Transition Image Layout --------------//
 void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> RHIImage, Layout RHIDstLayout)
 {
@@ -497,6 +555,87 @@ void VulkanCommandList::BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
 	}
 
 	m_handle->cmdBuffer.bindPipeline(bindPoint, pipeline);
+}
+
+
+//------------------- PUBLIC VULKAN ------------------//
+
+//vk::BufferMemoryBarrier bufferMemBarrier{};
+//bufferMemBarrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
+//bufferMemBarrier.dstAccessMask = bufferAccessFlags;
+//bufferMemBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
+//bufferMemBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
+//bufferMemBarrier.buffer = bufferHandle;
+//bufferMemBarrier.offset = offset;
+//bufferMemBarrier.size = size;
+vk::BufferMemoryBarrier VulkanCommandList::GetBufferMemoryBarrier(Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
+{
+	vk::BufferMemoryBarrier barrier{};
+	barrier.srcAccessMask = srcAccessMask;
+	barrier.dstAccessMask = dstAccessMask;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.buffer = RHIVulkanBuffer->GetHandle();
+	barrier.offset = offset;
+	barrier.size = size;
+
+	return barrier;
+}
+
+vk::ImageMemoryBarrier VulkanCommandList::GetImageMemoryBarrier(Core::RefCountPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
+{
+	vk::ImageLayout currentLayout = RHIVulkanImage->GetVulkanCurrentLayout();
+
+	vk::ImageMemoryBarrier barrier{};
+	barrier.oldLayout = currentLayout;
+	barrier.newLayout = dstLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = RHIVulkanImage->GetHandle();
+	barrier.subresourceRange.aspectMask = RHIVulkanImage->GetAspect();
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = RHIVulkanImage->GetMipLevels();
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = RHIVulkanImage->GetLayersCount();
+	barrier.srcAccessMask = srcAccessMask;
+	barrier.dstAccessMask = dstAccessMask;
+
+	return barrier;
+}
+
+vk::AccessFlags VulkanCommandList::GetSrcAccessMask(vk::ImageLayout layout)
+{
+	switch (layout)
+	{
+	case vk::ImageLayout::eUndefined:
+		return vk::AccessFlagBits::eNone;
+
+	case vk::ImageLayout::eColorAttachmentOptimal:
+		return vk::AccessFlagBits::eColorAttachmentWrite;
+
+	case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+	case vk::ImageLayout::eDepthAttachmentOptimal:
+	case vk::ImageLayout::eStencilAttachmentOptimal:
+		return vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+
+	case vk::ImageLayout::eShaderReadOnlyOptimal:
+		return vk::AccessFlagBits::eShaderRead;
+
+	case vk::ImageLayout::eTransferSrcOptimal:
+		return vk::AccessFlagBits::eTransferRead;
+
+	case vk::ImageLayout::eTransferDstOptimal:
+		return vk::AccessFlagBits::eTransferWrite;
+
+	case vk::ImageLayout::ePresentSrcKHR:
+		return vk::AccessFlagBits::eNone;
+
+	case vk::ImageLayout::eGeneral:
+		return vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite;
+
+	default:
+		return vk::AccessFlagBits::eNone;
+	}
 }
 
 END_NAMESPACE_RHI
