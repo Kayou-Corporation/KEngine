@@ -3,23 +3,11 @@
 #include <string>
 #include <vector>
 
-#include "Utils/Memory.hpp"
-#include "Utils/Export.hpp"
-
 #include "Window/Window.hpp"
 
 #include "Public/RHI.hpp"
 
 BEGIN_NAMESPACE_RHI
-
-// Forward declaration
-class Window;
-
-class Surface;
-struct SurfaceSpecs;
-
-class Device;
-struct DeviceSpecs;
 
 struct InstanceSpecs
 {
@@ -49,7 +37,6 @@ protected:
 	Version m_appVersion;
 	Version m_engineVersion;
 };
-typedef Core::RefCountPtr<Instance> InstanceHandle;
 
 class RendererInterface
 {

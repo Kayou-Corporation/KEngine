@@ -10,8 +10,6 @@
 #include <iosfwd>
 #include <string>
 
-#include "Utils/Export.hpp"
-#include "Utils/Memory.hpp"
 #include "Utils/File.hpp"
 
 BEGIN_NAMESPACE_RHI

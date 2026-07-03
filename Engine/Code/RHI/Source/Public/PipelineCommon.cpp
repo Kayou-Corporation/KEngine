@@ -2,9 +2,9 @@
 
 BEGIN_NAMESPACE_RHI
 
-Core::RefCountPtr<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(std::string name) const
+DescriptorSetLayoutHandle PipelineLayout::GetDescriptorSetLayout(std::string name) const
 {
-	for (const Core::RefCountPtr<DescriptorSetLayout>& DescriptorSetLayout : m_descriptorsLayouts)
+	for (const DescriptorSetLayoutHandle& DescriptorSetLayout : m_descriptorsLayouts)
 	{
 		if (DescriptorSetLayout->GetName() == name)
 		{
@@ -14,13 +14,13 @@ Core::RefCountPtr<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(st
 
 	spdlog::warn("DescriptorSetLayout {} doesn't exist in this pipeline layout", name);
 
-	Core::RefCountPtr<DescriptorSetLayout> EmptyDescriptorSetLayout = Core::CreateRefPtr<DescriptorSetLayout>();
+	DescriptorSetLayoutHandle EmptyDescriptorSetLayout = Core::CreateRefPtr<DescriptorSetLayout>();
 	return EmptyDescriptorSetLayout;
 }
 
-Core::RefCountPtr<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(uint32_t index) const
+DescriptorSetLayoutHandle PipelineLayout::GetDescriptorSetLayout(uint32_t index) const
 {
-	for (const Core::RefCountPtr<DescriptorSetLayout>& DescriptorSetLayout : m_descriptorsLayouts)
+	for (const DescriptorSetLayoutHandle& DescriptorSetLayout : m_descriptorsLayouts)
 	{
 		if (DescriptorSetLayout->GetIndex() == index)
 		{
@@ -30,14 +30,14 @@ Core::RefCountPtr<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(ui
 
 	spdlog::warn("DescriptorSetLayout index {} doesn't exist in this pipeline layout", index);
 
-	Core::RefCountPtr<DescriptorSetLayout> EmptyDescriptorSetLayout = Core::CreateRefPtr<DescriptorSetLayout>();
+	DescriptorSetLayoutHandle EmptyDescriptorSetLayout = Core::CreateRefPtr<DescriptorSetLayout>();
 	return EmptyDescriptorSetLayout;
 }
 
 std::vector<std::string> PipelineLayout::GetAllDescriptorSetsLayoutsNames() const
 {
 	std::vector<std::string> allDescriptorSetsLayoutsNames;
-	for (const Core::RefCountPtr<DescriptorSetLayout>& DescriptorSetLayout : m_descriptorsLayouts)
+	for (const DescriptorSetLayoutHandle& DescriptorSetLayout : m_descriptorsLayouts)
 	{
 		allDescriptorSetsLayoutsNames.push_back(DescriptorSetLayout->GetName());
 	}
@@ -47,7 +47,7 @@ std::vector<std::string> PipelineLayout::GetAllDescriptorSetsLayoutsNames() cons
 
 uint32_t PipelineLayout::GetDescriptorSetLayoutIndex(std::string name) const
 {
-	for (const Core::RefCountPtr<DescriptorSetLayout>& DescriptorSetLayout : m_descriptorsLayouts)
+	for (const DescriptorSetLayoutHandle& DescriptorSetLayout : m_descriptorsLayouts)
 	{
 		if (DescriptorSetLayout->GetName() == name)
 		{
@@ -59,9 +59,9 @@ uint32_t PipelineLayout::GetDescriptorSetLayoutIndex(std::string name) const
 	return 0;
 }
 
-Core::RefCountPtr<PushConstantLayout> PipelineLayout::GetPushConstantLayouts(std::string name) const
+PushConstantLayoutHandle PipelineLayout::GetPushConstantLayouts(std::string name) const
 {
-	for (const Core::RefCountPtr<PushConstantLayout>& PushConstantLayout : m_pushConstantsLayouts)
+	for (const PushConstantLayoutHandle& PushConstantLayout : m_pushConstantsLayouts)
 	{
 		if (PushConstantLayout->GetName() == name)
 		{
@@ -71,7 +71,7 @@ Core::RefCountPtr<PushConstantLayout> PipelineLayout::GetPushConstantLayouts(std
 
 	spdlog::warn("PushConstantLayout {} doesn't exist in this pipeline layout", name);
 
-	Core::RefCountPtr<PushConstantLayout> EmptyPushConstantLayout = Core::CreateRefPtr<PushConstantLayout>();
+	PushConstantLayoutHandle EmptyPushConstantLayout = Core::CreateRefPtr<PushConstantLayout>();
 	return EmptyPushConstantLayout;
 }
 

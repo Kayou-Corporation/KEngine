@@ -53,7 +53,7 @@ void VulkanCommandList::EndRendering()
 }
 
 //----------- Bind --------------//
-void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout, std::string layoutName, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
+void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, std::string layoutName, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
 	Core::RefCountPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
@@ -66,7 +66,7 @@ void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIP
 	m_handle->cmdBuffer.bindDescriptorSets(bindPoint, pipelineLayout, layoutIndex, 1,&descriptorSet, 0, nullptr);
 }
 
-void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout, uint32_t layoutIndex, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
+void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, uint32_t layoutIndex, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
 	Core::RefCountPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
@@ -465,7 +465,7 @@ void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> RHIImage,
 }
 
 //----------- Pipeline --------------//
-void VulkanCommandList::BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
+void VulkanCommandList::BindPipeline(PipelineHandle RHIPipeline)
 {
 	PipelineType RHIType = RHIPipeline->GetType();
 	vk::PipelineBindPoint bindPoint = TranslateToVulkan(RHIType);

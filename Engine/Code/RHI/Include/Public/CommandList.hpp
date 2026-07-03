@@ -12,13 +12,13 @@ struct SubmitInfo
 
 	PipelineStage stage;
 
-	std::vector<Core::RefCountPtr<Semaphore>> signalSemaphores;
+	std::vector<SemaphoreHandle> signalSemaphores;
 	std::vector<uint64_t> signalSemaphoresValues;
-	std::vector<Core::RefCountPtr<Semaphore>> waitSemaphores;
+	std::vector<SemaphoreHandle> waitSemaphores;
 	std::vector<uint64_t> waitSemaphoresValues;
 
 	// Deprecated
-	//Core::RefCountPtr<Fence> fence;
+	//FenceHandle fence;
 };
 
 class CommandList : virtual public Core::IResource
@@ -36,8 +36,8 @@ public:
 	KENGINE_API virtual void EndRendering() = 0;
 
 	//----------- Bind --------------//
-	KENGINE_API virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, std::string layoutName, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
-	KENGINE_API virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, uint32_t layoutIndex, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
+	KENGINE_API virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, std::string layoutName, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
+	KENGINE_API virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, uint32_t layoutIndex, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
 	KENGINE_API virtual void BindVertexBuffer(BufferHandle vertexBuffer, uint32_t offset) = 0;
 	KENGINE_API virtual void BindIndexBuffer(BufferHandle indexBuffer, uint32_t offset) = 0;
 
@@ -60,8 +60,7 @@ public:
 	KENGINE_API virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) = 0;
 
 	//----------- Pipeline --------------//
-	KENGINE_API virtual void BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline) = 0;
+	KENGINE_API virtual void BindPipeline(PipelineHandle RHIPipeline) = 0;
 };
-typedef Core::RefCountPtr<CommandList> CommandListHandle;
 
 END_NAMESPACE_RHI

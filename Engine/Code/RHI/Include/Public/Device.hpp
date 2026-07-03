@@ -21,7 +21,7 @@ struct DeviceSpecs
 
 struct PresentInfo
 {
-	std::vector<Core::RefCountPtr<Semaphore>> waitSemaphores;
+	std::vector<SemaphoreHandle> waitSemaphores;
 	std::vector<uint64_t> waitSemaphoresValues;
 
 	Core::RefCountPtr<Swapchain> swapchain;
@@ -42,19 +42,19 @@ public:
 
 
 	//----------- Syncronisation --------------// 
-	KENGINE_API virtual Core::RefCountPtr<Semaphore> CreateSemaphore(const SemaphoreSpecs& specs) = 0;
-	KENGINE_API virtual void DestroySemaphore(Core::RefCountPtr<Semaphore> semaphore) = 0;
-	KENGINE_API virtual void WaitForSemaphore(Core::RefCountPtr<Semaphore> semaphore, uint64_t waitValue) = 0;
-	KENGINE_API virtual Core::RefCountPtr<Fence> CreateFence() = 0;
-	KENGINE_API virtual void DestroyFence(Core::RefCountPtr<Fence> fence) = 0;
-	KENGINE_API virtual void WaitForFence(Core::RefCountPtr<Fence> fence) = 0;
-	KENGINE_API virtual void ResetFence(Core::RefCountPtr<Fence> fence) = 0;
+	KENGINE_API virtual SemaphoreHandle CreateSemaphore(const SemaphoreSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySemaphore(SemaphoreHandle semaphore) = 0;
+	KENGINE_API virtual void WaitForSemaphore(SemaphoreHandle semaphore, uint64_t waitValue) = 0;
+	KENGINE_API virtual FenceHandle CreateFence() = 0;
+	KENGINE_API virtual void DestroyFence(FenceHandle fence) = 0;
+	KENGINE_API virtual void WaitForFence(FenceHandle fence) = 0;
+	KENGINE_API virtual void ResetFence(FenceHandle fence) = 0;
 	
 
 	//----------- Swapchain --------------// 
 	KENGINE_API virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) = 0;
 	KENGINE_API virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) = 0;
-	KENGINE_API virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, Core::RefCountPtr<Semaphore> Semaphore) = 0;
+	KENGINE_API virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, SemaphoreHandle Semaphore) = 0;
 	KENGINE_API virtual bool Present(const PresentInfo& presentInfo) = 0;
 
 
@@ -71,50 +71,50 @@ public:
 	KENGINE_API virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) = 0; // Use classic Destroy
 
 	// -------------- Sampler -------------- // 
-	KENGINE_API virtual Core::RefCountPtr<Sampler> CreateSampler(const SamplerSpecs& specs) = 0;
-	KENGINE_API virtual void DestroySampler(Core::RefCountPtr<Sampler> sampler) = 0;
+	KENGINE_API virtual SamplerHandle CreateSampler(const SamplerSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySampler(SamplerHandle sampler) = 0;
 
 	// -------------- Shader -------------- // 
-	KENGINE_API virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout) = 0;
-	KENGINE_API virtual void DestroyShader(Core::RefCountPtr<Shader> shader) = 0;
+	KENGINE_API virtual ShaderHandle CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout) = 0;
+	KENGINE_API virtual void DestroyShader(ShaderHandle shader) = 0;
 
 	// -------------- DescriptorSetLayout -------------- // 
-	KENGINE_API virtual std::vector<Core::RefCountPtr<DescriptorSetLayout>> CreateDescriptorSetsLayouts(Core::RefCountPtr<Shader> shader) = 0;
-	KENGINE_API virtual Core::RefCountPtr<DescriptorSetLayout> CreateDescriptorSetLayout(Core::RefCountPtr<Shader> shader, std::string name) = 0;
-	KENGINE_API virtual Core::RefCountPtr<DescriptorSetLayout> CreateDescriptorSetLayout(Core::RefCountPtr<Shader> shader, uint32_t index) = 0;
-	KENGINE_API virtual void DestroyDescriptorSetsLayouts(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors) = 0;
-	KENGINE_API virtual void DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLayout> descriptors) = 0;
+	KENGINE_API virtual std::vector<DescriptorSetLayoutHandle> CreateDescriptorSetsLayouts(ShaderHandle shader) = 0;
+	KENGINE_API virtual DescriptorSetLayoutHandle CreateDescriptorSetLayout(ShaderHandle shader, std::string name) = 0;
+	KENGINE_API virtual DescriptorSetLayoutHandle CreateDescriptorSetLayout(ShaderHandle shader, uint32_t index) = 0;
+	KENGINE_API virtual void DestroyDescriptorSetsLayouts(std::vector<DescriptorSetLayoutHandle> descriptors) = 0;
+	KENGINE_API virtual void DestroyDescriptorSetLayout(DescriptorSetLayoutHandle descriptors) = 0;
 
 	// -------------- PushConstantLayout -------------- // 
-	KENGINE_API virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader) = 0;
-	KENGINE_API virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) = 0;
+	KENGINE_API virtual PushConstantLayoutHandle CreatePushConstantLayout(ShaderHandle shader) = 0;
+	KENGINE_API virtual void DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHandle>& pushConstants) = 0;
 
 	// -------------- Descriptor Set -------------- // 
-	KENGINE_API virtual DescriptorSetHandle CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) = 0;
+	KENGINE_API virtual DescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout) = 0;
 	KENGINE_API virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet) = 0;
 	KENGINE_API virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
 	KENGINE_API virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
-	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) = 0;
-	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) = 0;
-	KENGINE_API virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> sampler) = 0;
-	KENGINE_API virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, SamplerHandle sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, SamplerHandle sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) = 0;
 
 	// -------------- Pipeline Layout -------------- // 
-	KENGINE_API virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) = 0;
-	KENGINE_API virtual void DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout>) = 0;
+	KENGINE_API virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) = 0;
+	KENGINE_API virtual void DestroyPipelineLayout(PipelineLayoutHandle) = 0;
 
 	// -------------- Pipeline -------------- // 
-	KENGINE_API virtual Core::RefCountPtr<GraphicsPipeline> CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) = 0;
+	KENGINE_API virtual GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) = 0;
 	// TODO : Implment compute pipeline
 	//KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) = 0;
+	KENGINE_API virtual void DestroyPipeline(PipelineHandle pipeline) = 0;
 
 	KENGINE_API virtual void UpdateCompatibility(Core::RefCountPtr<Surface> surface) = 0;
 
 
 protected:
 	ShaderCompiler m_shaderCompiler;
-	std::unordered_map<std::string, Core::RefCountPtr<Shader>> m_compiledShaders{};
+	std::unordered_map<std::string, ShaderHandle> m_compiledShaders{};
 };
 
 END_NAMESPACE_RHI

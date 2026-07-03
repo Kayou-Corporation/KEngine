@@ -280,7 +280,7 @@ int main()
     samplerSpecs.borderColor = Kayou::RHI::BorderColor::IntOpaqueBlack;
     samplerSpecs.unnormalizedCoordinates = false;
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::Sampler> sampler = device->CreateSampler(samplerSpecs);
+    Kayou::RHI::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
 
 
     Kayou::RHI::CommandListHandle copyBufferDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
@@ -353,31 +353,31 @@ int main()
     // Timeline
     Kayou::RHI::SemaphoreSpecs timelineSpecs;
     timelineSpecs.type = Kayou::RHI::SemaphoreType::Timeline;
-    Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
+    Kayou::RHI::SemaphoreHandle frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
 
     // Binary 
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> imageAvailablesSemaphores;
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore>> renderFinishedSemaphores;
+    std::vector<Kayou::RHI::SemaphoreHandle> imageAvailablesSemaphores;
+    std::vector<Kayou::RHI::SemaphoreHandle> renderFinishedSemaphores;
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i) 
     {
         Kayou::RHI::SemaphoreSpecs binarySpecs{};
         binarySpecs.type = Kayou::RHI::SemaphoreType::Binary;
 
-        Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
-        Kayou::Core::RefCountPtr<Kayou::RHI::Semaphore> renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
+        Kayou::RHI::SemaphoreHandle imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
+        Kayou::RHI::SemaphoreHandle renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
 
         imageAvailablesSemaphores.push_back(imageAvailableSemaphore);
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderStage::Vertex, false, true);
-    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment, false, true);
-    Kayou::Core::RefCountPtr<Kayou::RHI::Shader> globalLayoutShader = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex, true, true);
+    Kayou::RHI::ShaderHandle baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderStage::Vertex, false, true);
+    Kayou::RHI::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment, false, true);
+    Kayou::RHI::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex, true, true);
 
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout>> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
+    std::vector<Kayou::RHI::DescriptorSetLayoutHandle> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::PipelineLayout> globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
+    Kayou::RHI::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
 
     Kayou::RHI::GraphicsPipelineSpecs unlitPipelineSpecs;
     unlitPipelineSpecs.colorAttachmentCount = 1;
@@ -398,11 +398,11 @@ int main()
     unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
     unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
     
-    Kayou::Core::RefCountPtr<Kayou::RHI::Pipeline> unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
+    Kayou::RHI::PipelineHandle unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
     
     // DescriptorSet
-    Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout> frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
-    Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout> drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
+    Kayou::RHI::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
+    Kayou::RHI::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
     
     Kayou::RHI::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
     Kayou::RHI::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);

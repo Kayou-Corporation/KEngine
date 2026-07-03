@@ -67,19 +67,19 @@ public:
 
 
     //----------- Syncronisation --------------// 
-    virtual Core::RefCountPtr<Semaphore> CreateSemaphore(const SemaphoreSpecs& specs) override;
-    virtual void DestroySemaphore(Core::RefCountPtr<Semaphore> semaphore) override;
-    virtual void WaitForSemaphore(Core::RefCountPtr<Semaphore> semaphore, uint64_t waitValue) override;
-    virtual Core::RefCountPtr<Fence> CreateFence() override;
-    virtual void DestroyFence(Core::RefCountPtr<Fence> fence) override;
-    virtual void WaitForFence(Core::RefCountPtr<Fence> fence) override;
-    virtual void ResetFence(Core::RefCountPtr<Fence> fence) override;
+    virtual SemaphoreHandle CreateSemaphore(const SemaphoreSpecs& specs) override;
+    virtual void DestroySemaphore(SemaphoreHandle semaphore) override;
+    virtual void WaitForSemaphore(SemaphoreHandle semaphore, uint64_t waitValue) override;
+    virtual FenceHandle CreateFence() override;
+    virtual void DestroyFence(FenceHandle fence) override;
+    virtual void WaitForFence(FenceHandle fence) override;
+    virtual void ResetFence(FenceHandle fence) override;
 
 
     //----------- Swapchain --------------// 
     virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
     virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) override;
-    virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, Core::RefCountPtr<Semaphore> Semaphore) override;
+    virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, SemaphoreHandle Semaphore) override;
     virtual bool Present(const PresentInfo& presentInfo) override;
 
 
@@ -96,43 +96,43 @@ public:
     virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) override;
 
     // -------------- Sampler -------------- // 
-    virtual Core::RefCountPtr<Sampler> CreateSampler(const SamplerSpecs& specs) override;
-    virtual void DestroySampler(Core::RefCountPtr<Sampler> sampler) override;
+    virtual SamplerHandle CreateSampler(const SamplerSpecs& specs) override;
+    virtual void DestroySampler(SamplerHandle sampler) override;
 
     // -------------- Shader -------------- // 
-    virtual Core::RefCountPtr<Shader> CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout) override;
-    virtual void DestroyShader(Core::RefCountPtr<Shader> shader) override;
+    virtual ShaderHandle CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout) override;
+    virtual void DestroyShader(ShaderHandle shader) override;
 
     // -------------- DescriptorSetLayout -------------- // 
-    virtual std::vector<Core::RefCountPtr<DescriptorSetLayout>> CreateDescriptorSetsLayouts(Core::RefCountPtr<Shader> shader) override;
-    virtual Core::RefCountPtr<DescriptorSetLayout> CreateDescriptorSetLayout(Core::RefCountPtr<Shader> shader, std::string name) override;
-    virtual Core::RefCountPtr<DescriptorSetLayout> CreateDescriptorSetLayout(Core::RefCountPtr<Shader> shader, uint32_t index) override;
-    virtual void DestroyDescriptorSetsLayouts(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors) override;
-    virtual void DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLayout> descriptors) override;
+    virtual std::vector<DescriptorSetLayoutHandle> CreateDescriptorSetsLayouts(ShaderHandle shader) override;
+    virtual DescriptorSetLayoutHandle CreateDescriptorSetLayout(ShaderHandle shader, std::string name) override;
+    virtual DescriptorSetLayoutHandle CreateDescriptorSetLayout(ShaderHandle shader, uint32_t index) override;
+    virtual void DestroyDescriptorSetsLayouts(std::vector<DescriptorSetLayoutHandle> descriptors) override;
+    virtual void DestroyDescriptorSetLayout(DescriptorSetLayoutHandle descriptors) override;
 
     // -------------- PushConstantLayout -------------- // 
-    virtual Core::RefCountPtr<PushConstantLayout> CreatePushConstantLayout(Core::RefCountPtr<Shader> shader) override;
-    virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) override;
+    virtual PushConstantLayoutHandle CreatePushConstantLayout(ShaderHandle shader) override;
+    virtual void DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHandle>& pushConstants) override;
 
     // -------------- Descriptor Set -------------- // 
-    virtual DescriptorSetHandle CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) override;
+    virtual DescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout) override;
     virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet) override;
     virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
     virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
-    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
-    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
-    virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> sampler) override;
-    virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> sampler) override;
+    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) override;
 
     // -------------- Pipeline Layout -------------- // 
-    virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;
-    virtual void DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout>) override;
+    virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) override;
+    virtual void DestroyPipelineLayout(PipelineLayoutHandle) override;
 
     // -------------- Pipeline -------------- // 
-    virtual Core::RefCountPtr<GraphicsPipeline> CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) override;
+    virtual GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) override;
     // TODO : Implment compute pipeline
     //KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
-    virtual void DestroyPipeline(Core::RefCountPtr<Pipeline> pipeline) override;
+    virtual void DestroyPipeline(PipelineHandle pipeline) override;
 
     virtual void UpdateCompatibility(Core::RefCountPtr<Surface> surface) override;
 

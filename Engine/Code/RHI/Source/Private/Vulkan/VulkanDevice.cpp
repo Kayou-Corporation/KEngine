@@ -112,7 +112,7 @@ void VulkanDevice::RunGarbageCollector()
 }
 
 //----------- Syncronisation --------------// 
-Core::RefCountPtr<Semaphore> VulkanDevice::CreateSemaphore(const SemaphoreSpecs& RHISpecs)
+SemaphoreHandle VulkanDevice::CreateSemaphore(const SemaphoreSpecs& RHISpecs)
 {
 	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = Core::CreateRefPtr<VulkanSemaphore>();
 
@@ -133,7 +133,7 @@ Core::RefCountPtr<Semaphore> VulkanDevice::CreateSemaphore(const SemaphoreSpecs&
 	return RHIVulkanSemaphore;
 }
 
-void VulkanDevice::DestroySemaphore(Core::RefCountPtr<Semaphore> RHISemaphore)
+void VulkanDevice::DestroySemaphore(SemaphoreHandle RHISemaphore)
 {
 	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISemaphore.CastAs<VulkanSemaphore>();
 
@@ -142,7 +142,7 @@ void VulkanDevice::DestroySemaphore(Core::RefCountPtr<Semaphore> RHISemaphore)
 	m_handle.destroySemaphore(semaphore);
 }
 
-void VulkanDevice::WaitForSemaphore(Core::RefCountPtr<Semaphore> RHISemaphore, uint64_t waitValue)
+void VulkanDevice::WaitForSemaphore(SemaphoreHandle RHISemaphore, uint64_t waitValue)
 {
 	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISemaphore.CastAs<VulkanSemaphore>();
 
@@ -157,7 +157,7 @@ void VulkanDevice::WaitForSemaphore(Core::RefCountPtr<Semaphore> RHISemaphore, u
 	VK_CHECK_VOID(m_handle.waitSemaphores(waitInfo, UINT64_MAX), "Can't wait semaphore");
 }
 
-Core::RefCountPtr<Fence> VulkanDevice::CreateFence()
+FenceHandle VulkanDevice::CreateFence()
 {
 	Core::RefCountPtr<VulkanFence> RHIVulkanFence = Core::CreateRefPtr<VulkanFence>();
 
@@ -170,7 +170,7 @@ Core::RefCountPtr<Fence> VulkanDevice::CreateFence()
 	return RHIVulkanFence;
 }
 
-void VulkanDevice::DestroyFence(Core::RefCountPtr<Fence> RHIFence)
+void VulkanDevice::DestroyFence(FenceHandle RHIFence)
 {
 	Core::RefCountPtr<VulkanFence> RHIVulkanFence = RHIFence.CastAs<VulkanFence>();
 
@@ -179,7 +179,7 @@ void VulkanDevice::DestroyFence(Core::RefCountPtr<Fence> RHIFence)
 	m_handle.destroyFence(fence);
 }
 
-void VulkanDevice::WaitForFence(Core::RefCountPtr<Fence> RHIFence)
+void VulkanDevice::WaitForFence(FenceHandle RHIFence)
 {
 	Core::RefCountPtr<VulkanFence> RHIVulkanFence = RHIFence.CastAs<VulkanFence>();
 
@@ -188,7 +188,7 @@ void VulkanDevice::WaitForFence(Core::RefCountPtr<Fence> RHIFence)
 	VK_CHECK_VOID(m_handle.waitForFences({ fence }, VK_TRUE, UINT64_MAX), "can't wait for fence");
 }
 
-void VulkanDevice::ResetFence(Core::RefCountPtr<Fence> RHIFence)
+void VulkanDevice::ResetFence(FenceHandle RHIFence)
 {
 	Core::RefCountPtr<VulkanFence> RHIVulkanFence = RHIFence.CastAs<VulkanFence>();
 
@@ -235,7 +235,7 @@ void VulkanDevice::DestroySwapchain(Core::RefCountPtr<Swapchain> RHISwapchain)
 	m_handle.destroySwapchainKHR(RHIVulkanSwapchain->GetHandle());
 }
 
-uint32_t VulkanDevice::AcquirreNextImage(Core::RefCountPtr<Swapchain> RHISwapchain, Core::RefCountPtr<Semaphore> RHISemaphore)
+uint32_t VulkanDevice::AcquirreNextImage(Core::RefCountPtr<Swapchain> RHISwapchain, SemaphoreHandle RHISemaphore)
 {
 	Core::RefCountPtr<VulkanSwapchain> RHIVulkanSwapchain = RHISwapchain.CastAs<VulkanSwapchain>();
 	Core::RefCountPtr<VulkanSemaphore> RHIVulkanSemaphore = RHISemaphore.CastAs<VulkanSemaphore>();
@@ -451,7 +451,7 @@ Core::RefCountPtr<Image> VulkanDevice::CreateImagesWithSwapchain(const Swapchain
 }
 
 // -------------- Sampler -------------- // 
-Core::RefCountPtr<Sampler> VulkanDevice::CreateSampler(const SamplerSpecs& specs)
+SamplerHandle VulkanDevice::CreateSampler(const SamplerSpecs& specs)
 {
 	Core::RefCountPtr<VulkanSampler> RHIVulkanSampler = Core::CreateRefPtr<VulkanSampler>();
 
@@ -467,7 +467,7 @@ Core::RefCountPtr<Sampler> VulkanDevice::CreateSampler(const SamplerSpecs& specs
 	return RHIVulkanSampler;
 }
 
-void VulkanDevice::DestroySampler(Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::DestroySampler(SamplerHandle RHISampler)
 {
 	Core::RefCountPtr<VulkanSampler> RHIVulkanSampler = RHISampler.CastAs<VulkanSampler>();
 
@@ -476,7 +476,7 @@ void VulkanDevice::DestroySampler(Core::RefCountPtr<Sampler> RHISampler)
 }
 
 //-------------- Shader --------------// 
-Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout)
+ShaderHandle VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout)
 {
 	Core::RefCountPtr<VulkanShader> shader{};
 
@@ -513,7 +513,7 @@ Core::RefCountPtr<Shader> VulkanDevice::CreateShader(const std::string& file, co
 	return shader;
 }
 
-void VulkanDevice::DestroyShader(Core::RefCountPtr<Shader> shader)
+void VulkanDevice::DestroyShader(ShaderHandle shader)
 {
 	vk::ShaderModule shaderModule = shader.CastAs<VulkanShader>()->GetModule();
 
@@ -521,9 +521,9 @@ void VulkanDevice::DestroyShader(Core::RefCountPtr<Shader> shader)
 }
 
 // -------------- DescriptorSetLayout -------------- // 
-std::vector<Core::RefCountPtr<DescriptorSetLayout>> VulkanDevice::CreateDescriptorSetsLayouts(Core::RefCountPtr<Shader> RHIShader)
+std::vector<DescriptorSetLayoutHandle> VulkanDevice::CreateDescriptorSetsLayouts(ShaderHandle RHIShader)
 {
-	std::vector<Core::RefCountPtr<DescriptorSetLayout>> RHIDescriptors;
+	std::vector<DescriptorSetLayoutHandle> RHIDescriptors;
 
 	std::vector<Descriptor> SLANGShaderDescriptors = RHIShader->GetDescriptors();
 	for (const Descriptor& SLANGDescriptor : SLANGShaderDescriptors)
@@ -563,7 +563,7 @@ std::vector<Core::RefCountPtr<DescriptorSetLayout>> VulkanDevice::CreateDescript
 	return RHIDescriptors;
 }
 
-Core::RefCountPtr<DescriptorSetLayout> VulkanDevice::CreateDescriptorSetLayout(Core::RefCountPtr<Shader> RHIShader, std::string name)
+DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle RHIShader, std::string name)
 {
 	Core::RefCountPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::CreateRefPtr<VulkanDescriptorSetLayout>();
 
@@ -605,7 +605,7 @@ Core::RefCountPtr<DescriptorSetLayout> VulkanDevice::CreateDescriptorSetLayout(C
 	return RHIVulkanDescriptor;
 }
 
-Core::RefCountPtr<DescriptorSetLayout> VulkanDevice::CreateDescriptorSetLayout(Core::RefCountPtr<Shader> RHIShader, uint32_t index)
+DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle RHIShader, uint32_t index)
 {
 	Core::RefCountPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::CreateRefPtr<VulkanDescriptorSetLayout>();
 
@@ -647,9 +647,9 @@ Core::RefCountPtr<DescriptorSetLayout> VulkanDevice::CreateDescriptorSetLayout(C
 	return RHIVulkanDescriptor;
 }
 
-void VulkanDevice::DestroyDescriptorSetsLayouts(std::vector<Core::RefCountPtr<DescriptorSetLayout>> RHIDescriptors)
+void VulkanDevice::DestroyDescriptorSetsLayouts(std::vector<DescriptorSetLayoutHandle> RHIDescriptors)
 {
-	for (const Core::RefCountPtr<DescriptorSetLayout>& RHIDescriptorSetLayout : RHIDescriptors)
+	for (const DescriptorSetLayoutHandle& RHIDescriptorSetLayout : RHIDescriptors)
 	{
 		Core::RefCountPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptorSetLayout = RHIDescriptorSetLayout.CastAs<VulkanDescriptorSetLayout>();
 		
@@ -657,7 +657,7 @@ void VulkanDevice::DestroyDescriptorSetsLayouts(std::vector<Core::RefCountPtr<De
 	}
 }
 
-void VulkanDevice::DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLayout> RHIDescriptor)
+void VulkanDevice::DestroyDescriptorSetLayout(DescriptorSetLayoutHandle RHIDescriptor)
 {
 	Core::RefCountPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptorSetLayout = RHIDescriptor.CastAs<VulkanDescriptorSetLayout>();
 
@@ -665,7 +665,7 @@ void VulkanDevice::DestroyDescriptorSetLayout(Core::RefCountPtr<DescriptorSetLay
 }
 
 // -------------- PushConstantLayout -------------- // 
-Core::RefCountPtr<PushConstantLayout> VulkanDevice::CreatePushConstantLayout(Core::RefCountPtr<Shader> RHIShader)
+PushConstantLayoutHandle VulkanDevice::CreatePushConstantLayout(ShaderHandle RHIShader)
 {
 	Core::RefCountPtr<VulkanPushConstantLayout> RHIVulkanPushConstants = Core::CreateRefPtr<VulkanPushConstantLayout>();
 
@@ -698,14 +698,14 @@ Core::RefCountPtr<PushConstantLayout> VulkanDevice::CreatePushConstantLayout(Cor
 	return RHIVulkanPushConstants;
 }
 
-void VulkanDevice::DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants)
+void VulkanDevice::DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHandle>& pushConstants)
 {
 	// Empty
 	pushConstants.clear();
 }
 
 // -------------- Descriptor Set -------------- // 
-DescriptorSetHandle VulkanDevice::CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> RHILayout)
+DescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle RHILayout)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::CreateRefPtr<VulkanDescriptorSet>();
 
@@ -817,7 +817,7 @@ void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, 
 	}
 }
 
-void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> RHIImage, Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> RHIImage, SamplerHandle RHISampler)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -862,7 +862,7 @@ void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, s
 	}
 }
 
-void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> RHIImage, Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> RHIImage, SamplerHandle RHISampler)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -906,7 +906,7 @@ void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, u
 	}
 }
 
-void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, SamplerHandle RHISampler)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -936,7 +936,7 @@ void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet,
 	}
 }
 
-void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, SamplerHandle RHISampler)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -967,12 +967,12 @@ void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet,
 }
 
 // -------------- Pipeline Layout -------------- // 
-Core::RefCountPtr<PipelineLayout> VulkanDevice::CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants)
+PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants)
 {
 	Core::RefCountPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = Core::CreateRefPtr<VulkanPipelineLayout>();
 
 	std::vector<vk::DescriptorSetLayout> descriptorSetsLayouts;
-	for (const Core::RefCountPtr<DescriptorSetLayout>& RHIDescriptor : descriptors)
+	for (const DescriptorSetLayoutHandle& RHIDescriptor : descriptors)
 	{
 		Core::RefCountPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = RHIDescriptor.CastAs<VulkanDescriptorSetLayout>();
 
@@ -981,7 +981,7 @@ Core::RefCountPtr<PipelineLayout> VulkanDevice::CreatePipelineLayout(std::vector
 	}
 
 	std::vector<vk::PushConstantRange> pushConstantRanges;
-	for (const Core::RefCountPtr<PushConstantLayout>& RHIPushConstant: pushConstants)
+	for (const PushConstantLayoutHandle& RHIPushConstant: pushConstants)
 	{
 		Core::RefCountPtr<VulkanPushConstantLayout> RHIVulkanPushConstant = RHIPushConstant.CastAs<VulkanPushConstantLayout>();
 
@@ -1001,7 +1001,7 @@ Core::RefCountPtr<PipelineLayout> VulkanDevice::CreatePipelineLayout(std::vector
 	return RHIVUlkanPipelineLayout;
 }
 
-void VulkanDevice::DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout)
+void VulkanDevice::DestroyPipelineLayout(PipelineLayoutHandle RHIPipelineLayout)
 {
 	Core::RefCountPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
 
@@ -1010,7 +1010,7 @@ void VulkanDevice::DestroyPipelineLayout(Core::RefCountPtr<PipelineLayout> RHIPi
 }
 
 //-------------- Pipeline --------------// 
-Core::RefCountPtr<GraphicsPipeline> VulkanDevice::CreateGraphicsPipeline(const GraphicsPipelineSpecs& RHISpecs)
+GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipelineSpecs& RHISpecs)
 {
 	Core::RefCountPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = Core::CreateRefPtr<VulkanGraphicsPipeline>();
 	RHIVulkanPipeline->SetLayout(RHISpecs.pipelineLayout);
@@ -1024,7 +1024,7 @@ Core::RefCountPtr<GraphicsPipeline> VulkanDevice::CreateGraphicsPipeline(const G
 	return RHIVulkanPipeline;
 }
 
-void VulkanDevice::DestroyPipeline(Core::RefCountPtr<Pipeline> RHIPipeline)
+void VulkanDevice::DestroyPipeline(PipelineHandle RHIPipeline)
 {
 	if (RHIPipeline->GetType() == PipelineType::Graphics)
 	{

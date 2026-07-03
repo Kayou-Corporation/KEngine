@@ -14,6 +14,7 @@ BEGIN_NAMESPACE_RHI
 class Buffer;
 class CommandList;
 class Image;
+class Instance;
 class Device;
 struct RenderingInfo;
 
@@ -47,11 +48,32 @@ class PushConstantLayout;
 class Sampler;
 struct SamplerSpecs;
 
+class Shader;
+
+class Window;
+
+struct SurfaceSpecs;
+
+struct DeviceSpecs;
+
+class RenderPass;
+
 // ---------- HANDLE TYPEDEFS ----------
 typedef Core::RefCountPtr<Buffer> BufferHandle;
 typedef Core::RefCountPtr<CommandList> CommandListHandle;
 typedef Core::RefCountPtr<DescriptorSet> DescriptorSetHandle;
+typedef Core::RefCountPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
 typedef Core::RefCountPtr<Device> DeviceHandle;
+typedef Core::RefCountPtr<Fence> FenceHandle;
+typedef Core::RefCountPtr<GraphicsPipeline> GraphicsPipelineHandle;
+typedef Core::RefCountPtr<Instance> InstanceHandle;
+typedef Core::RefCountPtr<Pipeline> PipelineHandle;
+typedef Core::RefCountPtr<PipelineLayout> PipelineLayoutHandle;
+typedef Core::RefCountPtr<PushConstantLayout> PushConstantLayoutHandle;
+typedef Core::RefCountPtr<RenderPass> RenderPassLayout;
+typedef Core::RefCountPtr<Semaphore> SemaphoreHandle;
+typedef Core::RefCountPtr<Sampler> SamplerHandle;
+typedef Core::RefCountPtr<Shader> ShaderHandle;
 
 // ---------- INSTANCE RELATED ----------
 struct Version

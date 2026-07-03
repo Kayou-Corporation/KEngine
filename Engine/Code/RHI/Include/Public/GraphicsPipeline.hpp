@@ -1,16 +1,9 @@
 #pragma once
 
-#include "Utils/Export.hpp"
-#include "Utils/Memory.hpp"
-
 #include "RHI.hpp"
 #include "PipelineCommon.hpp"
 
 BEGIN_NAMESPACE_RHI
-
-class Shader;
-class Swapchain;
-class PipelineLayout;
 
 struct GraphicsPipelineSpecs
 {
@@ -38,9 +31,9 @@ struct GraphicsPipelineSpecs
 	bool depthWrite;
 	CompareOp depthCompare;
 
-	std::vector<Core::RefCountPtr<Shader>> shaders{};
+	std::vector<ShaderHandle> shaders{};
 
-	Core::RefCountPtr<PipelineLayout> pipelineLayout;
+	PipelineLayoutHandle pipelineLayout;
 };
 
 class GraphicsPipeline : public Pipeline
