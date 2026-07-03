@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Window/Window.hpp"
-#include "Private/Vulkan/VulkanInstance.hpp"
+#include "Public/Instance.hpp"
 #include "Public/Surface.hpp"
 #include "Public/Device.hpp"
 #include "Public/Swapchain.hpp"
@@ -152,8 +152,8 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::Core::Window> window = Kayou::Core::WindowInterface::InitWindow(Kayou::Core::WindowAPI::SDL);
  
     Kayou::Core::WindowSpecs specs;
-    specs.width = 1920;
-    specs.height = 1080;
+    specs.width = 720;
+    specs.height = 480;
     specs.name = "KEngine";
     specs.allowResize = true;
     specs.rendererAPI = Kayou::Core::RendererAPI::Vulkan;
@@ -171,7 +171,6 @@ int main()
     editorCamera.SetFarPlane(100.0f);
 
     editorCamera.RecalculateMatrices();
-
 
     //glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
     //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -201,8 +200,7 @@ int main()
     mdl.model = glm::transpose(model);
     mdl.normal = normalMatrix;
 
-
-    Kayou::Core::RefCountPtr<Kayou::RHI::Instance> instance = Kayou::RHI::RendererInterface::InitRenderer(Kayou::Core::RendererAPI::Vulkan);
+    Kayou::RHI::InstanceHandle instance = Kayou::RHI::RendererInterface::InitRenderer(Kayou::Core::RendererAPI::Vulkan);
 
     Kayou::RHI::InstanceSpecs test;
     test.window = window;
@@ -234,7 +232,6 @@ int main()
 
     Kayou::Core::RefCountPtr<Kayou::RHI::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
 #pragma endregion
-
 
     // Vertex Buffer 
     Kayou::RHI::BufferSpecs vertexbufferSpecs{};

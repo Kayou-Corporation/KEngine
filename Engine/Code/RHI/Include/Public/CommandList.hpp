@@ -62,5 +62,6 @@ public:
 	//----------- Pipeline --------------//
 	KENGINE_API virtual void BindPipeline(Core::RefCountPtr<Pipeline> RHIPipeline) = 0;
 };
+typedef Core::RefCountPtr<CommandList> CommandListHandle;
 
 END_NAMESPACE_RHI

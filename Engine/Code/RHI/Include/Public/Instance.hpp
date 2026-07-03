@@ -49,11 +49,12 @@ protected:
 	Version m_appVersion;
 	Version m_engineVersion;
 };
+typedef Core::RefCountPtr<Instance> InstanceHandle;
 
 class RendererInterface
 {
 public:
-	static Core::RefCountPtr<Instance> InitRenderer(Core::RendererAPI api);
+	static InstanceHandle InitRenderer(Core::RendererAPI api);
 };
 
 END_NAMESPACE_RHI

@@ -4,7 +4,7 @@
 
 BEGIN_NAMESPACE_RHI
 
-Core::RefCountPtr<Instance> RendererInterface::InitRenderer(Core::RendererAPI api)
+InstanceHandle RendererInterface::InitRenderer(Core::RendererAPI api)
 {
 	switch (api)
 	{
