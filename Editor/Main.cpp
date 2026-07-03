@@ -221,7 +221,7 @@ int main()
     dSpecs.searchPresentQueue = true;
     dSpecs.surface = surface;
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::Device> device = instance->CreateDevice(dSpecs);
+    Kayou::RHI::DeviceHandle device = instance->CreateDevice(dSpecs);
 
     Kayou::RHI::SwapchainSpecs sSpecs;
     sSpecs.surface = surface;
@@ -243,7 +243,7 @@ int main()
     vertexbufferSpecs.size = meshVertices.size() * sizeof(Vertex);
     vertexbufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GpuOnly;
     vertexbufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
-    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
+    Kayou::RHI::BufferHandle vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
     
     // Index Buffer
     Kayou::RHI::BufferSpecs indexBufferSpecs{};
@@ -252,7 +252,7 @@ int main()
     indexBufferSpecs.size = meshIndices.size() * sizeof(uint32_t);
     indexBufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GpuOnly;
     indexBufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
-    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> indexBuffer = device->CreateBuffer(indexBufferSpecs);
+    Kayou::RHI::BufferHandle indexBuffer = device->CreateBuffer(indexBufferSpecs);
 
     // Base Texture
     Kayou::RHI::ImageSpecs textureImageSpecs;
@@ -286,7 +286,7 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::Sampler> sampler = device->CreateSampler(samplerSpecs);
 
 
-    auto copyBufferDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+    Kayou::RHI::CommandListHandle copyBufferDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
 
     copyBufferDataCommandList->Open();
     
@@ -313,7 +313,7 @@ int main()
     uniformCameraSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
     uniformCameraSpecs.isPersistentMapped = true;
     uniformCameraSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
-    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> uniformCamera = device->CreateBuffer(uniformCameraSpecs);
+    Kayou::RHI::BufferHandle uniformCamera = device->CreateBuffer(uniformCameraSpecs);
 
 
     // Uniform buffer modelMatrix
@@ -324,7 +324,7 @@ int main()
     uniformModelSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
     uniformModelSpecs.isPersistentMapped = true;
     uniformModelSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
-    Kayou::Core::RefCountPtr<Kayou::RHI::Buffer> uniformModel = device->CreateBuffer(uniformModelSpecs);
+    Kayou::RHI::BufferHandle uniformModel = device->CreateBuffer(uniformModelSpecs);
 
     auto copyUniformDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
     copyUniformDataCommandList->Open();
@@ -407,8 +407,8 @@ int main()
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout> frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
     Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSetLayout> drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
     
-    Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
-    Kayou::Core::RefCountPtr<Kayou::RHI::DescriptorSet> drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
+    Kayou::RHI::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
+    Kayou::RHI::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
     device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));

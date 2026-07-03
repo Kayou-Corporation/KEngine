@@ -18,8 +18,8 @@ public:
 	virtual Core::RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) override;
 	virtual void DestroySurface(Core::RefCountPtr<Surface> surface) override;
 
-	virtual Core::RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) override;
-	virtual void DestroyDevice(Core::RefCountPtr<Device> device) override;
+	virtual DeviceHandle CreateDevice(const DeviceSpecs& specs) override;
+	virtual void DestroyDevice(DeviceHandle device) override;
 
 protected:
 	Version m_engineVersion;

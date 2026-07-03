@@ -1,5 +1,7 @@
 #pragma once
 #include "Utils/Core.hpp"
+#include "Utils/Export.hpp"
+#include "Utils/Memory.hpp"
 
 #define RHI_NAMESPACE RHI
 
@@ -7,6 +9,49 @@
 #define END_NAMESPACE_RHI } /* namespace RHI_NAMESPACE */ END_NAMESPACE_KAYOU
 
 BEGIN_NAMESPACE_RHI
+
+// ---------- FORWARD DECLARATIONS ----------
+class Buffer;
+class CommandList;
+class Image;
+class Device;
+struct RenderingInfo;
+
+class Fence;
+class Semaphore;
+
+class Pipeline;
+class GraphicsPipeline;
+
+class PipelineLayout;
+class DescriptorSet;
+
+class Surface;
+
+class Swapchain;
+struct SwapchainSpecs;
+
+struct BufferSpecs;
+
+struct ImageSpecs;
+struct SwapchainImageSpecs;
+
+struct SemaphoreSpecs;
+struct SubmitInfo;
+
+struct GraphicsPipelineSpecs;
+
+class DescriptorSetLayout;
+class PushConstantLayout;
+
+class Sampler;
+struct SamplerSpecs;
+
+// ---------- HANDLE TYPEDEFS ----------
+typedef Core::RefCountPtr<Buffer> BufferHandle;
+typedef Core::RefCountPtr<CommandList> CommandListHandle;
+typedef Core::RefCountPtr<DescriptorSet> DescriptorSetHandle;
+typedef Core::RefCountPtr<Device> DeviceHandle;
 
 // ---------- INSTANCE RELATED ----------
 struct Version

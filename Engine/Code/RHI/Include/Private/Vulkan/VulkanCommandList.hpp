@@ -28,10 +28,10 @@ public:
 	virtual void EndRendering() override;
 
 	//----------- Bind --------------//
-	virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, std::string layoutName, Core::RefCountPtr<DescriptorSet> DescriptorSet, PipelineBindPoint bindPoint) override;
-	virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, uint32_t layoutIndex, Core::RefCountPtr<DescriptorSet> descriptorSet, PipelineBindPoint bindPoint) override;
-	virtual void BindVertexBuffer(Core::RefCountPtr<Buffer> vertexBuffer, uint32_t offset) override;
-	virtual void BindIndexBuffer(Core::RefCountPtr<Buffer> indexBuffer, uint32_t offset) override;
+	virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, std::string layoutName, DescriptorSetHandle DescriptorSet, PipelineBindPoint bindPoint) override;
+	virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, uint32_t layoutIndex, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) override;
+	virtual void BindVertexBuffer(BufferHandle vertexBuffer, uint32_t offset) override;
+	virtual void BindIndexBuffer(BufferHandle indexBuffer, uint32_t offset) override;
 
 	//----------- Draw --------------//
 	virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
@@ -39,8 +39,8 @@ public:
 	virtual void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) override;
 
 	//----------- Set Buffer / Image Data --------------//
-	virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) override;
-	virtual void CopyBufferToBuffer(Core::RefCountPtr<Buffer> srcBuffer, uint32_t srcOffset, Core::RefCountPtr<Buffer> dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) override;
+	virtual void SetBufferData(BufferHandle buffer, void* data, uint32_t size, uint32_t offset) override;
+	virtual void CopyBufferToBuffer(BufferHandle srcBuffer, uint32_t srcOffset, BufferHandle dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) override;
 	virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) override;
 	virtual void CopyImageToImage(Core::RefCountPtr<Image> srcImage, Extent3D srcOffset, Core::RefCountPtr<Image> dstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) override;
 

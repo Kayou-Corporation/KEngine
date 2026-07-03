@@ -165,7 +165,7 @@ VkBool32 VulkanInstance::DebugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT 
 	return VK_FALSE;
 }
 
-Core::RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
+DeviceHandle VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 {
 	vk::SurfaceKHR surface = specs.surface.CastAs<VulkanSurface>()->GetHandle();
 	vk::PhysicalDeviceType type = TranslateToVulkan(specs.gpuType);
@@ -182,7 +182,7 @@ Core::RefCountPtr<Device> VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 	return device;
 }
 
-void VulkanInstance::DestroyDevice(Core::RefCountPtr<Device> device)
+void VulkanInstance::DestroyDevice(DeviceHandle device)
 {
 	device.CastAs<VulkanDevice>()->Destroy();
 }

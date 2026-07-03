@@ -42,8 +42,8 @@ public:
 	KENGINE_API virtual Core::RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) = 0;
 	KENGINE_API virtual void DestroySurface(Core::RefCountPtr<Surface> surface) = 0;
 
-	KENGINE_API virtual Core::RefCountPtr<Device> CreateDevice(const DeviceSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyDevice(Core::RefCountPtr<Device> device) = 0;
+	KENGINE_API virtual DeviceHandle CreateDevice(const DeviceSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyDevice(DeviceHandle device) = 0;
 
 protected:
 	Version m_appVersion;

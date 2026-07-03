@@ -59,8 +59,8 @@ public:
     virtual ~VulkanDevice() override = default;
 
     //----------- Queue / Command --------------//
-    virtual Core::RefCountPtr<CommandList> GetCommandList(QueueType queueType) override;
-    virtual void SubmitCommandList(Core::RefCountPtr<CommandList> commandList, const SubmitInfo& submitInfo) override;
+    virtual CommandListHandle GetCommandList(QueueType queueType) override;
+    virtual void SubmitCommandList(CommandListHandle commandList, const SubmitInfo& submitInfo) override;
     virtual void WaitIdle() override;
     virtual void QueueWaitIdle(QueueType queueType) override;
     virtual void RunGarbageCollector() override;
@@ -84,8 +84,8 @@ public:
 
 
     //-------------- Buffer --------------// 
-    virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) override;
-    virtual void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) override;
+    virtual BufferHandle CreateBuffer(const BufferSpecs& specs) override;
+    virtual void DestroyBuffer(BufferHandle buffer) override;
 
 
     //-------------- Image --------------// 
@@ -115,14 +115,14 @@ public:
     virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) override;
 
     // -------------- Descriptor Set -------------- // 
-    virtual Core::RefCountPtr<DescriptorSet> CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) override;
-    virtual void DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> descriptorSet) override;
-    virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> buffer, uint32_t offset, uint32_t range) override;
-    virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> buffer, uint32_t offset, uint32_t range) override;
-    virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
-    virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
-    virtual void SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> sampler) override;
-    virtual void SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> sampler) override;
+    virtual DescriptorSetHandle CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) override;
+    virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet) override;
+    virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
+    virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
+    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
+    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) override;
+    virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> sampler) override;
+    virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> sampler) override;
 
     // -------------- Pipeline Layout -------------- // 
     virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) override;

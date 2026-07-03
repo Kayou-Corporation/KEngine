@@ -53,7 +53,7 @@ void VulkanCommandList::EndRendering()
 }
 
 //----------- Bind --------------//
-void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout, std::string layoutName, Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
+void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout, std::string layoutName, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
 	Core::RefCountPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
@@ -66,7 +66,7 @@ void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIP
 	m_handle->cmdBuffer.bindDescriptorSets(bindPoint, pipelineLayout, layoutIndex, 1,&descriptorSet, 0, nullptr);
 }
 
-void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout, uint32_t layoutIndex, Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
+void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIPipelineLayout, uint32_t layoutIndex, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
 	Core::RefCountPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
@@ -78,7 +78,7 @@ void VulkanCommandList::BindDescriptorSet(Core::RefCountPtr<PipelineLayout> RHIP
 	m_handle->cmdBuffer.bindDescriptorSets(bindPoint, pipelineLayout, layoutIndex, 1, &descriptorSet, 0, nullptr);
 }
 
-void VulkanCommandList::BindVertexBuffer(Core::RefCountPtr<Buffer> RHIVertexBuffer, uint32_t offset)
+void VulkanCommandList::BindVertexBuffer(BufferHandle RHIVertexBuffer, uint32_t offset)
 {
 	Core::RefCountPtr<VulkanBuffer> RHVulkanVertexBuffer = RHIVertexBuffer.CastAs<VulkanBuffer>();
 	
@@ -88,7 +88,7 @@ void VulkanCommandList::BindVertexBuffer(Core::RefCountPtr<Buffer> RHIVertexBuff
 	m_handle->cmdBuffer.bindVertexBuffers(0, { buffer }, { vkOffset });
 }
 
-void VulkanCommandList::BindIndexBuffer(Core::RefCountPtr<Buffer> RHIIndexBuffer, uint32_t offset)
+void VulkanCommandList::BindIndexBuffer(BufferHandle RHIIndexBuffer, uint32_t offset)
 {
 	Core::RefCountPtr<VulkanBuffer> RHVulkanIndexBuffer = RHIIndexBuffer.CastAs<VulkanBuffer>();
 
@@ -127,7 +127,7 @@ void VulkanCommandList::DrawIndexed(uint32_t indexCount, uint32_t instanceCount,
 }
 
 //----------- Set Buffer / Image Data --------------//
-void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void* data, uint32_t size, uint32_t offset)
+void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32_t size, uint32_t offset)
 {
 	ASSERT((size + offset) <= RHIBuffer->GetSize(), "Data is too large");
 
@@ -198,7 +198,7 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 	}
 }
 
-void VulkanCommandList::CopyBufferToBuffer(Core::RefCountPtr<Buffer> RHISrcBuffer, uint32_t srcOffset, Core::RefCountPtr<Buffer> RHIDstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage, bool returnDstBufferToInitialStage)
+void VulkanCommandList::CopyBufferToBuffer(BufferHandle RHISrcBuffer, uint32_t srcOffset, BufferHandle RHIDstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage, bool returnDstBufferToInitialStage)
 {
 	Core::RefCountPtr<VulkanBuffer> RHIVulkanSrcBuffer = RHISrcBuffer.CastAs<VulkanBuffer>();
 	Core::RefCountPtr<VulkanBuffer> RHIVulkanDstBuffer = RHIDstBuffer.CastAs<VulkanBuffer>();

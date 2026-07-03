@@ -3,45 +3,10 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Utils/Memory.hpp"
-#include "Utils/Export.hpp"
-
 #include "Public/RHI.hpp"
 #include "Public/Shader.hpp"
 
 BEGIN_NAMESPACE_RHI
-
-class Surface;
-
-class Swapchain;
-struct SwapchainSpecs;
-
-class Buffer;
-struct BufferSpecs;
-
-class Image;
-struct ImageSpecs;
-struct SwapchainImageSpecs;
-
-class CommandList;
-
-class Semaphore;
-struct SemaphoreSpecs;
-class Fence;
-struct SubmitInfo;
-
-class Pipeline;
-class GraphicsPipeline;
-struct GraphicsPipelineSpecs;
-
-class DescriptorSetLayout;
-class PushConstantLayout;
-class PipelineLayout;
-
-class DescriptorSet;
-
-class Sampler;
-struct SamplerSpecs;
 
 struct DeviceSpecs
 {
@@ -69,8 +34,8 @@ public:
 	virtual ~Device() = default;
 
 	//----------- Queue / Command --------------//
-	KENGINE_API virtual Core::RefCountPtr<CommandList> GetCommandList(QueueType queueType) = 0;
-	KENGINE_API virtual void SubmitCommandList(Core::RefCountPtr<CommandList> commandList, const SubmitInfo& submitInfo) = 0;
+	KENGINE_API virtual CommandListHandle GetCommandList(QueueType queueType) = 0;
+	KENGINE_API virtual void SubmitCommandList(CommandListHandle commandList, const SubmitInfo& submitInfo) = 0;
 	KENGINE_API virtual void WaitIdle() = 0;
 	KENGINE_API virtual void QueueWaitIdle(QueueType queueType) = 0;
 	KENGINE_API virtual void RunGarbageCollector() = 0;
@@ -94,8 +59,8 @@ public:
 
 
 	//-------------- Buffer --------------// 
-	KENGINE_API virtual Core::RefCountPtr<Buffer> CreateBuffer(const BufferSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyBuffer(Core::RefCountPtr<Buffer> buffer) = 0;
+	KENGINE_API virtual BufferHandle CreateBuffer(const BufferSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyBuffer(BufferHandle buffer) = 0;
 
 
 	// -------------- Image -------------- // 
@@ -125,14 +90,14 @@ public:
 	KENGINE_API virtual void DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<PushConstantLayout>>& pushConstants) = 0;
 
 	// -------------- Descriptor Set -------------- // 
-	KENGINE_API virtual Core::RefCountPtr<DescriptorSet> CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) = 0;
-	KENGINE_API virtual void DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> descriptorSet) = 0;
-	KENGINE_API virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> buffer, uint32_t offset, uint32_t range) = 0;
-	KENGINE_API virtual void SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> buffer, uint32_t offset, uint32_t range) = 0;
-	KENGINE_API virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) = 0;
-	KENGINE_API virtual void SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) = 0;
-	KENGINE_API virtual void SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> sampler) = 0;
-	KENGINE_API virtual void SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> sampler) = 0;
+	KENGINE_API virtual DescriptorSetHandle CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> layout) = 0;
+	KENGINE_API virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet) = 0;
+	KENGINE_API virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
+	KENGINE_API virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
+	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, Core::RefCountPtr<Sampler> sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> sampler) = 0;
 
 	// -------------- Pipeline Layout -------------- // 
 	KENGINE_API virtual Core::RefCountPtr<PipelineLayout> CreatePipelineLayout(std::vector<Core::RefCountPtr<DescriptorSetLayout>> descriptors, std::vector<Core::RefCountPtr<PushConstantLayout>> pushConstants) = 0;

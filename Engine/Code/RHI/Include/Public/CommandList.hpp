@@ -1,27 +1,10 @@
 #pragma once
 
-#include "Utils/Export.hpp"
-#include "Utils/Memory.hpp"
-
 #include "Public/RHI.hpp"
 
 #include <vector>
 
 BEGIN_NAMESPACE_RHI
-
-class Buffer;
-class Image;
-class Device;
-struct RenderingInfo;
-
-class Fence;
-class Semaphore;
-
-class Pipeline;
-class GraphicsPipeline;
-
-class PipelineLayout;
-class DescriptorSet;
 
 struct SubmitInfo
 {
@@ -53,10 +36,10 @@ public:
 	KENGINE_API virtual void EndRendering() = 0;
 
 	//----------- Bind --------------//
-	KENGINE_API virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, std::string layoutName, Core::RefCountPtr<DescriptorSet> descriptorSet, PipelineBindPoint bindPoint) = 0;
-	KENGINE_API virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, uint32_t layoutIndex, Core::RefCountPtr<DescriptorSet> descriptorSet, PipelineBindPoint bindPoint) = 0;
-	KENGINE_API virtual void BindVertexBuffer(Core::RefCountPtr<Buffer> vertexBuffer, uint32_t offset) = 0;
-	KENGINE_API virtual void BindIndexBuffer(Core::RefCountPtr<Buffer> indexBuffer, uint32_t offset) = 0;
+	KENGINE_API virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, std::string layoutName, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
+	KENGINE_API virtual void BindDescriptorSet(Core::RefCountPtr<PipelineLayout> pipelineLayout, uint32_t layoutIndex, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
+	KENGINE_API virtual void BindVertexBuffer(BufferHandle vertexBuffer, uint32_t offset) = 0;
+	KENGINE_API virtual void BindIndexBuffer(BufferHandle indexBuffer, uint32_t offset) = 0;
 
 	//----------- Draw --------------//
 	KENGINE_API virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
@@ -64,13 +47,13 @@ public:
 	KENGINE_API virtual void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) = 0;
 
 	//----------- Set Buffer / Image Data --------------//
-	KENGINE_API virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) = 0;
-	KENGINE_API virtual void CopyBufferToBuffer(Core::RefCountPtr<Buffer> srcBuffer, uint32_t srcOffset, Core::RefCountPtr<Buffer> dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) = 0;
+	KENGINE_API virtual void SetBufferData(BufferHandle buffer, void* data, uint32_t size, uint32_t offset) = 0;
+	KENGINE_API virtual void CopyBufferToBuffer(BufferHandle srcBuffer, uint32_t srcOffset, BufferHandle dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) = 0;
 	KENGINE_API virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) = 0;
 	// TODO : Implement Mips properly
 	KENGINE_API virtual void CopyImageToImage(Core::RefCountPtr<Image> srcImage, Extent3D srcOffset, Core::RefCountPtr<Image> dstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) = 0;
-	//KENGINE_API virtual void CopyImageToBuffer(Core::RefCountPtr<Image> srcImage, Core::RefCountPtr<Buffer> dstBuffer);	
-	//KENGINE_API virtual void CopyBufferToImage(Core::RefCountPtr<Buffer> srcBuffer, Core::RefCountPtr<Image> dstImage);
+	//KENGINE_API virtual void CopyImageToBuffer(Core::RefCountPtr<Image> srcImage, BufferHandle dstBuffer);	
+	//KENGINE_API virtual void CopyBufferToImage(BufferHandle srcBuffer, Core::RefCountPtr<Image> dstImage);
 
 
 	//----------- Transition Image Layout --------------//

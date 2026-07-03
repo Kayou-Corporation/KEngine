@@ -41,7 +41,7 @@ VulkanDevice::VulkanDevice()
 }
 
 //----------- Queue / Command --------------//
-Core::RefCountPtr<CommandList> VulkanDevice::GetCommandList(QueueType RHIQueueType)
+CommandListHandle VulkanDevice::GetCommandList(QueueType RHIQueueType)
 {
 	Core::RefCountPtr<VulkanCommandList> RHIVulkanCommandList = Core::CreateRefPtr<VulkanCommandList>();
 
@@ -59,7 +59,7 @@ Core::RefCountPtr<CommandList> VulkanDevice::GetCommandList(QueueType RHIQueueTy
 	return nullptr;
 }
 
-void VulkanDevice::SubmitCommandList(Core::RefCountPtr<CommandList> RHICommandList, const SubmitInfo& RHISubmitInfo)
+void VulkanDevice::SubmitCommandList(CommandListHandle RHICommandList, const SubmitInfo& RHISubmitInfo)
 {
 	Core::RefCountPtr<VulkanCommandList> RHIVulkanCommandList = RHICommandList.CastAs<VulkanCommandList>();
 	
@@ -281,7 +281,7 @@ bool VulkanDevice::Present(const PresentInfo& RHIPresentInfo)
 }
 
 //-------------- Buffer --------------// 
-Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs)
+BufferHandle VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs)
 {
 	Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer = Core::CreateRefPtr<VulkanBuffer>();
 
@@ -306,7 +306,7 @@ Core::RefCountPtr<Buffer> VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs
 	return RHIVulkanBuffer;
 }
 
-void VulkanDevice::DestroyBuffer(Core::RefCountPtr<Buffer> RHIBuffer)
+void VulkanDevice::DestroyBuffer(BufferHandle RHIBuffer)
 {
 	Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer = RHIBuffer.CastAs<VulkanBuffer>();
 
@@ -705,7 +705,7 @@ void VulkanDevice::DestroyPushConstantsLayouts(std::vector<Core::RefCountPtr<Pus
 }
 
 // -------------- Descriptor Set -------------- // 
-Core::RefCountPtr<DescriptorSet> VulkanDevice::CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> RHILayout)
+DescriptorSetHandle VulkanDevice::CreateDescriptorSet(Core::RefCountPtr<DescriptorSetLayout> RHILayout)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::CreateRefPtr<VulkanDescriptorSet>();
 
@@ -744,7 +744,7 @@ Core::RefCountPtr<DescriptorSet> VulkanDevice::CreateDescriptorSet(Core::RefCoun
 	return RHIVulkanDescriptorSet;
 }
 
-void VulkanDevice::DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet)
+void VulkanDevice::DestroyDescriptorSet(DescriptorSetHandle RHIDescriptorSet)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
 
@@ -753,7 +753,7 @@ void VulkanDevice::DestroyDescriptorSet(Core::RefCountPtr<DescriptorSet> RHIDesc
 	m_handle.destroyDescriptorPool(pool);
 }
 
-void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Buffer> RHIBuffer, uint32_t offset, uint32_t range)
+void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, BufferHandle RHIBuffer, uint32_t offset, uint32_t range)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -785,7 +785,7 @@ void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDe
 	}
 }
 
-void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Buffer> RHIBuffer, uint32_t offset, uint32_t range)
+void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, BufferHandle RHIBuffer, uint32_t offset, uint32_t range)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -817,7 +817,7 @@ void VulkanDevice::SetDescriptorSetBuffer(Core::RefCountPtr<DescriptorSet> RHIDe
 	}
 }
 
-void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> RHIImage, Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> RHIImage, Core::RefCountPtr<Sampler> RHISampler)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -862,7 +862,7 @@ void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDes
 	}
 }
 
-void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> RHIImage, Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> RHIImage, Core::RefCountPtr<Sampler> RHISampler)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -906,7 +906,7 @@ void VulkanDevice::SetDescriptorSetImage(Core::RefCountPtr<DescriptorSet> RHIDes
 	}
 }
 
-void VulkanDevice::SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Sampler> RHISampler)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
@@ -936,7 +936,7 @@ void VulkanDevice::SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> RHID
 	}
 }
 
-void VulkanDevice::SetDescriptorSetSampler(Core::RefCountPtr<DescriptorSet> RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> RHISampler)
+void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Sampler> RHISampler)
 {
 	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs <VulkanDescriptorSet>();
 
