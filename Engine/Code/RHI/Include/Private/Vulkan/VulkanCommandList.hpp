@@ -42,7 +42,7 @@ public:
 	virtual void SetBufferData(Core::RefCountPtr<Buffer> buffer, void* data, uint32_t size, uint32_t offset) override;
 	virtual void CopyBufferToBuffer(Core::RefCountPtr<Buffer> srcBuffer, uint32_t srcOffset, Core::RefCountPtr<Buffer> dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) override;
 	virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) override;
-	virtual void CopyImageToImage(Core::RefCountPtr<Image> srcImage, Core::RefCountPtr<Image> dstImage, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) override;
+	virtual void CopyImageToImage(Core::RefCountPtr<Image> srcImage, Extent3D srcOffset, Core::RefCountPtr<Image> dstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) override;
 
 	//----------- Transition Image Layout --------------//
 	virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) override;
@@ -59,7 +59,10 @@ public:
 	QueueType GetOwnerQueueType() { return m_OwnerQueueType; }
 
 	vk::BufferMemoryBarrier GetBufferMemoryBarrier(Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
+	vk::BufferMemoryBarrier GetRawBufferMemoryBarrier(vk::Buffer buffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
+
 	vk::ImageMemoryBarrier GetImageMemoryBarrier(Core::RefCountPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
+	vk::ImageMemoryBarrier GetRawImageMemoryBarrier(vk::Image image, vk::ImageLayout currentLayout, vk::ImageLayout dstLayout, vk::ImageAspectFlags aspect, uint32_t mipsLevel, uint32_t layersCount, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
 
 	vk::AccessFlags GetSrcAccessMask(vk::ImageLayout layout);
 

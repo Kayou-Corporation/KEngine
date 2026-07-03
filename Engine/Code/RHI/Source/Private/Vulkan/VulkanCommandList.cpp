@@ -149,14 +149,8 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 	{
 		VK_CHECK_VOID(static_cast<vk::Result>(vmaCopyMemoryToAllocation(memoryAllocator, data, bufferAllocation, offset, size)), "Failed to copy memory to buffer");
 
-		vk::BufferMemoryBarrier bufferMemBarrier{};
-		bufferMemBarrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
-		bufferMemBarrier.dstAccessMask = bufferAccessFlags;
-		bufferMemBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-		bufferMemBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-		bufferMemBarrier.buffer = bufferHandle;
-		bufferMemBarrier.offset = offset;
-		bufferMemBarrier.size = size;
+		// TODO : Check, not sure which size to use ? 
+		vk::BufferMemoryBarrier bufferMemBarrier = GetBufferMemoryBarrier(RHIVulkanBuffer, offset, size, vk::AccessFlagBits::eHostWrite, bufferAccessFlags);
 
 		cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eHost, pipelineStage, {}, nullptr, bufferMemBarrier, nullptr);
 	}
@@ -180,14 +174,7 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 		VK_CHECK_VOID(static_cast<vk::Result>(vmaCopyMemoryToAllocation(memoryAllocator, data, stagingAlloc, 0, size)), "Failed to copy memory to staging buffer");
 #pragma endregion
 
-		vk::BufferMemoryBarrier bufferMemBarrier{};
-		bufferMemBarrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
-		bufferMemBarrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
-		bufferMemBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-		bufferMemBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-		bufferMemBarrier.buffer = stagingBuf;
-		bufferMemBarrier.offset = 0;
-		bufferMemBarrier.size = size;
+		vk::BufferMemoryBarrier bufferMemBarrier = GetRawBufferMemoryBarrier(stagingBuf, 0, size, vk::AccessFlagBits::eHostWrite, vk::AccessFlagBits::eTransferRead);
 
 		cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eHost, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, bufferMemBarrier, nullptr);
 
@@ -198,14 +185,7 @@ void VulkanCommandList::SetBufferData(Core::RefCountPtr<Buffer> RHIBuffer, void*
 
 		cmdBuffer.copyBuffer(stagingBuf, bufferHandle, bufferCopy);
 
-		vk::BufferMemoryBarrier bufferMemBarrier2{};
-		bufferMemBarrier2.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-		bufferMemBarrier2.dstAccessMask = bufferAccessFlags;
-		bufferMemBarrier2.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-		bufferMemBarrier2.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-		bufferMemBarrier2.buffer = bufferHandle;
-		bufferMemBarrier2.offset = offset;
-		bufferMemBarrier2.size = size;
+		vk::BufferMemoryBarrier bufferMemBarrier2 = GetRawBufferMemoryBarrier(bufferHandle, offset, size, vk::AccessFlagBits::eTransferWrite, bufferAccessFlags);
 
 		cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, pipelineStage, {}, nullptr, bufferMemBarrier2, nullptr);
 
@@ -232,27 +212,13 @@ void VulkanCommandList::CopyBufferToBuffer(Core::RefCountPtr<Buffer> RHISrcBuffe
 	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
 
 	// -------------------- WE NEED TO PREPARE SRC BUFFER SO DST BUFFER CAN READ IT ----------------------- //
-	vk::BufferMemoryBarrier srcBufferPreparationBarrier{};
-	srcBufferPreparationBarrier.srcAccessMask = RHIVulkanSrcBuffer->GetAccessMask();
-	srcBufferPreparationBarrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
-	srcBufferPreparationBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-	srcBufferPreparationBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-	srcBufferPreparationBarrier.buffer = srcBuffer;
-	srcBufferPreparationBarrier.offset = srcOffset;
-	srcBufferPreparationBarrier.size = size;
+	vk::BufferMemoryBarrier srcBufferPreparationBarrier = GetRawBufferMemoryBarrier(srcBuffer, srcOffset, size, RHIVulkanSrcBuffer->GetAccessMask(), vk::AccessFlagBits::eTransferRead);
 
 	vk::PipelineStageFlags srcStageMask = srcBufferPreparationBarrier.srcAccessMask == vk::AccessFlagBits::eHostWrite ? vk::PipelineStageFlagBits::eHost : RHIVulkanSrcBuffer->GetPipelineStage();
 	cmdBuffer.pipelineBarrier(srcStageMask, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, srcBufferPreparationBarrier, nullptr);
 
 	// -------------------- WE NEED TO PREPARE DST BUFFER IT CAN READ SRC BUFFER ----------------------- //
-	vk::BufferMemoryBarrier dstBufferPreparationBarrier{};
-	dstBufferPreparationBarrier.srcAccessMask = RHIVulkanDstBuffer->GetAccessMask();
-	dstBufferPreparationBarrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
-	dstBufferPreparationBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-	dstBufferPreparationBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-	dstBufferPreparationBarrier.buffer = dstBuffer;
-	dstBufferPreparationBarrier.offset = dstOffset;
-	dstBufferPreparationBarrier.size = size;
+	vk::BufferMemoryBarrier dstBufferPreparationBarrier = GetRawBufferMemoryBarrier(dstBuffer, dstOffset, size, RHIVulkanDstBuffer->GetAccessMask(), vk::AccessFlagBits::eTransferWrite);
 
 	vk::PipelineStageFlags dstBufferSrcStageMask = dstBufferPreparationBarrier.srcAccessMask == vk::AccessFlagBits::eHostWrite ? vk::PipelineStageFlagBits::eHost : RHIVulkanDstBuffer->GetPipelineStage();
 	cmdBuffer.pipelineBarrier(dstBufferSrcStageMask, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, dstBufferPreparationBarrier, nullptr);
@@ -266,16 +232,10 @@ void VulkanCommandList::CopyBufferToBuffer(Core::RefCountPtr<Buffer> RHISrcBuffe
 	cmdBuffer.copyBuffer(srcBuffer, dstBuffer, bufferCopy);
 
 	// -------------------- REVERT SRC BUFFER TO INITIAL ACCESS MASK ----------------------- //
+	// TODO : probable issue with current srcAccessMask if returnSrcBufferToInitialStage = false, because not updtated ?
 	if (returnSrcBufferToInitialStage)
 	{
-		vk::BufferMemoryBarrier srcBufferPostCopyBarrier{};
-		srcBufferPostCopyBarrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
-		srcBufferPostCopyBarrier.dstAccessMask = RHIVulkanSrcBuffer->GetAccessMask();
-		srcBufferPostCopyBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-		srcBufferPostCopyBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-		srcBufferPostCopyBarrier.buffer = srcBuffer;
-		srcBufferPostCopyBarrier.offset = srcOffset;
-		srcBufferPostCopyBarrier.size = size;
+		vk::BufferMemoryBarrier srcBufferPostCopyBarrier = GetRawBufferMemoryBarrier(srcBuffer, srcOffset, size, vk::AccessFlagBits::eTransferRead, RHIVulkanSrcBuffer->GetAccessMask());
 
 		vk::PipelineStageFlags srcPostCopySrcStageMask = vk::PipelineStageFlagBits::eTransfer;
 		vk::PipelineStageFlags srcPostCopyDstStageMask = RHIVulkanSrcBuffer->GetPipelineStage();
@@ -286,14 +246,7 @@ void VulkanCommandList::CopyBufferToBuffer(Core::RefCountPtr<Buffer> RHISrcBuffe
 	// -------------------- REVERT DST BUFFER TO INITIAL ACCESS MASK ----------------------- //
 	if (returnDstBufferToInitialStage)
 	{
-		vk::BufferMemoryBarrier dstBufferPostCopyBarrier{};
-		dstBufferPostCopyBarrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-		dstBufferPostCopyBarrier.dstAccessMask = RHIVulkanDstBuffer->GetAccessMask();
-		dstBufferPostCopyBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-		dstBufferPostCopyBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-		dstBufferPostCopyBarrier.buffer = dstBuffer;
-		dstBufferPostCopyBarrier.offset = dstOffset;
-		dstBufferPostCopyBarrier.size = size;
+		vk::BufferMemoryBarrier dstBufferPostCopyBarrier = GetRawBufferMemoryBarrier(dstBuffer, dstOffset, size, vk::AccessFlagBits::eTransferWrite, RHIVulkanDstBuffer->GetAccessMask());
 
 		vk::PipelineStageFlags dstPostCopySrcStageMask = vk::PipelineStageFlagBits::eTransfer;
 		vk::PipelineStageFlags dstPostCopyDstStageMask = RHIVulkanDstBuffer->GetPipelineStage();
@@ -329,14 +282,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 	// --------------------  COPY DATA TO GPU IMAGE ----------------------- // 
 	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
 
-	vk::BufferMemoryBarrier bufferMemBarrier{};
-	bufferMemBarrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
-	bufferMemBarrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
-	bufferMemBarrier.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-	bufferMemBarrier.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-	bufferMemBarrier.buffer = stagingBuf;
-	bufferMemBarrier.offset = 0;
-	bufferMemBarrier.size = size;
+	vk::BufferMemoryBarrier bufferMemBarrier = GetRawBufferMemoryBarrier(stagingBuf, 0, size, vk::AccessFlagBits::eHostWrite, vk::AccessFlagBits::eTransferRead);
 
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eHost, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, bufferMemBarrier, nullptr);
 
@@ -346,19 +292,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 	vk::Extent3D extent = RHIVulkanImage->GetVulkanExtent();
 	vk::ImageAspectFlags aspect = RHIVulkanImage->GetAspect();
 
-	vk::ImageMemoryBarrier transitionToCopyLayout{};
-	transitionToCopyLayout.oldLayout = vk::ImageLayout::eUndefined;
-	transitionToCopyLayout.newLayout = vk::ImageLayout::eTransferDstOptimal;
-	transitionToCopyLayout.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-	transitionToCopyLayout.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-	transitionToCopyLayout.image = RHIVulkanImage->GetHandle();
-	transitionToCopyLayout.subresourceRange.aspectMask = aspect;
-	transitionToCopyLayout.subresourceRange.baseMipLevel = 0;
-	transitionToCopyLayout.subresourceRange.levelCount = mips;
-	transitionToCopyLayout.subresourceRange.baseArrayLayer = 0;
-	transitionToCopyLayout.subresourceRange.layerCount = layers;
-	transitionToCopyLayout.srcAccessMask = vk::AccessFlagBits::eNone;
-	transitionToCopyLayout.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+	vk::ImageMemoryBarrier transitionToCopyLayout = GetRawImageMemoryBarrier(RHIVulkanImage->GetHandle(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal, aspect, mips, layers, vk::AccessFlagBits::eNone, vk::AccessFlagBits::eTransferWrite);
 
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, nullptr, transitionToCopyLayout);
 
@@ -381,7 +315,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 			region.imageSubresource.aspectMask = aspect;
 			region.imageSubresource.mipLevel = mip;
 			region.imageSubresource.baseArrayLayer = layer;
-			region.imageSubresource.layerCount = 1;
+			region.imageSubresource.layerCount = 1; 
 			region.imageOffset = vk::Offset3D();
 			region.imageExtent = mipExtent;
 
@@ -407,33 +341,27 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 	vk::ImageLayout finalLayout = RHIVulkanImage->GetVulkanTargetLayout();
 
 	// A little bit "hardcode" but this function should only be use with a final layout = transitionToFinalLayout
-	vk::ImageMemoryBarrier transitionToFinalLayout{};
-	transitionToFinalLayout.oldLayout = vk::ImageLayout::eTransferDstOptimal;
-	transitionToFinalLayout.newLayout = finalLayout;
-	transitionToFinalLayout.srcQueueFamilyIndex = vk::QueueFamilyIgnored;
-	transitionToFinalLayout.dstQueueFamilyIndex = vk::QueueFamilyIgnored;
-	transitionToFinalLayout.image = RHIVulkanImage->GetHandle();
-	transitionToFinalLayout.subresourceRange.aspectMask = aspect;
-	transitionToFinalLayout.subresourceRange.baseMipLevel = 0;
-	transitionToFinalLayout.subresourceRange.levelCount = mips;
-	transitionToFinalLayout.subresourceRange.baseArrayLayer = 0;
-	transitionToFinalLayout.subresourceRange.layerCount = layers;
-	transitionToFinalLayout.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-	transitionToFinalLayout.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+	vk::ImageMemoryBarrier transitionToFinalLayout = GetRawImageMemoryBarrier(RHIVulkanImage->GetHandle(), vk::ImageLayout::eTransferDstOptimal, finalLayout, aspect, mips, layers, vk::AccessFlagBits::eTransferWrite, vk::AccessFlagBits::eShaderRead);
 
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, nullptr, nullptr, transitionToFinalLayout);
 }
 
-void VulkanCommandList::CopyImageToImage(Core::RefCountPtr<Image> RHISrcImage, Core::RefCountPtr<Image> RHIDstImage, bool returnSrcImageToInitialStage, bool returnDstImageToInitialStage)
+void VulkanCommandList::CopyImageToImage(Core::RefCountPtr<Image> RHISrcImage, Extent3D srcOffset, Core::RefCountPtr<Image> RHIDstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage, bool returnDstImageToInitialStage)
 {
 	Core::RefCountPtr<VulkanImage> VulkanSrcImage = RHISrcImage.CastAs<VulkanImage>();
 	Core::RefCountPtr<VulkanImage> VulkanDstImage = RHIDstImage.CastAs<VulkanImage>();
+
+	vk::Image srcHangle = VulkanSrcImage->GetHandle();
+	vk::Image dstHangle = VulkanDstImage->GetHandle();
 	
 	vk::ImageLayout srcImageLayout = VulkanSrcImage->GetVulkanCurrentLayout();
 	vk::AccessFlags srcCurrentAccessMask = GetSrcAccessMask(srcImageLayout);
 	
 	vk::ImageLayout dstImageLayout = VulkanDstImage->GetVulkanCurrentLayout();
 	vk::AccessFlags dstCurrentAccessMask = GetSrcAccessMask(dstImageLayout);
+
+	vk::Offset3D vkSrcOffset = vk::Offset3D(srcOffset.x, srcOffset.y, srcOffset.z);
+	vk::Offset3D vkDstOffset = vk::Offset3D(dstOffset.x, dstOffset.y, dstOffset.z);
 	
 	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
 	
@@ -447,9 +375,20 @@ void VulkanCommandList::CopyImageToImage(Core::RefCountPtr<Image> RHISrcImage, C
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, nullptr, nullptr, { srcPreparationBarrier, dstPreparationBarrier });
 
 	//----------- Actual Copy --------------//
-	//vk::ImageCopy copy;
-	////VkImageCopy
-	////cmdBuffer.copyImage(srcImage, srcImageLayout, dstImage, dstImageLayout,);
+	
+	vk::ImageCopy copyRegion{};
+	copyRegion.srcSubresource.aspectMask = VulkanSrcImage->GetAspect();
+	copyRegion.srcSubresource.mipLevel = 0;
+	copyRegion.srcSubresource.baseArrayLayer = 0;
+	copyRegion.srcSubresource.layerCount = VulkanSrcImage->GetLayersCount();
+	copyRegion.srcOffset = vkSrcOffset;
+	copyRegion.dstSubresource.aspectMask = VulkanDstImage->GetAspect();
+	copyRegion.srcSubresource.mipLevel = 0;
+	copyRegion.srcSubresource.baseArrayLayer = 0;
+	copyRegion.srcSubresource.layerCount = VulkanDstImage->GetLayersCount();
+	copyRegion.srcOffset = vkDstOffset;
+
+	cmdBuffer.copyImage(srcHangle, srcImageLayout, dstHangle, dstImageLayout, copyRegion);
 
 	//----------- Prepare Src image to return to initial stage --------------//
 	if (returnSrcImageToInitialStage)
@@ -557,6 +496,20 @@ vk::BufferMemoryBarrier VulkanCommandList::GetBufferMemoryBarrier(Core::RefCount
 	return barrier;
 }
 
+vk::BufferMemoryBarrier VulkanCommandList::GetRawBufferMemoryBarrier(vk::Buffer buffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
+{
+	vk::BufferMemoryBarrier barrier{};
+	barrier.srcAccessMask = srcAccessMask;
+	barrier.dstAccessMask = dstAccessMask;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.buffer = buffer;
+	barrier.offset = offset;
+	barrier.size = size;
+
+	return barrier;
+}
+
 vk::ImageMemoryBarrier VulkanCommandList::GetImageMemoryBarrier(Core::RefCountPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
 {
 	vk::ImageLayout currentLayout = RHIVulkanImage->GetVulkanCurrentLayout();
@@ -572,6 +525,25 @@ vk::ImageMemoryBarrier VulkanCommandList::GetImageMemoryBarrier(Core::RefCountPt
 	barrier.subresourceRange.levelCount = RHIVulkanImage->GetMipLevels();
 	barrier.subresourceRange.baseArrayLayer = 0;
 	barrier.subresourceRange.layerCount = RHIVulkanImage->GetLayersCount();
+	barrier.srcAccessMask = srcAccessMask;
+	barrier.dstAccessMask = dstAccessMask;
+
+	return barrier;
+}
+
+vk::ImageMemoryBarrier VulkanCommandList::GetRawImageMemoryBarrier(vk::Image image, vk::ImageLayout currentLayout, vk::ImageLayout dstLayout, vk::ImageAspectFlags aspect, uint32_t mipsLevel, uint32_t layersCount, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
+{
+	vk::ImageMemoryBarrier barrier{};
+	barrier.oldLayout = currentLayout;
+	barrier.newLayout = dstLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image;
+	barrier.subresourceRange.aspectMask = aspect;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = mipsLevel;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = layersCount;
 	barrier.srcAccessMask = srcAccessMask;
 	barrier.dstAccessMask = dstAccessMask;
 
