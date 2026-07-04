@@ -12,51 +12,35 @@ BEGIN_NAMESPACE_RHI
 
 // ---------- FORWARD DECLARATIONS ----------
 class Buffer;
-class CommandList;
-class Image;
-class Instance;
-class Device;
-struct RenderingInfo;
-
-class Fence;
-class Semaphore;
-
-class Pipeline;
-class GraphicsPipeline;
-
-class PipelineLayout;
-class DescriptorSet;
-
-class Surface;
-
-class Swapchain;
-struct SwapchainSpecs;
-
 struct BufferSpecs;
-
-struct ImageSpecs;
-struct SwapchainImageSpecs;
-
-struct SemaphoreSpecs;
-struct SubmitInfo;
-
-struct GraphicsPipelineSpecs;
-
+class CommandList;
+class DescriptorSet;
 class DescriptorSetLayout;
+class Device;
+struct DeviceSpecs;
+class Fence;
+class GraphicsPipeline;
+struct GraphicsPipelineSpecs;
+class Image;
+struct ImageSpecs;
+class Instance;
+class Pipeline;
+class PipelineLayout;
 class PushConstantLayout;
-
+struct RenderingInfo;
+class RenderPass;
 class Sampler;
 struct SamplerSpecs;
-
+class Semaphore;
+struct SemaphoreSpecs;
 class Shader;
-
-class Window;
-
+struct SubmitInfo;
+class Surface;
 struct SurfaceSpecs;
-
-struct DeviceSpecs;
-
-class RenderPass;
+class Swapchain;
+struct SwapchainImageSpecs;
+struct SwapchainSpecs;
+class Window;
 
 // ---------- HANDLE TYPEDEFS ----------
 typedef Core::RefCountPtr<Buffer> BufferHandle;
@@ -71,8 +55,8 @@ typedef Core::RefCountPtr<Pipeline> PipelineHandle;
 typedef Core::RefCountPtr<PipelineLayout> PipelineLayoutHandle;
 typedef Core::RefCountPtr<PushConstantLayout> PushConstantLayoutHandle;
 typedef Core::RefCountPtr<RenderPass> RenderPassLayout;
-typedef Core::RefCountPtr<Semaphore> SemaphoreHandle;
 typedef Core::RefCountPtr<Sampler> SamplerHandle;
+typedef Core::RefCountPtr<Semaphore> SemaphoreHandle;
 typedef Core::RefCountPtr<Shader> ShaderHandle;
 
 // ---------- INSTANCE RELATED ----------
