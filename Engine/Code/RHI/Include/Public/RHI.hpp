@@ -287,10 +287,10 @@ enum class BufferUsage
 
 enum class MemoryAccess
 {
-	GpuOnly,
-	Upload,
-	Readback,
-	Dynamic
+	GpuOnly,	// Only in VRAM
+	Upload,		// Only in RAM, can be copied by GPU
+	Readback,	// Only in RAM, written by GPU
+	Dynamic		// Only in VRAM, can be copied by CPU (max size of copies depends on ReBAR enabling)
 };
 
 enum class PipelineStage
