@@ -50,6 +50,7 @@ typedef Core::RefCountPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
 typedef Core::RefCountPtr<Device> DeviceHandle;
 typedef Core::RefCountPtr<Fence> FenceHandle;
 typedef Core::RefCountPtr<GraphicsPipeline> GraphicsPipelineHandle;
+typedef Core::RefCountPtr<Image> ImageHandle;
 typedef Core::RefCountPtr<Instance> InstanceHandle;
 typedef Core::RefCountPtr<Pipeline> PipelineHandle;
 typedef Core::RefCountPtr<PipelineLayout> PipelineLayoutHandle;
@@ -60,7 +61,6 @@ typedef Core::RefCountPtr<Semaphore> SemaphoreHandle;
 typedef Core::RefCountPtr<Shader> ShaderHandle;
 typedef Core::RefCountPtr<Surface> SurfaceHandle;
 typedef Core::RefCountPtr<Swapchain> SwapchainHandle;
-typedef Core::RefCountPtr<Image> ImageHandle;
 
 // ---------- INSTANCE RELATED ----------
 struct Version
