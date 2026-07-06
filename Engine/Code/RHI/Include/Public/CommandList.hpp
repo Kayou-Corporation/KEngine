@@ -49,15 +49,15 @@ public:
 	//----------- Set Buffer / Image Data --------------//
 	KENGINE_API virtual void SetBufferData(BufferHandle buffer, void* data, uint32_t size, uint32_t offset) = 0;
 	KENGINE_API virtual void CopyBufferToBuffer(BufferHandle srcBuffer, uint32_t srcOffset, BufferHandle dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) = 0;
-	KENGINE_API virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) = 0;
+	KENGINE_API virtual void SetImageData(ImageHandle image, void* data, uint32_t size) = 0;
 	// TODO : Implement Mips properly
-	KENGINE_API virtual void CopyImageToImage(Core::RefCountPtr<Image> srcImage, Extent3D srcOffset, Core::RefCountPtr<Image> dstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) = 0;
-	//KENGINE_API virtual void CopyImageToBuffer(Core::RefCountPtr<Image> srcImage, BufferHandle dstBuffer);	
-	//KENGINE_API virtual void CopyBufferToImage(BufferHandle srcBuffer, Core::RefCountPtr<Image> dstImage);
+	KENGINE_API virtual void CopyImageToImage(ImageHandle srcImage, Extent3D srcOffset, ImageHandle dstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) = 0;
+	//KENGINE_API virtual void CopyImageToBuffer(ImageHandle srcImage, BufferHandle dstBuffer);	
+	//KENGINE_API virtual void CopyBufferToImage(BufferHandle srcBuffer, ImageHandle dstImage);
 
 
 	//----------- Transition Image Layout --------------//
-	KENGINE_API virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) = 0;
+	KENGINE_API virtual void TransitionImageLayout(ImageHandle image, Layout dstLayout) = 0;
 
 	//----------- Pipeline --------------//
 	KENGINE_API virtual void BindPipeline(PipelineHandle RHIPipeline) = 0;

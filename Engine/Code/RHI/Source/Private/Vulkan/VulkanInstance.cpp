@@ -75,7 +75,7 @@ void VulkanInstance::Destroy()
 	m_handle.destroy();
 }
 
-Core::RefCountPtr<Surface> VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
+SurfaceHandle VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
 {
 	Core::RefCountPtr<Core::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
 	Core::RefCountPtr<Core::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Core::VulkanWindowRenderer>();
@@ -87,7 +87,7 @@ Core::RefCountPtr<Surface> VulkanInstance::CreateSurface(const SurfaceSpecs& spe
 	return Surface;
 }
 
-void VulkanInstance::DestroySurface(Core::RefCountPtr<Surface> surface)
+void VulkanInstance::DestroySurface(SurfaceHandle surface)
 {
 	m_handle.destroySurfaceKHR(surface.CastAs<VulkanSurface>()->GetHandle());
 }

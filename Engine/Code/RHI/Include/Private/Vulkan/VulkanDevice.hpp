@@ -77,9 +77,9 @@ public:
 
 
     //----------- Swapchain --------------// 
-    virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) override;
-    virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) override;
-    virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, SemaphoreHandle Semaphore) override;
+    virtual SwapchainHandle CreateSwapchain(const SwapchainSpecs& specs) override;
+    virtual void DestroySwapchain(SwapchainHandle swapchain) override;
+    virtual uint32_t AcquirreNextImage(SwapchainHandle swapchain, SemaphoreHandle Semaphore) override;
     virtual bool Present(const PresentInfo& presentInfo) override;
 
 
@@ -89,11 +89,11 @@ public:
 
 
     //-------------- Image --------------// 
-    virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) override;
-    virtual void DestroyImage(Core::RefCountPtr<Image> image) override;
-    virtual std::vector<Core::RefCountPtr<Image>> CreatePresentationImages(Core::RefCountPtr<Swapchain> swapchain) override;
-    virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) override;
-    virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) override;
+    virtual ImageHandle CreateImage(const ImageSpecs& specs) override;
+    virtual void DestroyImage(ImageHandle image) override;
+    virtual std::vector<ImageHandle> CreatePresentationImages(SwapchainHandle swapchain) override;
+    virtual void DestroyPresentationImages(std::vector<ImageHandle> presentationImages) override;
+    virtual ImageHandle CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, SwapchainHandle swapchain) override;
 
     // -------------- Sampler -------------- // 
     virtual SamplerHandle CreateSampler(const SamplerSpecs& specs) override;
@@ -119,8 +119,8 @@ public:
     virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet) override;
     virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
     virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
-    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, SamplerHandle sampler) override;
-    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, ImageHandle image, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, ImageHandle image, SamplerHandle sampler) override;
     virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) override;
     virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) override;
 
@@ -134,7 +134,7 @@ public:
     //KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
     virtual void DestroyPipeline(PipelineHandle pipeline) override;
 
-    virtual void UpdateCompatibility(Core::RefCountPtr<Surface> surface) override;
+    virtual void UpdateCompatibility(SurfaceHandle surface) override;
 
 // Public vulkan
 public:

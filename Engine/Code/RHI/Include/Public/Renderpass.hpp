@@ -6,7 +6,7 @@ BEGIN_NAMESPACE_RHI
 
 struct RenderingAttachment
 {
-	Core::RefCountPtr<Image> image;
+	ImageHandle image;
 	Layout layout;
 
 	LoadOp loadOp;

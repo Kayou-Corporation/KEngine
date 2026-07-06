@@ -12,7 +12,7 @@ class Surface;
 
 struct SwapchainSpecs
 {
-	Core::RefCountPtr<Surface> surface;
+	SurfaceHandle surface;
 
 	Extent2D extent;
 

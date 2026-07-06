@@ -27,8 +27,8 @@ public:
 	KENGINE_API virtual void Create(const InstanceSpecs& specs) = 0;
 	KENGINE_API virtual void Destroy() = 0;
 
-	KENGINE_API virtual Core::RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) = 0;
-	KENGINE_API virtual void DestroySurface(Core::RefCountPtr<Surface> surface) = 0;
+	KENGINE_API virtual SurfaceHandle CreateSurface(const SurfaceSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySurface(SurfaceHandle surface) = 0;
 
 	KENGINE_API virtual DeviceHandle CreateDevice(const DeviceSpecs& specs) = 0;
 	KENGINE_API virtual void DestroyDevice(DeviceHandle device) = 0;

@@ -210,7 +210,7 @@ int main()
     
     instance->Create(test);
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::Surface> surface = instance->CreateSurface({ window });
+    Kayou::RHI::SurfaceHandle surface = instance->CreateSurface({ window });
 
     Kayou::RHI::DeviceSpecs dSpecs;
     dSpecs.gpuType = Kayou::RHI::GpuType::Discrete;
@@ -229,8 +229,7 @@ int main()
     sSpecs.imageFormat = Kayou::RHI::Format::BGRA8_SRGB;
     sSpecs.isDepthEnable = true;
     sSpecs.depthImageFormat = Kayou::RHI::Format::D32_SFLOAT;
-
-    Kayou::Core::RefCountPtr<Kayou::RHI::Swapchain> swapchain = device->CreateSwapchain(sSpecs);
+    Kayou::RHI::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
 #pragma endregion
 
     // Vertex Buffer 
@@ -260,7 +259,7 @@ int main()
     textureImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Color;
     textureImageSpecs.usages = { Kayou::RHI::ImageUsage::TransferDst, Kayou::RHI::ImageUsage::ShaderSampled };
     textureImageSpecs.extent = { static_cast<uint32_t>(t_texWidth), static_cast<uint32_t>(t_texHeight), 1 };
-    Kayou::Core::RefCountPtr<Kayou::RHI::Image> textureImage = device->CreateImage(textureImageSpecs);
+    Kayou::RHI::ImageHandle textureImage = device->CreateImage(textureImageSpecs);
 
     // Base Sampler
     Kayou::RHI::SamplerSpecs samplerSpecs;
@@ -337,7 +336,7 @@ int main()
     device->SubmitCommandList(copyUniformDataCommandList, submitInfocopyUniformData);
 
     // Presentation images
-    std::vector<Kayou::Core::RefCountPtr<Kayou::RHI::Image>> presentationImages = device->CreatePresentationImages(swapchain);
+    std::vector<Kayou::RHI::ImageHandle> presentationImages = device->CreatePresentationImages(swapchain);
     
     // depth images
     Kayou::RHI::SwapchainImageSpecs depthImageSpecs; 
@@ -348,7 +347,7 @@ int main()
     depthImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
     depthImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Depth;
 
-    Kayou::Core::RefCountPtr<Kayou::RHI::Image> depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+    Kayou::RHI::ImageHandle depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
 
     // Timeline
     Kayou::RHI::SemaphoreSpecs timelineSpecs;

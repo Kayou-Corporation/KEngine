@@ -41,11 +41,11 @@ public:
 	//----------- Set Buffer / Image Data --------------//
 	virtual void SetBufferData(BufferHandle buffer, void* data, uint32_t size, uint32_t offset) override;
 	virtual void CopyBufferToBuffer(BufferHandle srcBuffer, uint32_t srcOffset, BufferHandle dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) override;
-	virtual void SetImageData(Core::RefCountPtr<Image> image, void* data, uint32_t size) override;
-	virtual void CopyImageToImage(Core::RefCountPtr<Image> srcImage, Extent3D srcOffset, Core::RefCountPtr<Image> dstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) override;
+	virtual void SetImageData(ImageHandle image, void* data, uint32_t size) override;
+	virtual void CopyImageToImage(ImageHandle srcImage, Extent3D srcOffset, ImageHandle dstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage = true, bool returnDstImageToInitialStage = true) override;
 
 	//----------- Transition Image Layout --------------//
-	virtual void TransitionImageLayout(Core::RefCountPtr<Image> image, Layout dstLayout) override;
+	virtual void TransitionImageLayout(ImageHandle image, Layout dstLayout) override;
 
 	//----------- Pipeline --------------//
 	virtual void BindPipeline(PipelineHandle RHIPipeline) override;

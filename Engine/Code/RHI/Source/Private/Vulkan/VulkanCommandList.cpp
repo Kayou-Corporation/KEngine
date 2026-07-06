@@ -255,7 +255,7 @@ void VulkanCommandList::CopyBufferToBuffer(BufferHandle RHISrcBuffer, uint32_t s
 	}
 }
 
-void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* data, uint32_t size)
+void VulkanCommandList::SetImageData(ImageHandle RHIImage, void* data, uint32_t size)
 {
 	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
 
@@ -346,7 +346,7 @@ void VulkanCommandList::SetImageData(Core::RefCountPtr<Image> RHIImage, void* da
 	cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, nullptr, nullptr, transitionToFinalLayout);
 }
 
-void VulkanCommandList::CopyImageToImage(Core::RefCountPtr<Image> RHISrcImage, Extent3D srcOffset, Core::RefCountPtr<Image> RHIDstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage, bool returnDstImageToInitialStage)
+void VulkanCommandList::CopyImageToImage(ImageHandle RHISrcImage, Extent3D srcOffset, ImageHandle RHIDstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage, bool returnDstImageToInitialStage)
 {
 	Core::RefCountPtr<VulkanImage> VulkanSrcImage = RHISrcImage.CastAs<VulkanImage>();
 	Core::RefCountPtr<VulkanImage> VulkanDstImage = RHIDstImage.CastAs<VulkanImage>();
@@ -406,7 +406,7 @@ void VulkanCommandList::CopyImageToImage(Core::RefCountPtr<Image> RHISrcImage, E
 }
 
 //----------- Transition Image Layout --------------//
-void VulkanCommandList::TransitionImageLayout(Core::RefCountPtr<Image> RHIImage, Layout RHIDstLayout)
+void VulkanCommandList::TransitionImageLayout(ImageHandle RHIImage, Layout RHIDstLayout)
 {
 	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
 

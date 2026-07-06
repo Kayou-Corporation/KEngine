@@ -16,7 +16,7 @@ struct DeviceSpecs
 	std::vector<Extensions> extensions;
 	std::vector<QueueType> queues;
 	bool searchPresentQueue;
-	Core::RefCountPtr<Surface> surface;
+	SurfaceHandle surface;
 };
 
 struct PresentInfo
@@ -24,7 +24,7 @@ struct PresentInfo
 	std::vector<SemaphoreHandle> waitSemaphores;
 	std::vector<uint64_t> waitSemaphoresValues;
 
-	Core::RefCountPtr<Swapchain> swapchain;
+	SwapchainHandle swapchain;
 	uint32_t imageIndex;
 };
 
@@ -52,9 +52,9 @@ public:
 	
 
 	//----------- Swapchain --------------// 
-	KENGINE_API virtual Core::RefCountPtr<Swapchain> CreateSwapchain(const SwapchainSpecs& specs) = 0;
-	KENGINE_API virtual void DestroySwapchain(Core::RefCountPtr<Swapchain> swapchain) = 0;
-	KENGINE_API virtual uint32_t AcquirreNextImage(Core::RefCountPtr<Swapchain> swapchain, SemaphoreHandle Semaphore) = 0;
+	KENGINE_API virtual SwapchainHandle CreateSwapchain(const SwapchainSpecs& specs) = 0;
+	KENGINE_API virtual void DestroySwapchain(SwapchainHandle swapchain) = 0;
+	KENGINE_API virtual uint32_t AcquirreNextImage(SwapchainHandle swapchain, SemaphoreHandle Semaphore) = 0;
 	KENGINE_API virtual bool Present(const PresentInfo& presentInfo) = 0;
 
 
@@ -64,11 +64,11 @@ public:
 
 
 	// -------------- Image -------------- // 
-	KENGINE_API virtual Core::RefCountPtr<Image> CreateImage(const ImageSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyImage(Core::RefCountPtr<Image> image) = 0;
-	KENGINE_API virtual std::vector<Core::RefCountPtr<Image>> CreatePresentationImages(Core::RefCountPtr<Swapchain> swapchain) = 0;
-	KENGINE_API virtual void DestroyPresentationImages(std::vector<Core::RefCountPtr<Image>> presentationImages) = 0;
-	KENGINE_API virtual Core::RefCountPtr<Image> CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, Core::RefCountPtr<Swapchain> swapchain) = 0; // Use classic Destroy
+	KENGINE_API virtual ImageHandle CreateImage(const ImageSpecs& specs) = 0;
+	KENGINE_API virtual void DestroyImage(ImageHandle image) = 0;
+	KENGINE_API virtual std::vector<ImageHandle> CreatePresentationImages(SwapchainHandle swapchain) = 0;
+	KENGINE_API virtual void DestroyPresentationImages(std::vector<ImageHandle> presentationImages) = 0;
+	KENGINE_API virtual ImageHandle CreateImagesWithSwapchain(const SwapchainImageSpecs& specs, SwapchainHandle swapchain) = 0; // Use classic Destroy
 
 	// -------------- Sampler -------------- // 
 	KENGINE_API virtual SamplerHandle CreateSampler(const SamplerSpecs& specs) = 0;
@@ -94,8 +94,8 @@ public:
 	KENGINE_API virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet) = 0;
 	KENGINE_API virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
 	KENGINE_API virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
-	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, Core::RefCountPtr<Image> image, SamplerHandle sampler) = 0;
-	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, Core::RefCountPtr<Image> image, SamplerHandle sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, ImageHandle image, SamplerHandle sampler) = 0;
+	KENGINE_API virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, ImageHandle image, SamplerHandle sampler) = 0;
 	KENGINE_API virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) = 0;
 	KENGINE_API virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) = 0;
 
@@ -109,7 +109,7 @@ public:
 	//KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
 	KENGINE_API virtual void DestroyPipeline(PipelineHandle pipeline) = 0;
 
-	KENGINE_API virtual void UpdateCompatibility(Core::RefCountPtr<Surface> surface) = 0;
+	KENGINE_API virtual void UpdateCompatibility(SurfaceHandle surface) = 0;
 
 
 protected:

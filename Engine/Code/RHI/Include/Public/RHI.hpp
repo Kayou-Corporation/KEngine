@@ -58,6 +58,9 @@ typedef Core::RefCountPtr<RenderPass> RenderPassLayout;
 typedef Core::RefCountPtr<Sampler> SamplerHandle;
 typedef Core::RefCountPtr<Semaphore> SemaphoreHandle;
 typedef Core::RefCountPtr<Shader> ShaderHandle;
+typedef Core::RefCountPtr<Surface> SurfaceHandle;
+typedef Core::RefCountPtr<Swapchain> SwapchainHandle;
+typedef Core::RefCountPtr<Image> ImageHandle;
 
 // ---------- INSTANCE RELATED ----------
 struct Version

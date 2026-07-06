@@ -15,8 +15,8 @@ public:
 	virtual void Create(const InstanceSpecs& specs) override;
 	virtual void Destroy() override;
 
-	virtual Core::RefCountPtr<Surface> CreateSurface(const SurfaceSpecs& specs) override;
-	virtual void DestroySurface(Core::RefCountPtr<Surface> surface) override;
+	virtual SurfaceHandle CreateSurface(const SurfaceSpecs& specs) override;
+	virtual void DestroySurface(SurfaceHandle surface) override;
 
 	virtual DeviceHandle CreateDevice(const DeviceSpecs& specs) override;
 	virtual void DestroyDevice(DeviceHandle device) override;
