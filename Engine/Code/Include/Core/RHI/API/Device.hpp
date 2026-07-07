@@ -3,8 +3,8 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Public/RHI.hpp"
-#include "Public/Shader.hpp"
+#include "RHI/API/RHI.hpp"
+#include "RHI/API/Shader.hpp"
 
 BEGIN_NAMESPACE_RHI
 

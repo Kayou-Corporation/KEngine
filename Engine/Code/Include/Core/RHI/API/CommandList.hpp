@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Public/RHI.hpp"
+#include "RHI/API/RHI.hpp"
 
 #include <vector>
 

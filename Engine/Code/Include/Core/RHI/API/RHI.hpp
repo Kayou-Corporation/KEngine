@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Utils/Core.hpp"
 #include "Utils/Export.hpp"
 #include "Utils/Memory.hpp"

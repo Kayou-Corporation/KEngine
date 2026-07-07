@@ -1,4 +1,16 @@
 # --------------------------------------- #
+#              ENGINE CMAKE               #
+# --------------------------------------- #
+
+# --------------------------------------- #
+#              UTILS                      #
+# --------------------------------------- #
+set(K_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Code/Include")
+set(K_SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Code/Source")
+
+set(K_ENGINE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Code/Source/Engine.cpp")
+
+# --------------------------------------- #
 #              FIND PACKAGES              #
 # --------------------------------------- #
 add_subdirectory(Libs)
@@ -21,9 +33,7 @@ set(K_TARGET_NAME KEngine)
 #---------------------------------------#
 #            BUILD MODE                 #
 #---------------------------------------#
-set(DUMMY_SOURCE "Code/Dummy.cpp")
-
-add_library(${K_TARGET_NAME} SHARED ${DUMMY_SOURCE})
+add_library(${K_TARGET_NAME} SHARED ${K_ENGINE_PATH})
 
 #---------------------------------------#
 #                COMPILE MODE           #
@@ -54,15 +64,19 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Disable C and C++ compiler extensions.
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(Code/Core)
-add_subdirectory(Code/RHI)
+#---------------------------------------#
+#                MODULE LIST            #
+#---------------------------------------#
+add_subdirectory(${K_INCLUDE_PATH}/CORE)
+target_link_libraries(${K_TARGET_NAME} PUBLIC CORE)
+
 target_link_libraries(${K_TARGET_NAME} PUBLIC stb)
 
 #target_include_directories(${K_TARGET_NAME} "Libs/Stbimage")
 
-if (LINK_RHI)
-    target_link_libraries(${K_TARGET_NAME} PUBLIC RHI)
-endif()
+#if (LINK_RHI)
+#    target_link_libraries(${K_TARGET_NAME} PUBLIC RHI)
+#endif()
 
 
 #---------------------------------------#

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RHI.hpp"
-#include "PipelineCommon.hpp"
+#include "RHI/API/RHI.hpp"
+#include "RHI/API/PipelineCommon.hpp"
 
 BEGIN_NAMESPACE_RHI
 
