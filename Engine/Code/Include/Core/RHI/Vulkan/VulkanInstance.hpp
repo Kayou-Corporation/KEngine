@@ -4,7 +4,7 @@
 
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanInstance : public Instance
 {
@@ -37,4 +37,4 @@ private:
 	vk::detail::DispatchLoaderDynamic m_dispatchLoader;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

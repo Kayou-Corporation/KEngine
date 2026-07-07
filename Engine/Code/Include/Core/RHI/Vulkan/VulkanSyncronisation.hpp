@@ -4,7 +4,7 @@
 
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanSemaphore : public Semaphore
 {
@@ -40,4 +40,4 @@ private:
 	vk::Fence m_handle;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

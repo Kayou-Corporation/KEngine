@@ -12,7 +12,7 @@
 
 #include "Utils/File.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct VertexAttributeLayout
 {
@@ -295,4 +295,4 @@ bool ShaderCompiler::CheckIsFileOpenOrValid(T& file, const std::string& name) co
     return false;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

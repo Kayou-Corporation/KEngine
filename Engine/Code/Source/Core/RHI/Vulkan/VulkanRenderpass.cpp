@@ -3,7 +3,7 @@
 #include "RHI/Vulkan/VulkanTranslate.hpp"
 #include "RHI/Vulkan/VulkanImage.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 vk::RenderingAttachmentInfo VulkanRenderpass::GetRenderingAttachmentInfo(const RenderingAttachment& attachment)
 {
@@ -32,4 +32,4 @@ vk::RenderingAttachmentInfo VulkanRenderpass::GetRenderingAttachmentInfo(const R
 	return renderingAttachment;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

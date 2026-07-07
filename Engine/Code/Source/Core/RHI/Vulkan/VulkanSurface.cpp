@@ -1,6 +1,6 @@
 #include "RHI/Vulkan/VulkanSurface.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 void VulkanSurface::SetHandle(vk::SurfaceKHR& surface)
 {
@@ -12,4 +12,4 @@ void VulkanSurface::SetHandle(VkSurfaceKHR& surface)
 	m_handle = surface;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

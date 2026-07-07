@@ -2,7 +2,7 @@
 
 #include "RHI.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class DescriptorSetLayout : virtual public Core::IResource
 {
@@ -81,4 +81,4 @@ protected:
 
 
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

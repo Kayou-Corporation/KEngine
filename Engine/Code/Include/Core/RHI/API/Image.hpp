@@ -5,7 +5,7 @@
 
 #include "RHI/API/RHI.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct ImageSpecs
 {
@@ -63,4 +63,4 @@ protected:
 	Layout m_rhiCurrentLayout = Layout::Undefined;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

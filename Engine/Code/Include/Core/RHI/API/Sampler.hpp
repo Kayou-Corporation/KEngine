@@ -2,7 +2,7 @@
 
 #include "RHI/API/RHI.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct SamplerSpecs 
 {
@@ -35,4 +35,4 @@ public:
 
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

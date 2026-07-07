@@ -4,12 +4,7 @@
 #include "Utils/Export.hpp"
 #include "Utils/Memory.hpp"
 
-#define RHI_NAMESPACE RHI
-
-#define BEGIN_NAMESPACE_RHI BEGIN_NAMESPACE_KAYOU namespace RHI_NAMESPACE {
-#define END_NAMESPACE_RHI } /* namespace RHI_NAMESPACE */ END_NAMESPACE_KAYOU
-
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 // ---------- FORWARD DECLARATIONS ----------
 class Buffer;
@@ -488,4 +483,4 @@ enum class CompareOp
 	Always
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

@@ -1,6 +1,6 @@
 #include "RHI/API/PipelineCommon.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 DescriptorSetLayoutHandle PipelineLayout::GetDescriptorSetLayout(std::string name) const
 {
@@ -75,4 +75,4 @@ PushConstantLayoutHandle PipelineLayout::GetPushConstantLayouts(std::string name
 	return EmptyPushConstantLayout;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

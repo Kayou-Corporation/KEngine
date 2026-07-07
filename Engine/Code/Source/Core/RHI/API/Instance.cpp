@@ -2,7 +2,7 @@
 
 #include "RHI/Vulkan/VulkanInstance.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 InstanceHandle RendererInterface::InitRenderer(Core::RendererAPI api)
 {
@@ -17,4 +17,4 @@ InstanceHandle RendererInterface::InitRenderer(Core::RendererAPI api)
 	return nullptr;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

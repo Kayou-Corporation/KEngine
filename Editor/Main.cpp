@@ -203,89 +203,89 @@ int main()
     mdl.model = glm::transpose(model);
     mdl.normal = normalMatrix;
 
-    RHI::InstanceHandle instance = RHI::RendererInterface::InitRenderer(Core::RendererAPI::Vulkan);
+    Core::InstanceHandle instance = Core::RendererInterface::InitRenderer(Core::RendererAPI::Vulkan);
 
-    RHI::InstanceSpecs test;
+    Core::InstanceSpecs test;
     test.window = window;
-    test.appVersion = RHI::Version(0, 0, 1);
-    test.engineVersion = RHI::Version(0, 0, 1);
-    test.debugLayers = {RHI::DebugLayers::Validation };
+    test.appVersion = Core::Version(0, 0, 1);
+    test.engineVersion = Core::Version(0, 0, 1);
+    test.debugLayers = {Core::DebugLayers::Validation };
     
     instance->Create(test);
 
-    RHI::SurfaceHandle surface = instance->CreateSurface({ window });
+    Core::SurfaceHandle surface = instance->CreateSurface({ window });
 
-    RHI::DeviceSpecs dSpecs;
-    dSpecs.gpuType = RHI::GpuType::Discrete;
-    dSpecs.extensions = {RHI::Extensions::Swapchain, RHI::Extensions::DynamicRendering, RHI::Extensions::ShaderObject };
-    dSpecs.queues = {RHI::QueueType::Graphics };
+    Core::DeviceSpecs dSpecs;
+    dSpecs.gpuType = Core::GpuType::Discrete;
+    dSpecs.extensions = {Core::Extensions::Swapchain, Core::Extensions::DynamicRendering, Core::Extensions::ShaderObject };
+    dSpecs.queues = {Core::QueueType::Graphics };
     dSpecs.searchPresentQueue = true;
     dSpecs.surface = surface;
 
-    RHI::DeviceHandle device = instance->CreateDevice(dSpecs);
+    Core::DeviceHandle device = instance->CreateDevice(dSpecs);
 
-    RHI::SwapchainSpecs sSpecs;
+    Core::SwapchainSpecs sSpecs;
     sSpecs.surface = surface;
-    sSpecs.extent = RHI::Extent2D(window->GetWidth(), window->GetHeight());
+    sSpecs.extent = Core::Extent2D(window->GetWidth(), window->GetHeight());
     sSpecs.imageCount = 2;
-    sSpecs.presentMode = RHI::PresentMode::Mailbox;
-    sSpecs.imageFormat = RHI::Format::BGRA8_SRGB;
+    sSpecs.presentMode = Core::PresentMode::Mailbox;
+    sSpecs.imageFormat = Core::Format::BGRA8_SRGB;
     sSpecs.isDepthEnable = true;
-    sSpecs.depthImageFormat = RHI::Format::D32_SFLOAT;
-    RHI::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
+    sSpecs.depthImageFormat = Core::Format::D32_SFLOAT;
+    Core::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
 #pragma endregion
 
     // Vertex Buffer 
-    RHI::BufferSpecs vertexbufferSpecs{};
-    vertexbufferSpecs.primaryUsage = RHI::BufferUsage::Vertex;
-    vertexbufferSpecs.additionalUsages = { RHI::BufferUsage::TransferDst };
+    Core::BufferSpecs vertexbufferSpecs{};
+    vertexbufferSpecs.primaryUsage = Core::BufferUsage::Vertex;
+    vertexbufferSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
     vertexbufferSpecs.size = meshVertices.size() * sizeof(Vertex);
-    vertexbufferSpecs.memoryAccess = RHI::MemoryAccess::GpuOnly;
-    vertexbufferSpecs.pipelineStage = RHI::PipelineStage::VertexInput;
-    RHI::BufferHandle vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
+    vertexbufferSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    vertexbufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
+    Core::BufferHandle vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
     
     // Index Buffer
-    RHI::BufferSpecs indexBufferSpecs{};
-    indexBufferSpecs.primaryUsage = RHI::BufferUsage::Index;
-    indexBufferSpecs.additionalUsages = { RHI::BufferUsage::TransferDst };
+    Core::BufferSpecs indexBufferSpecs{};
+    indexBufferSpecs.primaryUsage = Core::BufferUsage::Index;
+    indexBufferSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
     indexBufferSpecs.size = meshIndices.size() * sizeof(uint32_t);
-    indexBufferSpecs.memoryAccess = RHI::MemoryAccess::GpuOnly;
-    indexBufferSpecs.pipelineStage = RHI::PipelineStage::VertexInput;
-    RHI::BufferHandle indexBuffer = device->CreateBuffer(indexBufferSpecs);
+    indexBufferSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    indexBufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
+    Core::BufferHandle indexBuffer = device->CreateBuffer(indexBufferSpecs);
 
     // Base Texture
-    RHI::ImageSpecs textureImageSpecs;
-    textureImageSpecs.format = RHI::Format::RGBA8_SRGB;
-    textureImageSpecs.targetLayout = RHI::Layout::ShaderReadOnly;
-    textureImageSpecs.type = RHI::ImageType::Image2D;
-    textureImageSpecs.viewType = RHI::ImageViewType::Image2D;
-    textureImageSpecs.viewAspect = RHI::ImageViewAspect::Color;
-    textureImageSpecs.usages = { RHI::ImageUsage::TransferDst, RHI::ImageUsage::ShaderSampled };
+    Core::ImageSpecs textureImageSpecs;
+    textureImageSpecs.format = Core::Format::RGBA8_SRGB;
+    textureImageSpecs.targetLayout = Core::Layout::ShaderReadOnly;
+    textureImageSpecs.type = Core::ImageType::Image2D;
+    textureImageSpecs.viewType = Core::ImageViewType::Image2D;
+    textureImageSpecs.viewAspect = Core::ImageViewAspect::Color;
+    textureImageSpecs.usages = { Core::ImageUsage::TransferDst, Core::ImageUsage::ShaderSampled };
     textureImageSpecs.extent = { static_cast<uint32_t>(t_texWidth), static_cast<uint32_t>(t_texHeight), 1 };
-    RHI::ImageHandle textureImage = device->CreateImage(textureImageSpecs);
+    Core::ImageHandle textureImage = device->CreateImage(textureImageSpecs);
 
     // Base Sampler
-    RHI::SamplerSpecs samplerSpecs;
-    samplerSpecs.magFilter = RHI::Filter::Linear;
-    samplerSpecs.minFilter = RHI::Filter::Linear;
-    samplerSpecs.mipmapMode = RHI::SamplerMipmapMode::Linear;
-    samplerSpecs.addressU = RHI::SamplerAddressMode::Repeat;
-    samplerSpecs.addressV = RHI::SamplerAddressMode::Repeat;
-    samplerSpecs.addressW = RHI::SamplerAddressMode::Repeat;
+    Core::SamplerSpecs samplerSpecs;
+    samplerSpecs.magFilter = Core::Filter::Linear;
+    samplerSpecs.minFilter = Core::Filter::Linear;
+    samplerSpecs.mipmapMode = Core::SamplerMipmapMode::Linear;
+    samplerSpecs.addressU = Core::SamplerAddressMode::Repeat;
+    samplerSpecs.addressV = Core::SamplerAddressMode::Repeat;
+    samplerSpecs.addressW = Core::SamplerAddressMode::Repeat;
     samplerSpecs.mipLodBias = 0.0f;
     samplerSpecs.anisotropyEnable = false;
     samplerSpecs.maxAnisotropy = 1.0f;
     samplerSpecs.compareEnable = false;
-    samplerSpecs.compareOp = RHI::CompareOp::Always;
+    samplerSpecs.compareOp = Core::CompareOp::Always;
     samplerSpecs.minLod = 0.0f;
     samplerSpecs.maxLod = 0.0f;
-    samplerSpecs.borderColor = RHI::BorderColor::IntOpaqueBlack;
+    samplerSpecs.borderColor = Core::BorderColor::IntOpaqueBlack;
     samplerSpecs.unnormalizedCoordinates = false;
 
-    RHI::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
+    Core::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
 
 
-    RHI::CommandListHandle copyBufferDataCommandList = device->GetCommandList(RHI::QueueType::Graphics);
+    Core::CommandListHandle copyBufferDataCommandList = device->GetCommandList(Core::QueueType::Graphics);
 
     copyBufferDataCommandList->Open();
     
@@ -295,37 +295,37 @@ int main()
     
     copyBufferDataCommandList->SetImageData(textureImage, texturePixels, t_texWidth * t_texHeight * 4);
 
-    copyBufferDataCommandList->TransitionImageLayout(textureImage,RHI::Layout::ShaderReadOnly);
+    copyBufferDataCommandList->TransitionImageLayout(textureImage,Core::Layout::ShaderReadOnly);
 
     copyBufferDataCommandList->Close();
     
-    RHI::SubmitInfo submitInfocopyBufferData;
-    submitInfocopyBufferData.stage = RHI::PipelineStage::Transfer;
+    Core::SubmitInfo submitInfocopyBufferData;
+    submitInfocopyBufferData.stage = Core::PipelineStage::Transfer;
     
     device->SubmitCommandList(copyBufferDataCommandList, submitInfocopyBufferData);
 
     // Uniform buffer camera
-    RHI::BufferSpecs uniformCameraSpecs{};
-    uniformCameraSpecs.primaryUsage = RHI::BufferUsage::Uniform;
+    Core::BufferSpecs uniformCameraSpecs{};
+    uniformCameraSpecs.primaryUsage = Core::BufferUsage::Uniform;
     uniformCameraSpecs.size = sizeof(CameraData);
-    uniformCameraSpecs.memoryAccess = RHI::MemoryAccess::Upload;
-    uniformCameraSpecs.pipelineStage = RHI::PipelineStage::VertexShader;
+    uniformCameraSpecs.memoryAccess = Core::MemoryAccess::Upload;
+    uniformCameraSpecs.pipelineStage = Core::PipelineStage::VertexShader;
     uniformCameraSpecs.isPersistentMapped = true;
-    uniformCameraSpecs.additionalUsages = { RHI::BufferUsage::TransferDst };
-    RHI::BufferHandle uniformCamera = device->CreateBuffer(uniformCameraSpecs);
+    uniformCameraSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    Core::BufferHandle uniformCamera = device->CreateBuffer(uniformCameraSpecs);
 
 
     // Uniform buffer modelMatrix
-    RHI::BufferSpecs uniformModelSpecs{};
-    uniformModelSpecs.primaryUsage = RHI::BufferUsage::Uniform;
+    Core::BufferSpecs uniformModelSpecs{};
+    uniformModelSpecs.primaryUsage = Core::BufferUsage::Uniform;
     uniformModelSpecs.size = sizeof(Model);
-    uniformModelSpecs.memoryAccess = RHI::MemoryAccess::Upload;
-    uniformModelSpecs.pipelineStage = RHI::PipelineStage::VertexShader;
+    uniformModelSpecs.memoryAccess = Core::MemoryAccess::Upload;
+    uniformModelSpecs.pipelineStage = Core::PipelineStage::VertexShader;
     uniformModelSpecs.isPersistentMapped = true;
-    uniformModelSpecs.additionalUsages = { RHI::BufferUsage::TransferDst };
-    RHI::BufferHandle uniformModel = device->CreateBuffer(uniformModelSpecs);
+    uniformModelSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    Core::BufferHandle uniformModel = device->CreateBuffer(uniformModelSpecs);
 
-    auto copyUniformDataCommandList = device->GetCommandList(RHI::QueueType::Graphics);
+    auto copyUniformDataCommandList = device->GetCommandList(Core::QueueType::Graphics);
     copyUniformDataCommandList->Open();
 
     copyUniformDataCommandList->SetBufferData(uniformCamera, &initCam, sizeof(CameraData), 0);
@@ -333,86 +333,86 @@ int main()
 
     copyUniformDataCommandList->Close();
 
-    RHI::SubmitInfo submitInfocopyUniformData;
-    submitInfocopyUniformData.stage = RHI::PipelineStage::Transfer;
+    Core::SubmitInfo submitInfocopyUniformData;
+    submitInfocopyUniformData.stage = Core::PipelineStage::Transfer;
 
     device->SubmitCommandList(copyUniformDataCommandList, submitInfocopyUniformData);
 
     // Presentation images
-    std::vector<RHI::ImageHandle> presentationImages = device->CreatePresentationImages(swapchain);
+    std::vector<Core::ImageHandle> presentationImages = device->CreatePresentationImages(swapchain);
     
     // depth images
-    RHI::SwapchainImageSpecs depthImageSpecs; 
-    depthImageSpecs.imageType = RHI::SwapchainImageType::Depth;
-    depthImageSpecs.targetLayout = RHI::Layout::DepthStencilAttachment;
-    depthImageSpecs.type = RHI::ImageType::Image2D;
-    depthImageSpecs.usages = { RHI::ImageUsage::DepthStencilAttachment };
-    depthImageSpecs.viewType = RHI::ImageViewType::Image2D;
-    depthImageSpecs.viewAspect = RHI::ImageViewAspect::Depth;
+    Core::SwapchainImageSpecs depthImageSpecs; 
+    depthImageSpecs.imageType = Core::SwapchainImageType::Depth;
+    depthImageSpecs.targetLayout = Core::Layout::DepthStencilAttachment;
+    depthImageSpecs.type = Core::ImageType::Image2D;
+    depthImageSpecs.usages = { Core::ImageUsage::DepthStencilAttachment };
+    depthImageSpecs.viewType = Core::ImageViewType::Image2D;
+    depthImageSpecs.viewAspect = Core::ImageViewAspect::Depth;
 
-    RHI::ImageHandle depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+    Core::ImageHandle depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
 
     // Timeline
-    RHI::SemaphoreSpecs timelineSpecs;
-    timelineSpecs.type = RHI::SemaphoreType::Timeline;
-    RHI::SemaphoreHandle frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
+    Core::SemaphoreSpecs timelineSpecs;
+    timelineSpecs.type = Core::SemaphoreType::Timeline;
+    Core::SemaphoreHandle frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
 
     // Binary 
-    std::vector<RHI::SemaphoreHandle> imageAvailablesSemaphores;
-    std::vector<RHI::SemaphoreHandle> renderFinishedSemaphores;
+    std::vector<Core::SemaphoreHandle> imageAvailablesSemaphores;
+    std::vector<Core::SemaphoreHandle> renderFinishedSemaphores;
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i) 
     {
-        RHI::SemaphoreSpecs binarySpecs{};
-        binarySpecs.type = RHI::SemaphoreType::Binary;
+        Core::SemaphoreSpecs binarySpecs{};
+        binarySpecs.type = Core::SemaphoreType::Binary;
 
-        RHI::SemaphoreHandle imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
-        RHI::SemaphoreHandle renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
+        Core::SemaphoreHandle imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
+        Core::SemaphoreHandle renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
 
         imageAvailablesSemaphores.push_back(imageAvailableSemaphore);
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
 
-    RHI::ShaderHandle baseVert = device->CreateShader("base.vert", RHI::ShaderStage::Vertex, false, true);
-    RHI::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", RHI::ShaderStage::Fragment, false, true);
-    RHI::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", RHI::ShaderStage::Vertex, true, true);
+    Core::ShaderHandle baseVert = device->CreateShader("base.vert", Core::ShaderStage::Vertex, false, true);
+    Core::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Core::ShaderStage::Fragment, false, true);
+    Core::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", Core::ShaderStage::Vertex, true, true);
 
-    std::vector<RHI::DescriptorSetLayoutHandle> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
+    std::vector<Core::DescriptorSetLayoutHandle> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
 
-    RHI::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
+    Core::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
 
-    RHI::GraphicsPipelineSpecs unlitPipelineSpecs;
+    Core::GraphicsPipelineSpecs unlitPipelineSpecs;
     unlitPipelineSpecs.colorAttachmentCount = 1;
     unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
     unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
     unlitPipelineSpecs.viewportCount = 1;
     unlitPipelineSpecs.scissorCount = 1;
     unlitPipelineSpecs.lineWidth = 1;
-    unlitPipelineSpecs.cullmode = RHI::CullMode::Back;
-    unlitPipelineSpecs.frontFace = RHI::FrontFace::CounterClockWise;
-    unlitPipelineSpecs.SamplesCount = RHI::SampleCount::Count1;
+    unlitPipelineSpecs.cullmode = Core::CullMode::Back;
+    unlitPipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
+    unlitPipelineSpecs.SamplesCount = Core::SampleCount::Count1;
     unlitPipelineSpecs.blendColor = false;
     unlitPipelineSpecs.depthTest = true;
     unlitPipelineSpecs.depthWrite = true;
-    unlitPipelineSpecs.depthCompare = RHI::CompareOp::LessOrEqual;
-    unlitPipelineSpecs.dynamicStates = { RHI::DynamicState::ViewPort, RHI::DynamicState::Scissor };
-    unlitPipelineSpecs.topology = RHI::PrimitiveTopology::TriangleList;
+    unlitPipelineSpecs.depthCompare = Core::CompareOp::LessOrEqual;
+    unlitPipelineSpecs.dynamicStates = { Core::DynamicState::ViewPort, Core::DynamicState::Scissor };
+    unlitPipelineSpecs.topology = Core::PrimitiveTopology::TriangleList;
     unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
     unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
     
-    RHI::PipelineHandle unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
+    Core::PipelineHandle unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
     
     // DescriptorSet
-    RHI::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
-    RHI::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
+    Core::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
+    Core::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
     
-    RHI::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
-    RHI::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
+    Core::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
+    Core::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
-    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
-    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
-    device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", RHI::DescriptorType::SampledImage, textureImage, nullptr);
-    device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", RHI::DescriptorType::Sampler, sampler);
+    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
+    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Core::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
+    device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, textureImage, nullptr);
+    device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
     
     device->WaitIdle();
 
@@ -437,7 +437,7 @@ int main()
             // Recreate everything.
             uint32_t tWidth = window->GetWidth();
             uint32_t tHeight = window->GetHeight();
-            sSpecs.extent = RHI::Extent2D(tWidth, tHeight);
+            sSpecs.extent = Core::Extent2D(tWidth, tHeight);
             swapchain = device->CreateSwapchain(sSpecs);
             presentationImages = device->CreatePresentationImages(swapchain);
             depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
@@ -452,17 +452,17 @@ int main()
             resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
             resizeCam.cameraPos = editorCamera.GetPosition();
             
-            auto commandList = device->GetCommandList(RHI::QueueType::Graphics);
+            auto commandList = device->GetCommandList(Core::QueueType::Graphics);
             commandList->Open();
             commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
             commandList->Close();
             
-            RHI::SubmitInfo submitTransfer;
-            RHI::SubmitInfo submitInfo;
-            submitInfo.stage = RHI::PipelineStage::None;
+            Core::SubmitInfo submitTransfer;
+            Core::SubmitInfo submitInfo;
+            submitInfo.stage = Core::PipelineStage::None;
             
             device->SubmitCommandList(commandList, submitTransfer);
-            //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
+            //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
         }
     
         uint32_t maxFramesInFlight = swapchain->GetImageCount();
@@ -478,21 +478,21 @@ int main()
     
         device->RunGarbageCollector();
     
-        RHI::RenderingAttachment colorAttachment;
+        Core::RenderingAttachment colorAttachment;
         colorAttachment.image = presentationImages[imageIndex];
-        colorAttachment.layout = RHI::Layout::ColorAttachment;
-        colorAttachment.loadOp = RHI::LoadOp::Clear;
-        colorAttachment.storeOp = RHI::StoreOp::Store;
-        colorAttachment.clearValueColor = RHI::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
+        colorAttachment.layout = Core::Layout::ColorAttachment;
+        colorAttachment.loadOp = Core::LoadOp::Clear;
+        colorAttachment.storeOp = Core::StoreOp::Store;
+        colorAttachment.clearValueColor = Core::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
     
-        RHI::RenderingAttachment depthAttachment;
+        Core::RenderingAttachment depthAttachment;
         depthAttachment.image = depthImage;
-        depthAttachment.layout = RHI::Layout::DepthStencilAttachment;
-        depthAttachment.loadOp = RHI::LoadOp::Clear;
-        depthAttachment.storeOp = RHI::StoreOp::Store;
-        depthAttachment.clearValueDepth = RHI::ClearValue(1.0f, 0.f, 0.f, 0.f);
+        depthAttachment.layout = Core::Layout::DepthStencilAttachment;
+        depthAttachment.loadOp = Core::LoadOp::Clear;
+        depthAttachment.storeOp = Core::StoreOp::Store;
+        depthAttachment.clearValueDepth = Core::ClearValue(1.0f, 0.f, 0.f, 0.f);
     
-        RHI::RenderingInfo renderingInfo;
+        Core::RenderingInfo renderingInfo;
         renderingInfo.offset = { 0, 0 };
         renderingInfo.extent = { window->GetWidth(), window->GetHeight()};
         renderingInfo.layerCount = 1;
@@ -500,11 +500,11 @@ int main()
         renderingInfo.colorAttachments = { colorAttachment };
         renderingInfo.depthAttachment = depthAttachment;
     
-        auto commandList = device->GetCommandList(RHI::QueueType::Graphics);
+        auto commandList = device->GetCommandList(Core::QueueType::Graphics);
         commandList->Open();
     
-        commandList->TransitionImageLayout(presentationImages[imageIndex], RHI::Layout::ColorAttachment);
-        commandList->TransitionImageLayout(depthImage, RHI::Layout::DepthStencilAttachment);
+        commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::ColorAttachment);
+        commandList->TransitionImageLayout(depthImage, Core::Layout::DepthStencilAttachment);
     
         commandList->BeginRendering(renderingInfo);
     
@@ -513,8 +513,8 @@ int main()
     
         commandList->BindPipeline(unlitPipeline);
     
-        commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, RHI::PipelineBindPoint::Graphics);
-        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, RHI::PipelineBindPoint::Graphics);
+        commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Core::PipelineBindPoint::Graphics);
+        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
     
         commandList->BindVertexBuffer(vertexBuffer, 0);
         commandList->BindIndexBuffer(indexBuffer, 0);
@@ -523,22 +523,22 @@ int main()
     
         commandList->EndRendering();
     
-        commandList->TransitionImageLayout(presentationImages[imageIndex], RHI::Layout::Present);
+        commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::Present);
     
         commandList->Close();
     
         uint64_t signalValue = frameCounter + 1;
     
-        RHI::SubmitInfo submitInfo;
+        Core::SubmitInfo submitInfo;
         submitInfo.waitSemaphores = { imageAvailablesSemaphores[syncIndex] };
         submitInfo.waitSemaphoresValues = { 0 };
         submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[imageIndex] };
         submitInfo.signalSemaphoresValues = { signalValue, 0 };
-        submitInfo.stage = RHI::PipelineStage::ColorOutput;
+        submitInfo.stage = Core::PipelineStage::ColorOutput;
     
         device->SubmitCommandList(commandList, submitInfo);
     
-        RHI::PresentInfo presentInfo;
+        Core::PresentInfo presentInfo;
         presentInfo.waitSemaphores = { renderFinishedSemaphores[imageIndex] };
         presentInfo.swapchain = swapchain;
         presentInfo.imageIndex = imageIndex;

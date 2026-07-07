@@ -11,7 +11,7 @@ DISABLE_WARNINGS
 
 RESTORE_WARNINGS
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanImage : public Image
 {
@@ -77,4 +77,4 @@ private:
 	VmaAllocationInfo m_allocationInfo;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

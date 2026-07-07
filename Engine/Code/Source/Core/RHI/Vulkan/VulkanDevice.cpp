@@ -28,7 +28,7 @@ DISABLE_WARNINGS
 
 RESTORE_WARNINGS
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 
 // PUBLIC : 
@@ -1315,4 +1315,4 @@ void VulkanDevice::BuildFeaturesChain()
 	m_featuresChain.pNext = currentPNext;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

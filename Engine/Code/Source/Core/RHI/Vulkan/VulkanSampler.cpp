@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 vk::SamplerCreateInfo VulkanSampler::GetCreateInfo(SamplerSpecs specs, float maxDeviceAnisotropy)
 {
@@ -29,4 +29,4 @@ vk::SamplerCreateInfo VulkanSampler::GetCreateInfo(SamplerSpecs specs, float max
     return createInfo;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

@@ -1,6 +1,6 @@
 #include "RHI/Vulkan/VulkanPipelineCommon.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 VulkanBinding VulkanDescriptorSetLayout::GetBinding(std::string name)
 {
@@ -68,4 +68,4 @@ VulkanConstant VulkanPushConstantLayout::GetConstant(std::string name)
 	return VulkanConstant();
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

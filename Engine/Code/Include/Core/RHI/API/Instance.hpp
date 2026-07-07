@@ -11,7 +11,7 @@ namespace Kayou::Window
 	class Window;
 }
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct InstanceSpecs
 {
@@ -48,4 +48,4 @@ public:
 	static InstanceHandle InitRenderer(Core::RendererAPI api);
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

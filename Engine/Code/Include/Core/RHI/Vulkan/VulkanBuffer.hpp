@@ -11,7 +11,7 @@ DISABLE_WARNINGS
 
 RESTORE_WARNINGS
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanBuffer : public Buffer
 {
@@ -95,4 +95,4 @@ inline vk::AccessFlags GetWriteAccessFlagsFromUsage(vk::BufferUsageFlags usage)
 	return flags;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

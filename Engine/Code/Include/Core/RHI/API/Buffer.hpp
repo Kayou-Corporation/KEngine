@@ -2,7 +2,7 @@
 
 #include "RHI/API/RHI.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class Device;
 
@@ -39,4 +39,4 @@ protected:
 	bool m_isPersistentMapped = false;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

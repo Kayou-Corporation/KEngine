@@ -2,7 +2,7 @@
 
 #include "RHI/Vulkan/RHITranslate.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 vk::ImageCreateInfo VulkanImage::GetCreateInfo(const ImageSpecs& specs)
 {
@@ -185,4 +185,4 @@ uint32_t VulkanImage::GetFormatSize(vk::Format format)
 		return 0;
 	}
 }
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

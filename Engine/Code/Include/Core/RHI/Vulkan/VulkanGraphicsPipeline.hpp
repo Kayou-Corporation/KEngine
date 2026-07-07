@@ -5,7 +5,7 @@
 #include "RHI/Vulkan/VulkanUtils.hpp"
 #include "RHI/Vulkan/VulkanShader.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct VulkanGraphicsPipelineStructs
 {
@@ -59,4 +59,4 @@ private:
 	vk::Pipeline m_handle;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

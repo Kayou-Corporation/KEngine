@@ -8,7 +8,7 @@
 #include "RHI/Vulkan/VulkanBuffer.hpp"
 #include "RHI/Vulkan/VulkanImage.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanCommandList : public CommandList
 {
@@ -72,4 +72,4 @@ private:
 	QueueType m_OwnerQueueType;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

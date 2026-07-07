@@ -3,7 +3,7 @@
 
 #include "RHI/Vulkan/VulkanTranslate.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(const GraphicsPipelineSpecs& specs)
 {
@@ -185,4 +185,4 @@ vk::VertexInputAttributeDescription VulkanGraphicsPipeline::GetAttributeDescript
 	return attributeDescription;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

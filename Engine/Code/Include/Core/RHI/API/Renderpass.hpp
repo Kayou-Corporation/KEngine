@@ -2,7 +2,7 @@
 
 #include "RHI/API/RHI.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct RenderingAttachment
 {
@@ -63,4 +63,4 @@ public:
 //
 //vkCmdBeginRendering(cmdBuffer, &renderingInfo);
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

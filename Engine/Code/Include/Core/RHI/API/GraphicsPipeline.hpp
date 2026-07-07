@@ -3,7 +3,7 @@
 #include "RHI/API/RHI.hpp"
 #include "RHI/API/PipelineCommon.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct GraphicsPipelineSpecs
 {
@@ -41,4 +41,4 @@ class GraphicsPipeline : public Pipeline
 public:
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

@@ -7,7 +7,7 @@
 
 #include <map>
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanDescriptorSet : public DescriptorSet
 {
@@ -35,4 +35,4 @@ private:
 	std::vector<VulkanBinding> m_bindings;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

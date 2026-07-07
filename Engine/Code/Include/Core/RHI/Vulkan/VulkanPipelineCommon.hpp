@@ -4,7 +4,7 @@
 
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct VulkanBinding
 {
@@ -82,4 +82,4 @@ private:
 	vk::PipelineLayout m_layout;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

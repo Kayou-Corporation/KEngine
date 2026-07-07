@@ -3,7 +3,7 @@
 #include "RHI/API/RHI.hpp"
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 inline Format TranslateFromVulkan(vk::Format format)
 {
@@ -75,4 +75,4 @@ inline Extent3D TranslateFromVulkan(vk::Extent3D extent)
     return Extent3D(extent.width, extent.height, extent.depth);
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

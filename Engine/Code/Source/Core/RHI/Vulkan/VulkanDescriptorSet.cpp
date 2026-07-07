@@ -4,7 +4,7 @@
 #include "RHI/Vulkan/VulkanImage.hpp"
 #include "RHI/Vulkan/VulkanTranslate.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 vk::DescriptorSetAllocateInfo VulkanDescriptorSet::GetAllocInfo(vk::DescriptorSetLayout layout)
 {
@@ -37,4 +37,4 @@ vk::DescriptorPoolCreateInfo VulkanDescriptorSet::GetPoolCreateInfo(std::map<vk:
 	return createInfo;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

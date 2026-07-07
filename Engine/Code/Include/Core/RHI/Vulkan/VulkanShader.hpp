@@ -4,7 +4,7 @@
 
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanShader : public Shader
 {
@@ -21,4 +21,4 @@ private:
 	vk::ShaderModule m_module;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

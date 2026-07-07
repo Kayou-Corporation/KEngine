@@ -15,7 +15,7 @@ RESTORE_WARNINGS
 
 #include "RHI/API/RHI.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 // ---------- DEBUG LAYERS ---------------
 inline const char* TranslateToVulkan(DebugLayers layer)
@@ -1006,4 +1006,4 @@ inline vk::PipelineBindPoint TranslateToVulkan(PipelineBindPoint point)
     }
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

@@ -4,7 +4,7 @@
 
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanSampler : public Sampler
 {
@@ -21,4 +21,4 @@ private:
 	vk::Sampler m_handle;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

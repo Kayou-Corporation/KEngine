@@ -8,7 +8,7 @@
 #include"RHI/Vulkan/VulkanPipelineCommon.hpp"
 #include"RHI/Vulkan/VulkanDescriptorSet.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 //----------- Open / Close --------------//
 void VulkanCommandList::Open()
@@ -585,4 +585,4 @@ vk::AccessFlags VulkanCommandList::GetSrcAccessMask(vk::ImageLayout layout)
 	}
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

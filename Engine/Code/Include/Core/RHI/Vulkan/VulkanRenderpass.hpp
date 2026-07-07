@@ -4,7 +4,7 @@
 
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class VulkanRenderpass : public Renderpass
 {
@@ -16,4 +16,4 @@ public:
     static vk::RenderingAttachmentInfo GetRenderingAttachmentInfo(const RenderingAttachment& attachment);
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

@@ -7,7 +7,7 @@ namespace Kayou::Window
 	class Window;
 }
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class Instance;
 
@@ -22,4 +22,4 @@ public:
 	virtual ~Surface() = default;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

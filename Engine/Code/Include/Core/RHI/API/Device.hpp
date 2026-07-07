@@ -6,7 +6,7 @@
 #include "RHI/API/RHI.hpp"
 #include "RHI/API/Shader.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct DeviceSpecs
 {
@@ -117,4 +117,4 @@ protected:
 	std::unordered_map<std::string, ShaderHandle> m_compiledShaders{};
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

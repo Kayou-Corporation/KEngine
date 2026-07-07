@@ -2,7 +2,7 @@
 #include "RHI/Vulkan/VulkanCommandList.hpp"
 #include "RHI/Vulkan/VulkanDevice.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 QueueFamily QueueFamily::FindQueueFamily(const vk::PhysicalDevice& physicalDevice, std::vector<QueueType> queues, bool searchPresentQueue, const vk::SurfaceKHR& surface)
 {
@@ -270,4 +270,4 @@ void Queue::RunGarbageCollector(vk::Device& device)
     }
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

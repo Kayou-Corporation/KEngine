@@ -4,7 +4,7 @@
 
 #include <vector>
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct SubmitInfo
 {
@@ -63,4 +63,4 @@ public:
 	KENGINE_API virtual void BindPipeline(PipelineHandle RHIPipeline) = 0;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

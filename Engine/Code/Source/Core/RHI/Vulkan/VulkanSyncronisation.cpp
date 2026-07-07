@@ -1,6 +1,6 @@
 #include "RHI/Vulkan/VulkanSyncronisation.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 vk::SemaphoreCreateInfo VulkanSemaphore::GetCreateInfo(const SemaphoreSpecs& specs)
 {
@@ -18,4 +18,4 @@ vk::SemaphoreCreateInfo VulkanSemaphore::GetCreateInfo(const SemaphoreSpecs& spe
 	return createInfo;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

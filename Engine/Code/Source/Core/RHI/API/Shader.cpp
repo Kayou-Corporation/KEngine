@@ -6,7 +6,7 @@
 #include <map>
 #include <spdlog/spdlog.h>
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 std::string GetShaderName(const std::string& path)
 {
@@ -264,7 +264,7 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
             binding.stride = 0;
             binding.inputRate = VertexInputRate::PerVertex;
 
-            for (const Kayou::RHI::VertexAttributeLayout& attribute : bin.vertexAttributes)
+            for (const Kayou::Core::VertexAttributeLayout& attribute : bin.vertexAttributes)
             {
                 binding.stride += GetFormatSize(attribute.format);
             }
@@ -705,4 +705,4 @@ const VertexAttributeLayout Shader::GetVertexAttributeLayout(const std::string n
     return fallback;
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

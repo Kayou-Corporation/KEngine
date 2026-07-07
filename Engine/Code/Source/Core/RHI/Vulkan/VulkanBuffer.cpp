@@ -1,6 +1,6 @@
 #include "RHI/Vulkan/VulkanBuffer.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 vk::BufferCreateInfo VulkanBuffer::GetCreateInfo(const BufferSpecs& specs)
 {
@@ -39,4 +39,4 @@ vk::AccessFlags VulkanBuffer::GetAccessMask()
     return vk::AccessFlags{};
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

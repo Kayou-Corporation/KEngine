@@ -2,7 +2,7 @@
 
 #include "RHI/API/RHI.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 class Window;
 class Surface;
@@ -39,4 +39,4 @@ protected:
 	Format m_RHIdepthFormat;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

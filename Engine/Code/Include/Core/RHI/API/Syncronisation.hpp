@@ -2,7 +2,7 @@
 
 #include "RHI/API/RHI.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct SemaphoreSpecs
 {
@@ -23,4 +23,4 @@ public:
 	virtual ~Fence() = default;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

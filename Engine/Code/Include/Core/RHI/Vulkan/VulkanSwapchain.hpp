@@ -4,7 +4,7 @@
 
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct PhysicalDeviceCompatibiliy;
 
@@ -48,4 +48,4 @@ private:
 	vk::Extent2D m_imageExtent;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

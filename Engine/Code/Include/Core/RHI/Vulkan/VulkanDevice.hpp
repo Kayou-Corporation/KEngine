@@ -11,7 +11,7 @@ DISABLE_WARNINGS
 
 RESTORE_WARNINGS
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 struct PhysicalDevice 
 {
@@ -176,4 +176,4 @@ private:
     VmaAllocator m_memoryAllocator;
 };
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE

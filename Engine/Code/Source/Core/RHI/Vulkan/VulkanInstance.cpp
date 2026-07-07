@@ -9,7 +9,7 @@
 #include "RHI/Vulkan/VulkanSurface.hpp"
 #include "RHI/Vulkan/VulkanDevice.hpp"
 
-BEGIN_NAMESPACE_RHI
+BEGIN_NAMESPACE_CORE
 
 void VulkanInstance::Create(const InstanceSpecs& specs)
 {
@@ -189,4 +189,4 @@ void VulkanInstance::DestroyDevice(DeviceHandle device)
 	device.CastAs<VulkanDevice>()->Destroy();
 }
 
-END_NAMESPACE_RHI
+END_NAMESPACE_CORE
