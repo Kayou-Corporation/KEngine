@@ -18,6 +18,8 @@
 #include "RHI/API/RHI.hpp"
 #include "Camera/EditorCamera.hpp"
 
+USING_KAYOU
+
 DISABLE_WARNINGS
 
 #ifdef _MSC_VER
@@ -150,20 +152,20 @@ int main()
 #pragma endregion
 
 #pragma region Setup 
-    Kayou::Core::RefCountPtr<Kayou::Window::Window> window = Kayou::Window::WindowInterface::InitWindow(Kayou::Window::WindowAPI::SDL);
+    Core::RefCountPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
  
-    Kayou::Window::WindowSpecs specs;
+    Window::WindowSpecs specs;
     specs.width = 720;
     specs.height = 480;
     specs.name = "KEngine";
     specs.allowResize = true;
-    specs.rendererAPI = Kayou::Core::RendererAPI::Vulkan;
+    specs.rendererAPI = Core::RendererAPI::Vulkan;
     
     window->Create(specs);
 
     float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
 
-    Kayou::Core::EditorCamera editorCamera;
+    Core::EditorCamera editorCamera;
     editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
     editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
     editorCamera.SetFov(glm::radians(45.f));
@@ -201,89 +203,89 @@ int main()
     mdl.model = glm::transpose(model);
     mdl.normal = normalMatrix;
 
-    Kayou::RHI::InstanceHandle instance = Kayou::RHI::RendererInterface::InitRenderer(Kayou::Core::RendererAPI::Vulkan);
+    RHI::InstanceHandle instance = RHI::RendererInterface::InitRenderer(Core::RendererAPI::Vulkan);
 
-    Kayou::RHI::InstanceSpecs test;
+    RHI::InstanceSpecs test;
     test.window = window;
-    test.appVersion = Kayou::RHI::Version(0, 0, 1);
-    test.engineVersion = Kayou::RHI::Version(0, 0, 1);
-    test.debugLayers = {Kayou::RHI::DebugLayers::Validation };
+    test.appVersion = RHI::Version(0, 0, 1);
+    test.engineVersion = RHI::Version(0, 0, 1);
+    test.debugLayers = {RHI::DebugLayers::Validation };
     
     instance->Create(test);
 
-    Kayou::RHI::SurfaceHandle surface = instance->CreateSurface({ window });
+    RHI::SurfaceHandle surface = instance->CreateSurface({ window });
 
-    Kayou::RHI::DeviceSpecs dSpecs;
-    dSpecs.gpuType = Kayou::RHI::GpuType::Discrete;
-    dSpecs.extensions = {Kayou::RHI::Extensions::Swapchain, Kayou::RHI::Extensions::DynamicRendering, Kayou::RHI::Extensions::ShaderObject };
-    dSpecs.queues = {Kayou::RHI::QueueType::Graphics };
+    RHI::DeviceSpecs dSpecs;
+    dSpecs.gpuType = RHI::GpuType::Discrete;
+    dSpecs.extensions = {RHI::Extensions::Swapchain, RHI::Extensions::DynamicRendering, RHI::Extensions::ShaderObject };
+    dSpecs.queues = {RHI::QueueType::Graphics };
     dSpecs.searchPresentQueue = true;
     dSpecs.surface = surface;
 
-    Kayou::RHI::DeviceHandle device = instance->CreateDevice(dSpecs);
+    RHI::DeviceHandle device = instance->CreateDevice(dSpecs);
 
-    Kayou::RHI::SwapchainSpecs sSpecs;
+    RHI::SwapchainSpecs sSpecs;
     sSpecs.surface = surface;
-    sSpecs.extent = Kayou::RHI::Extent2D(window->GetWidth(), window->GetHeight());
+    sSpecs.extent = RHI::Extent2D(window->GetWidth(), window->GetHeight());
     sSpecs.imageCount = 2;
-    sSpecs.presentMode = Kayou::RHI::PresentMode::Mailbox;
-    sSpecs.imageFormat = Kayou::RHI::Format::BGRA8_SRGB;
+    sSpecs.presentMode = RHI::PresentMode::Mailbox;
+    sSpecs.imageFormat = RHI::Format::BGRA8_SRGB;
     sSpecs.isDepthEnable = true;
-    sSpecs.depthImageFormat = Kayou::RHI::Format::D32_SFLOAT;
-    Kayou::RHI::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
+    sSpecs.depthImageFormat = RHI::Format::D32_SFLOAT;
+    RHI::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
 #pragma endregion
 
     // Vertex Buffer 
-    Kayou::RHI::BufferSpecs vertexbufferSpecs{};
-    vertexbufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Vertex;
-    vertexbufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
+    RHI::BufferSpecs vertexbufferSpecs{};
+    vertexbufferSpecs.primaryUsage = RHI::BufferUsage::Vertex;
+    vertexbufferSpecs.additionalUsages = { RHI::BufferUsage::TransferDst };
     vertexbufferSpecs.size = meshVertices.size() * sizeof(Vertex);
-    vertexbufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GpuOnly;
-    vertexbufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
-    Kayou::RHI::BufferHandle vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
+    vertexbufferSpecs.memoryAccess = RHI::MemoryAccess::GpuOnly;
+    vertexbufferSpecs.pipelineStage = RHI::PipelineStage::VertexInput;
+    RHI::BufferHandle vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
     
     // Index Buffer
-    Kayou::RHI::BufferSpecs indexBufferSpecs{};
-    indexBufferSpecs.primaryUsage = Kayou::RHI::BufferUsage::Index;
-    indexBufferSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
+    RHI::BufferSpecs indexBufferSpecs{};
+    indexBufferSpecs.primaryUsage = RHI::BufferUsage::Index;
+    indexBufferSpecs.additionalUsages = { RHI::BufferUsage::TransferDst };
     indexBufferSpecs.size = meshIndices.size() * sizeof(uint32_t);
-    indexBufferSpecs.memoryAccess = Kayou::RHI::MemoryAccess::GpuOnly;
-    indexBufferSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexInput;
-    Kayou::RHI::BufferHandle indexBuffer = device->CreateBuffer(indexBufferSpecs);
+    indexBufferSpecs.memoryAccess = RHI::MemoryAccess::GpuOnly;
+    indexBufferSpecs.pipelineStage = RHI::PipelineStage::VertexInput;
+    RHI::BufferHandle indexBuffer = device->CreateBuffer(indexBufferSpecs);
 
     // Base Texture
-    Kayou::RHI::ImageSpecs textureImageSpecs;
-    textureImageSpecs.format = Kayou::RHI::Format::RGBA8_SRGB;
-    textureImageSpecs.targetLayout = Kayou::RHI::Layout::ShaderReadOnly;
-    textureImageSpecs.type = Kayou::RHI::ImageType::Image2D;
-    textureImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
-    textureImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Color;
-    textureImageSpecs.usages = { Kayou::RHI::ImageUsage::TransferDst, Kayou::RHI::ImageUsage::ShaderSampled };
+    RHI::ImageSpecs textureImageSpecs;
+    textureImageSpecs.format = RHI::Format::RGBA8_SRGB;
+    textureImageSpecs.targetLayout = RHI::Layout::ShaderReadOnly;
+    textureImageSpecs.type = RHI::ImageType::Image2D;
+    textureImageSpecs.viewType = RHI::ImageViewType::Image2D;
+    textureImageSpecs.viewAspect = RHI::ImageViewAspect::Color;
+    textureImageSpecs.usages = { RHI::ImageUsage::TransferDst, RHI::ImageUsage::ShaderSampled };
     textureImageSpecs.extent = { static_cast<uint32_t>(t_texWidth), static_cast<uint32_t>(t_texHeight), 1 };
-    Kayou::RHI::ImageHandle textureImage = device->CreateImage(textureImageSpecs);
+    RHI::ImageHandle textureImage = device->CreateImage(textureImageSpecs);
 
     // Base Sampler
-    Kayou::RHI::SamplerSpecs samplerSpecs;
-    samplerSpecs.magFilter = Kayou::RHI::Filter::Linear;
-    samplerSpecs.minFilter = Kayou::RHI::Filter::Linear;
-    samplerSpecs.mipmapMode = Kayou::RHI::SamplerMipmapMode::Linear;
-    samplerSpecs.addressU = Kayou::RHI::SamplerAddressMode::Repeat;
-    samplerSpecs.addressV = Kayou::RHI::SamplerAddressMode::Repeat;
-    samplerSpecs.addressW = Kayou::RHI::SamplerAddressMode::Repeat;
+    RHI::SamplerSpecs samplerSpecs;
+    samplerSpecs.magFilter = RHI::Filter::Linear;
+    samplerSpecs.minFilter = RHI::Filter::Linear;
+    samplerSpecs.mipmapMode = RHI::SamplerMipmapMode::Linear;
+    samplerSpecs.addressU = RHI::SamplerAddressMode::Repeat;
+    samplerSpecs.addressV = RHI::SamplerAddressMode::Repeat;
+    samplerSpecs.addressW = RHI::SamplerAddressMode::Repeat;
     samplerSpecs.mipLodBias = 0.0f;
     samplerSpecs.anisotropyEnable = false;
     samplerSpecs.maxAnisotropy = 1.0f;
     samplerSpecs.compareEnable = false;
-    samplerSpecs.compareOp = Kayou::RHI::CompareOp::Always;
+    samplerSpecs.compareOp = RHI::CompareOp::Always;
     samplerSpecs.minLod = 0.0f;
     samplerSpecs.maxLod = 0.0f;
-    samplerSpecs.borderColor = Kayou::RHI::BorderColor::IntOpaqueBlack;
+    samplerSpecs.borderColor = RHI::BorderColor::IntOpaqueBlack;
     samplerSpecs.unnormalizedCoordinates = false;
 
-    Kayou::RHI::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
+    RHI::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
 
 
-    Kayou::RHI::CommandListHandle copyBufferDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+    RHI::CommandListHandle copyBufferDataCommandList = device->GetCommandList(RHI::QueueType::Graphics);
 
     copyBufferDataCommandList->Open();
     
@@ -293,37 +295,37 @@ int main()
     
     copyBufferDataCommandList->SetImageData(textureImage, texturePixels, t_texWidth * t_texHeight * 4);
 
-    copyBufferDataCommandList->TransitionImageLayout(textureImage,Kayou::RHI::Layout::ShaderReadOnly);
+    copyBufferDataCommandList->TransitionImageLayout(textureImage,RHI::Layout::ShaderReadOnly);
 
     copyBufferDataCommandList->Close();
     
-    Kayou::RHI::SubmitInfo submitInfocopyBufferData;
-    submitInfocopyBufferData.stage = Kayou::RHI::PipelineStage::Transfer;
+    RHI::SubmitInfo submitInfocopyBufferData;
+    submitInfocopyBufferData.stage = RHI::PipelineStage::Transfer;
     
     device->SubmitCommandList(copyBufferDataCommandList, submitInfocopyBufferData);
 
     // Uniform buffer camera
-    Kayou::RHI::BufferSpecs uniformCameraSpecs{};
-    uniformCameraSpecs.primaryUsage = Kayou::RHI::BufferUsage::Uniform;
+    RHI::BufferSpecs uniformCameraSpecs{};
+    uniformCameraSpecs.primaryUsage = RHI::BufferUsage::Uniform;
     uniformCameraSpecs.size = sizeof(CameraData);
-    uniformCameraSpecs.memoryAccess = Kayou::RHI::MemoryAccess::Upload;
-    uniformCameraSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
+    uniformCameraSpecs.memoryAccess = RHI::MemoryAccess::Upload;
+    uniformCameraSpecs.pipelineStage = RHI::PipelineStage::VertexShader;
     uniformCameraSpecs.isPersistentMapped = true;
-    uniformCameraSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
-    Kayou::RHI::BufferHandle uniformCamera = device->CreateBuffer(uniformCameraSpecs);
+    uniformCameraSpecs.additionalUsages = { RHI::BufferUsage::TransferDst };
+    RHI::BufferHandle uniformCamera = device->CreateBuffer(uniformCameraSpecs);
 
 
     // Uniform buffer modelMatrix
-    Kayou::RHI::BufferSpecs uniformModelSpecs{};
-    uniformModelSpecs.primaryUsage = Kayou::RHI::BufferUsage::Uniform;
+    RHI::BufferSpecs uniformModelSpecs{};
+    uniformModelSpecs.primaryUsage = RHI::BufferUsage::Uniform;
     uniformModelSpecs.size = sizeof(Model);
-    uniformModelSpecs.memoryAccess = Kayou::RHI::MemoryAccess::Upload;
-    uniformModelSpecs.pipelineStage = Kayou::RHI::PipelineStage::VertexShader;
+    uniformModelSpecs.memoryAccess = RHI::MemoryAccess::Upload;
+    uniformModelSpecs.pipelineStage = RHI::PipelineStage::VertexShader;
     uniformModelSpecs.isPersistentMapped = true;
-    uniformModelSpecs.additionalUsages = { Kayou::RHI::BufferUsage::TransferDst };
-    Kayou::RHI::BufferHandle uniformModel = device->CreateBuffer(uniformModelSpecs);
+    uniformModelSpecs.additionalUsages = { RHI::BufferUsage::TransferDst };
+    RHI::BufferHandle uniformModel = device->CreateBuffer(uniformModelSpecs);
 
-    auto copyUniformDataCommandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+    auto copyUniformDataCommandList = device->GetCommandList(RHI::QueueType::Graphics);
     copyUniformDataCommandList->Open();
 
     copyUniformDataCommandList->SetBufferData(uniformCamera, &initCam, sizeof(CameraData), 0);
@@ -331,86 +333,86 @@ int main()
 
     copyUniformDataCommandList->Close();
 
-    Kayou::RHI::SubmitInfo submitInfocopyUniformData;
-    submitInfocopyUniformData.stage = Kayou::RHI::PipelineStage::Transfer;
+    RHI::SubmitInfo submitInfocopyUniformData;
+    submitInfocopyUniformData.stage = RHI::PipelineStage::Transfer;
 
     device->SubmitCommandList(copyUniformDataCommandList, submitInfocopyUniformData);
 
     // Presentation images
-    std::vector<Kayou::RHI::ImageHandle> presentationImages = device->CreatePresentationImages(swapchain);
+    std::vector<RHI::ImageHandle> presentationImages = device->CreatePresentationImages(swapchain);
     
     // depth images
-    Kayou::RHI::SwapchainImageSpecs depthImageSpecs; 
-    depthImageSpecs.imageType = Kayou::RHI::SwapchainImageType::Depth;
-    depthImageSpecs.targetLayout = Kayou::RHI::Layout::DepthStencilAttachment;
-    depthImageSpecs.type = Kayou::RHI::ImageType::Image2D;
-    depthImageSpecs.usages = { Kayou::RHI::ImageUsage::DepthStencilAttachment };
-    depthImageSpecs.viewType = Kayou::RHI::ImageViewType::Image2D;
-    depthImageSpecs.viewAspect = Kayou::RHI::ImageViewAspect::Depth;
+    RHI::SwapchainImageSpecs depthImageSpecs; 
+    depthImageSpecs.imageType = RHI::SwapchainImageType::Depth;
+    depthImageSpecs.targetLayout = RHI::Layout::DepthStencilAttachment;
+    depthImageSpecs.type = RHI::ImageType::Image2D;
+    depthImageSpecs.usages = { RHI::ImageUsage::DepthStencilAttachment };
+    depthImageSpecs.viewType = RHI::ImageViewType::Image2D;
+    depthImageSpecs.viewAspect = RHI::ImageViewAspect::Depth;
 
-    Kayou::RHI::ImageHandle depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+    RHI::ImageHandle depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
 
     // Timeline
-    Kayou::RHI::SemaphoreSpecs timelineSpecs;
-    timelineSpecs.type = Kayou::RHI::SemaphoreType::Timeline;
-    Kayou::RHI::SemaphoreHandle frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
+    RHI::SemaphoreSpecs timelineSpecs;
+    timelineSpecs.type = RHI::SemaphoreType::Timeline;
+    RHI::SemaphoreHandle frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
 
     // Binary 
-    std::vector<Kayou::RHI::SemaphoreHandle> imageAvailablesSemaphores;
-    std::vector<Kayou::RHI::SemaphoreHandle> renderFinishedSemaphores;
+    std::vector<RHI::SemaphoreHandle> imageAvailablesSemaphores;
+    std::vector<RHI::SemaphoreHandle> renderFinishedSemaphores;
 
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i) 
     {
-        Kayou::RHI::SemaphoreSpecs binarySpecs{};
-        binarySpecs.type = Kayou::RHI::SemaphoreType::Binary;
+        RHI::SemaphoreSpecs binarySpecs{};
+        binarySpecs.type = RHI::SemaphoreType::Binary;
 
-        Kayou::RHI::SemaphoreHandle imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
-        Kayou::RHI::SemaphoreHandle renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
+        RHI::SemaphoreHandle imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
+        RHI::SemaphoreHandle renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
 
         imageAvailablesSemaphores.push_back(imageAvailableSemaphore);
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
 
-    Kayou::RHI::ShaderHandle baseVert = device->CreateShader("base.vert", Kayou::RHI::ShaderStage::Vertex, false, true);
-    Kayou::RHI::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Kayou::RHI::ShaderStage::Fragment, false, true);
-    Kayou::RHI::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", Kayou::RHI::ShaderStage::Vertex, true, true);
+    RHI::ShaderHandle baseVert = device->CreateShader("base.vert", RHI::ShaderStage::Vertex, false, true);
+    RHI::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", RHI::ShaderStage::Fragment, false, true);
+    RHI::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", RHI::ShaderStage::Vertex, true, true);
 
-    std::vector<Kayou::RHI::DescriptorSetLayoutHandle> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
+    std::vector<RHI::DescriptorSetLayoutHandle> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
 
-    Kayou::RHI::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
+    RHI::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
 
-    Kayou::RHI::GraphicsPipelineSpecs unlitPipelineSpecs;
+    RHI::GraphicsPipelineSpecs unlitPipelineSpecs;
     unlitPipelineSpecs.colorAttachmentCount = 1;
     unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
     unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
     unlitPipelineSpecs.viewportCount = 1;
     unlitPipelineSpecs.scissorCount = 1;
     unlitPipelineSpecs.lineWidth = 1;
-    unlitPipelineSpecs.cullmode = Kayou::RHI::CullMode::Back;
-    unlitPipelineSpecs.frontFace = Kayou::RHI::FrontFace::CounterClockWise;
-    unlitPipelineSpecs.SamplesCount = Kayou::RHI::SampleCount::Count1;
+    unlitPipelineSpecs.cullmode = RHI::CullMode::Back;
+    unlitPipelineSpecs.frontFace = RHI::FrontFace::CounterClockWise;
+    unlitPipelineSpecs.SamplesCount = RHI::SampleCount::Count1;
     unlitPipelineSpecs.blendColor = false;
     unlitPipelineSpecs.depthTest = true;
     unlitPipelineSpecs.depthWrite = true;
-    unlitPipelineSpecs.depthCompare = Kayou::RHI::CompareOp::LessOrEqual;
-    unlitPipelineSpecs.dynamicStates = { Kayou::RHI::DynamicState::ViewPort, Kayou::RHI::DynamicState::Scissor };
-    unlitPipelineSpecs.topology = Kayou::RHI::PrimitiveTopology::TriangleList;
+    unlitPipelineSpecs.depthCompare = RHI::CompareOp::LessOrEqual;
+    unlitPipelineSpecs.dynamicStates = { RHI::DynamicState::ViewPort, RHI::DynamicState::Scissor };
+    unlitPipelineSpecs.topology = RHI::PrimitiveTopology::TriangleList;
     unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
     unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
     
-    Kayou::RHI::PipelineHandle unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
+    RHI::PipelineHandle unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
     
     // DescriptorSet
-    Kayou::RHI::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
-    Kayou::RHI::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
+    RHI::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
+    RHI::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
     
-    Kayou::RHI::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
-    Kayou::RHI::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
+    RHI::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
+    RHI::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
-    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
-    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Kayou::RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
-    device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Kayou::RHI::DescriptorType::SampledImage, textureImage, nullptr);
-    device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Kayou::RHI::DescriptorType::Sampler, sampler);
+    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
+    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", RHI::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
+    device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", RHI::DescriptorType::SampledImage, textureImage, nullptr);
+    device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", RHI::DescriptorType::Sampler, sampler);
     
     device->WaitIdle();
 
@@ -435,7 +437,7 @@ int main()
             // Recreate everything.
             uint32_t tWidth = window->GetWidth();
             uint32_t tHeight = window->GetHeight();
-            sSpecs.extent = Kayou::RHI::Extent2D(tWidth, tHeight);
+            sSpecs.extent = RHI::Extent2D(tWidth, tHeight);
             swapchain = device->CreateSwapchain(sSpecs);
             presentationImages = device->CreatePresentationImages(swapchain);
             depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
@@ -450,17 +452,17 @@ int main()
             resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
             resizeCam.cameraPos = editorCamera.GetPosition();
             
-            auto commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+            auto commandList = device->GetCommandList(RHI::QueueType::Graphics);
             commandList->Open();
             commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
             commandList->Close();
             
-            Kayou::RHI::SubmitInfo submitTransfer;
-            Kayou::RHI::SubmitInfo submitInfo;
-            submitInfo.stage = Kayou::RHI::PipelineStage::None;
+            RHI::SubmitInfo submitTransfer;
+            RHI::SubmitInfo submitInfo;
+            submitInfo.stage = RHI::PipelineStage::None;
             
             device->SubmitCommandList(commandList, submitTransfer);
-            //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Kayou::RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
+            //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", RHI::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
         }
     
         uint32_t maxFramesInFlight = swapchain->GetImageCount();
@@ -476,21 +478,21 @@ int main()
     
         device->RunGarbageCollector();
     
-        Kayou::RHI::RenderingAttachment colorAttachment;
+        RHI::RenderingAttachment colorAttachment;
         colorAttachment.image = presentationImages[imageIndex];
-        colorAttachment.layout = Kayou::RHI::Layout::ColorAttachment;
-        colorAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
-        colorAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-        colorAttachment.clearValueColor = Kayou::RHI::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
+        colorAttachment.layout = RHI::Layout::ColorAttachment;
+        colorAttachment.loadOp = RHI::LoadOp::Clear;
+        colorAttachment.storeOp = RHI::StoreOp::Store;
+        colorAttachment.clearValueColor = RHI::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
     
-        Kayou::RHI::RenderingAttachment depthAttachment;
+        RHI::RenderingAttachment depthAttachment;
         depthAttachment.image = depthImage;
-        depthAttachment.layout = Kayou::RHI::Layout::DepthStencilAttachment;
-        depthAttachment.loadOp = Kayou::RHI::LoadOp::Clear;
-        depthAttachment.storeOp = Kayou::RHI::StoreOp::Store;
-        depthAttachment.clearValueDepth = Kayou::RHI::ClearValue(1.0f, 0.f, 0.f, 0.f);
+        depthAttachment.layout = RHI::Layout::DepthStencilAttachment;
+        depthAttachment.loadOp = RHI::LoadOp::Clear;
+        depthAttachment.storeOp = RHI::StoreOp::Store;
+        depthAttachment.clearValueDepth = RHI::ClearValue(1.0f, 0.f, 0.f, 0.f);
     
-        Kayou::RHI::RenderingInfo renderingInfo;
+        RHI::RenderingInfo renderingInfo;
         renderingInfo.offset = { 0, 0 };
         renderingInfo.extent = { window->GetWidth(), window->GetHeight()};
         renderingInfo.layerCount = 1;
@@ -498,11 +500,11 @@ int main()
         renderingInfo.colorAttachments = { colorAttachment };
         renderingInfo.depthAttachment = depthAttachment;
     
-        auto commandList = device->GetCommandList(Kayou::RHI::QueueType::Graphics);
+        auto commandList = device->GetCommandList(RHI::QueueType::Graphics);
         commandList->Open();
     
-        commandList->TransitionImageLayout(presentationImages[imageIndex], Kayou::RHI::Layout::ColorAttachment);
-        commandList->TransitionImageLayout(depthImage, Kayou::RHI::Layout::DepthStencilAttachment);
+        commandList->TransitionImageLayout(presentationImages[imageIndex], RHI::Layout::ColorAttachment);
+        commandList->TransitionImageLayout(depthImage, RHI::Layout::DepthStencilAttachment);
     
         commandList->BeginRendering(renderingInfo);
     
@@ -511,8 +513,8 @@ int main()
     
         commandList->BindPipeline(unlitPipeline);
     
-        commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Kayou::RHI::PipelineBindPoint::Graphics);
-        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Kayou::RHI::PipelineBindPoint::Graphics);
+        commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, RHI::PipelineBindPoint::Graphics);
+        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, RHI::PipelineBindPoint::Graphics);
     
         commandList->BindVertexBuffer(vertexBuffer, 0);
         commandList->BindIndexBuffer(indexBuffer, 0);
@@ -521,22 +523,22 @@ int main()
     
         commandList->EndRendering();
     
-        commandList->TransitionImageLayout(presentationImages[imageIndex], Kayou::RHI::Layout::Present);
+        commandList->TransitionImageLayout(presentationImages[imageIndex], RHI::Layout::Present);
     
         commandList->Close();
     
         uint64_t signalValue = frameCounter + 1;
     
-        Kayou::RHI::SubmitInfo submitInfo;
+        RHI::SubmitInfo submitInfo;
         submitInfo.waitSemaphores = { imageAvailablesSemaphores[syncIndex] };
         submitInfo.waitSemaphoresValues = { 0 };
         submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[imageIndex] };
         submitInfo.signalSemaphoresValues = { signalValue, 0 };
-        submitInfo.stage = Kayou::RHI::PipelineStage::ColorOutput;
+        submitInfo.stage = RHI::PipelineStage::ColorOutput;
     
         device->SubmitCommandList(commandList, submitInfo);
     
-        Kayou::RHI::PresentInfo presentInfo;
+        RHI::PresentInfo presentInfo;
         presentInfo.waitSemaphores = { renderFinishedSemaphores[imageIndex] };
         presentInfo.swapchain = swapchain;
         presentInfo.imageIndex = imageIndex;
