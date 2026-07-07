@@ -2,7 +2,7 @@
 
 #include <atomic>
 #include <spdlog/spdlog.h>
-#include "Utils/Core.hpp"
+#include "CoreModule.hpp"
 #include <concepts>
 
 BEGIN_NAMESPACE_CORE

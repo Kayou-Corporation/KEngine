@@ -6,8 +6,10 @@
 
 #include "RHI/API/RHI.hpp"
 
-#include "Window.hpp"
-#include "WindowRenderer.hpp"
+namespace Kayou::Window
+{
+	class Window;
+}
 
 BEGIN_NAMESPACE_RHI
 

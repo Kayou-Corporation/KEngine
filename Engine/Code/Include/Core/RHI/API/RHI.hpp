@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utils/Core.hpp"
+#include "CoreModule.hpp"
 #include "Utils/Export.hpp"
 #include "Utils/Memory.hpp"
 

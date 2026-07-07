@@ -8,8 +8,6 @@ set(CORE_TARGET_NAME CORE)
 #---------------------------------------#
 file(GLOB_RECURSE CORE_SOURCE "${K_SOURCE_PATH}/Core/*.cpp")
 
-message(STATUS "L'enfant a accès au chemin : ${K_SOURCE_PATH}")
-
 #---------------------------------------#
 #            BUILD MODE                 #
 #---------------------------------------#

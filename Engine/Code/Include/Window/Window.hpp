@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "Utils/Core.hpp"
+#include "CoreModule.hpp"
 #include "Utils/Memory.hpp"
 #include "Utils/Export.hpp"
 

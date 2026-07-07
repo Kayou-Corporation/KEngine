@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Camera.hpp"
+#include "Camera/Camera.hpp"
 
 
 

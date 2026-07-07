@@ -1,6 +1,6 @@
-#include "Public/Camera/EditorCamera.hpp"
+#include "Camera/EditorCamera.hpp"
 
-#include "Public/Camera/CameraInput.hpp"
+#include "Camera/CameraInput.hpp"
 
 
 namespace Kayou::Core

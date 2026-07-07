@@ -1,6 +1,8 @@
 #include "RHI/Vulkan/VulkanInstance.hpp"
 
 #include <spdlog/spdlog.h>
+#include "Window.hpp"
+#include "WindowRenderer.hpp"
 
 #include "RHI/Vulkan/VulkanTranslate.hpp"
 #include "RHI/Vulkan/VulkanUtils.hpp"

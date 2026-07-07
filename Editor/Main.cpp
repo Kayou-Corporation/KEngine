@@ -1,21 +1,22 @@
 #include <iostream>
 
-//#include "Window/Window.hpp"
-//#include "Public/Instance.hpp"
-//#include "Public/Surface.hpp"
-//#include "Public/Device.hpp"
-//#include "Public/Swapchain.hpp"
-//#include "Public/Buffer.hpp"
-//#include "Public/Shader.hpp"
-//#include "Public/Image.hpp"
-//#include "Public/Renderpass.hpp"
-//#include "Public/CommandList.hpp"
-//#include "Public/Syncronisation.hpp"
-//#include "Public/GraphicsPipeline.hpp"
-//#include "Public/Sampler.hpp"
-//#include "Public/DescriptorSet.hpp"
-//#include "Public/Camera/EditorCamera.hpp"
-//#include "Public/RHI.hpp"
+#include "Window.hpp"
+#include "WindowRenderer.hpp"
+#include "RHI/API/Surface.hpp"
+#include "RHI/API/Instance.hpp"
+#include "RHI/API/Device.hpp"
+#include "RHI/API/Swapchain.hpp"
+#include "RHI/API/Buffer.hpp"
+#include "RHI/API/Shader.hpp"
+#include "RHI/API/Image.hpp"
+#include "RHI/API/Renderpass.hpp"
+#include "RHI/API/CommandList.hpp"
+#include "RHI/API/Syncronisation.hpp"
+#include "RHI/API/GraphicsPipeline.hpp"
+#include "RHI/API/Sampler.hpp"
+#include "RHI/API/DescriptorSet.hpp"
+#include "RHI/API/RHI.hpp"
+#include "Camera/EditorCamera.hpp"
 //
 //DISABLE_WARNINGS
 //
@@ -67,8 +68,8 @@
 //    glm::mat4 normal;
 //};
 //
-//int main()
-//{
+int main()
+{
 //#ifdef KENGINE_DEBUG
 //    spdlog::set_level(spdlog::level::debug);
 //#endif
@@ -598,4 +599,4 @@
 //    stbi_image_free(texturePixels);
 //
 //    return 0;
-//}
+}

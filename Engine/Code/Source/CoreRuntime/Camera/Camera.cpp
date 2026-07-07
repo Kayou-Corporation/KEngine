@@ -1,6 +1,4 @@
-#include "Public/Camera/Camera.hpp"
-
-
+#include "Camera/Camera.hpp"
 
 namespace Kayou::Core
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core.hpp"
+#include "CoreModule.hpp"
 
 #include <fstream>
 #include <type_traits>
