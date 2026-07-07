@@ -5,17 +5,17 @@
 #include "Utils/Memory.hpp"
 #include "Utils/Export.hpp"
 
+#include "Window.hpp"
+
 #ifdef VULKAN_ENABLE
 #include <vulkan/vulkan.h>
 #endif
 
-BEGIN_NAMESPACE_CORE
-
-class Window;
+BEGIN_NAMESPACE_WINDOW
 
 // -------- Window Renderer ----------
 
-class WindowRenderer : virtual public IResource
+class WindowRenderer : virtual public Core::IResource
 {
 public:
 	virtual ~WindowRenderer() = default;
@@ -35,4 +35,4 @@ protected:
 };
 #endif
 
-END_NAMESPACE_CORE
+END_NAMESPACE_WINDOW

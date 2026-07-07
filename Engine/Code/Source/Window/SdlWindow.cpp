@@ -8,7 +8,7 @@
 
 #include "spdlog/spdlog.h"
 
-BEGIN_NAMESPACE_CORE
+BEGIN_NAMESPACE_WINDOW
 
 void SDLWindow::Create(const WindowSpecs& specs)
 {
@@ -20,11 +20,11 @@ void SDLWindow::Create(const WindowSpecs& specs)
 
 	switch (specs.rendererAPI)
 	{
-	case RendererAPI::Vulkan:
+	case Core::RendererAPI::Vulkan:
 		m_window = SDL_CreateWindow(m_windowName.c_str(), static_cast<int>(m_width), static_cast<int>(m_height), SDL_WINDOW_VULKAN);
 
 		Window* myWindowPtr = static_cast<Window*>(this);
-		m_windowRenderer = CreateRefPtr<SDLVulkanWindowRenderer>(myWindowPtr);
+		m_windowRenderer = Core::CreateRefPtr<SDLVulkanWindowRenderer>(myWindowPtr);
 		break;
 	}
 	
@@ -113,4 +113,4 @@ SDLVulkanWindowRenderer::SDLVulkanWindowRenderer(Window* ownerWindow)
 	m_ownerWindow = ownerWindow;
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_WINDOW

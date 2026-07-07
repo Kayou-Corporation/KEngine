@@ -2,8 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "Window.hpp"
-#include "WindowRenderer.hpp"
 #include "RHI/Vulkan/VulkanTranslate.hpp"
 #include "RHI/Vulkan/VulkanUtils.hpp"
 #include "RHI/Vulkan/VulkanSurface.hpp"
@@ -20,8 +18,8 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	appInfo.setEngineVersion(VK_MAKE_VERSION(specs.engineVersion.major, specs.engineVersion.minor, specs.engineVersion.patch));
 	appInfo.setApiVersion(VK_API_VERSION_1_4);
 
-	Core::RefCountPtr<Core::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::RefCountPtr<Core::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Core::VulkanWindowRenderer>();
+	Core::RefCountPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::RefCountPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
 	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
 
 #ifdef KENGINE_DEBUG
@@ -79,8 +77,8 @@ void VulkanInstance::Destroy()
 
 SurfaceHandle VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
 {
-	Core::RefCountPtr<Core::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::RefCountPtr<Core::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Core::VulkanWindowRenderer>();
+	Core::RefCountPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::RefCountPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
 	VkSurfaceKHR vkSurface = wvkRenderer->CreateVulkanSurface(m_handle);
 
 	auto Surface = Core::CreateRefPtr<VulkanSurface>();

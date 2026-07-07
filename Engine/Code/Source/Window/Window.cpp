@@ -4,14 +4,13 @@
 
 #include <spdlog/spdlog.h>
 
-BEGIN_NAMESPACE_CORE
-
-RefCountPtr<Window> WindowInterface::InitWindow(WindowAPI api)
+BEGIN_NAMESPACE_WINDOW
+	Core::RefCountPtr<Window> WindowInterface::InitWindow(WindowAPI api)
 {
 	switch (api)
 	{
 	case SDL:
-		return CreateRefPtr<SDLWindow>();
+		return Core::CreateRefPtr<SDLWindow>();
 		break;
 	default:
 		spdlog::critical("Can't create window");
@@ -20,4 +19,4 @@ RefCountPtr<Window> WindowInterface::InitWindow(WindowAPI api)
 	}
 }
 
-END_NAMESPACE_CORE
+END_NAMESPACE_WINDOW

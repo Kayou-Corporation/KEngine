@@ -3,10 +3,11 @@
 #include <SDL3/SDL.h>
 
 #include "Window.hpp"
+#include "WindowRenderer.hpp"
+#include "SDL3/SDL_vulkan.h"
 
-BEGIN_NAMESPACE_CORE
-
-class SDLWindow : public Window
+BEGIN_NAMESPACE_WINDOW
+	class SDLWindow : public Window
 {
 public:
 	SDLWindow() = default;
@@ -39,4 +40,4 @@ private:
 };
 #endif
 
-END_NAMESPACE_CORE
+END_NAMESPACE_WINDOW

@@ -35,10 +35,10 @@ VSOutput vsMain(VSInput input)
     o.uv = input.uv;
 
     // Cam pos for lighting purpose in frag (only lit)
-    o.camPos = frameData.camera.CameraPos;
+    o.camPos = frameData.camera.cameraPos;
 
     // Out pixel pos in screen
-    o.position = mul(frameData.camera.CameraVP, world);
+    o.position = mul(frameData.camera.cameraVP, world);
 
     return o;
 }

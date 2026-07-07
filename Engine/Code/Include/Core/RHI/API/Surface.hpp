@@ -2,7 +2,7 @@
 
 #include "RHI/API/RHI.hpp"
 
-namespace Kayou::Core
+namespace Kayou::Window
 {
 	class Window;
 }
@@ -13,7 +13,7 @@ class Instance;
 
 struct SurfaceSpecs
 {
-	Core::RefCountPtr<Core::Window> window;
+	Core::RefCountPtr<Window::Window> window;
 };
 
 class Surface : virtual public Core::IResource

@@ -41,7 +41,6 @@ struct SurfaceSpecs;
 class Swapchain;
 struct SwapchainImageSpecs;
 struct SwapchainSpecs;
-class Window;
 
 // ---------- HANDLE TYPEDEFS ----------
 typedef Core::RefCountPtr<Buffer> BufferHandle;

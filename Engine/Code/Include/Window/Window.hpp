@@ -3,12 +3,18 @@
 #include <string>
 #include <vector>
 
+#include "Utils/Core.hpp"
 #include "Utils/Memory.hpp"
 #include "Utils/Export.hpp"
 
-#include "WindowRenderer.hpp"
+#define WINDOW_NAMESPACE Window
 
-BEGIN_NAMESPACE_CORE
+#define BEGIN_NAMESPACE_WINDOW BEGIN_NAMESPACE_KAYOU namespace WINDOW_NAMESPACE {
+#define END_NAMESPACE_WINDOW } /* namespace WINDOW_NAMESPACE */ END_NAMESPACE_KAYOU
+
+BEGIN_NAMESPACE_WINDOW
+
+class WindowRenderer;
 
 // -------- Base window ----------
 
@@ -19,10 +25,10 @@ struct WindowSpecs
 	std::string name = "Window";
 
 	bool allowResize = true;
-	RendererAPI rendererAPI = RendererAPI::Vulkan;
+	Core::RendererAPI rendererAPI = Core::RendererAPI::Vulkan;
 };
 
-class Window : virtual public IResource
+class Window : virtual public Core::IResource
 {
 public:
 	virtual ~Window() = default;
@@ -40,7 +46,7 @@ public:
 	std::string GetName() const { return m_windowName; }
 	bool GetHasResize() const { return m_HasResize; }
 
-	RefCountPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
+	Core::RefCountPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
 
 protected:
 	uint32_t m_width = 0u;
@@ -50,7 +56,7 @@ protected:
 
 	std::string m_windowName;
 
-	RefCountPtr<WindowRenderer> m_windowRenderer;
+	Core::RefCountPtr<WindowRenderer> m_windowRenderer;
 };
 
 // -------- Interface ----------
@@ -61,7 +67,7 @@ enum WindowAPI
 
 struct WindowInterface
 {
-	static RefCountPtr<Window> InitWindow(WindowAPI api);
+	static Core::RefCountPtr<Window> InitWindow(WindowAPI api);
 };
 
-END_NAMESPACE_CORE
+END_NAMESPACE_WINDOW
