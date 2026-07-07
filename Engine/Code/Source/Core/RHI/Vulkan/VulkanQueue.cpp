@@ -175,9 +175,9 @@ void Queue::Submit(TrackedCommandBufferPtr cmdBuffer, vk::PipelineStageFlags wai
     std::vector<vk::PipelineStageFlags> waitMasks(m_waitSemaprhores.size(), waitStages);
 
     vk::TimelineSemaphoreSubmitInfo timelineInfo;
-    timelineInfo.setSignalSemaphoreValueCount(m_signalSemaprhores.size());
+    timelineInfo.setSignalSemaphoreValueCount(static_cast<uint32_t>(m_signalSemaprhores.size()));
     timelineInfo.setPSignalSemaphoreValues(m_signalSemaphoresValues.data());
-    timelineInfo.setWaitSemaphoreValueCount(m_waitSemaprhores.size());
+    timelineInfo.setWaitSemaphoreValueCount(static_cast<uint32_t>(m_waitSemaprhores.size()));
     timelineInfo.setPWaitSemaphoreValues(m_waitSemaprhoresValues.data());
 
     vk::SubmitInfo submitInfo;
@@ -185,10 +185,10 @@ void Queue::Submit(TrackedCommandBufferPtr cmdBuffer, vk::PipelineStageFlags wai
     submitInfo.setCommandBufferCount(1);
     submitInfo.setPCommandBuffers(&cmdBuffer->cmdBuffer);
 
-    submitInfo.setSignalSemaphoreCount(m_signalSemaprhores.size());
+    submitInfo.setSignalSemaphoreCount(static_cast<uint32_t>(m_signalSemaprhores.size()));
     submitInfo.setPSignalSemaphores(m_signalSemaprhores.data());
 
-    submitInfo.setWaitSemaphoreCount(m_waitSemaprhores.size());
+    submitInfo.setWaitSemaphoreCount(static_cast<uint32_t>(m_waitSemaprhores.size()));
     submitInfo.setPWaitSemaphores(m_waitSemaprhores.data());
 
     submitInfo.setPWaitDstStageMask(waitMasks.data());

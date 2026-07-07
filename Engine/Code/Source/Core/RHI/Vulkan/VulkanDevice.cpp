@@ -264,7 +264,7 @@ bool VulkanDevice::Present(const PresentInfo& RHIPresentInfo)
 	vk::SwapchainKHR swapchain = RHIVulkanSwapchain->GetHandle();
 
 	vk::PresentInfoKHR presentInfo;
-	presentInfo.waitSemaphoreCount = waitSemaphores.size();
+	presentInfo.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
 	presentInfo.pWaitSemaphores = waitSemaphores.data();
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &swapchain;
@@ -551,7 +551,7 @@ std::vector<DescriptorSetLayoutHandle> VulkanDevice::CreateDescriptorSetsLayouts
 
 		vk::DescriptorSetLayoutCreateInfo createInfo{};
 		createInfo.flags = {};
-		createInfo.bindingCount = allBindings.size();
+		createInfo.bindingCount = static_cast<uint32_t>(allBindings.size());
 		createInfo.pBindings = allBindings.data();
 
 		vk::DescriptorSetLayout layout = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(createInfo), "Coundn't create DescriptorSetLayout");
@@ -592,7 +592,7 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 			std::vector<vk::DescriptorSetLayoutBinding> allBindings = RHIVulkanDescriptor->GetAllVulkanBindings();
 
 			vk::DescriptorSetLayoutCreateInfo createInfo{};
-			createInfo.bindingCount = allBindings.size();
+			createInfo.bindingCount = static_cast<uint32_t>(allBindings.size());
 			createInfo.pBindings = allBindings.data();
 
 			vk::DescriptorSetLayout layout = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(createInfo), "Coundn't create DescriptorSetLayout");
@@ -634,7 +634,7 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 			std::vector<vk::DescriptorSetLayoutBinding> allBindings = RHIVulkanDescriptor->GetAllVulkanBindings();
 
 			vk::DescriptorSetLayoutCreateInfo createInfo{};
-			createInfo.bindingCount = allBindings.size();
+			createInfo.bindingCount = static_cast<uint32_t>(allBindings.size());
 			createInfo.pBindings = allBindings.data();
 
 			vk::DescriptorSetLayout layout = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(createInfo), "Coundn't create DescriptorSetLayout");
@@ -674,22 +674,22 @@ PushConstantLayoutHandle VulkanDevice::CreatePushConstantLayout(ShaderHandle RHI
 	{
 		const PushConstant globalStruct = SLANGShaderPushConstants[0];
 		RHIVulkanPushConstants->SetName(globalStruct.name);
-		RHIVulkanPushConstants->SetSize(globalStruct.size);
+		RHIVulkanPushConstants->SetSize(static_cast<uint32_t>(globalStruct.size));
 		RHIVulkanPushConstants->SetStage(globalStruct.stage);
 
-		for (int i = SLANGShaderPushConstants.size() - 1; i > 0; i--)
+		for (int i = static_cast<int>(SLANGShaderPushConstants.size()) - 1; i > 0; i--)
 		{
 			VulkanConstant constant;
 			constant.constantName = SLANGShaderPushConstants[i].name;
 			constant.offset = SLANGShaderPushConstants[i].offset;
-			constant.size = SLANGShaderPushConstants[i].size;
+			constant.size = static_cast<uint32_t>(SLANGShaderPushConstants[i].size);
 
 			RHIVulkanPushConstants->AddConstant(constant);
 		}
 
 		vk::PushConstantRange pushConstantRange;
 		pushConstantRange.stageFlags = TranslateToVulkan(globalStruct.stage);
-		pushConstantRange.size = globalStruct.size;
+		pushConstantRange.size = static_cast<uint32_t>(globalStruct.size);
 		pushConstantRange.offset = globalStruct.offset;
 
 		RHIVulkanPushConstants->SetHandle(pushConstantRange);
@@ -990,9 +990,9 @@ PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(std::vector<DescriptorSe
 	}
 
 	vk::PipelineLayoutCreateInfo createInfo{};
-	createInfo.setLayoutCount = descriptorSetsLayouts.size();
+	createInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetsLayouts.size());
 	createInfo.pSetLayouts = descriptorSetsLayouts.data();
-	createInfo.pushConstantRangeCount = pushConstantRanges.size();
+	createInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
 	createInfo.pPushConstantRanges = pushConstantRanges.data();
 
 	vk::PipelineLayout pipelineLayout = VK_CHECK_RESULT(m_handle.createPipelineLayout(createInfo), "Coudn't create pipeline layout");

@@ -99,7 +99,7 @@ void VulkanCommandList::BindIndexBuffer(BufferHandle RHIIndexBuffer, uint32_t of
 }
 
 //----------- Draw --------------//
-void VulkanCommandList::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+void VulkanCommandList::SetViewport(const float x, const float y, const float width, const float height)
 {
 	vk::Viewport viewport{};
 	viewport.x = x;

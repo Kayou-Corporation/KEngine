@@ -33,7 +33,7 @@ public:
 	virtual void BindIndexBuffer(BufferHandle indexBuffer, uint32_t offset) override;
 
 	//----------- Draw --------------//
-	virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+	virtual void SetViewport(float x, float y, float width, float height) override;
 	virtual void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 	virtual void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) override;
 

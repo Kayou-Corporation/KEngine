@@ -30,7 +30,7 @@ vk::DescriptorPoolCreateInfo VulkanDescriptorSet::GetPoolCreateInfo(std::map<vk:
 		m_poolSizes.push_back(typeSize);
 	}
 
-	createInfo.poolSizeCount = m_poolSizes.size();
+	createInfo.poolSizeCount = static_cast<uint32_t>(m_poolSizes.size());
 	createInfo.pPoolSizes = m_poolSizes.data();
 	createInfo.maxSets = 1;
 

@@ -387,7 +387,7 @@ int main()
     unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
     unlitPipelineSpecs.viewportCount = 1;
     unlitPipelineSpecs.scissorCount = 1;
-    unlitPipelineSpecs.lineWidth = 1;
+    unlitPipelineSpecs.lineWidth = 1.f;
     unlitPipelineSpecs.cullmode = Core::CullMode::Back;
     unlitPipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
     unlitPipelineSpecs.SamplesCount = Core::SampleCount::Count1;
@@ -508,7 +508,7 @@ int main()
     
         commandList->BeginRendering(renderingInfo);
     
-        commandList->SetViewport(0, 0, window->GetWidth(), window->GetHeight());
+        commandList->SetViewport(0.f, 0.f, static_cast<float>(window->GetWidth()), static_cast<float>(window->GetHeight()));
         commandList->SetScissor(0, 0, window->GetWidth(), window->GetHeight());
     
         commandList->BindPipeline(unlitPipeline);

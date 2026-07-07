@@ -16,7 +16,7 @@ struct GraphicsPipelineSpecs
 	uint32_t viewportCount = 1;
 	uint32_t scissorCount = 1;
 
-	uint32_t lineWidth = 1;
+	float lineWidth = 1.f;
 	CullMode cullmode;
 	FrontFace frontFace;
 

@@ -42,7 +42,7 @@ public:
 	KENGINE_API virtual void BindIndexBuffer(BufferHandle indexBuffer, uint32_t offset) = 0;
 
 	//----------- Draw --------------//
-	KENGINE_API virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
+	KENGINE_API virtual void SetViewport(float x, float y, float width, float height) = 0;
 	KENGINE_API virtual void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 	KENGINE_API virtual void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) = 0;
 

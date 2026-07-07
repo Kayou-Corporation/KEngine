@@ -132,9 +132,9 @@ vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateIn
 {
 	vk::GraphicsPipelineCreateInfo createInfo{};
 
-	vulkanGraphicsPipelineSpecs.vertexInputInfo.vertexBindingDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.size();
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.size());
 	vulkanGraphicsPipelineSpecs.vertexInputInfo.pVertexBindingDescriptions = vulkanGraphicsPipelineSpecs.vertexInputBindingDescriptions.data();
-	vulkanGraphicsPipelineSpecs.vertexInputInfo.vertexAttributeDescriptionCount = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.size();
+	vulkanGraphicsPipelineSpecs.vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.size());
 	vulkanGraphicsPipelineSpecs.vertexInputInfo.pVertexAttributeDescriptions = vulkanGraphicsPipelineSpecs.vertexInputAttributeDescriptions.data();
 
 	vulkanGraphicsPipelineSpecs.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.dynamicStates.size());
@@ -145,7 +145,7 @@ vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateIn
 	vulkanGraphicsPipelineSpecs.renderingInfo.depthAttachmentFormat = vulkanGraphicsPipelineSpecs.depthAttachment;
 
 	createInfo.pNext = &vulkanGraphicsPipelineSpecs.renderingInfo;
-	createInfo.stageCount = vulkanGraphicsPipelineSpecs.stages.size();
+	createInfo.stageCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.stages.size());
 	createInfo.pStages = vulkanGraphicsPipelineSpecs.stages.data();
 	createInfo.pVertexInputState = &vulkanGraphicsPipelineSpecs.vertexInputInfo;
 	createInfo.pInputAssemblyState = &vulkanGraphicsPipelineSpecs.inputAssemblyState;
