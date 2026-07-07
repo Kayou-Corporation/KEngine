@@ -1,6 +1,6 @@
-#include "Window/Window.hpp"
+#include "Window.hpp"
 
-#include "Window/Private/SdlWindow.hpp"
+#include "SdlWindow.hpp"
 
 #include <spdlog/spdlog.h>
 

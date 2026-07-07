@@ -70,6 +70,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_subdirectory(${K_INCLUDE_PATH}/CORE)
 target_link_libraries(${K_TARGET_NAME} PUBLIC CORE)
 
+add_subdirectory(${K_INCLUDE_PATH}/WINDOW)
+target_link_libraries(${K_TARGET_NAME} PUBLIC WINDOW)
+
 target_link_libraries(${K_TARGET_NAME} PUBLIC stb)
 
 #target_include_directories(${K_TARGET_NAME} "Libs/Stbimage")

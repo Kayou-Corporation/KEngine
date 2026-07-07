@@ -2,7 +2,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "Window/Window.hpp"
+#include "Window.hpp"
 
 BEGIN_NAMESPACE_CORE
 

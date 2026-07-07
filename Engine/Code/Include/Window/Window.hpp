@@ -6,7 +6,7 @@
 #include "Utils/Memory.hpp"
 #include "Utils/Export.hpp"
 
-#include "Window/WindowRenderer.hpp"
+#include "WindowRenderer.hpp"
 
 BEGIN_NAMESPACE_CORE
 

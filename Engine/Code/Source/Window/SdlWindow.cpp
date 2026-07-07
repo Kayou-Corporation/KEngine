@@ -1,4 +1,4 @@
-#include "Window/Private/SdlWindow.hpp"
+#include "SdlWindow.hpp"
 
 #include <SDL3/SDL_vulkan.h>
 
