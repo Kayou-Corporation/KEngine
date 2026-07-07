@@ -1,4 +1,4 @@
-#include "Private/Vulkan/VulkanSyncronisation.hpp"
+#include "RHI/Vulkan/VulkanSyncronisation.hpp"
 
 BEGIN_NAMESPACE_RHI
 

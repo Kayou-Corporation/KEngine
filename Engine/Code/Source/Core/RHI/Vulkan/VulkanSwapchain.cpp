@@ -1,6 +1,6 @@
-#include "Private/Vulkan/VulkanSwapchain.hpp"
-#include "Private/Vulkan/VulkanDevice.hpp"
-#include "Private/Vulkan/RHITranslate.hpp"
+#include "RHI/Vulkan/VulkanSwapchain.hpp"
+#include "RHI/Vulkan/VulkanDevice.hpp"
+#include "RHI/Vulkan/RHITranslate.hpp"
 #include <algorithm>
 #include <iostream>
 

@@ -1,7 +1,7 @@
-#include "Private/Vulkan/VulkanRenderpass.hpp"
+#include "RHI/Vulkan/VulkanRenderpass.hpp"
 
-#include "Private/Vulkan/VulkanTranslate.hpp"
-#include "Private/Vulkan/VulkanImage.hpp"
+#include "RHI/Vulkan/VulkanTranslate.hpp"
+#include "RHI/Vulkan/VulkanImage.hpp"
 
 BEGIN_NAMESPACE_RHI
 

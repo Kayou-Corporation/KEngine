@@ -1,11 +1,11 @@
-#include "Private/Vulkan/VulkanInstance.hpp"
+#include "RHI/Vulkan/VulkanInstance.hpp"
 
 #include <spdlog/spdlog.h>
 
-#include "Private/Vulkan/VulkanTranslate.hpp"
-#include "Private/Vulkan/VulkanUtils.hpp"
-#include "Private/Vulkan/VulkanSurface.hpp"
-#include "Private/Vulkan/VulkanDevice.hpp"
+#include "RHI/Vulkan/VulkanTranslate.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanSurface.hpp"
+#include "RHI/Vulkan/VulkanDevice.hpp"
 
 BEGIN_NAMESPACE_RHI
 

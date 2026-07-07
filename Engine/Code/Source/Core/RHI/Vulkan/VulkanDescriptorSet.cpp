@@ -1,8 +1,8 @@
-#include "Private/Vulkan/VulkanDescriptorSet.hpp"
+#include "RHI/Vulkan/VulkanDescriptorSet.hpp"
 
-#include "Private/Vulkan/VulkanBuffer.hpp"
-#include "Private/Vulkan/VulkanImage.hpp"
-#include "Private/Vulkan/VulkanTranslate.hpp"
+#include "RHI/Vulkan/VulkanBuffer.hpp"
+#include "RHI/Vulkan/VulkanImage.hpp"
+#include "RHI/Vulkan/VulkanTranslate.hpp"
 
 BEGIN_NAMESPACE_RHI
 

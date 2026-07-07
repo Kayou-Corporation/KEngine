@@ -1,12 +1,12 @@
-#include "Private/Vulkan/VulkanCommandList.hpp"
+#include "RHI/Vulkan/VulkanCommandList.hpp"
 
-#include "Private/Vulkan/VulkanBuffer.hpp"
-#include "Private/Vulkan/VulkanDevice.hpp"
-#include "Private/Vulkan/VulkanImage.hpp"
-#include "Private/Vulkan/VulkanRenderpass.hpp"
-#include "Private/Vulkan/VulkanGraphicsPipeline.hpp"
-#include"Private/Vulkan/VulkanPipelineCommon.hpp"
-#include"Private/Vulkan/VulkanDescriptorSet.hpp"
+#include "RHI/Vulkan/VulkanBuffer.hpp"
+#include "RHI/Vulkan/VulkanDevice.hpp"
+#include "RHI/Vulkan/VulkanImage.hpp"
+#include "RHI/Vulkan/VulkanRenderpass.hpp"
+#include "RHI/Vulkan/VulkanGraphicsPipeline.hpp"
+#include"RHI/Vulkan/VulkanPipelineCommon.hpp"
+#include"RHI/Vulkan/VulkanDescriptorSet.hpp"
 
 BEGIN_NAMESPACE_RHI
 

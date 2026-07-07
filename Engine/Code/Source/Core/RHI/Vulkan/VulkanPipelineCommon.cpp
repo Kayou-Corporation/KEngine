@@ -1,4 +1,4 @@
-#include "Private/Vulkan/VulkanPipelineCommon.hpp"
+#include "RHI/Vulkan/VulkanPipelineCommon.hpp"
 
 BEGIN_NAMESPACE_RHI
 

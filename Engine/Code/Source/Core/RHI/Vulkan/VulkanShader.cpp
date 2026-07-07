@@ -1,4 +1,4 @@
-#include "Private/Vulkan/VulkanShader.hpp"
+#include "RHI/Vulkan/VulkanShader.hpp"
 
 BEGIN_NAMESPACE_RHI
 

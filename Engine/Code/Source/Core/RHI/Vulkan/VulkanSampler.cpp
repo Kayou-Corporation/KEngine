@@ -1,6 +1,6 @@
-#include "Private/Vulkan/VulkanSampler.hpp"
+#include "RHI/Vulkan/VulkanSampler.hpp"
 
-#include "Private/Vulkan/VulkanTranslate.hpp"
+#include "RHI/Vulkan/VulkanTranslate.hpp"
 
 #include <algorithm>
 

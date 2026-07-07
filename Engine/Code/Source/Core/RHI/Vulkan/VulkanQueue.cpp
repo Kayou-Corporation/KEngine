@@ -1,6 +1,6 @@
-#include "Private/Vulkan/VulkanQueue.hpp"
-#include "Private/Vulkan/VulkanCommandList.hpp"
-#include "Private/Vulkan/VulkanDevice.hpp"
+#include "RHI/Vulkan/VulkanQueue.hpp"
+#include "RHI/Vulkan/VulkanCommandList.hpp"
+#include "RHI/Vulkan/VulkanDevice.hpp"
 
 BEGIN_NAMESPACE_RHI
 

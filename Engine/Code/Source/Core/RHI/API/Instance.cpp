@@ -1,6 +1,6 @@
-#include "Public/Instance.hpp"
+#include "RHI/API/Instance.hpp"
 
-#include "Private/Vulkan/VulkanInstance.hpp"
+#include "RHI/Vulkan/VulkanInstance.hpp"
 
 BEGIN_NAMESPACE_RHI
 

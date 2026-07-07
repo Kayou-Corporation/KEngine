@@ -1,4 +1,4 @@
-#include "Public/PipelineCommon.hpp"
+#include "RHI/API/PipelineCommon.hpp"
 
 BEGIN_NAMESPACE_RHI
 

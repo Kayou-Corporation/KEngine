@@ -1,7 +1,7 @@
-#include "Private/Vulkan/VulkanGraphicsPipeline.hpp"
-#include "Private/Vulkan/VulkanPipelineCommon.hpp"
+#include "RHI/Vulkan/VulkanGraphicsPipeline.hpp"
+#include "RHI/Vulkan/VulkanPipelineCommon.hpp"
 
-#include "Private/Vulkan/VulkanTranslate.hpp"
+#include "RHI/Vulkan/VulkanTranslate.hpp"
 
 BEGIN_NAMESPACE_RHI
 
