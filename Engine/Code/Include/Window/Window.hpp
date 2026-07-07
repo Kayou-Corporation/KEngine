@@ -3,14 +3,10 @@
 #include <string>
 #include <vector>
 
+#include "WindowModule.hpp"
 #include "CoreModule.hpp"
 #include "Utils/Memory.hpp"
 #include "Utils/Export.hpp"
-
-#define WINDOW_NAMESPACE Window
-
-#define BEGIN_NAMESPACE_WINDOW BEGIN_NAMESPACE_KAYOU namespace WINDOW_NAMESPACE {
-#define END_NAMESPACE_WINDOW } /* namespace WINDOW_NAMESPACE */ END_NAMESPACE_KAYOU
 
 BEGIN_NAMESPACE_WINDOW
 

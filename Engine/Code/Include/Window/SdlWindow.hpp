@@ -7,7 +7,8 @@
 #include "SDL3/SDL_vulkan.h"
 
 BEGIN_NAMESPACE_WINDOW
-	class SDLWindow : public Window
+
+class SDLWindow : public Window
 {
 public:
 	SDLWindow() = default;
