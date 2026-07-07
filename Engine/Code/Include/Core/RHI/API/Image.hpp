@@ -3,7 +3,7 @@
 #include "Utils/Export.hpp"
 #include "Utils/Memory.hpp"
 
-#include "Public/RHI.hpp"
+#include "RHI/API/RHI.hpp"
 
 BEGIN_NAMESPACE_RHI
 

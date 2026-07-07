@@ -3,15 +3,19 @@
 #include <string>
 #include <vector>
 
-#include "Window/Window.hpp"
 
-#include "Public/RHI.hpp"
+#include "RHI/API/RHI.hpp"
+
+namespace Kayou::Window
+{
+	class window;
+}
 
 BEGIN_NAMESPACE_RHI
 
 struct InstanceSpecs
 {
-	Core::RefCountPtr<Core::Window> window; // To get window specific extensions required.
+	Core::RefCountPtr<Window> window; // To get window specific extensions required.
 
 	Version appVersion;
 	Version engineVersion;

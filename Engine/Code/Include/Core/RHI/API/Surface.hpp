@@ -2,9 +2,13 @@
 
 #include "RHI/API/RHI.hpp"
 
+namespace Kayou::Core
+{
+	class Window;
+}
+
 BEGIN_NAMESPACE_RHI
 
-class Window;
 class Instance;
 
 struct SurfaceSpecs

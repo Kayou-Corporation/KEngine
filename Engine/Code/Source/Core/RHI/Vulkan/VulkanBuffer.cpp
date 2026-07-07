@@ -1,4 +1,4 @@
-#include "Private/Vulkan/VulkanBuffer.hpp"
+#include "RHI/Vulkan/VulkanBuffer.hpp"
 
 BEGIN_NAMESPACE_RHI
 
