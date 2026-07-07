@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Public/Device.hpp"
+#include "RHI/API/Device.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
-#include "Private/Vulkan/VulkanQueue.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanQueue.hpp"
 
 DISABLE_WARNINGS
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Public/Shader.hpp"
+#include "RHI/API/Shader.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
 
 BEGIN_NAMESPACE_RHI
 

@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Public/CommandList.hpp"
-#include "Public/RHI.hpp"
+#include "RHI/API/Buffer.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
-#include "Private/Vulkan/VulkanQueue.hpp"
-#include "Private/Vulkan/VulkanRenderpass.hpp"
-#include "Private/Vulkan/VulkanBuffer.hpp"
-#include "Private/Vulkan/VulkanImage.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanQueue.hpp"
+#include "RHI/Vulkan/VulkanRenderpass.hpp"
+#include "RHI/Vulkan/VulkanBuffer.hpp"
+#include "RHI/Vulkan/VulkanImage.hpp"
 
 BEGIN_NAMESPACE_RHI
 

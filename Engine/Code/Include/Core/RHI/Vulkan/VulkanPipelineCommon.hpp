@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Public/PipelineCommon.hpp"
+#include "RHI/API/PipelineCommon.hpp"
 
-#include "VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
 
 BEGIN_NAMESPACE_RHI
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Public/Image.hpp"
+#include "RHI/API/Image.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
-#include "Private/Vulkan/VulkanTranslate.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanTranslate.hpp"
 
 DISABLE_WARNINGS
 

@@ -6,9 +6,9 @@
 #include <unordered_set>
 #include <optional>
 
-#include "Public/RHI.hpp"
+#include "RHI/API/RHI.hpp"
 #include "Utils/Memory.hpp"
-#include "Private/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
 
 DISABLE_WARNINGS
 

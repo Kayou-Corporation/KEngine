@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Public/Swapchain.hpp"
+#include "RHI/API/Swapchain.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
 
 BEGIN_NAMESPACE_RHI
 

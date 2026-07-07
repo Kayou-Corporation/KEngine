@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Public/Syncronisation.hpp"
+#include "RHI/API/Syncronisation.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
 
 BEGIN_NAMESPACE_RHI
 
