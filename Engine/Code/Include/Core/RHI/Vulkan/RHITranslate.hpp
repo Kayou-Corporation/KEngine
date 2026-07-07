@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Public/RHI.hpp"
-#include "Private/Vulkan/VulkanUtils.hpp"
+#include "RHI/API/RHI.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
 
 BEGIN_NAMESPACE_RHI
 

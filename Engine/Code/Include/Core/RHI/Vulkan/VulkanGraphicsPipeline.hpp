@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Public/GraphicsPipeline.hpp"
+#include "RHI/API/GraphicsPipeline.hpp"
 
-#include "VulkanUtils.hpp"
-#include "Private/Vulkan/VulkanShader.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanShader.hpp"
 
 BEGIN_NAMESPACE_RHI
 

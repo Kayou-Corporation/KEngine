@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Public/DescriptorSet.hpp"
+#include "RHI/API/DescriptorSet.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
-#include "Private/Vulkan/VulkanPipelineCommon.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanPipelineCommon.hpp"
 
 #include <map>
 

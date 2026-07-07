@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Public/Renderpass.hpp"
+#include "RHI/API/Renderpass.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
 
 BEGIN_NAMESPACE_RHI
 

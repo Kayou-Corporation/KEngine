@@ -13,7 +13,7 @@ RESTORE_WARNINGS
 #include <slang-com-helper.h>
 #include <spdlog/spdlog.h>
 
-#include "Public/RHI.hpp"
+#include "RHI/API/RHI.hpp"
 
 BEGIN_NAMESPACE_RHI
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Public/Sampler.hpp"
+#include "RHI/API/Sampler.hpp"
 
-#include "Private/Vulkan/VulkanUtils.hpp"
+#include "RHI/Vulkan/VulkanUtils.hpp"
 
 BEGIN_NAMESPACE_RHI
 
