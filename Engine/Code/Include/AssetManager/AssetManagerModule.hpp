@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CoreModule.hpp"
+
 #define ASSETMANAGER_NAMESPACE AssetManager
 
 #define BEGIN_NAMESPACE_ASSETMANAGER BEGIN_NAMESPACE_KAYOU namespace ASSETMANAGER_NAMESPACE {
