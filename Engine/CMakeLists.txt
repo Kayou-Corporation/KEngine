@@ -76,7 +76,8 @@ target_link_libraries(${K_TARGET_NAME} PUBLIC WINDOW)
 add_subdirectory(${K_INCLUDE_PATH}/CORERUNTIME)
 target_link_libraries(${K_TARGET_NAME} PUBLIC CORERUNTIME)
 
-target_link_libraries(${K_TARGET_NAME} PUBLIC stb)
+add_subdirectory(${K_INCLUDE_PATH}/ASSETMANAGER)
+target_link_libraries(${K_TARGET_NAME} PUBLIC ASSETMANAGER)
 
 #target_include_directories(${K_TARGET_NAME} "Libs/Stbimage")
 
