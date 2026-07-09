@@ -16,6 +16,9 @@
 [submodule "Engine/Libs/Slang"]
 	path = Engine/Libs/Slang
 	url = https://github.com/shader-slang/slang.git
+[submodule "Engine/Libs/KUtils"]
+	path = Engine/Libs/KUtils
+	url = https://github.com/Kayou-Corporation/KUtils.git
 [submodule "Engine/Libs/KThreads"]
 	path = Engine/Libs/KThreads
 	url = https://github.com/Kayou-Corporation/KThreads

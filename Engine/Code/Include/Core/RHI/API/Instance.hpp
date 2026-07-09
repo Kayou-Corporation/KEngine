@@ -28,14 +28,14 @@ class Instance : virtual public Core::IResource
 public:
 	virtual ~Instance() = default;
 
-	KENGINE_API virtual void Create(const InstanceSpecs& specs) = 0;
-	KENGINE_API virtual void Destroy() = 0;
+	KAPI virtual void Create(const InstanceSpecs& specs) = 0;
+	KAPI virtual void Destroy() = 0;
 
-	KENGINE_API virtual SurfaceHandle CreateSurface(const SurfaceSpecs& specs) = 0;
-	KENGINE_API virtual void DestroySurface(SurfaceHandle surface) = 0;
+	KAPI virtual SurfaceHandle CreateSurface(const SurfaceSpecs& specs) = 0;
+	KAPI virtual void DestroySurface(SurfaceHandle surface) = 0;
 
-	KENGINE_API virtual DeviceHandle CreateDevice(const DeviceSpecs& specs) = 0;
-	KENGINE_API virtual void DestroyDevice(DeviceHandle device) = 0;
+	KAPI virtual DeviceHandle CreateDevice(const DeviceSpecs& specs) = 0;
+	KAPI virtual void DestroyDevice(DeviceHandle device) = 0;
 
 protected:
 	Version m_appVersion;

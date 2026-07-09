@@ -52,6 +52,7 @@ function(engine_add_module MODULE_NAME)
     target_include_directories(${MODULE_NAME} PUBLIC Include)
     target_compile_definitions(${MODULE_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
     target_compile_definitions(${MODULE_NAME} PRIVATE _CRT_SECURE_NO_DEPRECATE)
+    target_compile_definitions(${MODULE_NAME} PRIVATE EXPORTS)
 
 endfunction()
 
@@ -95,7 +96,8 @@ set_target_properties(${K_TARGET_NAME} PROPERTIES PREFIX "")
 # Set dll name
 set_target_properties(${K_TARGET_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
 
-
+# Set export macro
+target_compile_definitions(${K_TARGET_NAME} PRIVATE EXPORTS)
 
 #---------------------------------------#
 #           COPY ASSETS FOLDER          #

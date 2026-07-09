@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Platform.hpp"
+
 #define KAYOU_GLOBAL Kayou
 
 #define USING_KAYOU using namespace KAYOU_GLOBAL;
@@ -13,7 +15,7 @@
 #define END_NAMESPACE_CORE } /* namespace CORE_NAMESPACE */ END_NAMESPACE_KAYOU
 
 
-#if defined(__clang__)
+#if defined(KCOMPILER_CLANG)
 #define DO_PRAGMA(x) _Pragma(#x)
 // Some warning flags might need to be added, see the flag in the output to add it here
 #define DISABLE_WARNINGS \
@@ -27,7 +29,7 @@
 
 #define RESTORE_WARNINGS DO_PRAGMA(clang diagnostic pop)
 
-#elif defined(__GNUC__)
+#elif defined(KCOMPILER_GCC)
 #define DO_PRAGMA(x) _Pragma(#x)
 // Some warning flags might need to be added, see the flag in the output to add it here
 #define DISABLE_WARNINGS \
@@ -41,7 +43,7 @@ DO_PRAGMA(GCC diagnostic ignored "-Winit-self")
 
 #define RESTORE_WARNINGS DO_PRAGMA(GCC diagnostic pop)
 
-#elif defined(_MSC_VER)
+#elif defined(KCOMPILER_MSVC)
 // Some warning flags might need to be added, see the flag in the output to add it here
 #define DISABLE_WARNINGS __pragma(warning(push)) __pragma(warning(disable: 4100 4189 4244 4267 4456 4700 4701 4703 4996 4324))
 #define RESTORE_WARNINGS __pragma(warning(pop))

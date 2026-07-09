@@ -9,11 +9,11 @@ class DescriptorSetLayout : virtual public Core::IResource
 public:
 	virtual ~DescriptorSetLayout() = default;
 
-	KENGINE_API std::string GetName() const { return m_descriptorName; }
-	KENGINE_API uint32_t GetIndex() const { return m_descriptorIndex; }
+	KAPI std::string GetName() const { return m_descriptorName; }
+	KAPI uint32_t GetIndex() const { return m_descriptorIndex; }
 
-	KENGINE_API void SetName(std::string name) { m_descriptorName = name; }
-	KENGINE_API void SetIndex(uint32_t index) { m_descriptorIndex = index; }
+	KAPI void SetName(std::string name) { m_descriptorName = name; }
+	KAPI void SetIndex(uint32_t index) { m_descriptorIndex = index; }
 
 protected:
 	std::string m_descriptorName;
@@ -26,13 +26,13 @@ class PushConstantLayout : virtual public Core::IResource
 public:
 	virtual ~PushConstantLayout() = default;
 
-	KENGINE_API std::string GetName() const { return m_name; }
-	KENGINE_API uint32_t GetSize() const { return m_totalSize; }
-	KENGINE_API ShaderStage GetStage() const { return m_stage; }
+	KAPI std::string GetName() const { return m_name; }
+	KAPI uint32_t GetSize() const { return m_totalSize; }
+	KAPI ShaderStage GetStage() const { return m_stage; }
 
-	KENGINE_API void SetName(std::string name) { m_name = name; }
-	KENGINE_API void SetSize(uint32_t offset) { m_totalSize = offset; }
-	KENGINE_API void SetStage(ShaderStage stage) { m_stage = stage; }
+	KAPI void SetName(std::string name) { m_name = name; }
+	KAPI void SetSize(uint32_t offset) { m_totalSize = offset; }
+	KAPI void SetStage(ShaderStage stage) { m_stage = stage; }
 
 protected:
 	std::string  m_name;
@@ -45,17 +45,17 @@ class PipelineLayout : virtual public Core::IResource
 public:
 	virtual ~PipelineLayout() = default;
 
-	KENGINE_API DescriptorSetLayoutHandle GetDescriptorSetLayout(std::string name) const;
-	KENGINE_API DescriptorSetLayoutHandle GetDescriptorSetLayout(uint32_t index) const;
-	KENGINE_API std::vector<DescriptorSetLayoutHandle>& GetAllDescriptorSetsLayouts() { return m_descriptorsLayouts; }
-	KENGINE_API std::vector<std::string> GetAllDescriptorSetsLayoutsNames()const;
-	KENGINE_API uint32_t GetDescriptorSetLayoutIndex(std::string name) const;
+	KAPI DescriptorSetLayoutHandle GetDescriptorSetLayout(std::string name) const;
+	KAPI DescriptorSetLayoutHandle GetDescriptorSetLayout(uint32_t index) const;
+	KAPI std::vector<DescriptorSetLayoutHandle>& GetAllDescriptorSetsLayouts() { return m_descriptorsLayouts; }
+	KAPI std::vector<std::string> GetAllDescriptorSetsLayoutsNames()const;
+	KAPI uint32_t GetDescriptorSetLayoutIndex(std::string name) const;
 
-	KENGINE_API PushConstantLayoutHandle GetPushConstantLayouts(std::string name) const;
-	KENGINE_API std::vector<PushConstantLayoutHandle>& GetAllPushConstantsLayouts() { return m_pushConstantsLayouts; }
+	KAPI PushConstantLayoutHandle GetPushConstantLayouts(std::string name) const;
+	KAPI std::vector<PushConstantLayoutHandle>& GetAllPushConstantsLayouts() { return m_pushConstantsLayouts; }
 
-	KENGINE_API void AddDescriptorSetLayout(DescriptorSetLayoutHandle layout) { m_descriptorsLayouts.push_back(layout); }
-	KENGINE_API void AddPushConstantLayout(PushConstantLayoutHandle layout) { m_pushConstantsLayouts.push_back(layout); }
+	KAPI void AddDescriptorSetLayout(DescriptorSetLayoutHandle layout) { m_descriptorsLayouts.push_back(layout); }
+	KAPI void AddPushConstantLayout(PushConstantLayoutHandle layout) { m_pushConstantsLayouts.push_back(layout); }
 
 protected:
 	std::vector<DescriptorSetLayoutHandle> m_descriptorsLayouts;
@@ -67,11 +67,11 @@ class Pipeline : virtual public Core::IResource
 public:
 	virtual ~Pipeline() = default;
 
-	KENGINE_API PipelineType GetType() { return m_type; }
-	KENGINE_API PipelineLayoutHandle GetLayout() { return m_layout; }
+	KAPI PipelineType GetType() { return m_type; }
+	KAPI PipelineLayoutHandle GetLayout() { return m_layout; }
 
-	KENGINE_API void SetType(PipelineType type) { m_type = type; }
-	KENGINE_API void SetLayout(PipelineLayoutHandle layout) { m_layout = layout; }
+	KAPI void SetType(PipelineType type) { m_type = type; }
+	KAPI void SetLayout(PipelineLayoutHandle layout) { m_layout = layout; }
 
 
 protected:
