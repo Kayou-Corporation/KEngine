@@ -9,6 +9,8 @@
 #include "RHI/Vulkan/VulkanSurface.hpp"
 #include "RHI/Vulkan/VulkanDevice.hpp"
 
+#include "BuildMode.hpp"
+
 BEGIN_NAMESPACE_CORE
 
 void VulkanInstance::Create(const InstanceSpecs& specs)
@@ -24,7 +26,7 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	Core::RefCountPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
 	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
 
-#ifdef KENGINE_DEBUG
+#ifdef KDEBUG
 	vkExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif 
 
@@ -39,7 +41,7 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	createInfo.setPEnabledExtensionNames(vkExtensions);
 
 	[[maybe_unused]] vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-#ifdef KENGINE_DEBUG
+#ifdef KDEBUG
 	debugCreateInfo.setMessageSeverity
 	(vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
 		vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
@@ -62,14 +64,14 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 
 	m_dispatchLoader.init(m_handle, vkGetInstanceProcAddr);
 
-#ifdef KENGINE_DEBUG
+#ifdef KDEBUG
 	m_debugHandler = VK_CHECK_RESULT(m_handle.createDebugUtilsMessengerEXT(debugCreateInfo, nullptr, m_dispatchLoader), "Can't create validation layers");
 #endif
 }
 
 void VulkanInstance::Destroy()
 {
-#ifdef KENGINE_DEBUG
+#ifdef KDEBUG
 	m_handle.destroyDebugUtilsMessengerEXT(m_debugHandler, nullptr, m_dispatchLoader);
 #endif
 

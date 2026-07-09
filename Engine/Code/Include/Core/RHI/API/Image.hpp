@@ -1,8 +1,5 @@
 #pragma once
 
-#include "Utils/Export.hpp"
-#include "Utils/Memory.hpp"
-
 #include "RHI/API/RHI.hpp"
 
 BEGIN_NAMESPACE_CORE
@@ -50,10 +47,10 @@ class Image : virtual public Core::IResource
 public:
 	virtual ~Image() = default;
 
-	KENGINE_API Extent3D GetExtent() { return m_rhiExtent; }
-	KENGINE_API Format GetFormat() { return m_rhiFormat; }
-	KENGINE_API Layout GetCurrentLayout() { return m_rhiCurrentLayout; }
-	KENGINE_API Layout GetTargetLayout() { return m_rhiTargetLayout; }
+	KAPI Extent3D GetExtent() { return m_rhiExtent; }
+	KAPI Format GetFormat() { return m_rhiFormat; }
+	KAPI Layout GetCurrentLayout() { return m_rhiCurrentLayout; }
+	KAPI Layout GetTargetLayout() { return m_rhiTargetLayout; }
 
 protected:
 	Extent3D m_rhiExtent;

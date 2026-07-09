@@ -84,7 +84,7 @@ std::vector<const char*> SDLVulkanWindowRenderer::GetVulkanInstanceExtensions()
 	if (sdlInstanceExtensions && sdlInstanceExtensionsCount > 0)
 		extensions.assign(sdlInstanceExtensions, sdlInstanceExtensions + sdlInstanceExtensionsCount);
 
-#ifdef KENGINE_DEBUG
+#ifdef KDEBUG
 	extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 #endif
 	return extensions;

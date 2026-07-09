@@ -131,7 +131,7 @@ public:
     // -------------- Pipeline -------------- // 
     virtual GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) override;
     // TODO : Implment compute pipeline
-    //KENGINE_API virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
+    //KAPI virtual Core::RefCountPtr<ComputePipeline> CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
     virtual void DestroyPipeline(PipelineHandle pipeline) override;
 
     virtual void UpdateCompatibility(SurfaceHandle surface) override;

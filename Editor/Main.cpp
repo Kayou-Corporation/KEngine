@@ -18,27 +18,29 @@
 #include "RHI/API/RHI.hpp"
 #include "Camera/EditorCamera.hpp"
 
+#include "BuildMode.hpp"
+
 USING_KAYOU
 
 DISABLE_WARNINGS
 
-#ifdef _MSC_VER
+#ifdef KCOMPILER_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4309)
 #endif
 
-#ifdef __clang__
+#ifdef KCOMPILER_CLANG
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmicrosoft-enum-value"
 #endif
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#ifdef __clang__
+#ifdef KCOMPILER_CLANG
 #pragma clang diagnostic pop
 #endif
 
-#ifdef _MSC_VER
+#ifdef KCOMPILER_MSVC
 #pragma warning(pop)
 #endif
 
@@ -72,7 +74,7 @@ struct Model
 
 int main()
 {
-#ifdef KENGINE_DEBUG
+#ifdef KDEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
 

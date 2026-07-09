@@ -6,7 +6,7 @@
 #include "WindowModule.hpp"
 #include "CoreModule.hpp"
 #include "Utils/Memory.hpp"
-#include "Utils/Export.hpp"
+#include "Export.hpp"
 
 BEGIN_NAMESPACE_WINDOW
 
@@ -29,11 +29,11 @@ class Window : virtual public Core::IResource
 public:
 	virtual ~Window() = default;
 
-	KENGINE_API virtual void Create(const WindowSpecs& specs) = 0;
-	KENGINE_API virtual void Destroy() = 0;
+	KAPI virtual void Create(const WindowSpecs& specs) = 0;
+	KAPI virtual void Destroy() = 0;
 
-	KENGINE_API virtual bool ShouldClose() = 0;
-	KENGINE_API virtual void PollEvents() = 0;
+	KAPI virtual bool ShouldClose() = 0;
+	KAPI virtual void PollEvents() = 0;
 
 	void ResizeComplete() { m_HasResize = false; }
 

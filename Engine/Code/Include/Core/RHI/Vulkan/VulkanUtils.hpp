@@ -6,9 +6,11 @@
 #define VULKAN_HPP_NO_EXCEPTIONS
 #include <vulkan/vulkan.hpp>
 
-#include "Utils/Export.hpp"
+#include "Export.hpp"
+#include "BuildMode.hpp"
+#include "Debug.hpp"
 
-#ifdef KENGINE_DEBUG
+#ifdef KDEBUG
 
 #define VK_CHECK_RESULT(func, message)                                       \
     ([&]() {                                                                 \
@@ -44,7 +46,7 @@
 
 #endif
 
-#ifdef KENGINE_DEBUG
+#ifdef KDEBUG
 #define VK_CHECK_VOID(func, message)                                             \
     do {                                                                             \
         vk::Result _code = (func);                                                   \

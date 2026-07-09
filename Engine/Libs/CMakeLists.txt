@@ -61,7 +61,10 @@ if(TARGET assimp)
     endif()
 endif()
 
-# ----------- Assimp ----------- #
+# ----------- STB ----------- #
 add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Stbimage")
+
+# ----------- KUtils ----------- #
+add_subdirectory(KUtils)
 

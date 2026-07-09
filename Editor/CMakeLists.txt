@@ -68,7 +68,7 @@ set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT KEditor)
 #---------------------------------------#
 add_subdirectory(Libs)
 
-target_link_libraries(${KE_TARGET_NAME} PUBLIC KEngine)
+target_link_libraries(${KE_TARGET_NAME} PUBLIC KEngine KUtils)
 
 
 

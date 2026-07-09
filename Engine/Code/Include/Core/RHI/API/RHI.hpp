@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreModule.hpp"
-#include "Utils/Export.hpp"
+#include "Export.hpp"
 #include "Utils/Memory.hpp"
 
 BEGIN_NAMESPACE_CORE

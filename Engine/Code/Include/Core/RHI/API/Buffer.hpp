@@ -23,7 +23,7 @@ public:
 	virtual ~Buffer() = default;
 
 	// Warning : will return null if the buffer is GPU only
-	KENGINE_API virtual void* GetMappedData() const = 0;
+	KAPI virtual void* GetMappedData() const = 0;
 
 	virtual bool GetIsGpuOnly() const { return m_isGpuOnly; }
 	virtual MemoryAccess GetMemoryAccess() const { return m_access; }

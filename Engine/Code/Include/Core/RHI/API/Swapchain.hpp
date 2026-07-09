@@ -27,12 +27,12 @@ class Swapchain : public virtual Core::IResource
 public:
 	virtual ~Swapchain() = default;
 
-	KENGINE_API virtual uint32_t GetCurrentImageIndex() = 0;
-	KENGINE_API virtual uint32_t GetImageCount() = 0;
-	KENGINE_API virtual void SwapImages() = 0;
+	KAPI virtual uint32_t GetCurrentImageIndex() = 0;
+	KAPI virtual uint32_t GetImageCount() = 0;
+	KAPI virtual void SwapImages() = 0;
 
-	KENGINE_API Format GetColorImageFormat() const { return m_RHIcolorFormat; }
-	KENGINE_API Format GetDepthImageFormat() const { return m_RHIdepthFormat; }
+	KAPI Format GetColorImageFormat() const { return m_RHIcolorFormat; }
+	KAPI Format GetDepthImageFormat() const { return m_RHIdepthFormat; }
 
 protected:
 	Format m_RHIcolorFormat;
