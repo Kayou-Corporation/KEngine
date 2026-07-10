@@ -66,6 +66,11 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #---------------------------------------#
+#            DEFAULT ENGINE             #
+#---------------------------------------#
+target_include_directories(${K_TARGET_NAME} PUBLIC ${K_INCLUDE_PATH})
+
+#---------------------------------------#
 #                MODULE LIST            #
 #---------------------------------------#
 add_subdirectory(${K_INCLUDE_PATH}/Core)

@@ -2,18 +2,27 @@
 
 #include "AssetManagerModule.hpp"
 
-#include "ThreadManager.hpp"
+#include "ThreadPool.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
-
-class AssetLoader
+    class AssetLoader
 {
 public:
-    AssetLoader();
+    AssetLoader(std::unordered_map<Priority, int> priorityQueuesThreadsCount);
     ~AssetLoader();
 
 private:
-    ThreadManager m_threadManager;
+    ThreadPool m_pool;
+    std::unordered_map<Priority, std::string_view> m_queueNames;
+    int m_minimumThreads = 2;
+
+
+// Deleted constructors & operator
+private:
+    AssetLoader(const AssetLoader&) = delete;
+    AssetLoader& operator=(const AssetLoader&) = delete;
+    AssetLoader(AssetLoader&&) = delete;
+    AssetLoader& operator=(AssetLoader&&) = delete;
 };
 END_NAMESPACE_ASSETMANAGER
 
