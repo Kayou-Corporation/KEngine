@@ -68,16 +68,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #---------------------------------------#
 #                MODULE LIST            #
 #---------------------------------------#
-add_subdirectory(${K_INCLUDE_PATH}/CORE)
+add_subdirectory(${K_INCLUDE_PATH}/Core)
 target_link_libraries(${K_TARGET_NAME} PUBLIC CORE)
 
-add_subdirectory(${K_INCLUDE_PATH}/WINDOW)
+add_subdirectory(${K_INCLUDE_PATH}/Window)
 target_link_libraries(${K_TARGET_NAME} PUBLIC WINDOW)
 
-add_subdirectory(${K_INCLUDE_PATH}/CORERUNTIME)
+add_subdirectory(${K_INCLUDE_PATH}/CoreRuntime)
 target_link_libraries(${K_TARGET_NAME} PUBLIC CORERUNTIME)
 
-add_subdirectory(${K_INCLUDE_PATH}/ASSETMANAGER)
+add_subdirectory(${K_INCLUDE_PATH}/AssetManager)
 target_link_libraries(${K_TARGET_NAME} PUBLIC ASSETMANAGER)
 
 #target_include_directories(${K_TARGET_NAME} "Libs/Stbimage")
