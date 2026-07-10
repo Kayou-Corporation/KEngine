@@ -66,7 +66,9 @@ add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Stbimage")
 
 # ----------- KUtils ----------- #
-add_subdirectory(KUtils)
+if(NOT TARGET KUtils)
+    add_subdirectory(KUtils)
+endif()
 
 # ----------- KTHREADS ----------- #
 set(KTHREAD_PERMISSIVE_EXCEPTIONS OFF)
