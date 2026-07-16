@@ -24,6 +24,9 @@ private:
     std::vector<std::string_view> m_queueNames;
     int m_minimumThreads = 2;
 
+    // Assets
+
+
 private:
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;

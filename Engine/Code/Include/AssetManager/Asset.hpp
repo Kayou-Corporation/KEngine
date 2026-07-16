@@ -21,6 +21,18 @@ public:
 protected:
     AssetType m_type;
 
+private:
+    void GuessAssetTypeFromSource(const std::string& source);
 };
+
+template<typename T>
+class SoftAssetPtr
+{
+public:
+
+private:
+    SoftAssetPtr() = delete;
+};
+
 END_NAMESPACE_ASSETMANAGER
 

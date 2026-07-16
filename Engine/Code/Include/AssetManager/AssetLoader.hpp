@@ -8,14 +8,10 @@ BEGIN_NAMESPACE_ASSETMANAGER
     class AssetLoader
 {
 public:
-    AssetLoader(std::unordered_map<Priority, int> priorityQueuesThreadsCount);
+    AssetLoader();
     ~AssetLoader();
 
 private:
-    ThreadPool m_pool;
-    std::unordered_map<Priority, std::string_view> m_queueNames;
-    int m_minimumThreads = 2;
-
 
 // Deleted constructors & operator
 private:
