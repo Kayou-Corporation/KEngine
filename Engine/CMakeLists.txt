@@ -69,7 +69,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #            DEFAULT ENGINE             #
 #---------------------------------------#
 target_include_directories(${K_TARGET_NAME} PUBLIC ${K_INCLUDE_PATH})
-target_link_libraries(${K_TARGET_NAME} PRIVATE spdlog::spdlog)
+
 #---------------------------------------#
 #                MODULE LIST            #
 #---------------------------------------#
