@@ -1,7 +1,7 @@
 #pragma once
 #include "CoreModule.hpp"
 
-#include "ThreadPool.hpp"
+//#include "ThreadPool.hpp"
 
 BEGIN_NAMESPACE_KAYOU
 
@@ -11,7 +11,7 @@ BEGIN_NAMESPACE_KAYOU
 class Engine
 {
 public:
-    Engine(std::unordered_map<std::string_view, int> priorityQueuesThreadsCount);
+    //Engine(std::unordered_map<std::string_view, int> priorityQueuesThreadsCount);
     ~Engine();
 
 
@@ -20,8 +20,8 @@ private:
     // Device
 
     // ThreadPool
-    ThreadPool m_pool;
-    std::vector<std::string_view> m_queueNames;
+    //ThreadPool m_pool;
+    //std::vector<std::string_view> m_queueNames;
     int m_minimumThreads = 2;
 
     // Assets
