@@ -397,22 +397,22 @@ enum class SemaphoreType
 	Timeline
 };
 
-constexpr const char* ShaderStageToEntry(ShaderStage sType)
+constexpr const char* ShaderStageToEntry(const ShaderStage sType)
 {
 	switch (sType)
 	{
-	case ShaderStage::Vertex:
-		return "vsMain";
-	case ShaderStage::Fragment:
-		return "fsMain";
-	case ShaderStage::Compute:
-		return "csMain";
-	case ShaderStage::Geometry:
-		return "gsMain";
-	case ShaderStage::Tesselation:
-		return "tsMain";
-		default:
-			return "";
+		case ShaderStage::Vertex:
+			return "vsMain";
+		case ShaderStage::Fragment:
+			return "fsMain";
+		case ShaderStage::Compute:
+			return "csMain";
+		case ShaderStage::Geometry:
+			return "gsMain";
+		case ShaderStage::Tesselation:
+			return "tsMain";
+		case ShaderStage::All:
+			return "main";
 	}
 
 	return "main";

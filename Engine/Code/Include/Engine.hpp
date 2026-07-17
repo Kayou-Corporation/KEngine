@@ -11,7 +11,7 @@ BEGIN_NAMESPACE_KAYOU
 class Engine
 {
 public:
-    Engine(std::unordered_map<std::string_view, int> priorityQueuesThreadsCount);
+    explicit Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
     ~Engine();
 
 

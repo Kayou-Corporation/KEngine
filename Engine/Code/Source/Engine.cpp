@@ -3,7 +3,7 @@
 #include "spdlog/spdlog.h"
 BEGIN_NAMESPACE_KAYOU
 
-Engine::Engine(std::unordered_map<std::string_view, int> priorityQueuesThreadsCount)
+Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount)
 {
     //----------- ThreadPool --------------//
     std::vector<Priority> priorities = std::vector<Priority>(priorityQueuesThreadsCount.size());
@@ -16,7 +16,7 @@ Engine::Engine(std::unordered_map<std::string_view, int> priorityQueuesThreadsCo
         totalThreadsCount += threadCount;
         m_queueNames.push_back(queueName);
 
-        m_pool.InitQueue(queueName, threadCount);
+        m_pool.InitQueue(queueName, static_cast<uint8_t>(threadCount));
     }
 
     if (std::thread::hardware_concurrency() - m_minimumThreads < totalThreadsCount)
@@ -27,9 +27,7 @@ Engine::Engine(std::unordered_map<std::string_view, int> priorityQueuesThreadsCo
     
 }
 
-Engine::~Engine()
-{
-
-}
+// TODO : Replace with destructor when needed
+Engine::~Engine() = default;
 
 END_NAMESPACE_KAYOU

@@ -119,6 +119,19 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       }
+    },
+
+    {
+      "name": "vs2026",
+      "displayName": "Visual Studio 2026",
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/TEMP/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
     }
   ],
 
@@ -173,6 +186,20 @@
     {
       "name": "VS2022 Release",
       "configurePreset": "vs2022",
+      "configuration": "Release",
+      "verbose": true,
+      "jobs": 8
+    },
+    {
+      "name": "VS2026 Debug",
+      "configurePreset": "vs2026",
+      "configuration": "Debug",
+      "verbose": true,
+      "jobs": 8
+    },
+    {
+      "name": "VS2026 Release",
+      "configurePreset": "vs2026",
       "configuration": "Release",
       "verbose": true,
       "jobs": 8

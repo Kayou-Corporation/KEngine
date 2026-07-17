@@ -747,31 +747,28 @@ inline vk::FrontFace TranslateToVulkan(FrontFace face)
     {
     case FrontFace::ClockWise:
         return vk::FrontFace::eClockwise;
-    case FrontFace::CounterClockWise:
-        return vk::FrontFace::eCounterClockwise;
+
     default:
         return vk::FrontFace::eCounterClockwise;
     }
 }
 
-inline vk::CullModeFlags TranslateToVulkan(CullMode mode)
+inline vk::CullModeFlags TranslateToVulkan(const CullMode mode)
 {
     switch (mode)
     {
     case CullMode::Front:
         return vk::CullModeFlagBits::eFront;
+
     case CullMode::Back:
-        return vk::CullModeFlagBits::eBack;    
-    case CullMode::None:
-        return vk::CullModeFlagBits::eNone;
+        return vk::CullModeFlagBits::eBack;
+
     default:
         return vk::CullModeFlagBits::eNone;
     }
-    
-    return vk::CullModeFlagBits::eNone; 
 }
 
-inline vk::AttachmentStoreOp TranslateToVulkan(StoreOp storeOp)
+inline vk::AttachmentStoreOp TranslateToVulkan(const StoreOp storeOp)
 {
     switch (storeOp)
     {
@@ -786,9 +783,9 @@ inline vk::AttachmentStoreOp TranslateToVulkan(StoreOp storeOp)
     }
 }
 
-inline vk::AttachmentLoadOp TranslateToVulkan(LoadOp storeOp)
+inline vk::AttachmentLoadOp TranslateToVulkan(const LoadOp loadOp)
 {
-    switch (storeOp)
+    switch (loadOp)
     {
     case LoadOp::Load:
         return vk::AttachmentLoadOp::eLoad;
@@ -804,7 +801,7 @@ inline vk::AttachmentLoadOp TranslateToVulkan(LoadOp storeOp)
     }
 }
 
-inline vk::DescriptorType TranslateToVulkan(slang::BindingType bindingType)
+inline vk::DescriptorType TranslateToVulkan(const slang::BindingType bindingType)
 {
     switch (bindingType)
     {
@@ -849,7 +846,7 @@ inline vk::DescriptorType TranslateToVulkan(slang::BindingType bindingType)
     }
 }
 
-inline vk::PipelineBindPoint TranslateToVulkan(PipelineType pipelineType)
+inline vk::PipelineBindPoint TranslateToVulkan(const PipelineType pipelineType)
 {
     switch (pipelineType)
     {
@@ -861,7 +858,7 @@ inline vk::PipelineBindPoint TranslateToVulkan(PipelineType pipelineType)
     }
 }
 
-inline vk::DescriptorType TranslateToVulkan(DescriptorType type)
+inline vk::DescriptorType TranslateToVulkan(const DescriptorType type)
 {
     switch (type)
     {
@@ -905,7 +902,7 @@ inline vk::DescriptorType TranslateToVulkan(DescriptorType type)
     return vk::DescriptorType::eSampler;
 }
 
-inline vk::Filter TranslateToVulkan(Filter filter)
+inline vk::Filter TranslateToVulkan(const Filter filter)
 {
     switch (filter)
     {
@@ -917,7 +914,7 @@ inline vk::Filter TranslateToVulkan(Filter filter)
     }
 }
 
-inline vk::SamplerMipmapMode TranslateToVulkan(SamplerMipmapMode mode)
+inline vk::SamplerMipmapMode TranslateToVulkan(const SamplerMipmapMode mode)
 {
     switch (mode)
     {
@@ -929,7 +926,7 @@ inline vk::SamplerMipmapMode TranslateToVulkan(SamplerMipmapMode mode)
     }
 }
 
-inline vk::SamplerAddressMode TranslateToVulkan(SamplerAddressMode mode)
+inline vk::SamplerAddressMode TranslateToVulkan(const SamplerAddressMode mode)
 {
     switch (mode)
     {
@@ -947,7 +944,7 @@ inline vk::SamplerAddressMode TranslateToVulkan(SamplerAddressMode mode)
     }
 }
 
-inline vk::CompareOp TranslateToVulkan(CompareOp op)
+inline vk::CompareOp TranslateToVulkan(const CompareOp op)
 {
     switch (op)
     {
@@ -971,7 +968,7 @@ inline vk::CompareOp TranslateToVulkan(CompareOp op)
     }
 }
 
-inline vk::BorderColor TranslateToVulkan(BorderColor color)
+inline vk::BorderColor TranslateToVulkan(const BorderColor color)
 {
     switch (color)
     {
@@ -991,7 +988,7 @@ inline vk::BorderColor TranslateToVulkan(BorderColor color)
     }
 }
 
-inline vk::PipelineBindPoint TranslateToVulkan(PipelineBindPoint point)
+inline vk::PipelineBindPoint TranslateToVulkan(const PipelineBindPoint point)
 {
     switch (point)
     {

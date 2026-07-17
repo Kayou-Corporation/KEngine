@@ -241,7 +241,7 @@ int main()
     Core::BufferSpecs vertexbufferSpecs{};
     vertexbufferSpecs.primaryUsage = Core::BufferUsage::Vertex;
     vertexbufferSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
-    vertexbufferSpecs.size = meshVertices.size() * sizeof(Vertex);
+    vertexbufferSpecs.size = static_cast<uint32_t>(meshVertices.size()) * sizeof(Vertex);
     vertexbufferSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
     vertexbufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
     Core::BufferHandle vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
@@ -250,7 +250,7 @@ int main()
     Core::BufferSpecs indexBufferSpecs{};
     indexBufferSpecs.primaryUsage = Core::BufferUsage::Index;
     indexBufferSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
-    indexBufferSpecs.size = meshIndices.size() * sizeof(uint32_t);
+    indexBufferSpecs.size = static_cast<uint32_t>(meshIndices.size()) * sizeof(uint32_t);
     indexBufferSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
     indexBufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
     Core::BufferHandle indexBuffer = device->CreateBuffer(indexBufferSpecs);
@@ -291,9 +291,9 @@ int main()
 
     copyBufferDataCommandList->Open();
     
-    copyBufferDataCommandList->SetBufferData(vertexBuffer, meshVertices.data(), meshVertices.size() * sizeof(Vertex), 0);
+    copyBufferDataCommandList->SetBufferData(vertexBuffer, meshVertices.data(), static_cast<uint32_t>(meshVertices.size()) * sizeof(Vertex), 0);
     
-    copyBufferDataCommandList->SetBufferData(indexBuffer, meshIndices.data(), meshIndices.size() * sizeof(uint32_t), 0);
+    copyBufferDataCommandList->SetBufferData(indexBuffer, meshIndices.data(), static_cast<uint32_t>(meshIndices.size()) * sizeof(uint32_t), 0);
     
     copyBufferDataCommandList->SetImageData(textureImage, texturePixels, t_texWidth * t_texHeight * 4);
 
@@ -521,7 +521,7 @@ int main()
         commandList->BindVertexBuffer(vertexBuffer, 0);
         commandList->BindIndexBuffer(indexBuffer, 0);
         
-        commandList->DrawIndexed(meshIndices.size(), 1, 0, 0, 0);
+        commandList->DrawIndexed(static_cast<uint32_t>(meshIndices.size()), 1, 0, 0, 0);
     
         commandList->EndRendering();
     

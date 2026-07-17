@@ -367,17 +367,17 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
                 if (!subField) 
                     continue;
 
-                std::string name = subField->getName();
+                std::string subfieldName = subField->getName();
 
-                uint32_t size = static_cast<uint32_t>(subField->getTypeLayout()->getSize(SLANG_PARAMETER_CATEGORY_UNIFORM));
+                uint32_t subfieldSize = static_cast<uint32_t>(subField->getTypeLayout()->getSize(SLANG_PARAMETER_CATEGORY_UNIFORM));
 
-                uint32_t offset = static_cast<uint32_t>(subField->getOffset(SLANG_PARAMETER_CATEGORY_UNIFORM));
+                uint32_t subfieldOffset = static_cast<uint32_t>(subField->getOffset(SLANG_PARAMETER_CATEGORY_UNIFORM));
 
-                PushConstant& pushConstant = pushConstantMap[pushConstantIdx];
-                pushConstant.name = name;
-                pushConstant.size = size;
-                pushConstant.offset = offset;
-                pushConstant.stage = isGlobalLayout ? ShaderStage::All : stage;
+                PushConstant& subfieldPushConstant = pushConstantMap[pushConstantIdx];
+                subfieldPushConstant.name = subfieldName;
+                subfieldPushConstant.size = subfieldSize;
+                subfieldPushConstant.offset = subfieldOffset;
+                subfieldPushConstant.stage = isGlobalLayout ? ShaderStage::All : stage;
 
                 pushConstantIdx++;
             }
