@@ -1,10 +1,9 @@
 #include "Engine.hpp"
 
 #include "spdlog/spdlog.h"
-
 BEGIN_NAMESPACE_KAYOU
 
-/*Engine::Engine(std::unordered_map<std::string_view, int> priorityQueuesThreadsCount)
+Engine::Engine(std::unordered_map<std::string_view, int> priorityQueuesThreadsCount)
 {
     //----------- ThreadPool --------------//
     std::vector<Priority> priorities = std::vector<Priority>(priorityQueuesThreadsCount.size());
@@ -31,6 +30,6 @@ BEGIN_NAMESPACE_KAYOU
 Engine::~Engine()
 {
 
-}*/
+}
 
 END_NAMESPACE_KAYOU
