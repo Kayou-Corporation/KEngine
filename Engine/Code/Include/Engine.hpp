@@ -16,6 +16,7 @@ public:
 
 
 
+// Deleted constructors & operator
 private:
     // Device
 

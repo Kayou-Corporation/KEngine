@@ -12,7 +12,7 @@ Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesTh
     m_queueNames.reserve(priorityQueuesThreadsCount.size());
     for (const auto& [name, threadCount] : priorityQueuesThreadsCount)
     {
-        std::string queueName = "AssetLoaderQueue_" + std::string(name);
+        std::string queueName = std::string(name);
         totalThreadsCount += threadCount;
         m_queueNames.push_back(queueName);
 

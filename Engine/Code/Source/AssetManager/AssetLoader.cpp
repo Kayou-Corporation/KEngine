@@ -11,9 +11,6 @@ AssetLoader::AssetLoader()
 
 AssetLoader::~AssetLoader()
 {
-    //for (const auto& queueName : m_queueNames)
-    //{
-       // m_pool.ReleaseQueue(queueName);
-    //}
+
 }
 END_NAMESPACE_ASSETMANAGER
