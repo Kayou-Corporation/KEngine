@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "AssetManagerModule.hpp"
+#include  "StackAllocator.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
 
@@ -12,7 +13,7 @@ public:
 // List of asset by type with id ?
 
 private:
-
+    Memory::StackAllocator m_allocator;
 
 // Deleted constructors & operator
 private:

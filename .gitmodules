@@ -22,3 +22,6 @@
 [submodule "Engine/Libs/KThreads"]
 	path = Engine/Libs/KThreads
 	url = https://github.com/Kayou-Corporation/KThreads
+[submodule "Engine/Libs/KAlloc"]
+	path = Engine/Libs/KAlloc
+	url = https://github.com/Kayou-Corporation/KAlloc.git

@@ -73,3 +73,6 @@ endif()
 # ----------- KTHREADS ----------- #
 set(KTHREAD_PERMISSIVE_EXCEPTIONS OFF)
 add_subdirectory(KThreads)
+
+# ----------- KTHREADS ----------- #
+add_subdirectory(KAlloc)
