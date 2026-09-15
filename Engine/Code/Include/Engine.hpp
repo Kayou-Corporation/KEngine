@@ -2,22 +2,33 @@
 #include "CoreModule.hpp"
 
 #include "ThreadPool.hpp"
+#include "Utils/Memory.hpp"
 
 BEGIN_NAMESPACE_KAYOU
 
 #define ENGINE_QUEUE_ASSET "AssetLoaderQueue"
 #define ENGINE_QUEUE_PHYSICS "PhysicsLoaderQueue"
 
-class Engine
+class Engine : public virtual Core::IResource
 {
 public:
-    explicit Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
-    ~Engine();
+    Engine() = delete;
+    Engine(Engine const&) = delete;
+    Engine& operator=(Engine const&) = delete;
+    ~Engine() {};
+
+    // TO BE USE ONLY 1 TIME
+    static void Init(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
+    static void Shutdown();
+
+    static Core::RefCountPtr<Engine> GetInstance();
 
 
 
-// Deleted constructors & operator
+
+
 private:
+    explicit Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
     // Device
 
     // ThreadPool
@@ -28,11 +39,9 @@ private:
     // Assets
 
 
-private:
-    Engine(const Engine&) = delete;
-    Engine& operator=(const Engine&) = delete;
-    Engine(Engine&&) = delete;
-    Engine& operator=(Engine&&) = delete;
+    inline static std::unique_ptr<Engine> m_instance{nullptr};
+    explicit Engine() : m_value{0} {}
+    int m_value;
 };
 
 END_NAMESPACE_KAYOU

@@ -13,7 +13,8 @@ public:
 // List of asset by type with id ?
 
 private:
-    Memory::StackAllocator m_allocator;
+    // All Asset
+    // All Asset per type (Mesh, Texture)
 
 // Deleted constructors & operator
 private:

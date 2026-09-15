@@ -3,6 +3,35 @@
 #include "spdlog/spdlog.h"
 BEGIN_NAMESPACE_KAYOU
 
+void Engine::Init(const std::unordered_map<std::string_view, int> &priorityQueuesThreadsCount)
+{
+    if (!m_instance)
+    {
+        m_instance = std::make_unique<Engine>(priorityQueuesThreadsCount);
+    }
+    else
+    {
+        spdlog::error("Engine already initialized");
+    }
+}
+
+void Engine::Shutdown()
+{
+    if (!m_instance)
+    {
+        spdlog::error("Engine already shut down");
+    }
+}
+
+Core::RefCountPtr<Engine> Engine::GetInstance()
+{
+    if (!m_instance)
+    {
+        m_instance = std::make_unique<Engine>();
+    }
+    return m_instance;
+}
+
 Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount)
 {
     //----------- ThreadPool --------------//
@@ -26,8 +55,5 @@ Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesTh
 
     
 }
-
-// TODO : Replace with destructor when needed
-Engine::~Engine() = default;
 
 END_NAMESPACE_KAYOU
