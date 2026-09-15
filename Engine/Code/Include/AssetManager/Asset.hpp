@@ -47,12 +47,21 @@ private:
 };
 
 template<typename T>
-class SoftAssetPtr
+class SoftAssetRef
 {
 public:
+    Core::RefCountPtr<T> Load();
+    Core::RefCountPtr<T> LoadAsync();
+
+    //KAPI AssetType GetType() const { return ; }
+    //KAPI std::string GetName() const { return m_name; }
+    KAPI uint32_t GetID() const { return m_id; }
 
 private:
-    SoftAssetPtr() = delete;
+    uint32_t m_id;
+
+private:
+    SoftAssetRef() = delete;
 };
 
 END_NAMESPACE_ASSETMANAGER

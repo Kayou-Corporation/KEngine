@@ -74,6 +74,7 @@ struct Model
 
 int main()
 {
+
 #ifdef KDEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif

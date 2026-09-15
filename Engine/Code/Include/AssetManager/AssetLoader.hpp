@@ -3,6 +3,7 @@
 #include "AssetManagerModule.hpp"
 
 #include "ThreadPool.hpp"
+#include "Utils/Memory.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
     class AssetLoader
@@ -11,7 +12,12 @@ public:
     AssetLoader();
     ~AssetLoader();
 
-private:
+    //template<typename AssetClass>
+    //Core::RefCountPtr<AssetClass> CreateAsset(const std::string_view& assetPath)
+    //{
+
+    //}
+
 
 // Deleted constructors & operator
 private:
