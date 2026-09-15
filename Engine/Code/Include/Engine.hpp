@@ -15,9 +15,11 @@ public:
     Engine() = delete;
     Engine(Engine const&) = delete;
     Engine& operator=(Engine const&) = delete;
+    Engine(Engine&&) = delete;
+    Engine& operator=(Engine&&) = delete;
     ~Engine() {};
 
-    // TO BE USE ONLY 1 TIME
+    // TO BE USED ONLY 1 TIME
     static void Init(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
     static void Shutdown();
 
@@ -27,8 +29,9 @@ public:
 
 
 
-private:
+protected:
     explicit Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
+
     // Device
 
     // ThreadPool
@@ -39,9 +42,7 @@ private:
     // Assets
 
 
-    inline static std::unique_ptr<Engine> m_instance{nullptr};
-    explicit Engine() : m_value{0} {}
-    int m_value;
+    inline static Core::RefCountPtr<Engine> m_instance{nullptr};
 };
 
 END_NAMESPACE_KAYOU

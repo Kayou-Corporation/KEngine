@@ -7,7 +7,7 @@ void Engine::Init(const std::unordered_map<std::string_view, int> &priorityQueue
 {
     if (!m_instance)
     {
-        m_instance = std::make_unique<Engine>(priorityQueuesThreadsCount);
+        m_instance = Core::CreateRefPtr<Engine>(priorityQueuesThreadsCount);
     }
     else
     {
@@ -27,7 +27,7 @@ Core::RefCountPtr<Engine> Engine::GetInstance()
 {
     if (!m_instance)
     {
-        m_instance = std::make_unique<Engine>();
+        spdlog::error("Engine not initialized");
     }
     return m_instance;
 }
