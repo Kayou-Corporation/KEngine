@@ -2,6 +2,7 @@
 
 #include "Window.hpp"
 #include "WindowRenderer.hpp"
+#include "Engine.hpp"
 #include "RHI/API/Surface.hpp"
 #include "RHI/API/Instance.hpp"
 #include "RHI/API/Device.hpp"
@@ -74,7 +75,7 @@ struct Model
 
 int main()
 {
-
+/*
 #ifdef KDEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
@@ -153,7 +154,7 @@ int main()
     stbi_uc* texturePixels = stbi_load(texturePath.c_str(), &t_texWidth, &t_texHeight, &t_texChannels, STBI_rgb_alpha);
    
 #pragma endregion
-
+*/
 #pragma region Setup 
     Core::RefCountPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
  
@@ -166,6 +167,10 @@ int main()
     
     window->Create(specs);
 
+	Engine::Init({ {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} });
+
+
+/*
     float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
 
     Core::EditorCamera editorCamera;
@@ -178,18 +183,17 @@ int main()
 
     editorCamera.RecalculateMatrices();
 
-    //glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
-    //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    //glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
-    //glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
-    //
-    //float fov = glm::radians(45.f);
-    //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
-    //float nearPlane = 0.1f;
-    //float farPlane = 100.0f;
-    //glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
-    //proj[1][1] *= -1;
+    glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
 
+    float fov = glm::radians(45.f);
+    float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+    glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
+    proj[1][1] *= -1
     CameraData initCam;
     initCam.cameraVP = editorCamera.GetViewProjectionMatrix();
     initCam.cameraPos = editorCamera.GetPosition();
@@ -205,7 +209,9 @@ int main()
     Model mdl;
     mdl.model = glm::transpose(model);
     mdl.normal = normalMatrix;
+	*/
 
+	/*
     Core::InstanceHandle instance = Core::RendererInterface::InitRenderer(Core::RendererAPI::Vulkan);
 
     Core::InstanceSpecs test;
@@ -421,10 +427,11 @@ int main()
 
     uint64_t frameCounter = 0;
     bool gpuResizeRequest = false;
+*/
     while (!window->ShouldClose())
     {
         window->PollEvents();
-         
+         /*
         if (window->GetHasResize() || gpuResizeRequest)
         {
             device->WaitIdle();
@@ -554,8 +561,9 @@ int main()
         }
     
         frameCounter++;
+        */
     }
-    
+    /*
     device->WaitIdle();
 
     device->DestroyBuffer(vertexBuffer);
@@ -597,11 +605,14 @@ int main()
     instance->DestroySurface(surface);
 
     instance->Destroy();
+    */
+
+	Engine::Shutdown();
 
     window->Destroy();
 
-    t_importer.FreeScene();
-    stbi_image_free(texturePixels);
+    //t_importer.FreeScene();
+    //stbi_image_free(texturePixels);
 
     return 0;
 }

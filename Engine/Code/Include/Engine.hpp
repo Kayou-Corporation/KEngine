@@ -42,6 +42,7 @@ protected:
     // Assets
 
 
+    // Replace by unique ptr
     inline static Core::RefCountPtr<Engine> m_instance{nullptr};
 };
 
