@@ -53,8 +53,8 @@ public:
 template<typename T>
 class RefCountPtr
 {
-    // Permet aux différentes spécialisations (ex: RefCountPtr<Window> et RefCountPtr<SDLWindow>)
-    // d'accéder à leurs membres privés respectifs (m_ptr).
+    template<typename U> friend class RefCountPtr;
+
 private:
     T* m_ptr = nullptr;
 
@@ -62,6 +62,8 @@ public:
     RefCountPtr() = default;
 
     explicit RefCountPtr(T* p) : m_ptr(p) { if (m_ptr) m_ptr->AddRef(); }
+
+    RefCountPtr(std::nullptr_t) noexcept : m_ptr(nullptr) {}
 
     RefCountPtr(const RefCountPtr& other) : m_ptr(other.m_ptr) { if (m_ptr) m_ptr->AddRef(); }
 
