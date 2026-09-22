@@ -73,30 +73,17 @@ struct Model
     glm::mat4 normal;
 };
 
-class TestResource : public Core::IResource
+class TestResource : public std::enable_shared_from_this<TestResource>
 {
 public:
-    static std::atomic<int> instanceCount;
-
-    TestResource() {
-        ++instanceCount;
-    }
-
-    virtual ~TestResource() {
-        --instanceCount;
-    }
-
-    // Si tu n'utilises pas le template RefCounter directement dans la classe :
-    // ces méthodes seront surchargées par RefCounter<TestResource>
-    unsigned long AddRef() override { return 0; }
-    unsigned long Release() override { return 0; }
-    unsigned long GetRefCount() override { return 0; }
+	TestResource() = default;
+	~TestResource() = default;
 };
-
-std::atomic<int> TestResource::instanceCount{ 0 };
 
 int main()
 {
+
+
 /*
 #ifdef KDEBUG
     spdlog::set_level(spdlog::level::debug);
@@ -177,6 +164,8 @@ int main()
    
 #pragma endregion
 */
+
+
 #pragma region Setup 
     Core::KSharedPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
  
@@ -189,8 +178,9 @@ int main()
     
     window->Create(specs);
 
-	Engine::Init({ {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} });
+	Core::Engine::Init({ {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} });
 
+	Core::Engine::Get().TestFunction();
 
 /*
     float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
@@ -629,7 +619,7 @@ int main()
     instance->Destroy();
     */
 
-	Engine::Shutdown();
+	Core::Engine::Shutdown();
 
     window->Destroy();
 

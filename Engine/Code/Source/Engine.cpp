@@ -1,13 +1,13 @@
 #include "Engine.hpp"
 
 #include "spdlog/spdlog.h"
-BEGIN_NAMESPACE_KAYOU
+BEGIN_NAMESPACE_CORE
 
 void Engine::Init(const std::unordered_map<std::string_view, int> &priorityQueuesThreadsCount)
 {
     if (!m_instance)
     {
-        m_instance = Core::CreateRefPtr<Engine>(priorityQueuesThreadsCount);
+        m_instance = Core::CreateUniquePtr<Engine>(priorityQueuesThreadsCount);
     }
     else
     {
@@ -21,15 +21,16 @@ void Engine::Shutdown()
     {
         spdlog::error("Engine already shut down");
     }
+    m_instance.Reset();
 }
 
-Core::KSharedPtr<Engine> Engine::GetInstance()
+Engine& Engine::Get()
 {
     if (!m_instance)
     {
         spdlog::error("Engine not initialized");
     }
-    return m_instance;
+    return *m_instance;
 }
 
 Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount)
@@ -53,7 +54,7 @@ Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesTh
         spdlog::warn("AssetLoader: Not enough threads available for the requested queues. Some queues may not have enough threads to function properly.");
     }
 
-    
+
 }
 
-END_NAMESPACE_KAYOU
+END_NAMESPACE_CORE
