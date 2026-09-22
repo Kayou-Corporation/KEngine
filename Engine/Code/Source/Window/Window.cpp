@@ -5,7 +5,7 @@
 #include <spdlog/spdlog.h>
 
 BEGIN_NAMESPACE_WINDOW
-	Core::RefCountPtr<Window> WindowInterface::InitWindow(WindowAPI api)
+	Core::KSharedPtr<Window> WindowInterface::InitWindow(WindowAPI api)
 {
 	switch (api)
 	{

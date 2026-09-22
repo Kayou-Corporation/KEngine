@@ -42,7 +42,7 @@ public:
 	std::string GetName() const { return m_windowName; }
 	bool GetHasResize() const { return m_HasResize; }
 
-	Core::RefCountPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
+	Core::KSharedPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
 
 protected:
 	uint32_t m_width = 0u;
@@ -52,7 +52,7 @@ protected:
 
 	std::string m_windowName;
 
-	Core::RefCountPtr<WindowRenderer> m_windowRenderer;
+	Core::KSharedPtr<WindowRenderer> m_windowRenderer;
 };
 
 // -------- Interface ----------
@@ -63,7 +63,7 @@ enum WindowAPI
 
 struct WindowInterface
 {
-	static Core::RefCountPtr<Window> InitWindow(WindowAPI api);
+	static Core::KSharedPtr<Window> InitWindow(WindowAPI api);
 };
 
 END_NAMESPACE_WINDOW

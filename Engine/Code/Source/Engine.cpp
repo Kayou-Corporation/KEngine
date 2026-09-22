@@ -23,7 +23,7 @@ void Engine::Shutdown()
     }
 }
 
-Core::RefCountPtr<Engine> Engine::GetInstance()
+Core::KSharedPtr<Engine> Engine::GetInstance()
 {
     if (!m_instance)
     {

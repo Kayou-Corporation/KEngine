@@ -55,8 +55,8 @@ void VulkanCommandList::EndRendering()
 //----------- Bind --------------//
 void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, std::string layoutName, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
-	Core::RefCountPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
-	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
+	Core::KSharedPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
 
 	vk::PipelineLayout pipelineLayout = RHVulkanIPipelineLayout->GetHandle();
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
@@ -68,8 +68,8 @@ void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout
 
 void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, uint32_t layoutIndex, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
-	Core::RefCountPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
-	Core::RefCountPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
+	Core::KSharedPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
 
 	vk::PipelineLayout pipelineLayout = RHVulkanIPipelineLayout->GetHandle();
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
@@ -80,7 +80,7 @@ void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout
 
 void VulkanCommandList::BindVertexBuffer(BufferHandle RHIVertexBuffer, uint32_t offset)
 {
-	Core::RefCountPtr<VulkanBuffer> RHVulkanVertexBuffer = RHIVertexBuffer.CastAs<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHVulkanVertexBuffer = RHIVertexBuffer.CastAs<VulkanBuffer>();
 	
 	vk::Buffer buffer = RHVulkanVertexBuffer->GetHandle();
 	vk::DeviceSize vkOffset = static_cast<vk::DeviceSize>(offset);
@@ -90,7 +90,7 @@ void VulkanCommandList::BindVertexBuffer(BufferHandle RHIVertexBuffer, uint32_t 
 
 void VulkanCommandList::BindIndexBuffer(BufferHandle RHIIndexBuffer, uint32_t offset)
 {
-	Core::RefCountPtr<VulkanBuffer> RHVulkanIndexBuffer = RHIIndexBuffer.CastAs<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHVulkanIndexBuffer = RHIIndexBuffer.CastAs<VulkanBuffer>();
 
 	vk::Buffer buffer = RHVulkanIndexBuffer->GetHandle();
 	vk::DeviceSize vkOffset = static_cast<vk::DeviceSize>(offset);
@@ -131,7 +131,7 @@ void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32
 {
 	ASSERT((size + offset) <= RHIBuffer->GetSize(), "Data is too large");
 
-	Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer = RHIBuffer.CastAs<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHIVulkanBuffer = RHIBuffer.CastAs<VulkanBuffer>();
 
 	VmaAllocator memoryAllocator = m_handle->memoryAllocator;
 
@@ -200,8 +200,8 @@ void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32
 
 void VulkanCommandList::CopyBufferToBuffer(BufferHandle RHISrcBuffer, uint32_t srcOffset, BufferHandle RHIDstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage, bool returnDstBufferToInitialStage)
 {
-	Core::RefCountPtr<VulkanBuffer> RHIVulkanSrcBuffer = RHISrcBuffer.CastAs<VulkanBuffer>();
-	Core::RefCountPtr<VulkanBuffer> RHIVulkanDstBuffer = RHIDstBuffer.CastAs<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHIVulkanSrcBuffer = RHISrcBuffer.CastAs<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHIVulkanDstBuffer = RHIDstBuffer.CastAs<VulkanBuffer>();
 
 	vk::Buffer srcBuffer = RHIVulkanSrcBuffer->GetHandle();
 	vk::Buffer dstBuffer = RHIVulkanDstBuffer->GetHandle();
@@ -257,7 +257,7 @@ void VulkanCommandList::CopyBufferToBuffer(BufferHandle RHISrcBuffer, uint32_t s
 
 void VulkanCommandList::SetImageData(ImageHandle RHIImage, void* data, uint32_t size)
 {
-	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
 
 	VmaAllocator allocator = m_handle->memoryAllocator;
 
@@ -348,8 +348,8 @@ void VulkanCommandList::SetImageData(ImageHandle RHIImage, void* data, uint32_t 
 
 void VulkanCommandList::CopyImageToImage(ImageHandle RHISrcImage, Extent3D srcOffset, ImageHandle RHIDstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage, bool returnDstImageToInitialStage)
 {
-	Core::RefCountPtr<VulkanImage> VulkanSrcImage = RHISrcImage.CastAs<VulkanImage>();
-	Core::RefCountPtr<VulkanImage> VulkanDstImage = RHIDstImage.CastAs<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> VulkanSrcImage = RHISrcImage.CastAs<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> VulkanDstImage = RHIDstImage.CastAs<VulkanImage>();
 
 	vk::Image srcHangle = VulkanSrcImage->GetHandle();
 	vk::Image dstHangle = VulkanDstImage->GetHandle();
@@ -408,7 +408,7 @@ void VulkanCommandList::CopyImageToImage(ImageHandle RHISrcImage, Extent3D srcOf
 //----------- Transition Image Layout --------------//
 void VulkanCommandList::TransitionImageLayout(ImageHandle RHIImage, Layout RHIDstLayout)
 {
-	Core::RefCountPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
 
 	vk::ImageLayout oldLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 	vk::ImageLayout newLayout = TranslateToVulkan(RHIDstLayout);
@@ -482,7 +482,7 @@ void VulkanCommandList::BindPipeline(PipelineHandle RHIPipeline)
 
 
 //------------------- PUBLIC VULKAN ------------------//
-vk::BufferMemoryBarrier VulkanCommandList::GetBufferMemoryBarrier(Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
+vk::BufferMemoryBarrier VulkanCommandList::GetBufferMemoryBarrier(Core::KSharedPtr<VulkanBuffer> RHIVulkanBuffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
 {
 	vk::BufferMemoryBarrier barrier{};
 	barrier.srcAccessMask = srcAccessMask;
@@ -510,7 +510,7 @@ vk::BufferMemoryBarrier VulkanCommandList::GetRawBufferMemoryBarrier(vk::Buffer 
 	return barrier;
 }
 
-vk::ImageMemoryBarrier VulkanCommandList::GetImageMemoryBarrier(Core::RefCountPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
+vk::ImageMemoryBarrier VulkanCommandList::GetImageMemoryBarrier(Core::KSharedPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
 {
 	vk::ImageLayout currentLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 

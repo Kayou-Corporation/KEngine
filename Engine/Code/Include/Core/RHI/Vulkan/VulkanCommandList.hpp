@@ -57,10 +57,10 @@ public:
 	void SetOwnerQueueType(QueueType queueType) { m_OwnerQueueType = queueType; }
 	QueueType GetOwnerQueueType() { return m_OwnerQueueType; }
 
-	vk::BufferMemoryBarrier GetBufferMemoryBarrier(Core::RefCountPtr<VulkanBuffer> RHIVulkanBuffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
+	vk::BufferMemoryBarrier GetBufferMemoryBarrier(Core::KSharedPtr<VulkanBuffer> RHIVulkanBuffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
 	vk::BufferMemoryBarrier GetRawBufferMemoryBarrier(vk::Buffer buffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
 
-	vk::ImageMemoryBarrier GetImageMemoryBarrier(Core::RefCountPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
+	vk::ImageMemoryBarrier GetImageMemoryBarrier(Core::KSharedPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
 	vk::ImageMemoryBarrier GetRawImageMemoryBarrier(vk::Image image, vk::ImageLayout currentLayout, vk::ImageLayout dstLayout, vk::ImageAspectFlags aspect, uint32_t mipsLevel, uint32_t layersCount, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask);
 
 	vk::AccessFlags GetSrcAccessMask(vk::ImageLayout layout);

@@ -15,7 +15,7 @@ BEGIN_NAMESPACE_CORE
 
 struct InstanceSpecs
 {
-	Core::RefCountPtr<Window::Window> window; // To get window specific extensions required.
+	Core::KSharedPtr<Window::Window> window; // To get window specific extensions required.
 
 	Version appVersion;
 	Version engineVersion;

@@ -38,24 +38,24 @@ struct SwapchainImageSpecs;
 struct SwapchainSpecs;
 
 // ---------- HANDLE TYPEDEFS ----------
-typedef Core::RefCountPtr<Buffer> BufferHandle;
-typedef Core::RefCountPtr<CommandList> CommandListHandle;
-typedef Core::RefCountPtr<DescriptorSet> DescriptorSetHandle;
-typedef Core::RefCountPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
-typedef Core::RefCountPtr<Device> DeviceHandle;
-typedef Core::RefCountPtr<Fence> FenceHandle;
-typedef Core::RefCountPtr<GraphicsPipeline> GraphicsPipelineHandle;
-typedef Core::RefCountPtr<Image> ImageHandle;
-typedef Core::RefCountPtr<Instance> InstanceHandle;
-typedef Core::RefCountPtr<Pipeline> PipelineHandle;
-typedef Core::RefCountPtr<PipelineLayout> PipelineLayoutHandle;
-typedef Core::RefCountPtr<PushConstantLayout> PushConstantLayoutHandle;
-typedef Core::RefCountPtr<RenderPass> RenderPassLayout;
-typedef Core::RefCountPtr<Sampler> SamplerHandle;
-typedef Core::RefCountPtr<Semaphore> SemaphoreHandle;
-typedef Core::RefCountPtr<Shader> ShaderHandle;
-typedef Core::RefCountPtr<Surface> SurfaceHandle;
-typedef Core::RefCountPtr<Swapchain> SwapchainHandle;
+typedef Core::KSharedPtr<Buffer> BufferHandle;
+typedef Core::KSharedPtr<CommandList> CommandListHandle;
+typedef Core::KSharedPtr<DescriptorSet> DescriptorSetHandle;
+typedef Core::KSharedPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
+typedef Core::KSharedPtr<Device> DeviceHandle;
+typedef Core::KSharedPtr<Fence> FenceHandle;
+typedef Core::KSharedPtr<GraphicsPipeline> GraphicsPipelineHandle;
+typedef Core::KSharedPtr<Image> ImageHandle;
+typedef Core::KSharedPtr<Instance> InstanceHandle;
+typedef Core::KSharedPtr<Pipeline> PipelineHandle;
+typedef Core::KSharedPtr<PipelineLayout> PipelineLayoutHandle;
+typedef Core::KSharedPtr<PushConstantLayout> PushConstantLayoutHandle;
+typedef Core::KSharedPtr<RenderPass> RenderPassLayout;
+typedef Core::KSharedPtr<Sampler> SamplerHandle;
+typedef Core::KSharedPtr<Semaphore> SemaphoreHandle;
+typedef Core::KSharedPtr<Shader> ShaderHandle;
+typedef Core::KSharedPtr<Surface> SurfaceHandle;
+typedef Core::KSharedPtr<Swapchain> SwapchainHandle;
 
 // ---------- INSTANCE RELATED ----------
 struct Version

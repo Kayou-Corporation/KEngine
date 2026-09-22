@@ -16,7 +16,7 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	std::vector<VertexAttributeLayout> RHIShadersAttributes;
 	for (const auto& RHIShader : specs.shaders)
 	{
-		Core::RefCountPtr<VulkanShader> RHIVulkanShader = RHIShader.CastAs<VulkanShader>();
+		Core::KSharedPtr<VulkanShader> RHIVulkanShader = RHIShader.CastAs<VulkanShader>();
 		ShaderStage stage = RHIShader->GetShaderStage();
 
 		vk::PipelineShaderStageCreateInfo shaderStageCreateInfo{};

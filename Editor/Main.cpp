@@ -73,6 +73,28 @@ struct Model
     glm::mat4 normal;
 };
 
+class TestResource : public Core::IResource
+{
+public:
+    static std::atomic<int> instanceCount;
+
+    TestResource() {
+        ++instanceCount;
+    }
+
+    virtual ~TestResource() {
+        --instanceCount;
+    }
+
+    // Si tu n'utilises pas le template RefCounter directement dans la classe :
+    // ces méthodes seront surchargées par RefCounter<TestResource>
+    unsigned long AddRef() override { return 0; }
+    unsigned long Release() override { return 0; }
+    unsigned long GetRefCount() override { return 0; }
+};
+
+std::atomic<int> TestResource::instanceCount{ 0 };
+
 int main()
 {
 /*
@@ -156,7 +178,7 @@ int main()
 #pragma endregion
 */
 #pragma region Setup 
-    Core::RefCountPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
+    Core::KSharedPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
  
     Window::WindowSpecs specs;
     specs.width = 720;

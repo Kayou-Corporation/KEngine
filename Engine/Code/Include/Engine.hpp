@@ -23,7 +23,7 @@ public:
     static void Init(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
     static void Shutdown();
 
-    static Core::RefCountPtr<Engine> GetInstance();
+    static Core::KSharedPtr<Engine> GetInstance();
 
 
 
@@ -43,7 +43,7 @@ protected:
 
 
     // Replace by unique ptr
-    inline static Core::RefCountPtr<Engine> m_instance{nullptr};
+    inline static Core::KSharedPtr<Engine> m_instance{nullptr};
 };
 
 END_NAMESPACE_KAYOU

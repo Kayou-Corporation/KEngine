@@ -51,26 +51,26 @@ public:
 };
 
 template<typename T>
-class RefCountPtr
+class KSharedPtr
 {
-    template<typename U> friend class RefCountPtr;
+    template<typename U> friend class KSharedPtr;
 
 private:
     T* m_ptr = nullptr;
 
 public:
-    RefCountPtr() = default;
+    KSharedPtr() = default;
 
-    explicit RefCountPtr(T* p) : m_ptr(p) { if (m_ptr) m_ptr->AddRef(); }
+    explicit KSharedPtr(T* p) : m_ptr(p) { if (m_ptr) m_ptr->AddRef(); }
 
-    RefCountPtr(std::nullptr_t) noexcept : m_ptr(nullptr) {}
+    KSharedPtr(std::nullptr_t) noexcept : m_ptr(nullptr) {}
 
-    RefCountPtr(const RefCountPtr& other) : m_ptr(other.m_ptr) { if (m_ptr) m_ptr->AddRef(); }
+    KSharedPtr(const KSharedPtr& other) : m_ptr(other.m_ptr) { if (m_ptr) m_ptr->AddRef(); }
 
     template<typename U>
-    RefCountPtr(const RefCountPtr<U>& other) : m_ptr(other.m_ptr) { if (m_ptr) m_ptr->AddRef(); }
+    KSharedPtr(const KSharedPtr<U>& other) : m_ptr(other.m_ptr) { if (m_ptr) m_ptr->AddRef(); }
 
-    RefCountPtr& operator=(const RefCountPtr& other)
+    KSharedPtr& operator=(const KSharedPtr& other)
     {
         if (this != &other)
         {
@@ -84,7 +84,7 @@ public:
     }
 
     template<typename U>
-    RefCountPtr& operator=(const RefCountPtr<U>& other)
+    KSharedPtr& operator=(const KSharedPtr<U>& other)
     {
         if (this->m_ptr != other.m_ptr)
         {
@@ -97,18 +97,18 @@ public:
         return *this;
     }
 
-    RefCountPtr(RefCountPtr&& other) noexcept : m_ptr(other.m_ptr)
+    KSharedPtr(KSharedPtr&& other) noexcept : m_ptr(other.m_ptr)
     {
         other.m_ptr = nullptr;
     }
 
     template<typename U>
-    RefCountPtr(RefCountPtr<U>&& other) noexcept : m_ptr(other.m_ptr)
+    KSharedPtr(KSharedPtr<U>&& other) noexcept : m_ptr(other.m_ptr)
     {
         other.m_ptr = nullptr;
     }
 
-    RefCountPtr& operator=(RefCountPtr&& other) noexcept
+    KSharedPtr& operator=(KSharedPtr&& other) noexcept
     {
         if (this != &other)
         {
@@ -120,7 +120,7 @@ public:
     }
 
     template<typename U>
-    RefCountPtr& operator=(RefCountPtr<U>&& other) noexcept
+    KSharedPtr& operator=(KSharedPtr<U>&& other) noexcept
     {
         if (this->m_ptr != other.m_ptr)
         {
@@ -131,7 +131,7 @@ public:
         return *this;
     }
 
-    ~RefCountPtr() { Release(); }
+    ~KSharedPtr() { Release(); }
 
     void Release() {
         if (m_ptr) {
@@ -153,10 +153,10 @@ public:
     }
 
     template<typename CastType>
-    RefCountPtr<CastType> CastAs() const {
+    KSharedPtr<CastType> CastAs() const {
         if (!m_ptr) return {};
         CastType* casted = dynamic_cast<CastType*>(m_ptr);
-        return casted ? RefCountPtr<CastType>(casted) : RefCountPtr<CastType>();
+        return casted ? KSharedPtr<CastType>(casted) : KSharedPtr<CastType>();
     }
 
     T* operator->() const { return m_ptr; }
@@ -166,9 +166,9 @@ public:
 };
 
 template<typename T, typename... Args>
-RefCountPtr<T> CreateRefPtr(Args&&... args)
+KSharedPtr<T> CreateRefPtr(Args&&... args)
 {
-    RefCountPtr<T> ptr;
+    KSharedPtr<T> ptr;
     ptr.Attach(new RefCounter<T>(std::forward<Args>(args)...));
     return ptr;
 }

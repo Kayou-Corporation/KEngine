@@ -22,8 +22,8 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	appInfo.setEngineVersion(VK_MAKE_VERSION(specs.engineVersion.major, specs.engineVersion.minor, specs.engineVersion.patch));
 	appInfo.setApiVersion(VK_API_VERSION_1_4);
 
-	Core::RefCountPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::RefCountPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
+	Core::KSharedPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
 	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
 
 #ifdef KDEBUG
@@ -81,8 +81,8 @@ void VulkanInstance::Destroy()
 
 SurfaceHandle VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
 {
-	Core::RefCountPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::RefCountPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
+	Core::KSharedPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
 	VkSurfaceKHR vkSurface = wvkRenderer->CreateVulkanSurface(m_handle);
 
 	auto Surface = Core::CreateRefPtr<VulkanSurface>();
@@ -175,7 +175,7 @@ DeviceHandle VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 	vk::PhysicalDeviceType type = TranslateToVulkan(specs.gpuType);
 	std::vector<const char*> extensions = TranslateToVulkan(specs.extensions);
 
-	Core::RefCountPtr<VulkanDevice> device = Core::CreateRefPtr<VulkanDevice>();
+	Core::KSharedPtr<VulkanDevice> device = Core::CreateRefPtr<VulkanDevice>();
 
 	device->PickPhysicalDevice(m_handle, specs.queues, specs.searchPresentQueue, surface, type, extensions);
 

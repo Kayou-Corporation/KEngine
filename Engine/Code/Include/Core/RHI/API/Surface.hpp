@@ -13,7 +13,7 @@ class Instance;
 
 struct SurfaceSpecs
 {
-	Core::RefCountPtr<Window::Window> window;
+	Core::KSharedPtr<Window::Window> window;
 };
 
 class Surface : virtual public Core::IResource

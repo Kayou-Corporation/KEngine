@@ -50,8 +50,8 @@ template<typename T>
 class SoftAssetRef
 {
 public:
-    Core::RefCountPtr<T> Load();
-    Core::RefCountPtr<T> LoadAsync();
+    Core::KSharedPtr<T> Load();
+    Core::KSharedPtr<T> LoadAsync();
 
     //KAPI AssetType GetType() const { return ; }
     //KAPI std::string GetName() const { return m_name; }
