@@ -1,16 +1,17 @@
 ﻿#pragma once
 
+#include "Asset.hpp"
 #include "AssetManagerModule.hpp"
 
 #include "ThreadPool.hpp"
 #include "Utils/Memory.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
-    class AssetLoader
+class AssetLoader
 {
 public:
-    AssetLoader();
-    ~AssetLoader();
+    AssetLoader() = default;
+    ~AssetLoader() = default;
 
     //template<typename AssetClass>
     //Core::RefCountPtr<AssetClass> CreateAsset(const std::string_view& assetPath)
@@ -18,6 +19,8 @@ public:
 
     //}
 
+private:
+    AssetType GuessAssetTypeFromSource(const std::string_view& path);
 
 // Deleted constructors & operator
 private:
