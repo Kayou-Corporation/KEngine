@@ -22,11 +22,11 @@ enum class AssetType
  * Copy of original data (std::vector<DataType> depending on Type of mesh)
  *
  */
-class Asset : Core::IResource
+class Asset : public virtual Core::IResource
 {
 public:
     KAPI Asset(const AssetType type, const std::string& name, const uint32_t id);
-    KAPI ~Asset() = default;
+    KAPI virtual ~Asset() = default;
 
     KAPI AssetType GetType() const { return m_type; }
     KAPI std::string GetName() const { return m_name; }

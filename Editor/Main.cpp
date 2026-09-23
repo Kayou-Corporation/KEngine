@@ -73,13 +73,6 @@ struct Model
     glm::mat4 normal;
 };
 
-class TestResource : public std::enable_shared_from_this<TestResource>
-{
-public:
-	TestResource() = default;
-	~TestResource() = default;
-};
-
 int main()
 {
 

@@ -13,6 +13,9 @@ public:
     AssetLoader() = default;
     ~AssetLoader() = default;
 
+    void CreateAsset(const std::string_view& assetPath);
+    //void DestroyAsset()
+
     //template<typename AssetClass>
     //Core::RefCountPtr<AssetClass> CreateAsset(const std::string_view& assetPath)
     //{
@@ -21,6 +24,8 @@ public:
 
 private:
     AssetType GuessAssetTypeFromSource(const std::string_view& path);
+
+
 
 // Deleted constructors & operator
 private:

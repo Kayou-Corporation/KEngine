@@ -10,7 +10,7 @@ BEGIN_NAMESPACE_CORE
 template<typename T>
 void Write(std::ofstream& out, const T& value)
 {
-    static_assert(std::is_trivially_copyable_v<T>, "Core::Write requires T to be trivially copyable");
+    static_assert(std::is_trivially_copyable_v<T>, "Write requires T to be trivially copyable");
 
     out.write(reinterpret_cast<const char*>(&value), sizeof(T));
 }
@@ -18,7 +18,7 @@ void Write(std::ofstream& out, const T& value)
 template<typename T>
 void Read(std::ifstream& in, T& value)
 {
-    static_assert(std::is_trivially_copyable_v<T>, "Core::Read requires T to be trivially copyable");
+    static_assert(std::is_trivially_copyable_v<T>, "Read requires T to be trivially copyable");
 
     in.read(reinterpret_cast<char*>(&value), sizeof(T));
 }
