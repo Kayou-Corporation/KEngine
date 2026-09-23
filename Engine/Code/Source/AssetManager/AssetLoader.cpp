@@ -3,12 +3,7 @@
 //#include "spdlog/spdlog.h"
 
 BEGIN_NAMESPACE_ASSETMANAGER
-void AssetLoader::CreateAsset(const std::string_view &assetPath)
-{
-    AssetType type = GuessAssetTypeFromSource(assetPath);
-    (void)type;
 
-}
 
 AssetType AssetLoader::GuessAssetTypeFromSource(const std::string_view &path)
 {

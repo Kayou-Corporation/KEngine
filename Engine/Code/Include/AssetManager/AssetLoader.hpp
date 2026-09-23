@@ -10,29 +10,16 @@ BEGIN_NAMESPACE_ASSETMANAGER
 class AssetLoader
 {
 public:
-    AssetLoader() = default;
-    ~AssetLoader() = default;
+    AssetLoader() = delete;
+    ~AssetLoader() = delete;
 
-    void CreateAsset(const std::string_view& assetPath);
-    //void DestroyAsset()
-
-    //template<typename AssetClass>
-    //Core::RefCountPtr<AssetClass> CreateAsset(const std::string_view& assetPath)
-    //{
-
-    //}
-
-private:
-    AssetType GuessAssetTypeFromSource(const std::string_view& path);
-
-
-
-// Deleted constructors & operator
-private:
     AssetLoader(const AssetLoader&) = delete;
     AssetLoader& operator=(const AssetLoader&) = delete;
     AssetLoader(AssetLoader&&) = delete;
     AssetLoader& operator=(AssetLoader&&) = delete;
+
+public:
+    static AssetType GuessAssetTypeFromSource(const std::string_view& path);
 };
 END_NAMESPACE_ASSETMANAGER
 

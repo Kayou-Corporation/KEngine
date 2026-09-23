@@ -21,7 +21,9 @@ void Engine::Shutdown()
     {
         spdlog::error("Engine already shut down");
     }
-    m_instance.Reset();
+    {
+        m_instance.Reset();
+    }
 }
 
 Engine& Engine::Get()
