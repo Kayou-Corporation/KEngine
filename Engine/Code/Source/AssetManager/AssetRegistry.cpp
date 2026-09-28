@@ -62,6 +62,8 @@ void AssetRegistry::RegisterAllAssets()
 
 void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string& assetName)
 {
+    std::filesystem::create_directories("Cache/Assets/");
+
     AssetType type = AssetLoader::GuessAssetTypeFromSource(assetPath);
 
     const std::string fullAssetPath = CacheAssetPath(assetName, ASSET_EXTENSION);
