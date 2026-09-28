@@ -9,14 +9,19 @@
 
 BEGIN_NAMESPACE_ASSETMANAGER
 
-struct RawStaticMeshData
+struct RawData
+{
+    // Empty, only useful for heritage.
+};
+
+struct RawStaticMeshData : public RawData
 {
     std::vector<CoreObject::Vertex> vertices;
     std::vector<uint32_t> indices;
     std::vector<CoreObject::SubMesh> submeshes;
 };
 
-struct RawTextureData
+struct RawTextureData : public RawData
 {
     std::vector<uint8_t> pixels;
     uint32_t width;

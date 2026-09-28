@@ -37,6 +37,7 @@ protected:
     std::string m_name;
     uint32_t m_id;
 
+    std::string_view AssetPath;
 
 // Deleted constructors & operator
 private:

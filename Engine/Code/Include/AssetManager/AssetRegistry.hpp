@@ -1,10 +1,12 @@
 ﻿#pragma once
 
+#include "Asset.hpp"
 #include "AssetManagerModule.hpp"
-#include  "StackAllocator.hpp"
 #include "Utils/Memory.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
+
+#define ASSET_EXTENSION ".kasset"
 
 struct RegisterAsset
 {
@@ -26,21 +28,25 @@ public:
     AssetRegistry(AssetRegistry&&) = delete;
     AssetRegistry& operator=(AssetRegistry&&) = delete;
 
-    static void Init(const std::string_view &folderPath);
-    static void Shutdown();
-    static AssetRegistry& Get();
-
 public:
-    // To be executed on initalization
-    void RegisterAllAssets();
+    void Init();
+    void ShutDown();
 
-    void CreateAsset(const std::string_view &assetPath);
+    void CreateAsset(const std::string& assetPath);
     void DestroyAsset(uint32_t id);
 
 private:
-    inline static Core::KUniquePtr<AssetRegistry> m_instance{nullptr};
+    // High level functions, to be executed on initalization
+    void RegisterAllAssets();
+    void RegisterAsset(const std::string_view& assetPath);
+
+    template<typename RawData>
+    void WriteAssetRawData(std::ofstream& file, const RawData& data);
+
+    inline std::string CacheAssetPath(const std::string& name, const char* ext);
 
     std::string_view m_folderPath;
+    uint32_t m_lastAssetId = 0;
 };
 END_NAMESPACE_ASSETMANAGER
 

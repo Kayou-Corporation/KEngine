@@ -1,4 +1,5 @@
 #pragma once
+#include "AssetRegistry.hpp"
 #include "CoreModule.hpp"
 
 #include "ThreadPool.hpp"
@@ -34,7 +35,6 @@ public:
     Engine& operator=(Engine&&) = delete;
 
 protected:
-
     // Device
 
     // ThreadPool
@@ -43,9 +43,10 @@ protected:
     int m_minimumThreads = 2;
 
     // Assets
+    Core::KUniquePtr<AssetManager::AssetRegistry> m_assetRegistry;
 
 
-
+    // Self reference for singleton
     inline static KUniquePtr<Engine> m_instance{nullptr};
 };
 
