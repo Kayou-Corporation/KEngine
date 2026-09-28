@@ -56,6 +56,8 @@ Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesTh
         spdlog::warn("AssetLoader: Not enough threads available for the requested queues. Some queues may not have enough threads to function properly.");
     }
 
+    //----------- AssetManager --------------//
+    m_assetRegistry = Core::CreateUniquePtr<AssetManager::AssetRegistry>("Cache/Assets/");
 
 }
 

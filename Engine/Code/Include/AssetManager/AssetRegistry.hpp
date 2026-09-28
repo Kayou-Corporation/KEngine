@@ -29,10 +29,7 @@ public:
     AssetRegistry& operator=(AssetRegistry&&) = delete;
 
 public:
-    void Init();
-    void ShutDown();
-
-    void CreateAsset(const std::string& assetPath);
+    void CreateAsset(const std::string& assetPath, const std::string& assetName);
     void DestroyAsset(uint32_t id);
 
 private:

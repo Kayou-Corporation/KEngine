@@ -175,6 +175,8 @@ int main()
 
 	Core::Engine::Get().TestFunction();
 
+
+
 /*
     float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
 

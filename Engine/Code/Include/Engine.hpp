@@ -24,7 +24,7 @@ public:
 
     void TestFunction()
     {
-        spdlog::error("Engine TestFunction called");
+        m_assetRegistry->CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
     }
 
 public:
