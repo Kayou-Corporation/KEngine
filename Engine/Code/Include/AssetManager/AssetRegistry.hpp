@@ -40,6 +40,9 @@ private:
     template<typename RawData>
     void WriteAssetRawData(std::ofstream& file, const RawData& data);
 
+    template<typename RawData>
+    RawData ReadAssetRawData(std::ifstream& file);
+
     inline std::string CacheAssetPath(const std::string& name, const char* ext);
 
     // Maybe useless

@@ -42,6 +42,59 @@ void AssetRegistry::WriteAssetRawData<RawStaticMeshData>(std::ofstream& file, co
     }
 }
 
+template<>
+RawStaticMeshData AssetRegistry::ReadAssetRawData<RawStaticMeshData>(std::ifstream& file)
+{
+    // Skip first part of the files to get the data.
+    size_t commonDataSize;
+    Core::Read(file, commonDataSize);
+    file.seekg(commonDataSize, std::ios::beg);
+
+    RawStaticMeshData data;
+
+    uint32_t verticesCount;
+    Core::Read(file, verticesCount);
+    data.vertices.resize(verticesCount);
+    for (uint32_t i = 0; i < verticesCount; ++i)
+    {
+        CoreObject::Vertex vertex;
+        Core::Read(file, vertex.pos.x);
+        Core::Read(file, vertex.pos.y);
+        Core::Read(file, vertex.pos.z);
+
+        Core::Read(file, vertex.normal.x);
+        Core::Read(file, vertex.normal.y);
+        Core::Read(file, vertex.normal.z);
+
+        Core::Read(file, vertex.uv.x);
+        Core::Read(file, vertex.uv.y);
+
+        data.vertices.push_back(vertex);
+    }
+
+    uint32_t indices;
+    Core::Read(file, indices);
+    data.indices.resize(indices);
+    for (uint32_t i = 0; i < indices; ++i)
+    {
+        uint32_t indice;
+        Core::Read(file, indice);
+        data.indices.push_back(indice);
+    }
+
+    uint32_t submeshes;
+    Core::Read(file, submeshes);
+    data.submeshes.resize(submeshes);
+    for (uint32_t i = 0; i < submeshes; ++i)
+    {
+       CoreObject::SubMesh submesh;
+       Core::Read(file, submesh);
+       data.submeshes.push_back(submesh);
+    }
+
+    return data;
+}
+
 //template<>
 //void AssetRegistry::WriteAssetRawData<RawTextureData>(std::ofstream& file, const RawTextureData& data)
 //{
@@ -73,15 +126,22 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
     const std::string fullAssetPath = CacheAssetPath(assetName, ASSET_EXTENSION);
     std::ofstream asset(fullAssetPath, std::ios::binary);
 
-    // Generic data
-    Core::Write(asset, m_lastAssetId);
 
     AssetType type = AssetLoader::GuessAssetTypeFromSource(assetPath);
+    // Generic data
+    size_t commonDataSize = sizeof(uint32_t) + sizeof(AssetType) + sizeof(uint32_t) + (sizeof(char) * assetName.length());
+    Core::Write(asset, commonDataSize);
+
+    Core::Write(asset, m_lastAssetId);
+
     Core::Write(asset, type);
 
     Core::Write(asset, assetName.length());
 
-    Core::Write(asset, assetName.c_str());
+    for (uint32_t i = 0; i < assetName.length(); ++i)
+    {
+        Core::Write(asset, assetName[i]);
+    }
 
     switch (type)
     {
@@ -108,7 +168,8 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
     }
 
     // Create Asset in memory :
-    RegisterAsset(assetPath);
+    Core::KUniquePtr<AssetManager::Asset> assetPtr = Core::CreateUniquePtr<AssetManager::Asset>(type, assetName, m_lastAssetId);
+    m_assets.push_back(std::move(assetPtr));
 
     m_lastAssetId++;
 }
