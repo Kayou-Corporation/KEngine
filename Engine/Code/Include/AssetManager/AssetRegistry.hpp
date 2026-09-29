@@ -42,8 +42,11 @@ private:
 
     inline std::string CacheAssetPath(const std::string& name, const char* ext);
 
+    // Maybe useless
     std::string_view m_folderPath;
     uint32_t m_lastAssetId = 0;
+
+    std::vector<Asset> m_assets;
 };
 END_NAMESPACE_ASSETMANAGER
 

@@ -52,6 +52,7 @@ void AssetRegistry::WriteAssetRawData<RawStaticMeshData>(std::ofstream& file, co
 AssetRegistry::AssetRegistry(const std::string_view &folderPath)
 {
     m_folderPath = folderPath;
+    //m_assets = std::vector<Asset>(100);
 }
 
 
@@ -63,13 +64,20 @@ void AssetRegistry::RegisterAllAssets()
 
 void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string& assetName)
 {
+    // Create only 1 time, become void if called multiple times
     std::filesystem::create_directories("Cache/Assets/");
 
-    AssetType type = AssetLoader::GuessAssetTypeFromSource(assetPath);
+    // TODO : Maybe add security here to check if already exist ?
 
+    // Actual asset created
     const std::string fullAssetPath = CacheAssetPath(assetName, ASSET_EXTENSION);
-
     std::ofstream asset(fullAssetPath, std::ios::binary);
+
+    // Generic data
+    AssetType type = AssetLoader::GuessAssetTypeFromSource(assetPath);
+    Core::Write(asset, type);
+    Core::Write(asset, m_lastAssetId);
+    Core::Write(asset, assetName.c_str());
 
     switch (type)
     {
@@ -95,16 +103,22 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
             return;
     }
 
+    // Create Asset in memory :
+    RegisterAsset(assetPath);
+
+    m_lastAssetId++;
 }
 
 void AssetRegistry::RegisterAsset(const std::string_view &assetPath)
 {
     (void)assetPath;
+
+    
 }
 
 std::string AssetRegistry::CacheAssetPath(const std::string &name, const char *ext)
 {
-    return "Cache/Assets/" + name + '.' + ext;
+    return "Cache/Assets/" + name + ext;
 }
 
 void AssetRegistry::DestroyAsset(uint32_t id)
