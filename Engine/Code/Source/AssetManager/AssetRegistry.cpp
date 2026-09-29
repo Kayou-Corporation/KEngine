@@ -1,6 +1,7 @@
 ﻿#include  "AssetRegistry.hpp"
 
 #include <fstream>
+#include <filesystem>
 
 #include "AssetLoader.hpp"
 #include  "Utils/File.hpp"

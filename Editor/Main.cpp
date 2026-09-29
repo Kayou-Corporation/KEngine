@@ -20,6 +20,7 @@
 #include "Camera/EditorCamera.hpp"
 
 #include "BuildMode.hpp"
+#include "MeshBase.hpp"
 
 USING_KAYOU
 
@@ -77,24 +78,49 @@ int main()
 {
 
 
-/*
+
 #ifdef KDEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
 
 #pragma region Mesh
-    std::string meshPath = "Engine/Assets/Meshes/viking_room.obj";
-    Assimp::Importer t_importer{};
-    const aiScene* t_scene = t_importer.ReadFile(meshPath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_FindDegenerates | aiProcess_FindInvalidData | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_GenSmoothNormals | aiProcess_FixInfacingNormals);
-    if (!t_scene || !t_scene->mRootNode)
-    {
-        spdlog::error("coudn't find path");
-    }
-    std::string t_directory = meshPath.substr(0, meshPath.find_last_of('/'));
+    //std::string meshPath = "Engine/Assets/Meshes/viking_room.obj";
+    //Assimp::Importer t_importer{};
+    //const aiScene* t_scene = t_importer.ReadFile(meshPath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_FindDegenerates | aiProcess_FindInvalidData | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_GenSmoothNormals | aiProcess_FixInfacingNormals);
+    //if (!t_scene || !t_scene->mRootNode)
+    //{
+    //    spdlog::error("coudn't find path");
+    //}
+    //std::string t_directory = meshPath.substr(0, meshPath.find_last_of('/'));
 
-    std::vector<Vertex> meshVertices;
+	std::ifstream mesh("Cache/Assets/viking_room.kasset", std::ios::binary);
+    std::vector<CoreObject::Vertex> meshVertices;
     std::vector<uint32_t> meshIndices;
-	for (unsigned int i = 0; i < t_scene->mNumMeshes; ++i)
+	uint32_t verticesCount = 0;
+	uint32_t indicesCount = 0;
+	Core::Read(mesh, verticesCount);
+	meshVertices.resize(verticesCount);
+	for (uint32_t i = 0; i < verticesCount; ++i)
+	{
+		Core::Read(mesh, meshVertices[i].pos.x);
+		Core::Read(mesh, meshVertices[i].pos.y);
+		Core::Read(mesh, meshVertices[i].pos.z);
+
+		Core::Read(mesh, meshVertices[i].normal.x);
+		Core::Read(mesh, meshVertices[i].normal.y);
+		Core::Read(mesh, meshVertices[i].normal.z);
+
+		Core::Read(mesh, meshVertices[i].uv.x);
+		Core::Read(mesh, meshVertices[i].uv.y);
+	}
+
+	Core::Read(mesh, indicesCount);
+	meshIndices.resize(indicesCount);
+	for (uint32_t i = 0; i < indicesCount; ++i)
+	{
+		Core::Read(mesh, meshIndices[i]);
+	}
+	/*for (unsigned int i = 0; i < t_scene->mNumMeshes; ++i)
 	{
 		const aiMesh* mesh = t_scene->mMeshes[i];
 
@@ -146,7 +172,7 @@ int main()
 				meshIndices.push_back(face.mIndices[indexIdx] + vertexOffset);
 			}
 		}
-	}
+	}*/
 #pragma endregion
 
 #pragma region Texture
@@ -156,7 +182,7 @@ int main()
     stbi_uc* texturePixels = stbi_load(texturePath.c_str(), &t_texWidth, &t_texHeight, &t_texChannels, STBI_rgb_alpha);
    
 #pragma endregion
-*/
+
 
 
 #pragma region Setup 
@@ -177,7 +203,7 @@ int main()
 
 
 
-/*
+
     float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
 
     Core::EditorCamera editorCamera;
@@ -190,17 +216,17 @@ int main()
 
     editorCamera.RecalculateMatrices();
 
-    glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
+    //glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
+    //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    //glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
+    //glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
 
     float fov = glm::radians(45.f);
-    float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
+    //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
     float nearPlane = 0.1f;
     float farPlane = 100.0f;
     glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
-    proj[1][1] *= -1
+    proj[1][1] *= -1;
     CameraData initCam;
     initCam.cameraVP = editorCamera.GetViewProjectionMatrix();
     initCam.cameraPos = editorCamera.GetPosition();
@@ -216,9 +242,9 @@ int main()
     Model mdl;
     mdl.model = glm::transpose(model);
     mdl.normal = normalMatrix;
-	*/
 
-	/*
+
+
     Core::InstanceHandle instance = Core::RendererInterface::InitRenderer(Core::RendererAPI::Vulkan);
 
     Core::InstanceSpecs test;
@@ -434,11 +460,11 @@ int main()
 
     uint64_t frameCounter = 0;
     bool gpuResizeRequest = false;
-*/
+
     while (!window->ShouldClose())
     {
         window->PollEvents();
-         /*
+
         if (window->GetHasResize() || gpuResizeRequest)
         {
             device->WaitIdle();
@@ -568,9 +594,8 @@ int main()
         }
     
         frameCounter++;
-        */
     }
-    /*
+
     device->WaitIdle();
 
     device->DestroyBuffer(vertexBuffer);
@@ -612,7 +637,7 @@ int main()
     instance->DestroySurface(surface);
 
     instance->Destroy();
-    */
+
 
 	Core::Engine::Shutdown();
 
