@@ -51,12 +51,8 @@ template<typename T>
 class SoftAssetRef
 {
 public:
-    Core::KSharedPtr<T> Load();
-    Core::KSharedPtr<T> LoadAsync();
-
-    //KAPI AssetType GetType() const { return ; }
-    //KAPI std::string GetName() const { return m_name; }
-    KAPI uint32_t GetID() const { return m_id; }
+    Core::KUniquePtr<T> Load();
+    Core::KUniquePtr<T> LoadAsync();
 
 private:
     uint32_t m_id;

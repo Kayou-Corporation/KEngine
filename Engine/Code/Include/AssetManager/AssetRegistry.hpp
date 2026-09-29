@@ -18,8 +18,8 @@ class AssetRegistry : public virtual Core::IResource
 {
 // Basic stuff for lifetime managment & access
 public:
-    explicit AssetRegistry(const std::string_view& folderPath);
-    virtual ~AssetRegistry() = default;
+    KAPI explicit AssetRegistry(const std::string_view& folderPath);
+    KAPI virtual ~AssetRegistry() = default;
 
     // Deleted constructors / destructors
     AssetRegistry() = delete;
@@ -29,13 +29,13 @@ public:
     AssetRegistry& operator=(AssetRegistry&&) = delete;
 
 public:
-    void CreateAsset(const std::string& assetPath, const std::string& assetName);
-    void DestroyAsset(uint32_t id);
+    KAPI void CreateAsset(const std::string& assetPath, const std::string& assetName);
+    KAPI void DestroyAsset(uint32_t id);
 
 private:
     // High level functions, to be executed on initalization
     void RegisterAllAssets();
-    void RegisterAsset(const std::string_view& assetPath);
+    void RegisterAsset(const std::string& assetPath);
 
     template<typename RawData>
     void WriteAssetRawData(std::ofstream& file, const RawData& data);
@@ -46,7 +46,7 @@ private:
     std::string_view m_folderPath;
     uint32_t m_lastAssetId = 0;
 
-    std::vector<Asset> m_assets;
+    std::vector<Core::KUniquePtr<Asset>> m_assets;
 };
 END_NAMESPACE_ASSETMANAGER
 

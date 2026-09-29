@@ -93,86 +93,33 @@ int main()
     //}
     //std::string t_directory = meshPath.substr(0, meshPath.find_last_of('/'));
 
-	std::ifstream mesh("Cache/Assets/viking_room.kasset", std::ios::binary);
-    std::vector<CoreObject::Vertex> meshVertices;
-    std::vector<uint32_t> meshIndices;
-	uint32_t verticesCount = 0;
-	uint32_t indicesCount = 0;
-	Core::Read(mesh, verticesCount);
-	meshVertices.resize(verticesCount);
-	for (uint32_t i = 0; i < verticesCount; ++i)
-	{
-		Core::Read(mesh, meshVertices[i].pos.x);
-		Core::Read(mesh, meshVertices[i].pos.y);
-		Core::Read(mesh, meshVertices[i].pos.z);
-
-		Core::Read(mesh, meshVertices[i].normal.x);
-		Core::Read(mesh, meshVertices[i].normal.y);
-		Core::Read(mesh, meshVertices[i].normal.z);
-
-		Core::Read(mesh, meshVertices[i].uv.x);
-		Core::Read(mesh, meshVertices[i].uv.y);
-	}
-
-	Core::Read(mesh, indicesCount);
-	meshIndices.resize(indicesCount);
-	for (uint32_t i = 0; i < indicesCount; ++i)
-	{
-		Core::Read(mesh, meshIndices[i]);
-	}
-	/*for (unsigned int i = 0; i < t_scene->mNumMeshes; ++i)
-	{
-		const aiMesh* mesh = t_scene->mMeshes[i];
-
-		uint32_t vertexOffset = static_cast<uint32_t>(meshVertices.size());
-
-		for (unsigned int v = 0; v < mesh->mNumVertices; ++v)
-		{
-			Vertex vertex;
-
-			if (mesh->HasPositions())
-			{
-				vertex.pos = glm::vec3(
-					mesh->mVertices[v].x,
-					mesh->mVertices[v].y,
-					mesh->mVertices[v].z
-				);
-			}
-
-			if (mesh->HasNormals())
-			{
-				vertex.normal = glm::vec3(
-					mesh->mNormals[v].x,
-					mesh->mNormals[v].y,
-					mesh->mNormals[v].z
-				);
-			}
-
-			if (mesh->HasTextureCoords(0))
-			{
-				vertex.uv = glm::vec2(
-					mesh->mTextureCoords[0][v].x,
-					1.f - mesh->mTextureCoords[0][v].y // Flip Y pour Vulkan
-				);
-			}
-			else
-			{
-				vertex.uv = glm::vec2(0.0f, 0.0f);
-			}
-
-			meshVertices.push_back(vertex);
-		}
-
-		for (unsigned int f = 0; f < mesh->mNumFaces; ++f)
-		{
-			const aiFace& face = mesh->mFaces[f];
-
-			for (unsigned int indexIdx = 0; indexIdx < face.mNumIndices; ++indexIdx)
-			{
-				meshIndices.push_back(face.mIndices[indexIdx] + vertexOffset);
-			}
-		}
-	}*/
+	//std::ifstream mesh("Cache/Assets/viking_room.kasset", std::ios::binary);
+    //std::vector<CoreObject::Vertex> meshVertices;
+    //std::vector<uint32_t> meshIndices;
+	//uint32_t verticesCount = 0;
+	//uint32_t indicesCount = 0;
+	//Core::Read(mesh, verticesCount);
+	//meshVertices.resize(verticesCount);
+	//for (uint32_t i = 0; i < verticesCount; ++i)
+	//{
+	//	Core::Read(mesh, meshVertices[i].pos.x);
+	//	Core::Read(mesh, meshVertices[i].pos.y);
+	//	Core::Read(mesh, meshVertices[i].pos.z);
+//
+	//	Core::Read(mesh, meshVertices[i].normal.x);
+	//	Core::Read(mesh, meshVertices[i].normal.y);
+	//	Core::Read(mesh, meshVertices[i].normal.z);
+//
+	//	Core::Read(mesh, meshVertices[i].uv.x);
+	//	Core::Read(mesh, meshVertices[i].uv.y);
+	//}
+//
+	//Core::Read(mesh, indicesCount);
+	//meshIndices.resize(indicesCount);
+	//for (uint32_t i = 0; i < indicesCount; ++i)
+	//{
+	//	Core::Read(mesh, meshIndices[i]);
+	//}
 #pragma endregion
 
 #pragma region Texture

@@ -74,9 +74,13 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
     std::ofstream asset(fullAssetPath, std::ios::binary);
 
     // Generic data
+    Core::Write(asset, m_lastAssetId);
+
     AssetType type = AssetLoader::GuessAssetTypeFromSource(assetPath);
     Core::Write(asset, type);
-    Core::Write(asset, m_lastAssetId);
+
+    Core::Write(asset, assetName.length());
+
     Core::Write(asset, assetName.c_str());
 
     switch (type)
@@ -109,11 +113,26 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
     m_lastAssetId++;
 }
 
-void AssetRegistry::RegisterAsset(const std::string_view &assetPath)
+void AssetRegistry::RegisterAsset(const std::string&assetPath)
 {
-    (void)assetPath;
+    uint32_t assetId;
+    AssetType assetType;
+    uint32_t assetNameLength;
+    std::string assetName;
 
-    
+    std::ifstream asset(assetPath, std::ios::binary);
+    Core::Read(asset, assetId);
+    Core::Read(asset, assetType);
+    Core::Read(asset, assetNameLength);
+    for (uint32_t i = 0; i < assetNameLength; ++i)
+    {
+        char c;
+        Core::Read(asset, c);
+        assetName += c;
+    }
+
+    Core::KUniquePtr<AssetManager::Asset> assetPtr = Core::CreateUniquePtr<AssetManager::Asset>(assetType, assetName, assetId);
+    m_assets.push_back(std::move(assetPtr));
 }
 
 std::string AssetRegistry::CacheAssetPath(const std::string &name, const char *ext)
