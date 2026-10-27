@@ -10,28 +10,31 @@ BEGIN_NAMESPACE_ASSETMANAGER
 #define ASSET_EXTENSION ".kasset"
 #define DEFAULT_PATH "Cache/Assets/"
 
-struct RegisterAsset
+struct AssetHeader
 {
+    size_t size;
+
     uint32_t id;
-    // Ref ?
+    AssetType type;
+    std::string name;
 };
 
 class AssetRegistry : public virtual Core::IResource
 {
 // Basic stuff for lifetime managment & access
 public:
+    KAPI explicit AssetRegistry();
     KAPI explicit AssetRegistry(const std::string_view& folderPath);
     KAPI virtual ~AssetRegistry() = default;
 
     // Deleted constructors / destructors
-    AssetRegistry() = delete;
     AssetRegistry(const AssetRegistry&) = delete;
     AssetRegistry& operator=(const AssetRegistry&) = delete;
     AssetRegistry(AssetRegistry&&) = delete;
     AssetRegistry& operator=(AssetRegistry&&) = delete;
 
 public:
-    KAPI void CreateAsset(const std::string& assetPath, const std::string& assetName);
+    KAPI void CreateAsset(const std::string& assetPath, const std::string& assetName, const AssetType type = AssetType::DefaultGuess);
     KAPI void DestroyAsset(uint32_t id);
 
     template<typename AssetDerived>
@@ -65,16 +68,10 @@ private:
     void RegisterAllAssets();
     void RegisterAsset(const std::string& assetPath);
 
-    template<typename RawData>
-    void WriteAssetRawData(std::ofstream& file, const RawData& data);
-
-    template<typename RawData>
-    RawData ReadAssetRawData(std::ifstream& file);
-
     inline std::string CacheAssetPath(const std::string& name, const char* ext);
 
     // Maybe useless
-    std::string_view m_folderPath;
+    std::string m_folderPath;
     uint32_t m_lastAssetId = 0;
 
     std::vector<Core::KSharedPtr<Asset>> m_assets;

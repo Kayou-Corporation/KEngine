@@ -29,22 +29,22 @@ struct RawTextureData : public RawData
     uint32_t channels;
 };
 
-class AssetLoader
+class ExternalAssetLoader
 {
 public:
-    AssetLoader() = delete;
-    ~AssetLoader() = delete;
+    template<typename RawData>
+    KAPI static RawData LoadAssetFromSource(const std::string_view& path);
 
-    AssetLoader(const AssetLoader&) = delete;
-    AssetLoader& operator=(const AssetLoader&) = delete;
-    AssetLoader(AssetLoader&&) = delete;
-    AssetLoader& operator=(AssetLoader&&) = delete;
+    KAPI static AssetType GuessAssetTypeFromSource(const std::string_view& path);
 
 public:
-    template<typename RawData>
-    static RawData LoadAssetFromSource(const std::string_view& path);
+    ExternalAssetLoader() = delete;
+    ~ExternalAssetLoader() = delete;
 
-    static AssetType GuessAssetTypeFromSource(const std::string_view& path);
+    ExternalAssetLoader(const ExternalAssetLoader&) = delete;
+    ExternalAssetLoader& operator=(const ExternalAssetLoader&) = delete;
+    ExternalAssetLoader(ExternalAssetLoader&&) = delete;
+    ExternalAssetLoader& operator=(ExternalAssetLoader&&) = delete;
 };
 END_NAMESPACE_ASSETMANAGER
 

@@ -1,4 +1,4 @@
-﻿#include  "AssetLoader.hpp"
+﻿#include  "ExternalAssetLoader.hpp"
 
 #ifdef KCOMPILER_CLANG
 #pragma clang diagnostic push
@@ -17,7 +17,7 @@
 BEGIN_NAMESPACE_ASSETMANAGER
 
 
-AssetType AssetLoader::GuessAssetTypeFromSource(const std::string_view &path)
+AssetType ExternalAssetLoader::GuessAssetTypeFromSource(const std::string_view &path)
 {
     const std::string_view::size_type dotPos = path.find_last_of('.');
     if (dotPos == std::string_view::npos || dotPos == path.length() - 1)
@@ -49,7 +49,7 @@ AssetType AssetLoader::GuessAssetTypeFromSource(const std::string_view &path)
 }
 
 template<>
-RawStaticMeshData AssetLoader::LoadAssetFromSource<RawStaticMeshData>(const std::string_view& path)
+RawStaticMeshData ExternalAssetLoader::LoadAssetFromSource<RawStaticMeshData>(const std::string_view& path)
 {
     RawStaticMeshData rawData;
 
@@ -128,7 +128,7 @@ RawStaticMeshData AssetLoader::LoadAssetFromSource<RawStaticMeshData>(const std:
 }
 
 template<>
-RawTextureData AssetLoader::LoadAssetFromSource<RawTextureData>(const std::string_view& path)
+RawTextureData ExternalAssetLoader::LoadAssetFromSource<RawTextureData>(const std::string_view& path)
 {
     RawTextureData rawData;
     int texWidth, texHeight, texChannels;

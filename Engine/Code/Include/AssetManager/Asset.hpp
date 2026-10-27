@@ -12,7 +12,8 @@ enum class AssetType
     StaticMesh = 0,
     Texture2D = 1,
 
-    COUNT = 2
+    DefaultGuess = 2,
+    COUNT = 3
 };
 
 /*
@@ -39,6 +40,7 @@ protected:
     uint32_t m_id;
 
     std::string_view AssetPath;
+    bool isLoaded = false;
 
 // Deleted constructors & operator
 private:
