@@ -105,7 +105,7 @@ RawStaticMeshData AssetRegistry::ReadAssetRawData<RawStaticMeshData>(std::ifstre
 AssetRegistry::AssetRegistry(const std::string_view &folderPath)
 {
     m_folderPath = folderPath;
-    //m_assets = std::vector<Asset>(100);
+    m_assets.reserve(50);
 }
 
 
@@ -118,7 +118,7 @@ void AssetRegistry::RegisterAllAssets()
 void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string& assetName)
 {
     // Create only 1 time, become void if called multiple times
-    std::filesystem::create_directories("Cache/Assets/");
+    std::filesystem::create_directories(DEFAULT_PATH);
 
     // TODO : Maybe add security here to check if already exist ?
 
@@ -154,7 +154,7 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
 
             break;
         }
-        case AssetType::Texture:
+        case AssetType::Texture2D:
         {
             // TODO: Implement for texture
             RawTextureData textureData = AssetLoader::LoadAssetFromSource<RawTextureData>(assetPath);
@@ -168,7 +168,7 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
     }
 
     // Create Asset in memory :
-    Core::KUniquePtr<AssetManager::Asset> assetPtr = Core::CreateUniquePtr<AssetManager::Asset>(type, assetName, m_lastAssetId);
+    Core::KSharedPtr<AssetManager::Asset> assetPtr = Core::CreateRefPtr<AssetManager::Asset>(type, assetName, m_lastAssetId);
     m_assets.push_back(std::move(assetPtr));
 
     m_lastAssetId++;
@@ -192,13 +192,13 @@ void AssetRegistry::RegisterAsset(const std::string&assetPath)
         assetName += c;
     }
 
-    Core::KUniquePtr<AssetManager::Asset> assetPtr = Core::CreateUniquePtr<AssetManager::Asset>(assetType, assetName, assetId);
+    Core::KSharedPtr<AssetManager::Asset> assetPtr = Core::CreateRefPtr<AssetManager::Asset>(assetType, assetName, assetId);
     m_assets.push_back(std::move(assetPtr));
 }
 
 std::string AssetRegistry::CacheAssetPath(const std::string &name, const char *ext)
 {
-    return "Cache/Assets/" + name + ext;
+    return DEFAULT_PATH + name + ext;
 }
 
 void AssetRegistry::DestroyAsset(uint32_t id)

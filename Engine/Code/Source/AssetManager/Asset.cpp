@@ -9,7 +9,6 @@ Asset::Asset(const AssetType type, const std::string& name, const uint32_t id)
     m_id = id;
 }
 
-//Core::KUniquePtr<T> Load()
 
 
 END_NAMESPACE_ASSETMANAGER

@@ -37,7 +37,7 @@ AssetType AssetLoader::GuessAssetTypeFromSource(const std::string_view &path)
     }
     else if (filExtension == "png" || filExtension == "jpg" || filExtension == "jpeg" || filExtension == "bmp")
     {
-        return AssetType::Texture;
+        return AssetType::Texture2D;
     }
     else
     {

@@ -21,3 +21,4 @@ target_include_directories(${ASSETMANAGER_TARGET_NAME} PUBLIC "${K_INCLUDE_PATH}
 target_compile_definitions(${ASSETMANAGER_TARGET_NAME} PUBLIC ASSETMANAGER)
 
 target_link_libraries(${ASSETMANAGER_TARGET_NAME} PRIVATE CORE COREOBJECT spdlog::spdlog KAlloc)
+target_link_directories(${ASSETMANAGER_TARGET_NAME} PRIVATE "${K_INCLUDE_PATH}/Engine.hpp")

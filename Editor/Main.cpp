@@ -83,45 +83,6 @@ int main()
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-#pragma region Mesh
-    //std::string meshPath = "Engine/Assets/Meshes/viking_room.obj";
-    //Assimp::Importer t_importer{};
-    //const aiScene* t_scene = t_importer.ReadFile(meshPath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_FindDegenerates | aiProcess_FindInvalidData | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_GenSmoothNormals | aiProcess_FixInfacingNormals);
-    //if (!t_scene || !t_scene->mRootNode)
-    //{
-    //    spdlog::error("coudn't find path");
-    //}
-    //std::string t_directory = meshPath.substr(0, meshPath.find_last_of('/'));
-
-	//std::ifstream mesh("Cache/Assets/viking_room.kasset", std::ios::binary);
-    //std::vector<CoreObject::Vertex> meshVertices;
-    //std::vector<uint32_t> meshIndices;
-	//uint32_t verticesCount = 0;
-	//uint32_t indicesCount = 0;
-	//Core::Read(mesh, verticesCount);
-	//meshVertices.resize(verticesCount);
-	//for (uint32_t i = 0; i < verticesCount; ++i)
-	//{
-	//	Core::Read(mesh, meshVertices[i].pos.x);
-	//	Core::Read(mesh, meshVertices[i].pos.y);
-	//	Core::Read(mesh, meshVertices[i].pos.z);
-//
-	//	Core::Read(mesh, meshVertices[i].normal.x);
-	//	Core::Read(mesh, meshVertices[i].normal.y);
-	//	Core::Read(mesh, meshVertices[i].normal.z);
-//
-	//	Core::Read(mesh, meshVertices[i].uv.x);
-	//	Core::Read(mesh, meshVertices[i].uv.y);
-	//}
-//
-	//Core::Read(mesh, indicesCount);
-	//meshIndices.resize(indicesCount);
-	//for (uint32_t i = 0; i < indicesCount; ++i)
-	//{
-	//	Core::Read(mesh, meshIndices[i]);
-	//}
-#pragma endregion
-
 #pragma region Texture
 
     std::string texturePath = "Engine/Assets/Textures/viking_room.png";
@@ -129,8 +90,6 @@ int main()
     stbi_uc* texturePixels = stbi_load(texturePath.c_str(), &t_texWidth, &t_texHeight, &t_texChannels, STBI_rgb_alpha);
    
 #pragma endregion
-
-
 
 #pragma region Setup 
     Core::KSharedPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
@@ -148,7 +107,7 @@ int main()
 
 	Core::Engine::Get().TestFunction();
 
-
+    
 
 
     float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());

@@ -3,13 +3,14 @@
 #include  "Utils/Memory.hpp"
 #include "Export.hpp"
 #include "AssetManagerModule.hpp"
+//#include "Engine.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
 
 enum class AssetType
 {
     StaticMesh = 0,
-    Texture = 1,
+    Texture2D = 1,
 
     COUNT = 2
 };
@@ -51,13 +52,16 @@ template<typename T>
 class SoftAssetRef
 {
 public:
-    Core::KUniquePtr<T> Load();
-    Core::KUniquePtr<T> LoadAsync();
+    Core::KSharedPtr<T> Load()
+    {
+        //Core::Engine::Get()
+    }
+
+    Core::KSharedPtr<T> LoadAsync() {}
 
 private:
     uint32_t m_id;
 
-private:
     SoftAssetRef() = delete;
 };
 
