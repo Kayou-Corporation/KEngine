@@ -22,9 +22,21 @@ public:
 
     static Engine& Get();
 
-    void TestFunction()
+    void CreateAsset(const std::string& assetPath, const std::string& assetName, const AssetManager::AssetType type = AssetManager::AssetType::DefaultGuess)
     {
-        m_assetRegistry->CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
+        m_assetRegistry->CreateAsset(assetPath, assetName, type);
+    }
+
+    template<typename AssetDerived>
+    AssetManager::SoftAssetRef<AssetDerived> GetAsset(uint32_t id)
+    {
+        return m_assetRegistry->GetAsset<AssetDerived>(id);
+    }
+
+    template<typename AssetDerived>
+    AssetManager::SoftAssetRef<AssetDerived> GetAsset(const std::string& name)
+    {
+        return m_assetRegistry->GetAsset<AssetDerived>(name);
     }
 
 public:

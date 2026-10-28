@@ -83,6 +83,32 @@ public:
         return SoftAssetRef<AssetDerived>{-1}; // Return an invalid SoftAssetRef
     }
 
+    template<typename AssetDerived>
+    KAPI SoftAssetRef<AssetDerived> GetAsset(const std::string& name)
+    {
+        if (name.empty())
+        {
+            spdlog::error("AssetRegistry::GetAsset: Invalid asset name.");
+            return SoftAssetRef<AssetDerived>{-1};
+        }
+
+        for (const auto& asset : m_assets)
+        {
+            if (asset->GetName() == name)
+            {
+                if (asset->GetType() != AssetDerived::GetStaticType())
+                {
+                    spdlog::error("AssetRegistry::GetAsset: Asset with name {} is not of the requested type.", name);
+                    return SoftAssetRef<AssetDerived>{asset->GetID()};
+                }
+                return SoftAssetRef<AssetDerived>{asset->GetID()};
+            }
+        }
+
+        spdlog::error("AssetRegistry::GetAsset: Asset with name {} not found.", name);
+        return SoftAssetRef<AssetDerived>{-1};
+    }
+
     void RegisterAllAssets();
 
 private:

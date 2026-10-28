@@ -58,7 +58,7 @@ class SoftAssetRef
 private:
     uint32_t m_id;
 
-    SoftAssetRef() = delete;
+    SoftAssetRef(uint32_t id) : m_id(id) {};
 };
 
 END_NAMESPACE_ASSETMANAGER

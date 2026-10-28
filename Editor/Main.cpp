@@ -18,6 +18,7 @@
 #include "RHI/API/DescriptorSet.hpp"
 #include "RHI/API/RHI.hpp"
 #include "Camera/EditorCamera.hpp"
+#include "CoreObject/StaticMesh.hpp"
 
 #include "BuildMode.hpp"
 #include "MeshBase.hpp"
@@ -100,11 +101,11 @@ int main()
 
 	Core::Engine::Init({ {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} });
 
-	Core::Engine::Get().TestFunction();
+	//Core::Engine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
 
+    //AssetManager::SoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::Engine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
 
-
-    //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
+    //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight( ));
     //Core::EditorCamera editorCamera;
     //editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
     //editorCamera.SetRotation(glm::vec3(0, 0, 0.f));

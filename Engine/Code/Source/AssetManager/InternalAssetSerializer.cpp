@@ -14,7 +14,8 @@ void InternalAssetSerializer::WriteAssetHeader(std::ofstream& asset, const Asset
 
     Core::Write(asset, headerInfo.type);
 
-    Core::Write(asset, headerInfo.name.length());
+    uint32_t nameLength = headerInfo.name.length();
+    Core::Write(asset, nameLength);
 
     for (uint32_t i = 0; i < headerInfo.name.length(); ++i)
     {

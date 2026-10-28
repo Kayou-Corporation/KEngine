@@ -58,6 +58,7 @@ Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesTh
 
     //----------- AssetManager --------------//
     m_assetRegistry = Core::CreateUniquePtr<AssetManager::AssetRegistry>("Cache/Assets/");
+    m_assetRegistry->RegisterAllAssets();
 
 }
 
