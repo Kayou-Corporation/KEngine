@@ -12,6 +12,8 @@
 #endif
 
 #define STB_IMAGE_IMPLEMENTATION
+#include <filesystem>
+
 #include "stb_image.h"
 
 BEGIN_NAMESPACE_ASSETMANAGER
@@ -46,6 +48,20 @@ AssetType ExternalAssetLoader::GuessAssetTypeFromSource(const std::string_view &
     }
 
     return AssetType::COUNT;
+}
+
+uint32_t ExternalAssetLoader::GetAssetSize(const std::string_view &path)
+{
+    std::error_code ec;
+    uint64_t size = std::filesystem::file_size(path, ec);
+
+    if (ec)
+    {
+        spdlog::error("ExternalAssetLoader::GetAssetSize: Error getting file size for path: {}", path);
+        return 0;
+    }
+    
+    return static_cast<uint32_t>(size);
 }
 
 template<>

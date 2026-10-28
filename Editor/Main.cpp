@@ -76,20 +76,15 @@ struct Model
 
 int main()
 {
-
-
-
 #ifdef KDEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
 
-#pragma region Texture
 
-    std::string texturePath = "Engine/Assets/Textures/viking_room.png";
-    int t_texWidth, t_texHeight, t_texChannels;
-    stbi_uc* texturePixels = stbi_load(texturePath.c_str(), &t_texWidth, &t_texHeight, &t_texChannels, STBI_rgb_alpha);
-   
-#pragma endregion
+// Texture
+    //std::string texturePath = "Engine/Assets/Textures/viking_room.png";
+    //int t_texWidth, t_texHeight, t_texChannels;
+    //stbi_uc* texturePixels = stbi_load(texturePath.c_str(), &t_texWidth, &t_texHeight, &t_texChannels, STBI_rgb_alpha);
 
 #pragma region Setup 
     Core::KSharedPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
@@ -107,449 +102,447 @@ int main()
 
 	Core::Engine::Get().TestFunction();
 
-    
 
 
-    float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
+    //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
+    //Core::EditorCamera editorCamera;
+    //editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
+    //editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
+    //editorCamera.SetFov(glm::radians(45.f));
+    //editorCamera.SetAspectRatio(aspectRatio);
+    //editorCamera.SetNearPlane(0.1f);
+    //editorCamera.SetFarPlane(100.0f);
 
-    Core::EditorCamera editorCamera;
-    editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
-    editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
-    editorCamera.SetFov(glm::radians(45.f));
-    editorCamera.SetAspectRatio(aspectRatio);
-    editorCamera.SetNearPlane(0.1f);
-    editorCamera.SetFarPlane(100.0f);
-
-    editorCamera.RecalculateMatrices();
-
+    //editorCamera.RecalculateMatrices();
     //glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
     //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     //glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
     //glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
-
-    float fov = glm::radians(45.f);
-    //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
-    float nearPlane = 0.1f;
-    float farPlane = 100.0f;
-    glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
-    proj[1][1] *= -1;
-    CameraData initCam;
-    initCam.cameraVP = editorCamera.GetViewProjectionMatrix();
-    initCam.cameraPos = editorCamera.GetPosition();
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-    model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
-    model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-
-    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-
-    Model mdl;
-    mdl.model = glm::transpose(model);
-    mdl.normal = normalMatrix;
-
-
-
-    Core::InstanceHandle instance = Core::RendererInterface::InitRenderer(Core::RendererAPI::Vulkan);
-
-    Core::InstanceSpecs test;
-    test.window = window;
-    test.appVersion = Core::Version(0, 0, 1);
-    test.engineVersion = Core::Version(0, 0, 1);
-    test.debugLayers = {Core::DebugLayers::Validation };
-    
-    instance->Create(test);
-
-    Core::SurfaceHandle surface = instance->CreateSurface({ window });
-
-    Core::DeviceSpecs dSpecs;
-    dSpecs.gpuType = Core::GpuType::Discrete;
-    dSpecs.extensions = {Core::Extensions::Swapchain, Core::Extensions::DynamicRendering, Core::Extensions::ShaderObject };
-    dSpecs.queues = {Core::QueueType::Graphics };
-    dSpecs.searchPresentQueue = true;
-    dSpecs.surface = surface;
-
-    Core::DeviceHandle device = instance->CreateDevice(dSpecs);
-
-    Core::SwapchainSpecs sSpecs;
-    sSpecs.surface = surface;
-    sSpecs.extent = Core::Extent2D(window->GetWidth(), window->GetHeight());
-    sSpecs.imageCount = 2;
-    sSpecs.presentMode = Core::PresentMode::Mailbox;
-    sSpecs.imageFormat = Core::Format::BGRA8_SRGB;
-    sSpecs.isDepthEnable = true;
-    sSpecs.depthImageFormat = Core::Format::D32_SFLOAT;
-    Core::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
+//
+    //float fov = glm::radians(45.f);
+    ////float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
+    //float nearPlane = 0.1f;
+    //float farPlane = 100.0f;
+    //glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
+    //proj[1][1] *= -1;
+    //CameraData initCam;
+    //initCam.cameraVP = editorCamera.GetViewProjectionMatrix();
+    //initCam.cameraPos = editorCamera.GetPosition();
+//
+    //glm::mat4 model = glm::mat4(1.0f);
+    //model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+    //model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
+    //model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
+    //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+//
+    //glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
+//
+    //Model mdl;
+    //mdl.model = glm::transpose(model);
+    //mdl.normal = normalMatrix;
+//
+//
+//
+    //Core::InstanceHandle instance = Core::RendererInterface::InitRenderer(Core::RendererAPI::Vulkan);
+//
+    //Core::InstanceSpecs test;
+    //test.window = window;
+    //test.appVersion = Core::Version(0, 0, 1);
+    //test.engineVersion = Core::Version(0, 0, 1);
+    //test.debugLayers = {Core::DebugLayers::Validation };
+    //
+    //instance->Create(test);
+//
+    //Core::SurfaceHandle surface = instance->CreateSurface({ window });
+//
+    //Core::DeviceSpecs dSpecs;
+    //dSpecs.gpuType = Core::GpuType::Discrete;
+    //dSpecs.extensions = {Core::Extensions::Swapchain, Core::Extensions::DynamicRendering, Core::Extensions::ShaderObject };
+    //dSpecs.queues = {Core::QueueType::Graphics };
+    //dSpecs.searchPresentQueue = true;
+    //dSpecs.surface = surface;
+//
+    //Core::DeviceHandle device = instance->CreateDevice(dSpecs);
+//
+    //Core::SwapchainSpecs sSpecs;
+    //sSpecs.surface = surface;
+    //sSpecs.extent = Core::Extent2D(window->GetWidth(), window->GetHeight());
+    //sSpecs.imageCount = 2;
+    //sSpecs.presentMode = Core::PresentMode::Mailbox;
+    //sSpecs.imageFormat = Core::Format::BGRA8_SRGB;
+    //sSpecs.isDepthEnable = true;
+    //sSpecs.depthImageFormat = Core::Format::D32_SFLOAT;
+    //Core::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
 #pragma endregion
 
-    // Vertex Buffer 
-    Core::BufferSpecs vertexbufferSpecs{};
-    vertexbufferSpecs.primaryUsage = Core::BufferUsage::Vertex;
-    vertexbufferSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
-    vertexbufferSpecs.size = static_cast<uint32_t>(meshVertices.size()) * sizeof(Vertex);
-    vertexbufferSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
-    vertexbufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
-    Core::BufferHandle vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
-    
-    // Index Buffer
-    Core::BufferSpecs indexBufferSpecs{};
-    indexBufferSpecs.primaryUsage = Core::BufferUsage::Index;
-    indexBufferSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
-    indexBufferSpecs.size = static_cast<uint32_t>(meshIndices.size()) * sizeof(uint32_t);
-    indexBufferSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
-    indexBufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
-    Core::BufferHandle indexBuffer = device->CreateBuffer(indexBufferSpecs);
+    //std::vector<Vertex> meshVertices;
+    //std::vector<uint32_t> meshIndices;
+    //// Vertex Buffer
+    //Core::BufferSpecs vertexbufferSpecs{};
+    //vertexbufferSpecs.primaryUsage = Core::BufferUsage::Vertex;
+    //vertexbufferSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    //vertexbufferSpecs.size = static_cast<uint32_t>(meshVertices.size()) * sizeof(Vertex);
+    //vertexbufferSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    //vertexbufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
+    //Core::BufferHandle vertexBuffer = device->CreateBuffer(vertexbufferSpecs);
+    //
+    //// Index Buffer
+    //Core::BufferSpecs indexBufferSpecs{};
+    //indexBufferSpecs.primaryUsage = Core::BufferUsage::Index;
+    //indexBufferSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    //indexBufferSpecs.size = static_cast<uint32_t>(meshIndices.size()) * sizeof(uint32_t);
+    //indexBufferSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    //indexBufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
+    //Core::BufferHandle indexBuffer = device->CreateBuffer(indexBufferSpecs);
+//
+    //// Base Texture
+    //Core::ImageSpecs textureImageSpecs;
+    //textureImageSpecs.format = Core::Format::RGBA8_SRGB;
+    //textureImageSpecs.targetLayout = Core::Layout::ShaderReadOnly;
+    //textureImageSpecs.type = Core::ImageType::Image2D;
+    //textureImageSpecs.viewType = Core::ImageViewType::Image2D;
+    //textureImageSpecs.viewAspect = Core::ImageViewAspect::Color;
+    //textureImageSpecs.usages = { Core::ImageUsage::TransferDst, Core::ImageUsage::ShaderSampled };
+    //textureImageSpecs.extent = { static_cast<uint32_t>(t_texWidth), static_cast<uint32_t>(t_texHeight), 1 };
+    //Core::ImageHandle textureImage = device->CreateImage(textureImageSpecs);
+//
+    //// Base Sampler
+    //Core::SamplerSpecs samplerSpecs;
+    //samplerSpecs.magFilter = Core::Filter::Linear;
+    //samplerSpecs.minFilter = Core::Filter::Linear;
+    //samplerSpecs.mipmapMode = Core::SamplerMipmapMode::Linear;
+    //samplerSpecs.addressU = Core::SamplerAddressMode::Repeat;
+    //samplerSpecs.addressV = Core::SamplerAddressMode::Repeat;
+    //samplerSpecs.addressW = Core::SamplerAddressMode::Repeat;
+    //samplerSpecs.mipLodBias = 0.0f;
+    //samplerSpecs.anisotropyEnable = false;
+    //samplerSpecs.maxAnisotropy = 1.0f;
+    //samplerSpecs.compareEnable = false;
+    //samplerSpecs.compareOp = Core::CompareOp::Always;
+    //samplerSpecs.minLod = 0.0f;
+    //samplerSpecs.maxLod = 0.0f;
+    //samplerSpecs.borderColor = Core::BorderColor::IntOpaqueBlack;
+    //samplerSpecs.unnormalizedCoordinates = false;
+//
+    //Core::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
+//
+//
+    //Core::CommandListHandle copyBufferDataCommandList = device->GetCommandList(Core::QueueType::Graphics);
+//
+    //copyBufferDataCommandList->Open();
+    //
+    //copyBufferDataCommandList->SetBufferData(vertexBuffer, meshVertices.data(), static_cast<uint32_t>(meshVertices.size()) * sizeof(Vertex), 0);
+    //
+    //copyBufferDataCommandList->SetBufferData(indexBuffer, meshIndices.data(), static_cast<uint32_t>(meshIndices.size()) * sizeof(uint32_t), 0);
+    //
+    //copyBufferDataCommandList->SetImageData(textureImage, texturePixels, t_texWidth * t_texHeight * 4);
+//
+    //copyBufferDataCommandList->TransitionImageLayout(textureImage,Core::Layout::ShaderReadOnly);
+//
+    //copyBufferDataCommandList->Close();
+    //
+    //Core::SubmitInfo submitInfocopyBufferData;
+    //submitInfocopyBufferData.stage = Core::PipelineStage::Transfer;
+    //
+    //device->SubmitCommandList(copyBufferDataCommandList, submitInfocopyBufferData);
+//
+    //// Uniform buffer camera
+    //Core::BufferSpecs uniformCameraSpecs{};
+    //uniformCameraSpecs.primaryUsage = Core::BufferUsage::Uniform;
+    //uniformCameraSpecs.size = sizeof(CameraData);
+    //uniformCameraSpecs.memoryAccess = Core::MemoryAccess::Upload;
+    //uniformCameraSpecs.pipelineStage = Core::PipelineStage::VertexShader;
+    //uniformCameraSpecs.isPersistentMapped = true;
+    //uniformCameraSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    //Core::BufferHandle uniformCamera = device->CreateBuffer(uniformCameraSpecs);
+//
+//
+    //// Uniform buffer modelMatrix
+    //Core::BufferSpecs uniformModelSpecs{};
+    //uniformModelSpecs.primaryUsage = Core::BufferUsage::Uniform;
+    //uniformModelSpecs.size = sizeof(Model);
+    //uniformModelSpecs.memoryAccess = Core::MemoryAccess::Upload;
+    //uniformModelSpecs.pipelineStage = Core::PipelineStage::VertexShader;
+    //uniformModelSpecs.isPersistentMapped = true;
+    //uniformModelSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    //Core::BufferHandle uniformModel = device->CreateBuffer(uniformModelSpecs);
+//
+    //auto copyUniformDataCommandList = device->GetCommandList(Core::QueueType::Graphics);
+    //copyUniformDataCommandList->Open();
+//
+    //copyUniformDataCommandList->SetBufferData(uniformCamera, &initCam, sizeof(CameraData), 0);
+    //copyUniformDataCommandList->SetBufferData(uniformModel, &mdl, sizeof(Model), 0);
+//
+    //copyUniformDataCommandList->Close();
+//
+    //Core::SubmitInfo submitInfocopyUniformData;
+    //submitInfocopyUniformData.stage = Core::PipelineStage::Transfer;
+//
+    //device->SubmitCommandList(copyUniformDataCommandList, submitInfocopyUniformData);
+//
+    //// Presentation images
+    //std::vector<Core::ImageHandle> presentationImages = device->CreatePresentationImages(swapchain);
+    //
+    //// depth images
+    //Core::SwapchainImageSpecs depthImageSpecs;
+    //depthImageSpecs.imageType = Core::SwapchainImageType::Depth;
+    //depthImageSpecs.targetLayout = Core::Layout::DepthStencilAttachment;
+    //depthImageSpecs.type = Core::ImageType::Image2D;
+    //depthImageSpecs.usages = { Core::ImageUsage::DepthStencilAttachment };
+    //depthImageSpecs.viewType = Core::ImageViewType::Image2D;
+    //depthImageSpecs.viewAspect = Core::ImageViewAspect::Depth;
+//
+    //Core::ImageHandle depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+//
+    //// Timeline
+    //Core::SemaphoreSpecs timelineSpecs;
+    //timelineSpecs.type = Core::SemaphoreType::Timeline;
+    //Core::SemaphoreHandle frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
+//
+    //// Binary
+    //std::vector<Core::SemaphoreHandle> imageAvailablesSemaphores;
+    //std::vector<Core::SemaphoreHandle> renderFinishedSemaphores;
+//
+    //for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
+    //{
+    //    Core::SemaphoreSpecs binarySpecs{};
+    //    binarySpecs.type = Core::SemaphoreType::Binary;
+//
+    //    Core::SemaphoreHandle imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
+    //    Core::SemaphoreHandle renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
+//
+    //    imageAvailablesSemaphores.push_back(imageAvailableSemaphore);
+    //    renderFinishedSemaphores.push_back(renderFinishedSemaphore);
+    //}
+//
+    //Core::ShaderHandle baseVert = device->CreateShader("base.vert", Core::ShaderStage::Vertex, false, true);
+    //Core::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Core::ShaderStage::Fragment, false, true);
+    //Core::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", Core::ShaderStage::Vertex, true, true);
+//
+    //std::vector<Core::DescriptorSetLayoutHandle> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
+//
+    //Core::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
+//
+    //Core::GraphicsPipelineSpecs unlitPipelineSpecs;
+    //unlitPipelineSpecs.colorAttachmentCount = 1;
+    //unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
+    //unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
+    //unlitPipelineSpecs.viewportCount = 1;
+    //unlitPipelineSpecs.scissorCount = 1;
+    //unlitPipelineSpecs.lineWidth = 1.f;
+    //unlitPipelineSpecs.cullmode = Core::CullMode::Back;
+    //unlitPipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
+    //unlitPipelineSpecs.SamplesCount = Core::SampleCount::Count1;
+    //unlitPipelineSpecs.blendColor = false;
+    //unlitPipelineSpecs.depthTest = true;
+    //unlitPipelineSpecs.depthWrite = true;
+    //unlitPipelineSpecs.depthCompare = Core::CompareOp::LessOrEqual;
+    //unlitPipelineSpecs.dynamicStates = { Core::DynamicState::ViewPort, Core::DynamicState::Scissor };
+    //unlitPipelineSpecs.topology = Core::PrimitiveTopology::TriangleList;
+    //unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
+    //unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
+    //
+    //Core::PipelineHandle unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
+    //
+    //// DescriptorSet
+    //Core::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
+    //Core::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
+    //
+    //Core::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
+    //Core::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
+//
+    //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
+    //device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Core::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
+    //device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, textureImage, nullptr);
+    //device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
+    //
+    //device->WaitIdle();
 
-    // Base Texture
-    Core::ImageSpecs textureImageSpecs;
-    textureImageSpecs.format = Core::Format::RGBA8_SRGB;
-    textureImageSpecs.targetLayout = Core::Layout::ShaderReadOnly;
-    textureImageSpecs.type = Core::ImageType::Image2D;
-    textureImageSpecs.viewType = Core::ImageViewType::Image2D;
-    textureImageSpecs.viewAspect = Core::ImageViewAspect::Color;
-    textureImageSpecs.usages = { Core::ImageUsage::TransferDst, Core::ImageUsage::ShaderSampled };
-    textureImageSpecs.extent = { static_cast<uint32_t>(t_texWidth), static_cast<uint32_t>(t_texHeight), 1 };
-    Core::ImageHandle textureImage = device->CreateImage(textureImageSpecs);
-
-    // Base Sampler
-    Core::SamplerSpecs samplerSpecs;
-    samplerSpecs.magFilter = Core::Filter::Linear;
-    samplerSpecs.minFilter = Core::Filter::Linear;
-    samplerSpecs.mipmapMode = Core::SamplerMipmapMode::Linear;
-    samplerSpecs.addressU = Core::SamplerAddressMode::Repeat;
-    samplerSpecs.addressV = Core::SamplerAddressMode::Repeat;
-    samplerSpecs.addressW = Core::SamplerAddressMode::Repeat;
-    samplerSpecs.mipLodBias = 0.0f;
-    samplerSpecs.anisotropyEnable = false;
-    samplerSpecs.maxAnisotropy = 1.0f;
-    samplerSpecs.compareEnable = false;
-    samplerSpecs.compareOp = Core::CompareOp::Always;
-    samplerSpecs.minLod = 0.0f;
-    samplerSpecs.maxLod = 0.0f;
-    samplerSpecs.borderColor = Core::BorderColor::IntOpaqueBlack;
-    samplerSpecs.unnormalizedCoordinates = false;
-
-    Core::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
-
-
-    Core::CommandListHandle copyBufferDataCommandList = device->GetCommandList(Core::QueueType::Graphics);
-
-    copyBufferDataCommandList->Open();
-    
-    copyBufferDataCommandList->SetBufferData(vertexBuffer, meshVertices.data(), static_cast<uint32_t>(meshVertices.size()) * sizeof(Vertex), 0);
-    
-    copyBufferDataCommandList->SetBufferData(indexBuffer, meshIndices.data(), static_cast<uint32_t>(meshIndices.size()) * sizeof(uint32_t), 0);
-    
-    copyBufferDataCommandList->SetImageData(textureImage, texturePixels, t_texWidth * t_texHeight * 4);
-
-    copyBufferDataCommandList->TransitionImageLayout(textureImage,Core::Layout::ShaderReadOnly);
-
-    copyBufferDataCommandList->Close();
-    
-    Core::SubmitInfo submitInfocopyBufferData;
-    submitInfocopyBufferData.stage = Core::PipelineStage::Transfer;
-    
-    device->SubmitCommandList(copyBufferDataCommandList, submitInfocopyBufferData);
-
-    // Uniform buffer camera
-    Core::BufferSpecs uniformCameraSpecs{};
-    uniformCameraSpecs.primaryUsage = Core::BufferUsage::Uniform;
-    uniformCameraSpecs.size = sizeof(CameraData);
-    uniformCameraSpecs.memoryAccess = Core::MemoryAccess::Upload;
-    uniformCameraSpecs.pipelineStage = Core::PipelineStage::VertexShader;
-    uniformCameraSpecs.isPersistentMapped = true;
-    uniformCameraSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
-    Core::BufferHandle uniformCamera = device->CreateBuffer(uniformCameraSpecs);
-
-
-    // Uniform buffer modelMatrix
-    Core::BufferSpecs uniformModelSpecs{};
-    uniformModelSpecs.primaryUsage = Core::BufferUsage::Uniform;
-    uniformModelSpecs.size = sizeof(Model);
-    uniformModelSpecs.memoryAccess = Core::MemoryAccess::Upload;
-    uniformModelSpecs.pipelineStage = Core::PipelineStage::VertexShader;
-    uniformModelSpecs.isPersistentMapped = true;
-    uniformModelSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
-    Core::BufferHandle uniformModel = device->CreateBuffer(uniformModelSpecs);
-
-    auto copyUniformDataCommandList = device->GetCommandList(Core::QueueType::Graphics);
-    copyUniformDataCommandList->Open();
-
-    copyUniformDataCommandList->SetBufferData(uniformCamera, &initCam, sizeof(CameraData), 0);
-    copyUniformDataCommandList->SetBufferData(uniformModel, &mdl, sizeof(Model), 0);
-
-    copyUniformDataCommandList->Close();
-
-    Core::SubmitInfo submitInfocopyUniformData;
-    submitInfocopyUniformData.stage = Core::PipelineStage::Transfer;
-
-    device->SubmitCommandList(copyUniformDataCommandList, submitInfocopyUniformData);
-
-    // Presentation images
-    std::vector<Core::ImageHandle> presentationImages = device->CreatePresentationImages(swapchain);
-    
-    // depth images
-    Core::SwapchainImageSpecs depthImageSpecs; 
-    depthImageSpecs.imageType = Core::SwapchainImageType::Depth;
-    depthImageSpecs.targetLayout = Core::Layout::DepthStencilAttachment;
-    depthImageSpecs.type = Core::ImageType::Image2D;
-    depthImageSpecs.usages = { Core::ImageUsage::DepthStencilAttachment };
-    depthImageSpecs.viewType = Core::ImageViewType::Image2D;
-    depthImageSpecs.viewAspect = Core::ImageViewAspect::Depth;
-
-    Core::ImageHandle depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
-
-    // Timeline
-    Core::SemaphoreSpecs timelineSpecs;
-    timelineSpecs.type = Core::SemaphoreType::Timeline;
-    Core::SemaphoreHandle frameTimelineSemaphore = device->CreateSemaphore(timelineSpecs);
-
-    // Binary 
-    std::vector<Core::SemaphoreHandle> imageAvailablesSemaphores;
-    std::vector<Core::SemaphoreHandle> renderFinishedSemaphores;
-
-    for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i) 
-    {
-        Core::SemaphoreSpecs binarySpecs{};
-        binarySpecs.type = Core::SemaphoreType::Binary;
-
-        Core::SemaphoreHandle imageAvailableSemaphore = device->CreateSemaphore(binarySpecs);
-        Core::SemaphoreHandle renderFinishedSemaphore = device->CreateSemaphore(binarySpecs);
-
-        imageAvailablesSemaphores.push_back(imageAvailableSemaphore);
-        renderFinishedSemaphores.push_back(renderFinishedSemaphore);
-    }
-
-    Core::ShaderHandle baseVert = device->CreateShader("base.vert", Core::ShaderStage::Vertex, false, true);
-    Core::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Core::ShaderStage::Fragment, false, true);
-    Core::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", Core::ShaderStage::Vertex, true, true);
-
-    std::vector<Core::DescriptorSetLayoutHandle> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
-
-    Core::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
-
-    Core::GraphicsPipelineSpecs unlitPipelineSpecs;
-    unlitPipelineSpecs.colorAttachmentCount = 1;
-    unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
-    unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
-    unlitPipelineSpecs.viewportCount = 1;
-    unlitPipelineSpecs.scissorCount = 1;
-    unlitPipelineSpecs.lineWidth = 1.f;
-    unlitPipelineSpecs.cullmode = Core::CullMode::Back;
-    unlitPipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
-    unlitPipelineSpecs.SamplesCount = Core::SampleCount::Count1;
-    unlitPipelineSpecs.blendColor = false;
-    unlitPipelineSpecs.depthTest = true;
-    unlitPipelineSpecs.depthWrite = true;
-    unlitPipelineSpecs.depthCompare = Core::CompareOp::LessOrEqual;
-    unlitPipelineSpecs.dynamicStates = { Core::DynamicState::ViewPort, Core::DynamicState::Scissor };
-    unlitPipelineSpecs.topology = Core::PrimitiveTopology::TriangleList;
-    unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
-    unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
-    
-    Core::PipelineHandle unlitPipeline = device->CreateGraphicsPipeline(unlitPipelineSpecs);
-    
-    // DescriptorSet
-    Core::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
-    Core::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
-    
-    Core::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
-    Core::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
-
-    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
-    device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Core::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
-    device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, textureImage, nullptr);
-    device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
-    
-    device->WaitIdle();
-
-    uint64_t frameCounter = 0;
-    bool gpuResizeRequest = false;
+    //uint64_t frameCounter = 0;
+    //bool gpuResizeRequest = false;
 
     while (!window->ShouldClose())
     {
         window->PollEvents();
 
-        if (window->GetHasResize() || gpuResizeRequest)
+        if (window->GetHasResize() /*|| gpuResizeRequest*/)
         {
-            device->WaitIdle();
-    
-            // Destroy everything.
-            device->DestroyPresentationImages(presentationImages);
-            device->DestroyImage(depthImage);
-            device->DestroySwapchain(swapchain);
-    
-            // Update everything
-            device->UpdateCompatibility(surface);
+            //device->WaitIdle();
+
+            //// Destroy everything.
+            //device->DestroyPresentationImages(presentationImages);
+            //device->DestroyImage(depthImage);
+            //device->DestroySwapchain(swapchain);
+
+            //// Update everything
+            //device->UpdateCompatibility(surface);
     
             // Recreate everything.
-            uint32_t tWidth = window->GetWidth();
-            uint32_t tHeight = window->GetHeight();
-            sSpecs.extent = Core::Extent2D(tWidth, tHeight);
-            swapchain = device->CreateSwapchain(sSpecs);
-            presentationImages = device->CreatePresentationImages(swapchain);
-            depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+            //uint32_t tWidth = window->GetWidth();
+            //uint32_t tHeight = window->GetHeight();
+            //sSpecs.extent = Core::Extent2D(tWidth, tHeight);
+            //swapchain = device->CreateSwapchain(sSpecs);
+            //presentationImages = device->CreatePresentationImages(swapchain);
+            //depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
     
             window->ResizeComplete();
-            gpuResizeRequest = false;
+            //gpuResizeRequest = false;
     
-            editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
-            editorCamera.RecalculateMatrices();
-    
-            CameraData resizeCam;
-            resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
-            resizeCam.cameraPos = editorCamera.GetPosition();
-            
-            auto commandList = device->GetCommandList(Core::QueueType::Graphics);
-            commandList->Open();
-            commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
-            commandList->Close();
-            
-            Core::SubmitInfo submitTransfer;
-            Core::SubmitInfo submitInfo;
-            submitInfo.stage = Core::PipelineStage::None;
-            
-            device->SubmitCommandList(commandList, submitTransfer);
+            //editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
+            //editorCamera.RecalculateMatrices();
+    //
+            //CameraData resizeCam;
+            //resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
+            //resizeCam.cameraPos = editorCamera.GetPosition();
+            //
+            //auto commandList = device->GetCommandList(Core::QueueType::Graphics);
+            //commandList->Open();
+            //commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
+            //commandList->Close();
+            //
+            //Core::SubmitInfo submitTransfer;
+            //Core::SubmitInfo submitInfo;
+            //submitInfo.stage = Core::PipelineStage::None;
+            //
+            //device->SubmitCommandList(commandList, submitTransfer);
             //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
         }
     
-        uint32_t maxFramesInFlight = swapchain->GetImageCount();
-        uint32_t syncIndex = frameCounter % maxFramesInFlight;
+        //uint32_t maxFramesInFlight = swapchain->GetImageCount();
+        //uint32_t syncIndex = frameCounter % maxFramesInFlight;
+    //
+        //if (frameCounter >= maxFramesInFlight)
+        //{
+        //    uint64_t waitValue = frameCounter - maxFramesInFlight + 1;
+        //    device->WaitForSemaphore(frameTimelineSemaphore, waitValue);
+        //}
+    //
+        //uint32_t imageIndex = device->AcquirreNextImage(swapchain, imageAvailablesSemaphores[syncIndex]);
     
-        if (frameCounter >= maxFramesInFlight)
-        {
-            uint64_t waitValue = frameCounter - maxFramesInFlight + 1;
-            device->WaitForSemaphore(frameTimelineSemaphore, waitValue);
-        }
+        //device->RunGarbageCollector();
     
-        uint32_t imageIndex = device->AcquirreNextImage(swapchain, imageAvailablesSemaphores[syncIndex]);
+        //Core::RenderingAttachment colorAttachment;
+        //colorAttachment.image = presentationImages[imageIndex];
+        //colorAttachment.layout = Core::Layout::ColorAttachment;
+        //colorAttachment.loadOp = Core::LoadOp::Clear;
+        //colorAttachment.storeOp = Core::StoreOp::Store;
+        //colorAttachment.clearValueColor = Core::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
+    //
+        //Core::RenderingAttachment depthAttachment;
+        //depthAttachment.image = depthImage;
+        //depthAttachment.layout = Core::Layout::DepthStencilAttachment;
+        //depthAttachment.loadOp = Core::LoadOp::Clear;
+        //depthAttachment.storeOp = Core::StoreOp::Store;
+        //depthAttachment.clearValueDepth = Core::ClearValue(1.0f, 0.f, 0.f, 0.f);
+    //
+        //Core::RenderingInfo renderingInfo;
+        //renderingInfo.offset = { 0, 0 };
+        //renderingInfo.extent = { window->GetWidth(), window->GetHeight()};
+        //renderingInfo.layerCount = 1;
+        //renderingInfo.colorAttachmentCount = 1;
+        //renderingInfo.colorAttachments = { colorAttachment };
+        //renderingInfo.depthAttachment = depthAttachment;
     
-        device->RunGarbageCollector();
+        //auto commandList = device->GetCommandList(Core::QueueType::Graphics);
+        //commandList->Open();
+    //
+        //commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::ColorAttachment);
+        //commandList->TransitionImageLayout(depthImage, Core::Layout::DepthStencilAttachment);
+    //
+        //commandList->BeginRendering(renderingInfo);
+    //
+        //commandList->SetViewport(0.f, 0.f, static_cast<float>(window->GetWidth()), static_cast<float>(window->GetHeight()));
+        //commandList->SetScissor(0, 0, window->GetWidth(), window->GetHeight());
+    //
+        //commandList->BindPipeline(unlitPipeline);
+    //
+        //commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Core::PipelineBindPoint::Graphics);
+        //commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
+    //
+        //commandList->BindVertexBuffer(vertexBuffer, 0);
+        //commandList->BindIndexBuffer(indexBuffer, 0);
+        //
+        //commandList->DrawIndexed(static_cast<uint32_t>(meshIndices.size()), 1, 0, 0, 0);
+    //
+        //commandList->EndRendering();
+    //
+        //commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::Present);
+    //
+        //commandList->Close();
     
-        Core::RenderingAttachment colorAttachment;
-        colorAttachment.image = presentationImages[imageIndex];
-        colorAttachment.layout = Core::Layout::ColorAttachment;
-        colorAttachment.loadOp = Core::LoadOp::Clear;
-        colorAttachment.storeOp = Core::StoreOp::Store;
-        colorAttachment.clearValueColor = Core::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
+        //uint64_t signalValue = frameCounter + 1;
+    //
+        //Core::SubmitInfo submitInfo;
+        //submitInfo.waitSemaphores = { imageAvailablesSemaphores[syncIndex] };
+        //submitInfo.waitSemaphoresValues = { 0 };
+        //submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[imageIndex] };
+        //submitInfo.signalSemaphoresValues = { signalValue, 0 };
+        //submitInfo.stage = Core::PipelineStage::ColorOutput;
+    //
+        //device->SubmitCommandList(commandList, submitInfo);
+    //
+        //Core::PresentInfo presentInfo;
+        //presentInfo.waitSemaphores = { renderFinishedSemaphores[imageIndex] };
+        //presentInfo.swapchain = swapchain;
+        //presentInfo.imageIndex = imageIndex;
+    //
+        //bool sucess = device->Present(presentInfo);
+    //
+        //if (!sucess)
+        //{
+        //    gpuResizeRequest = true;
+        //}
     
-        Core::RenderingAttachment depthAttachment;
-        depthAttachment.image = depthImage;
-        depthAttachment.layout = Core::Layout::DepthStencilAttachment;
-        depthAttachment.loadOp = Core::LoadOp::Clear;
-        depthAttachment.storeOp = Core::StoreOp::Store;
-        depthAttachment.clearValueDepth = Core::ClearValue(1.0f, 0.f, 0.f, 0.f);
-    
-        Core::RenderingInfo renderingInfo;
-        renderingInfo.offset = { 0, 0 };
-        renderingInfo.extent = { window->GetWidth(), window->GetHeight()};
-        renderingInfo.layerCount = 1;
-        renderingInfo.colorAttachmentCount = 1;
-        renderingInfo.colorAttachments = { colorAttachment };
-        renderingInfo.depthAttachment = depthAttachment;
-    
-        auto commandList = device->GetCommandList(Core::QueueType::Graphics);
-        commandList->Open();
-    
-        commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::ColorAttachment);
-        commandList->TransitionImageLayout(depthImage, Core::Layout::DepthStencilAttachment);
-    
-        commandList->BeginRendering(renderingInfo);
-    
-        commandList->SetViewport(0.f, 0.f, static_cast<float>(window->GetWidth()), static_cast<float>(window->GetHeight()));
-        commandList->SetScissor(0, 0, window->GetWidth(), window->GetHeight());
-    
-        commandList->BindPipeline(unlitPipeline);
-    
-        commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Core::PipelineBindPoint::Graphics);
-        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
-    
-        commandList->BindVertexBuffer(vertexBuffer, 0);
-        commandList->BindIndexBuffer(indexBuffer, 0);
-        
-        commandList->DrawIndexed(static_cast<uint32_t>(meshIndices.size()), 1, 0, 0, 0);
-    
-        commandList->EndRendering();
-    
-        commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::Present);
-    
-        commandList->Close();
-    
-        uint64_t signalValue = frameCounter + 1;
-    
-        Core::SubmitInfo submitInfo;
-        submitInfo.waitSemaphores = { imageAvailablesSemaphores[syncIndex] };
-        submitInfo.waitSemaphoresValues = { 0 };
-        submitInfo.signalSemaphores = { frameTimelineSemaphore, renderFinishedSemaphores[imageIndex] };
-        submitInfo.signalSemaphoresValues = { signalValue, 0 };
-        submitInfo.stage = Core::PipelineStage::ColorOutput;
-    
-        device->SubmitCommandList(commandList, submitInfo);
-    
-        Core::PresentInfo presentInfo;
-        presentInfo.waitSemaphores = { renderFinishedSemaphores[imageIndex] };
-        presentInfo.swapchain = swapchain;
-        presentInfo.imageIndex = imageIndex;
-    
-        bool sucess = device->Present(presentInfo);
-    
-        if (!sucess)
-        {
-            gpuResizeRequest = true;
-        }
-    
-        frameCounter++;
+        //frameCounter++;
     }
 
-    device->WaitIdle();
-
-    device->DestroyBuffer(vertexBuffer);
-    device->DestroyBuffer(indexBuffer);
-    device->DestroyImage(textureImage);
-    device->DestroySampler(sampler);
-    device->DestroyBuffer(uniformCamera);
-    device->DestroyBuffer(uniformModel);
-
-    device->DestroyDescriptorSet(frameDataDescriptorSet);
-    device->DestroyDescriptorSet(drawDataDescriptorSet);
-
-    device->DestroyPipeline(unlitPipeline);
-    device->DestroyPipelineLayout(globalPipelineLayout);
-    device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
-    
-    device->DestroyShader(unlitFrag);
-    device->DestroyShader(baseVert);
-    device->DestroyShader(globalLayoutShader);
-
-    for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
-    {
-        // delete fence & semaphore
-        device->DestroySemaphore(imageAvailablesSemaphores[i]);
-        device->DestroySemaphore(renderFinishedSemaphores[i]);
-    }
-    device->DestroySemaphore(frameTimelineSemaphore);
-
-    device->DestroyPresentationImages(presentationImages);
-
-    device->DestroyImage(depthImage);
-
+    //device->WaitIdle();
+//
+    //device->DestroyBuffer(vertexBuffer);
+    //device->DestroyBuffer(indexBuffer);
     //device->DestroyImage(textureImage);
-
-    device->DestroySwapchain(swapchain);
-
-    instance->DestroyDevice(device);
-
-    instance->DestroySurface(surface);
-
-    instance->Destroy();
+    //device->DestroySampler(sampler);
+    //device->DestroyBuffer(uniformCamera);
+    //device->DestroyBuffer(uniformModel);
+//
+    //device->DestroyDescriptorSet(frameDataDescriptorSet);
+    //device->DestroyDescriptorSet(drawDataDescriptorSet);
+//
+    //device->DestroyPipeline(unlitPipeline);
+    //device->DestroyPipelineLayout(globalPipelineLayout);
+    //device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
+    //
+    //device->DestroyShader(unlitFrag);
+    //device->DestroyShader(baseVert);
+    //device->DestroyShader(globalLayoutShader);
+//
+    //for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
+    //{
+    //    // delete fence & semaphore
+    //    device->DestroySemaphore(imageAvailablesSemaphores[i]);
+    //    device->DestroySemaphore(renderFinishedSemaphores[i]);
+    //}
+    //device->DestroySemaphore(frameTimelineSemaphore);
+//
+    //device->DestroyPresentationImages(presentationImages);
+//
+    //device->DestroyImage(depthImage);
+//
+    ////device->DestroyImage(textureImage);
+//
+    //device->DestroySwapchain(swapchain);
+//
+    //instance->DestroyDevice(device);
+//
+    //instance->DestroySurface(surface);
+//
+    //instance->Destroy();
 
 
 	Core::Engine::Shutdown();
 
     window->Destroy();
 
-    //t_importer.FreeScene();
     //stbi_image_free(texturePixels);
 
     return 0;

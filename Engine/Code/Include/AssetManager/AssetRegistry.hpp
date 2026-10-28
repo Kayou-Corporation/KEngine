@@ -3,7 +3,6 @@
 #include "Asset.hpp"
 #include "AssetManagerModule.hpp"
 #include "Utils/Memory.hpp"
-#include "Asset.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
 
@@ -17,6 +16,26 @@ struct AssetHeader
     uint32_t id;
     AssetType type;
     std::string name;
+};
+
+/*
+ * Valid = Is valid, success
+ *
+ * InvalidName = create name -> success
+ * NameAlreadyExist = Change name to add number : input : xxx -> xxx1 -> success
+ * AssetAlreadyExist = Reimport asset
+ *
+ */
+enum class AssetCreationRequest
+{
+    Valid = 0,
+
+    InvalidName = 1,
+    InvalidPath = 2,
+    NameAlreadyExist = 3,
+    //AssetAlreadyExist = 3,
+
+    COUNT = 2
 };
 
 class AssetRegistry : public virtual Core::IResource
@@ -35,6 +54,7 @@ public:
 
 public:
     KAPI void CreateAsset(const std::string& assetPath, const std::string& assetName, const AssetType type = AssetType::DefaultGuess);
+    // TODO : Implement this
     KAPI void DestroyAsset(uint32_t id);
 
     template<typename AssetDerived>
@@ -63,14 +83,18 @@ public:
         return SoftAssetRef<AssetDerived>{-1}; // Return an invalid SoftAssetRef
     }
 
-private:
-    // High level functions, to be executed on initalization
     void RegisterAllAssets();
-    void RegisterAsset(const std::string& assetPath);
 
+private:
     inline std::string CacheAssetPath(const std::string& name, const char* ext);
 
-    // Maybe useless
+    // High level functions, to be executed on initalization
+    // TODO : Implement this
+    void RegisterAsset(const std::string& assetPath);
+
+    AssetCreationRequest EnsureCreatedAssetValidity(const std::string& assetPath, const std::string& assetName);
+    std::string GenerateFallbackName(const std::string& baseName);
+
     std::string m_folderPath;
     uint32_t m_lastAssetId = 0;
 

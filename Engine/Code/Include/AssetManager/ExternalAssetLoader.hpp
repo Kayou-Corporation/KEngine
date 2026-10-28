@@ -37,6 +37,8 @@ public:
 
     KAPI static AssetType GuessAssetTypeFromSource(const std::string_view& path);
 
+    KAPI static uint32_t GetAssetSize(const std::string_view& path);
+
 public:
     ExternalAssetLoader() = delete;
     ~ExternalAssetLoader() = delete;

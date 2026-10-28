@@ -31,4 +31,20 @@ inline bool IsFileOpenOrValid(T& file)
     return file.is_open() && file.good();
 }
 
+namespace InternalXXH32
+{
+    constexpr uint32_t PRIME32_1 = 2654435761U;
+    constexpr uint32_t PRIME32_2 = 2246822519U;
+    constexpr uint32_t PRIME32_3 = 3266489917U;
+    constexpr uint32_t PRIME32_4 = 668265263U;
+    constexpr uint32_t PRIME32_5 = 374761393U;
+
+    inline uint32_t rotl32(uint32_t x, int r)
+    {
+        return (x << r) | (x >> (32 - r));
+    }
+
+    uint32_t ComputeHash(const char* input, size_t len, uint32_t seed = 0);
+}
+
 END_NAMESPACE_CORE

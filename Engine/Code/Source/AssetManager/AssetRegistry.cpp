@@ -32,13 +32,47 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
 // TODO : Implement this
 void AssetRegistry::RegisterAllAssets()
 {
+    std::filesystem::path folderPath(m_folderPath);
 
+    if (!std::filesystem::exists(folderPath) || !std::filesystem::is_directory(folderPath))
+    {
+        spdlog::error("AssetRegistry::RegisterAllAssets: Invalid folder path: {}", m_folderPath);
+        return;
+    }
+
+    for (const auto& entry : std::filesystem::directory_iterator(folderPath))
+    {
+        if (entry.is_regular_file() && entry.path().extension() == ASSET_EXTENSION)
+        {
+            RegisterAsset(entry.path().string());
+        }
+    }
 }
 
 void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string& assetName, const AssetType type)
 {
     // Create only 1 time, become void if called multiple times
     std::filesystem::create_directories(m_folderPath);
+
+    //AssetCreationRequest assetCreationRequest = EnsureCreatedAssetValidity(assetPath, assetName);
+
+    //if (assetCreationRequest == AssetCreationRequest::NameAlreadyExist)
+    //{
+    //    assetName = GenerateFallbackName(assetName);
+    //}
+    //else if (assetCreationRequest == AssetCreationRequest::InvalidPath)
+    //{
+    //    return;
+    //}
+    //else if (assetCreationRequest == AssetCreationRequest::InvalidName)
+    //{
+    //    spdlog::error("AssetRegistry::CreateAsset: Invalid asset name: {}", assetName);
+    //    return;
+    //}
+
+    // Source asset info
+    //uint32_t sourceSize = ExternalAssetLoader::GetAssetSize(assetPath);
+    //uint32_t sourceHash = Core::InternalXXH32::ComputeHash(assetPath.c_str(), assetPath.length());
 
     // Actual asset created
     const std::string fullAssetPath = CacheAssetPath(assetName, ASSET_EXTENSION);
@@ -64,25 +98,22 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
         .type = usedAssetType,
         .name = assetName
     };
-
     InternalAssetSerializer::WriteAssetHeader(asset, header);
 
-    switch (type)
+    switch (usedAssetType)
     {
         case AssetType::StaticMesh:
         {
-            // TODO: Implement for static mesh
             RawStaticMeshData assetData = ExternalAssetLoader::LoadAssetFromSource<RawStaticMeshData>(assetPath);
             InternalAssetSerializer::WriteAssetRawData(asset, assetData);
             spdlog::info("AssetRegistry::CreateAsset: Creating StaticMesh asset from path: {}", assetPath);
-
             break;
         }
         case AssetType::Texture2D:
         {
             // TODO: Implement for texture
             RawTextureData textureData = ExternalAssetLoader::LoadAssetFromSource<RawTextureData>(assetPath);
-            InternalAssetSerializer::WriteAssetRawData(asset, textureData);
+            //InternalAssetSerializer::WriteAssetRawData(asset, textureData);
             spdlog::info("AssetRegistry::CreateAsset: Creating Texture asset from path: {}", assetPath);
             break;
         }
@@ -92,7 +123,7 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
     }
 
     // Create Asset in memory :
-    Core::KSharedPtr<AssetManager::Asset> assetPtr = Core::CreateRefPtr<AssetManager::Asset>(type, assetName, m_lastAssetId);
+    Core::KSharedPtr<AssetManager::Asset> assetPtr = Core::CreateRefPtr<AssetManager::Asset>(usedAssetType, assetName, m_lastAssetId, 0, 0);
     m_assets.push_back(std::move(assetPtr));
 
     m_lastAssetId++;
@@ -100,24 +131,47 @@ void AssetRegistry::CreateAsset(const std::string& assetPath, const std::string&
 
 void AssetRegistry::RegisterAsset(const std::string&assetPath)
 {
-    uint32_t assetId;
-    AssetType assetType;
-    uint32_t assetNameLength;
-    std::string assetName;
+   std::ifstream asset(assetPath, std::ios::binary);
+   AssetHeader header = InternalAssetSerializer::ReadAssetHeader(asset);
 
-    std::ifstream asset(assetPath, std::ios::binary);
-    Core::Read(asset, assetId);
-    Core::Read(asset, assetType);
-    Core::Read(asset, assetNameLength);
-    for (uint32_t i = 0; i < assetNameLength; ++i)
+    Core::KSharedPtr<AssetManager::Asset> assetPtr = Core::CreateRefPtr<AssetManager::Asset>(header.type, header.name, header.id, 0, 0);
+    m_assets.push_back(std::move(assetPtr));
+}
+
+AssetCreationRequest AssetRegistry::EnsureCreatedAssetValidity(const std::string &assetPath, const std::string &assetName)
+{
+    // Invalid input
+    if (assetPath.empty())
     {
-        char c;
-        Core::Read(asset, c);
-        assetName += c;
+        spdlog::error("AssetRegistry::EnsureCreatedAssetValidity: Invalid asset path.");
+        return AssetCreationRequest::InvalidPath;
     }
 
-    Core::KSharedPtr<AssetManager::Asset> assetPtr = Core::CreateRefPtr<AssetManager::Asset>(assetType, assetName, assetId);
-    m_assets.push_back(std::move(assetPtr));
+    if (assetName.empty())
+    {
+        spdlog::error("AssetRegistry::EnsureCreatedAssetValidity: Invalid asset name.");
+        return AssetCreationRequest::InvalidName;
+    }
+
+    // already has name
+    for (const auto& asset : m_assets)
+    {
+        if (asset->GetName() == assetName)
+        {
+            spdlog::warn("AssetRegistry::EnsureCreatedAssetValidity: Asset with name '{}' already exists.", assetName);
+            return AssetCreationRequest::NameAlreadyExist;
+        }
+    }
+
+
+
+
+    return AssetCreationRequest::Valid;
+}
+
+std::string AssetRegistry::GenerateFallbackName(const std::string &baseName)
+{
+    return baseName + "1";
 }
 
 std::string AssetRegistry::CacheAssetPath(const std::string &name, const char *ext)

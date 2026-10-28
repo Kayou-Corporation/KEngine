@@ -27,7 +27,7 @@ enum class AssetType
 class Asset : public virtual Core::IResource
 {
 public:
-    KAPI Asset(const AssetType type, const std::string& name, const uint32_t id);
+    KAPI Asset(const AssetType type, const std::string& name, const uint32_t id, uint32_t sourceHash, uint32_t sourceSize);
     KAPI virtual ~Asset() = default;
 
     KAPI AssetType GetType() const { return m_type; }
@@ -39,10 +39,12 @@ protected:
     std::string m_name;
     uint32_t m_id;
 
-    std::string_view AssetPath;
+    //std::string_view AssetPath;
     bool isLoaded = false;
+    uint32_t m_sourceHash;
+    uint32_t m_sourceSize;
 
-// Deleted constructors & operator
+    // Deleted constructors & operator
 private:
     Asset(const Asset&) = delete;
     Asset& operator=(const Asset&) = delete;
@@ -53,14 +55,6 @@ private:
 template<typename T>
 class SoftAssetRef
 {
-public:
-    Core::KSharedPtr<T> Load()
-    {
-        //Core::Engine::Get()
-    }
-
-    Core::KSharedPtr<T> LoadAsync() {}
-
 private:
     uint32_t m_id;
 

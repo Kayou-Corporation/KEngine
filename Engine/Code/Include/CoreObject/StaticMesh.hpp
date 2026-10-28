@@ -15,9 +15,9 @@ class StaticMesh : public MeshBase
 public:
     KAPI virtual ~StaticMesh() = default;
 
-    KAPI static AssetType GetStaticType()
+    KAPI static AssetManager::AssetType GetStaticType()
     {
-        return AssetType::StaticMesh;
+        return AssetManager::AssetType::StaticMesh;
     }
 };
 
