@@ -27,7 +27,7 @@ struct SubMesh
 class MeshBase : public AssetManager::Asset
 {
 public:
-
+    KAPI MeshBase(const AssetManager::AssetType type, const std::string& name, const uint32_t id, uint32_t sourceHash, uint32_t sourceSize);
     KAPI virtual ~MeshBase() = default;
 
     // Base utility
@@ -42,7 +42,11 @@ public:
     KAPI std::vector<uint32_t> GetSubmeshIndices(uint32_t index) const;
 
 
+
 protected:
+    KAPI bool Load(std::ifstream& file) override;
+    KAPI void UnLoad() override;
+
     // Raw Data
     std::vector<Vertex> m_vertices;
     std::vector<uint32_t> m_indices;

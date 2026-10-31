@@ -1,6 +1,7 @@
 #pragma once
 #include "AssetRegistry.hpp"
 #include "CoreModule.hpp"
+#include "SoftAssetReference.hpp"
 
 #include "ThreadPool.hpp"
 #include "Utils/Memory.hpp"

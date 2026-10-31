@@ -18,6 +18,7 @@ public:
     virtual unsigned long AddRef() { return 1; };
     virtual unsigned long Release() { delete this; return 0; };
     virtual unsigned long GetRefCount() { return 1; };
+    virtual void OnUnload() {}
 };
 
 template<typename T>
@@ -43,6 +44,7 @@ public:
         unsigned long currentCount = --m_count;
         if (currentCount == 0)
         {
+            this->OnUnload();
             delete this;
         }
         return currentCount;

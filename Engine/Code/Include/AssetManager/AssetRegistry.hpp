@@ -1,8 +1,10 @@
 ﻿#pragma once
 
-#include "Asset.hpp"
+#include "AssetManager.hpp"
 #include "AssetManagerModule.hpp"
+#include "Export.hpp"
 #include "Utils/Memory.hpp"
+#include "Asset.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
 
@@ -54,68 +56,45 @@ public:
 
 public:
     KAPI void CreateAsset(const std::string& assetPath, const std::string& assetName, const AssetType type = AssetType::DefaultGuess);
-    // TODO : Implement this
     KAPI void DestroyAsset(uint32_t id);
 
+    KAPI bool LoadAsset(uint32_t id);
+    KAPI void UnloadAsset(uint32_t id);
+
     template<typename AssetDerived>
-    KAPI SoftAssetRef<AssetDerived> GetAsset(uint32_t id)
+    KAPI Core::KSharedPtr<AssetDerived> GetAsset(uint32_t id)
     {
-        if (id < 0)
+        auto it = m_assetsById.find(id);
+        if (it == m_assetsById.end())
         {
-            spdlog::error("AssetRegistry::GetAsset: Invalid asset ID {}.", id);
-            return SoftAssetRef<AssetDerived>{-1};
+            spdlog::error("AssetRegistry::GetAsset: Asset ID {} non trouve.", id);
+            return nullptr;
         }
 
-        for (const auto& asset : m_assets)
+        uint32_t index = it->second;
+        Core::KSharedPtr<Asset>& asset = m_assets[index];
+
+        if (!asset) return nullptr;
+
+        if (!asset->IsLoaded())
         {
-            if (asset->GetID() == id)
+            if (!LoadAsset(id))
             {
-                if (asset->GetType() != AssetDerived::GetStaticType())
-                {
-                    spdlog::error("AssetRegistry::GetAsset: Asset with ID {} is not of the requested type.", id);
-                    return SoftAssetRef<AssetDerived>{id}; // Return an invalid SoftAssetRef
-                }
-                return SoftAssetRef<AssetDerived>{id};
+                spdlog::error("AssetRegistry::GetAsset: Fail to load Asset {}.", id);
+                return nullptr;
             }
         }
 
-        spdlog::error("AssetRegistry::GetAsset: Asset with ID {} not found.", id);
-        return SoftAssetRef<AssetDerived>{-1}; // Return an invalid SoftAssetRef
-    }
-
-    template<typename AssetDerived>
-    KAPI SoftAssetRef<AssetDerived> GetAsset(const std::string& name)
-    {
-        if (name.empty())
-        {
-            spdlog::error("AssetRegistry::GetAsset: Invalid asset name.");
-            return SoftAssetRef<AssetDerived>{-1};
-        }
-
-        for (const auto& asset : m_assets)
-        {
-            if (asset->GetName() == name)
-            {
-                if (asset->GetType() != AssetDerived::GetStaticType())
-                {
-                    spdlog::error("AssetRegistry::GetAsset: Asset with name {} is not of the requested type.", name);
-                    return SoftAssetRef<AssetDerived>{asset->GetID()};
-                }
-                return SoftAssetRef<AssetDerived>{asset->GetID()};
-            }
-        }
-
-        spdlog::error("AssetRegistry::GetAsset: Asset with name {} not found.", name);
-        return SoftAssetRef<AssetDerived>{-1};
+        return asset.CastAs<AssetDerived>();
     }
 
     void RegisterAllAssets();
 
 private:
+    Core::KSharedPtr<Asset> CreateAssetInstance(AssetType type, const std::string& name, uint32_t id);
     inline std::string CacheAssetPath(const std::string& name, const char* ext);
 
     // High level functions, to be executed on initalization
-    // TODO : Implement this
     void RegisterAsset(const std::string& assetPath);
 
     AssetCreationRequest EnsureCreatedAssetValidity(const std::string& assetPath, const std::string& assetName);
@@ -125,6 +104,8 @@ private:
     uint32_t m_lastAssetId = 0;
 
     std::vector<Core::KSharedPtr<Asset>> m_assets;
+    std::unordered_map<uint32_t, uint32_t> m_assetsById;
+    std::vector<uint32_t> m_freeIndex;
 };
 END_NAMESPACE_ASSETMANAGER
 

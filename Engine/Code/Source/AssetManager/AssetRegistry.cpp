@@ -5,27 +5,22 @@
 
 #include "ExternalAssetLoader.hpp"
 #include "InternalAssetSerializer.hpp"
+#include "StaticMesh.hpp"
 #include  "Utils/File.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
-    //template<>
-    //void AssetRegistry::WriteAssetRawData<RawTextureData>(std::ofstream& file, const RawTextureData& data)
-    //{
-    //    // TODO : Implement this
-    //    file.write(reinterpret_cast<const char*>(&data), 12);
-    //}
 
-    AssetRegistry::AssetRegistry()
-    {
-        m_folderPath = DEFAULT_PATH;
-        m_assets.reserve(50);
-    }
+AssetRegistry::AssetRegistry()
+{
+    m_folderPath = DEFAULT_PATH;
+    m_assets.reserve(50);
+}
 
-    AssetRegistry::AssetRegistry(const std::string_view &folderPath)
-    {
-        m_folderPath = folderPath;
-        m_assets.reserve(50);
-    }
+AssetRegistry::AssetRegistry(const std::string_view &folderPath)
+{
+    m_folderPath = folderPath;
+    m_assets.reserve(50);
+}
 
 
     // TODO : Implement this
@@ -45,6 +40,18 @@ BEGIN_NAMESPACE_ASSETMANAGER
             {
                 RegisterAsset(entry.path().string());
             }
+        }
+    }
+
+    Core::KSharedPtr<Asset> AssetRegistry::CreateAssetInstance(AssetType type, const std::string &name, uint32_t id)
+    {
+        switch (type)
+        {
+            case AssetType::StaticMesh:
+                return Core::CreateRefPtr<CoreObject::StaticMesh>(type, name, id, 0, 0);
+            default:
+                spdlog::error("AssetRegistry: Type d'asset non supporte.");
+                return nullptr;
         }
     }
 
@@ -124,9 +131,10 @@ BEGIN_NAMESPACE_ASSETMANAGER
         }
 
         // Create Asset in memory :
-        Core::KSharedPtr<AssetManager::Asset> assetPtr = Core::CreateRefPtr<AssetManager::Asset>(
-            usedAssetType, usedName, m_lastAssetId, 0, 0);
+        Core::KSharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(usedAssetType, usedName, m_lastAssetId);
+
         m_assets.push_back(std::move(assetPtr));
+        m_assetsById[m_lastAssetId] = m_assets.size() - 1;
 
         m_lastAssetId++;
     }
@@ -136,9 +144,10 @@ BEGIN_NAMESPACE_ASSETMANAGER
         std::ifstream asset(assetPath, std::ios::binary);
         AssetHeader header = InternalAssetSerializer::ReadAssetHeader(asset);
 
-        Core::KSharedPtr<AssetManager::Asset> assetPtr = Core::CreateRefPtr<AssetManager::Asset>(
-            header.type, header.name, header.id, 0, 0);
+        Core::KSharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(header.type, header.name, header.id);
+
         m_assets.push_back(std::move(assetPtr));
+        m_assetsById[header.id] = m_assets.size() - 1;
     }
 
     AssetCreationRequest AssetRegistry::EnsureCreatedAssetValidity(const std::string &assetPath,
@@ -172,19 +181,89 @@ BEGIN_NAMESPACE_ASSETMANAGER
         return AssetCreationRequest::Valid;
     }
 
-    std::string AssetRegistry::GenerateFallbackName(const std::string &baseName)
+std::string AssetRegistry::GenerateFallbackName(const std::string &baseName)
+{
+    return baseName + "1";
+}
+
+std::string AssetRegistry::CacheAssetPath(const std::string &name, const char *ext)
+{
+    return m_folderPath + name + ext;
+}
+
+void AssetRegistry::DestroyAsset(uint32_t id)
+{
+    auto it = m_assetsById.find(id);
+    if (it == m_assetsById.end())
     {
-        return baseName + "1";
+        spdlog::warn("AssetRegistry::DestroyAsset: Asset ID {} not found.", id);
+        return;
     }
 
-    std::string AssetRegistry::CacheAssetPath(const std::string &name, const char *ext)
+    if (m_assetsById[id] >= m_assets.size())
     {
-        return m_folderPath + name + ext;
+        spdlog::error("AssetRegistry::DestroyAsset: Invalid asset ID.");return;
     }
 
-    void AssetRegistry::DestroyAsset(uint32_t id)
+    uint32_t index = it->second;
+
+    if (m_assets[index]->IsLoaded())
     {
-        (void) id;
+        // Unload
     }
+
+    m_assets[index] = nullptr;
+    m_assetsById.erase(it);
+    m_freeIndex.push_back(index);
+
+    spdlog::info("AssetRegistry::DestroyAsset: Asset ID {} destroyed.", id);
+}
+
+bool AssetRegistry::LoadAsset(uint32_t id)
+{
+    auto it = m_assetsById.find(id);
+    if (it == m_assetsById.end())
+    {
+        return false;
+    }
+
+    Core::KSharedPtr<Asset>& asset = m_assets[it->second];
+    if (!asset || asset->IsLoaded())
+    {
+        return true;
+    }
+
+    std::string filePath = CacheAssetPath(asset->m_name.c_str(), ASSET_EXTENSION);
+    std::ifstream file(filePath, std::ios::binary);
+
+    if (!file.is_open())
+    {
+        spdlog::error("AssetRegistry::LoadAsset: Impossible d'ouvrir le fichier {}", filePath);
+        return false;
+    }
+
+    if (asset->Load(file))
+    {
+        asset->isLoaded = true;
+        spdlog::info("Asset '{}' (ID: {}) loaded.", asset->GetName(), id);
+        return true;
+    }
+
+    return false;
+}
+
+void AssetRegistry::UnloadAsset(uint32_t id)
+{
+    auto it = m_assetsById.find(id);
+    if (it == m_assetsById.end()) return;
+
+    Core::KSharedPtr<Asset>& asset = m_assets[it->second];
+    if (asset && asset->IsLoaded())
+    {
+        asset->UnLoad();
+        asset->isLoaded = false;
+        spdlog::info("Asset '{}' (ID: {}) unloaded.", asset->GetName(), id);
+    }
+}
 
 END_NAMESPACE_ASSETMANAGER

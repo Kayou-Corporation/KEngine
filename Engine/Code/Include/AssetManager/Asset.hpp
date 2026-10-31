@@ -3,18 +3,11 @@
 #include  "Utils/Memory.hpp"
 #include "Export.hpp"
 #include "AssetManagerModule.hpp"
+
+#include "AssetManager.hpp"
 //#include "Engine.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
-
-enum class AssetType
-{
-    StaticMesh = 0,
-    Texture2D = 1,
-
-    DefaultGuess = 2,
-    COUNT = 3
-};
 
 /*
  * Type d'asset : TypeID
@@ -26,6 +19,8 @@ enum class AssetType
  */
 class Asset : public virtual Core::IResource
 {
+    friend class AssetRegistry;
+
 public:
     KAPI Asset(const AssetType type, const std::string& name, const uint32_t id, uint32_t sourceHash, uint32_t sourceSize);
     KAPI virtual ~Asset() = default;
@@ -33,8 +28,22 @@ public:
     KAPI AssetType GetType() const { return m_type; }
     KAPI std::string GetName() const { return m_name; }
     KAPI uint32_t GetID() const { return m_id; }
+    KAPI bool IsLoaded() const {return isLoaded;}
+
+    void OnUnload() override
+    {
+        if (isLoaded)
+        {
+            UnLoad();
+            isLoaded = false;
+        }
+    }
+
 
 protected:
+    KAPI virtual bool Load(std::ifstream& file) { (void) file; return true; }
+    KAPI virtual void UnLoad() {}
+
     AssetType m_type;
     std::string m_name;
     uint32_t m_id;
@@ -50,15 +59,6 @@ private:
     Asset& operator=(const Asset&) = delete;
     Asset(Asset&&) = delete;
     Asset& operator=(Asset&&) = delete;
-};
-
-template<typename T>
-class SoftAssetRef
-{
-private:
-    uint32_t m_id;
-
-    SoftAssetRef(uint32_t id) : m_id(id) {};
 };
 
 END_NAMESPACE_ASSETMANAGER
