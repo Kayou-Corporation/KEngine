@@ -43,6 +43,17 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         }
     }
 
+    void AssetRegistry::RunGarbageCollector()
+    {
+        for (uint32_t i = 0; i < m_assets.size(); ++i)
+        {
+            if (m_assets[i]->GetRefCount() == 1)
+            {
+                UnloadAsset(m_assets[i]->GetID());
+            }
+        }
+    }
+
     Core::KSharedPtr<Asset> AssetRegistry::CreateAssetInstance(AssetType type, const std::string &name, uint32_t id)
     {
         switch (type)
@@ -133,8 +144,20 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         // Create Asset in memory :
         Core::KSharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(usedAssetType, usedName, m_lastAssetId);
 
-        m_assets.push_back(std::move(assetPtr));
-        m_assetsById[m_lastAssetId] = m_assets.size() - 1;
+        if (m_freeIndex.empty())
+        {
+            m_assets.push_back(std::move(assetPtr));
+            m_assetsById[m_lastAssetId] = m_assets.size() - 1;
+            m_assetsByName[usedName] = m_assets.size() - 1;
+        }
+        else
+        {
+            uint32_t listIndex = m_freeIndex.back();
+            m_freeIndex.pop_back();
+            m_assets[listIndex] = std::move(assetPtr);
+            m_assetsById[m_lastAssetId] = listIndex;
+            m_assetsByName[usedName] = listIndex;
+        }
 
         m_lastAssetId++;
     }
@@ -146,8 +169,20 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
 
         Core::KSharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(header.type, header.name, header.id);
 
-        m_assets.push_back(std::move(assetPtr));
-        m_assetsById[header.id] = m_assets.size() - 1;
+        if (m_freeIndex.empty())
+        {
+            m_assets.push_back(std::move(assetPtr));
+            m_assetsByName[header.name] = m_assets.size() - 1;
+            m_assetsById[header.id] = m_assets.size() - 1;
+        }
+        else
+        {
+            uint32_t listIndex = m_freeIndex.back();
+            m_freeIndex.pop_back();
+            m_assets[listIndex] = std::move(assetPtr);
+            m_assetsByName[header.name] = listIndex;
+            m_assetsById[header.id] = listIndex;
+        }
     }
 
     AssetCreationRequest AssetRegistry::EnsureCreatedAssetValidity(const std::string &assetPath,
@@ -202,21 +237,57 @@ void AssetRegistry::DestroyAsset(uint32_t id)
 
     if (m_assetsById[id] >= m_assets.size())
     {
-        spdlog::error("AssetRegistry::DestroyAsset: Invalid asset ID.");return;
+        spdlog::error("AssetRegistry::DestroyAsset: Invalid asset ID.");
+        return;
     }
 
     uint32_t index = it->second;
 
     if (m_assets[index]->IsLoaded())
     {
-        // Unload
+        m_assets[index]->UnLoad();
+        m_assets[index]->isLoaded = false;
     }
 
-    m_assets[index] = nullptr;
+    m_assetsByName.erase(m_assets[index]->GetName());
     m_assetsById.erase(it);
     m_freeIndex.push_back(index);
 
+    m_assets[index] = nullptr;
+
     spdlog::info("AssetRegistry::DestroyAsset: Asset ID {} destroyed.", id);
+}
+
+void AssetRegistry::DestroyAsset(const std::string &name)
+{
+    auto it = m_assetsByName.find(name);
+    if (it == m_assetsByName.end())
+    {
+        spdlog::warn("AssetRegistry::DestroyAsset: Asset name {} not found.", name);
+        return;
+    }
+
+    if (m_assetsByName[name] >= m_assets.size())
+    {
+        spdlog::error("AssetRegistry::DestroyAsset: Invalid asset ID.");
+        return;
+    }
+
+    uint32_t index = it->second;
+
+    if (m_assets[index]->IsLoaded())
+    {
+        m_assets[index]->UnLoad();
+        m_assets[index]->isLoaded = false;
+    }
+
+    m_assetsByName.erase(m_assets[index]->GetName());
+    m_assetsById.erase(m_assets[index]->GetID());
+    m_freeIndex.push_back(index);
+
+    m_assets[index] = nullptr;
+
+    spdlog::info("AssetRegistry::DestroyAsset: Asset ID {} destroyed.", name);
 }
 
 bool AssetRegistry::LoadAsset(uint32_t id)
@@ -238,7 +309,7 @@ bool AssetRegistry::LoadAsset(uint32_t id)
 
     if (!file.is_open())
     {
-        spdlog::error("AssetRegistry::LoadAsset: Impossible d'ouvrir le fichier {}", filePath);
+        spdlog::error("AssetRegistry::LoadAsset: can't open file {}", filePath);
         return false;
     }
 

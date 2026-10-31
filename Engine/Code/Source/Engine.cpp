@@ -21,9 +21,20 @@ void Engine::Shutdown()
     {
         spdlog::error("Engine already shut down");
     }
+    else
     {
         m_instance.Reset();
     }
+}
+
+void Engine::Update()
+{
+    if (!m_instance)
+    {
+        return;
+    }
+
+    m_instance->m_assetRegistry->RunGarbageCollector();
 }
 
 Engine& Engine::Get()

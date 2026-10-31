@@ -101,9 +101,16 @@ int main()
 
 	Core::Engine::Init({ {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} });
 
-	//Core::Engine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
+	Core::Engine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
 
-    //AssetManager::SoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::Engine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
+    AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::Engine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
+
+    {
+        Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
+        spdlog::info("id {}", vikingRoomMesh->GetID());
+    }
+
+    Core::Engine::Update();
 
     //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight( ));
     //Core::EditorCamera editorCamera;

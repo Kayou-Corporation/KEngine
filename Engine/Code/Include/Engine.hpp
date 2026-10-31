@@ -20,6 +20,7 @@ public:
     // TO BE USED ONLY 1 TIME
     static void Init(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
     static void Shutdown();
+    static void Update();
 
     static Engine& Get();
 
@@ -28,14 +29,19 @@ public:
         m_assetRegistry->CreateAsset(assetPath, assetName, type);
     }
 
+    void DestroyAsset(const std::string& name)
+    {
+        m_assetRegistry->DestroyAsset(name);
+    }
+
     template<typename AssetDerived>
-    AssetManager::SoftAssetRef<AssetDerived> GetAsset(uint32_t id)
+    AssetManager::KSoftAssetRef<AssetDerived> GetAsset(uint32_t id)
     {
         return m_assetRegistry->GetAsset<AssetDerived>(id);
     }
 
     template<typename AssetDerived>
-    AssetManager::SoftAssetRef<AssetDerived> GetAsset(const std::string& name)
+    AssetManager::KSoftAssetRef<AssetDerived> GetAsset(const std::string& name)
     {
         return m_assetRegistry->GetAsset<AssetDerived>(name);
     }

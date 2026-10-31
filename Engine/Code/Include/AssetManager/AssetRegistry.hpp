@@ -5,9 +5,9 @@
 #include "Export.hpp"
 #include "Utils/Memory.hpp"
 #include "Asset.hpp"
+#include "SoftAssetReference.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
-
 #define ASSET_EXTENSION ".kasset"
 #define DEFAULT_PATH "Cache/Assets/"
 
@@ -57,12 +57,13 @@ public:
 public:
     KAPI void CreateAsset(const std::string& assetPath, const std::string& assetName, const AssetType type = AssetType::DefaultGuess);
     KAPI void DestroyAsset(uint32_t id);
+    KAPI void DestroyAsset(const std::string& name);
 
     KAPI bool LoadAsset(uint32_t id);
     KAPI void UnloadAsset(uint32_t id);
 
     template<typename AssetDerived>
-    KAPI Core::KSharedPtr<AssetDerived> GetAsset(uint32_t id)
+    KAPI Core::KSharedPtr<AssetDerived> GetAssetHard(uint32_t id)
     {
         auto it = m_assetsById.find(id);
         if (it == m_assetsById.end())
@@ -88,7 +89,61 @@ public:
         return asset.CastAs<AssetDerived>();
     }
 
+    template<typename AssetDerived>
+    KAPI Core::KSharedPtr<AssetDerived> GetAssetHard(const std::string& name)
+    {
+        auto it = m_assetsByName.find(name);
+        if (it == m_assetsByName.end())
+        {
+            spdlog::error("AssetRegistry::GetAsset: Asset name {} non trouve.", name);
+            return nullptr;
+        }
+
+        uint32_t index = it->second;
+        Core::KSharedPtr<Asset>& asset = m_assets[index];
+
+        if (!asset) return nullptr;
+
+        if (!asset->IsLoaded())
+        {
+            if (!LoadAsset(asset->GetID()))
+            {
+                spdlog::error("AssetRegistry::GetAsset: Fail to load Asset {}.", asset->GetID());
+                return nullptr;
+            }
+        }
+
+        return asset.CastAs<AssetDerived>();
+    }
+
+    template<typename AssetDerived>
+    KAPI KSoftAssetRef<AssetDerived> GetAsset(uint32_t id)
+    {
+        auto it = m_assetsById.find(id);
+        if (it == m_assetsById.end())
+        {
+            spdlog::error("AssetRegistry::GetAsset: Asset ID {} non trouve.", id);
+            return KSoftAssetRef<AssetDerived>(static_cast<uint32_t>(-1), nullptr);
+        }
+
+        return KSoftAssetRef<AssetDerived>(id, this);
+    }
+
+    template<typename AssetDerived>
+    KAPI KSoftAssetRef<AssetDerived> GetAsset(const std::string& name)
+    {
+        auto it = m_assetsByName.find(name);
+        if (it == m_assetsByName.end())
+        {
+            spdlog::error("AssetRegistry::GetAsset: Asset name {} non trouve.", name);
+            return KSoftAssetRef<AssetDerived>(static_cast<uint32_t>(-1), nullptr);
+        }
+
+        return KSoftAssetRef<AssetDerived>(it->second, this);
+    }
+
     void RegisterAllAssets();
+    void RunGarbageCollector();
 
 private:
     Core::KSharedPtr<Asset> CreateAssetInstance(AssetType type, const std::string& name, uint32_t id);
@@ -106,7 +161,29 @@ private:
     std::vector<Core::KSharedPtr<Asset>> m_assets;
     std::unordered_map<uint32_t, uint32_t> m_assetsById;
     std::vector<uint32_t> m_freeIndex;
+
+    std::unordered_map<std::string, uint32_t> m_assetsByName;
 };
+
+template<typename T>
+Core::KSharedPtr<T> KSoftAssetRef<T>::Get() const
+{
+    if (!IsValid())
+    {
+        spdlog::error("SoftAssetRef::Get: Invalid SoftAssetRef.");
+        return Core::KSharedPtr<T>(nullptr);
+    }
+
+    Core::KSharedPtr<T> shared = m_registry->GetAssetHard<T>(m_id);
+
+    if (shared.Get() == nullptr)
+    {
+        spdlog::error("SoftAssetRef::Get: Asset with ID {} not found.", m_id);
+        return Core::KSharedPtr<T>(nullptr);
+    }
+
+    return shared;
+}
 END_NAMESPACE_ASSETMANAGER
 
 
