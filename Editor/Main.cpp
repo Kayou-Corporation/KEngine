@@ -2,7 +2,7 @@
 
 #include "Window.hpp"
 #include "WindowRenderer.hpp"
-#include "Engine.hpp"
+#include "../Engine/Code/Include/Engine/KEngine.hpp"
 #include "RHI/API/Surface.hpp"
 #include "RHI/API/Instance.hpp"
 #include "RHI/API/Device.hpp"
@@ -99,18 +99,18 @@ int main()
     
     window->Create(specs);
 
-	Core::Engine::Init({ {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} });
+	Core::KEngine::Init({ {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} });
 
-	Core::Engine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
+	Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
 
-    AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::Engine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
+    AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
 
     {
         Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
         spdlog::info("id {}", vikingRoomMesh->GetID());
     }
 
-    Core::Engine::Update();
+    Core::KEngine::Update();
 
     //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight( ));
     //Core::EditorCamera editorCamera;
@@ -547,7 +547,7 @@ int main()
     //instance->Destroy();
 
 
-	Core::Engine::Shutdown();
+	Core::KEngine::Shutdown();
 
     window->Destroy();
 

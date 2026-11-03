@@ -8,7 +8,7 @@
 set(K_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Code/Include")
 set(K_SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Code/Source")
 
-set(K_ENGINE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Code/Source/Engine.cpp")
+set(K_ENGINE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Code/Source/Engine/KEngine.cpp")
 
 # --------------------------------------- #
 #              FIND PACKAGES              #

@@ -21,3 +21,4 @@ target_include_directories(${COREOBJECT_TARGET_NAME} PUBLIC "${K_INCLUDE_PATH}/C
 target_compile_definitions(${COREOBJECT_TARGET_NAME} PUBLIC COREOBJECT)
 
 target_link_libraries(${COREOBJECT_TARGET_NAME} PRIVATE CORE ASSETMANAGER spdlog::spdlog)
+target_include_directories(${COREOBJECT_TARGET_NAME} PRIVATE "${K_INCLUDE_PATH}/Engine")

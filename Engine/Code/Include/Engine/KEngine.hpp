@@ -11,18 +11,18 @@ BEGIN_NAMESPACE_CORE
 #define ENGINE_QUEUE_ASSET "AssetLoaderQueue"
 #define ENGINE_QUEUE_PHYSICS "PhysicsLoaderQueue"
 
-class Engine : public virtual Core::IResource
+class KEngine : public virtual Core::IResource
 {
 public:
-    explicit Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
-    virtual ~Engine() = default;
+    explicit KEngine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
+    virtual ~KEngine() = default;
 
     // TO BE USED ONLY 1 TIME
     static void Init(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
     static void Shutdown();
     static void Update();
 
-    static Engine& Get();
+    static KEngine& Get();
 
     void CreateAsset(const std::string& assetPath, const std::string& assetName, const AssetManager::AssetType type = AssetManager::AssetType::DefaultGuess)
     {
@@ -47,11 +47,11 @@ public:
     }
 
 public:
-    Engine() = delete;
-    Engine(Engine const&) = delete;
-    Engine& operator=(Engine const&) = delete;
-    Engine(Engine&&) = delete;
-    Engine& operator=(Engine&&) = delete;
+    KEngine() = delete;
+    KEngine(KEngine const&) = delete;
+    KEngine& operator=(KEngine const&) = delete;
+    KEngine(KEngine&&) = delete;
+    KEngine& operator=(KEngine&&) = delete;
 
 protected:
     // Device
@@ -66,7 +66,7 @@ protected:
 
 
     // Self reference for singleton
-    inline static KUniquePtr<Engine> m_instance{nullptr};
+    inline static KUniquePtr<KEngine> m_instance{nullptr};
 };
 
 END_NAMESPACE_CORE

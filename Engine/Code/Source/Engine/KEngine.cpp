@@ -1,13 +1,13 @@
-#include "Engine.hpp"
+#include "../../Include/Engine/KEngine.hpp"
 
 #include "spdlog/spdlog.h"
 BEGIN_NAMESPACE_CORE
 
-void Engine::Init(const std::unordered_map<std::string_view, int> &priorityQueuesThreadsCount)
+void KEngine::Init(const std::unordered_map<std::string_view, int> &priorityQueuesThreadsCount)
 {
     if (!m_instance)
     {
-        m_instance = Core::CreateUniquePtr<Engine>(priorityQueuesThreadsCount);
+        m_instance = Core::CreateUniquePtr<KEngine>(priorityQueuesThreadsCount);
     }
     else
     {
@@ -15,7 +15,7 @@ void Engine::Init(const std::unordered_map<std::string_view, int> &priorityQueue
     }
 }
 
-void Engine::Shutdown()
+void KEngine::Shutdown()
 {
     if (!m_instance)
     {
@@ -27,7 +27,7 @@ void Engine::Shutdown()
     }
 }
 
-void Engine::Update()
+void KEngine::Update()
 {
     if (!m_instance)
     {
@@ -37,7 +37,7 @@ void Engine::Update()
     m_instance->m_assetRegistry->RunGarbageCollector();
 }
 
-Engine& Engine::Get()
+KEngine& KEngine::Get()
 {
     if (!m_instance)
     {
@@ -46,7 +46,7 @@ Engine& Engine::Get()
     return *m_instance;
 }
 
-Engine::Engine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount)
+KEngine::KEngine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount)
 {
     //----------- ThreadPool --------------//
     std::vector<Priority> priorities = std::vector<Priority>(priorityQueuesThreadsCount.size());

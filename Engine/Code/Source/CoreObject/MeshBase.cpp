@@ -1,5 +1,7 @@
 ﻿#include "MeshBase.hpp"
 
+#include "KEngine.hpp"
+
 BEGIN_NAMESPACE_COREOBJECT
 
 MeshBase::MeshBase(const AssetManager::AssetType type, const std::string& name, const uint32_t id, uint32_t sourceHash, uint32_t sourceSize)
