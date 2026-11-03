@@ -1,24 +1,47 @@
 #pragma once
-#include "AssetRegistry.hpp"
 #include "CoreModule.hpp"
+
+#include "Utils/Memory.hpp"
+#include "AssetRegistry.hpp"
 #include "SoftAssetReference.hpp"
 
+#include "Window.hpp"
+#include "WindowRenderer.hpp"
+
 #include "ThreadPool.hpp"
-#include "Utils/Memory.hpp"
+
+#include "RHI/API/Instance.hpp"
+#include "RHI/API/Device.hpp"
+#include "RHI/API/RHI.hpp"
 
 BEGIN_NAMESPACE_CORE
-
 #define ENGINE_QUEUE_ASSET "AssetLoaderQueue"
 #define ENGINE_QUEUE_PHYSICS "PhysicsLoaderQueue"
+
+struct KEngineSpecs
+{
+    Window::WindowAPI windowAPI;
+    uint32_t windowWidth;
+    uint32_t windowHeight;
+    std::string windowName;
+    bool allowWindowResize;
+
+    Version version;
+
+    std::unordered_map<std::string_view, int> priorityQueuesThreadsCount;
+
+    RendererAPI rendererAPI;
+    std::vector<DebugLayers> debugLayers;
+};
 
 class KEngine : public virtual Core::IResource
 {
 public:
-    explicit KEngine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
-    virtual ~KEngine() = default;
+    explicit KEngine(const KEngineSpecs& specs);
+    virtual ~KEngine();
 
     // TO BE USED ONLY 1 TIME
-    static void Init(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount);
+    static void Init(const KEngineSpecs& specs);
     static void Shutdown();
     static void Update();
 
@@ -46,6 +69,11 @@ public:
         return m_assetRegistry->GetAsset<AssetDerived>(name);
     }
 
+    KSharedPtr<Window::Window> GetWindow() const
+    {
+        return m_window;
+    }
+
 public:
     KEngine() = delete;
     KEngine(KEngine const&) = delete;
@@ -54,7 +82,12 @@ public:
     KEngine& operator=(KEngine&&) = delete;
 
 protected:
-    // Device
+    // Window :
+    KSharedPtr<Window::Window> m_window;
+
+    // RHI :
+    //InstanceHandle m_rhiInstance;
+    //DeviceHandle m_deviceHandle;
 
     // ThreadPool
     ThreadPool m_pool;
@@ -62,7 +95,7 @@ protected:
     int m_minimumThreads = 2;
 
     // Assets
-    Core::KUniquePtr<AssetManager::AssetRegistry> m_assetRegistry;
+    KUniquePtr<AssetManager::AssetRegistry> m_assetRegistry;
 
 
     // Self reference for singleton

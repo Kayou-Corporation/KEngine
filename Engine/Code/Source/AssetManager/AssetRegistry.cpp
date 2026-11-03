@@ -28,10 +28,15 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
     {
         std::filesystem::path folderPath(m_folderPath);
 
-        if (!std::filesystem::exists(folderPath) || !std::filesystem::is_directory(folderPath))
+        if (!std::filesystem::exists(folderPath))
         {
-            spdlog::error("AssetRegistry::RegisterAllAssets: Invalid folder path: {}", m_folderPath);
-            return;
+            spdlog::info("AssetRegistry::RegisterAllAssets: not folder path: {}, creating one", m_folderPath);
+            std::filesystem::create_directories(m_folderPath);
+            if (!std::filesystem::exists(folderPath) || !std::filesystem::is_directory(folderPath))
+            {
+                spdlog::error("AssetRegistry::RegisterAllAssets: failed to create folder path: {}", m_folderPath);
+                return;
+            }
         }
 
         for (const auto &entry: std::filesystem::directory_iterator(folderPath))

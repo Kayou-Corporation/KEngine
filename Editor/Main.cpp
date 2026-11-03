@@ -88,27 +88,41 @@ int main()
     //stbi_uc* texturePixels = stbi_load(texturePath.c_str(), &t_texWidth, &t_texHeight, &t_texChannels, STBI_rgb_alpha);
 
 #pragma region Setup 
-    Core::KSharedPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
- 
-    Window::WindowSpecs specs;
-    specs.width = 720;
-    specs.height = 480;
-    specs.name = "KEngine";
-    specs.allowResize = true;
-    specs.rendererAPI = Core::RendererAPI::Vulkan;
-    
-    window->Create(specs);
+    //Core::KSharedPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
+ //
+    //Window::WindowSpecs specs;
+    //specs.width = 720;
+    //specs.height = 480;
+    //specs.name = "KEngine";
+    //specs.allowResize = true;
+    //specs.rendererAPI = Core::RendererAPI::Vulkan;
+    //
+    //window->Create(specs);
 
-	Core::KEngine::Init({ {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} });
+    Core::KEngineSpecs engineSpecs;
+    engineSpecs.windowAPI = Window::WindowAPI::SDL;
+    engineSpecs.windowWidth = 720;
+    engineSpecs.windowHeight = 480;
+    engineSpecs.windowName = "KEngine";
+    engineSpecs.allowWindowResize = true;
+    engineSpecs.version = Core::Version(0.f, 0.f, 1.f);
+    engineSpecs.rendererAPI = Core::RendererAPI::Vulkan;
+    engineSpecs.debugLayers = { Core::DebugLayers::Validation };
+    engineSpecs.priorityQueuesThreadsCount = { {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} };
 
-	Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
+	Core::KEngine::Init(engineSpecs);
 
-    AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
+    // Window Reference :
+    Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
 
-    {
-        Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
-        spdlog::info("id {}", vikingRoomMesh->GetID());
-    }
+	//Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
+//
+    //AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
+//
+    //{
+    //    Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
+    //    spdlog::info("id {}", vikingRoomMesh->GetID());
+    //}
 
     Core::KEngine::Update();
 
@@ -369,11 +383,11 @@ int main()
     //uint64_t frameCounter = 0;
     //bool gpuResizeRequest = false;
 
-    while (!window->ShouldClose())
+    while (!windowReference->ShouldClose())
     {
-        window->PollEvents();
+        windowReference->PollEvents();
 
-        if (window->GetHasResize() /*|| gpuResizeRequest*/)
+        if (windowReference->GetHasResize() /*|| gpuResizeRequest*/)
         {
             //device->WaitIdle();
 
@@ -393,7 +407,7 @@ int main()
             //presentationImages = device->CreatePresentationImages(swapchain);
             //depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
     
-            window->ResizeComplete();
+            windowReference->ResizeComplete();
             //gpuResizeRequest = false;
     
             //editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
@@ -548,8 +562,6 @@ int main()
 
 
 	Core::KEngine::Shutdown();
-
-    window->Destroy();
 
     //stbi_image_free(texturePixels);
 

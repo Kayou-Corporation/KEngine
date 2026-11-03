@@ -3,11 +3,11 @@
 #include "spdlog/spdlog.h"
 BEGIN_NAMESPACE_CORE
 
-void KEngine::Init(const std::unordered_map<std::string_view, int> &priorityQueuesThreadsCount)
+void KEngine::Init(const KEngineSpecs& specs)
 {
     if (!m_instance)
     {
-        m_instance = Core::CreateUniquePtr<KEngine>(priorityQueuesThreadsCount);
+        m_instance = Core::CreateUniquePtr<KEngine>(specs);
     }
     else
     {
@@ -46,14 +46,14 @@ KEngine& KEngine::Get()
     return *m_instance;
 }
 
-KEngine::KEngine(const std::unordered_map<std::string_view, int>& priorityQueuesThreadsCount)
+KEngine::KEngine(const KEngineSpecs& specs)
 {
     //----------- ThreadPool --------------//
-    std::vector<Priority> priorities = std::vector<Priority>(priorityQueuesThreadsCount.size());
+    std::vector<Priority> priorities = std::vector<Priority>(specs.priorityQueuesThreadsCount.size());
     uint32_t totalThreadsCount = 0;
 
-    m_queueNames.reserve(priorityQueuesThreadsCount.size());
-    for (const auto& [name, threadCount] : priorityQueuesThreadsCount)
+    m_queueNames.reserve(specs.priorityQueuesThreadsCount.size());
+    for (const auto& [name, threadCount] : specs.priorityQueuesThreadsCount)
     {
         std::string queueName = std::string(name);
         totalThreadsCount += threadCount;
@@ -71,6 +71,26 @@ KEngine::KEngine(const std::unordered_map<std::string_view, int>& priorityQueues
     m_assetRegistry = Core::CreateUniquePtr<AssetManager::AssetRegistry>("Cache/Assets/");
     m_assetRegistry->RegisterAllAssets();
 
+    // ------------ Window -----------------//
+    m_window = Window::WindowInterface::InitWindow(specs.windowAPI);
+
+    Window::WindowSpecs windowSpecs;
+    windowSpecs.width = specs.windowWidth;
+    windowSpecs.height = specs.windowHeight;
+    windowSpecs.name = specs.windowName;
+    windowSpecs.allowResize = specs.allowWindowResize;
+    windowSpecs.rendererAPI = specs.rendererAPI;
+
+    m_window->Create(windowSpecs);
+
+    // ------------ RHI Instance -----------------//
+
+}
+
+KEngine::~KEngine()
+{
+    m_window->Destroy();
+    m_window = nullptr;
 }
 
 END_NAMESPACE_CORE
