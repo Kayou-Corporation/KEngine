@@ -13,7 +13,12 @@ BEGIN_NAMESPACE_COREOBJECT
 
 }
 
-SubMesh MeshBase::GetSubmeshInfo(uint32_t index) const
+MeshBase::~MeshBase()
+{
+    UnLoad();
+}
+
+    SubMesh MeshBase::GetSubmeshInfo(uint32_t index) const
 {
     if (index >= m_submeshesCount)
     {
@@ -96,11 +101,6 @@ void MeshBase::UnLoad()
         m_indexBuffer = nullptr;
     }
 
-    m_verticesCount = 0;
-    m_indicesCount = 0;
-    m_submeshesInfo.clear();
-    m_submeshesCount = 0;
-
     isLoaded = false;
 }
 
@@ -114,7 +114,6 @@ void MeshBase::CreateVertexBuffer(Core::DeviceHandle localDeviceReference, uint3
     vertexbufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
 
     m_vertexBuffer = localDeviceReference->CreateBuffer(vertexbufferSpecs);
-    hasBeenLoaded = true;
 }
 
 void MeshBase::CreateIndexBuffer(Core::DeviceHandle localDeviceReference, uint32_t bufferSize)
@@ -127,7 +126,6 @@ void MeshBase::CreateIndexBuffer(Core::DeviceHandle localDeviceReference, uint32
     indexBufferSpecs.pipelineStage = Core::PipelineStage::VertexInput;
 
     m_indexBuffer = localDeviceReference->CreateBuffer(indexBufferSpecs);
-    hasBeenLoaded = true;
 }
 
 END_NAMESPACE_COREOBJECT

@@ -64,6 +64,7 @@ uint32_t ExternalAssetLoader::GetAssetSize(const std::string_view &path)
     return static_cast<uint32_t>(size);
 }
 
+// ----- StaticMesh Write / Read ------ //
 template<>
 RawMeshData ExternalAssetLoader::LoadAssetFromSource<RawMeshData>(const std::string_view& path)
 {
@@ -157,7 +158,7 @@ RawTextureData ExternalAssetLoader::LoadAssetFromSource<RawTextureData>(const st
         return rawData;
     }
 
-    rawData.pixels.resize(texWidth * texHeight * texChannels);
+    rawData.pixels.resize(texWidth * texHeight * 4);
     memcpy(rawData.pixels.data(), texturePixels, rawData.pixels.size());
 
     rawData.width = texWidth;

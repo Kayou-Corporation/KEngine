@@ -6,6 +6,7 @@
 #include "ExternalAssetLoader.hpp"
 #include "InternalAssetSerializer.hpp"
 #include "StaticMesh.hpp"
+#include "Texture2D.hpp"
 #include  "Utils/File.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER
@@ -39,10 +40,12 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
             }
         }
 
+
         for (const auto &entry: std::filesystem::directory_iterator(folderPath))
         {
             if (entry.is_regular_file() && entry.path().extension() == ASSET_EXTENSION)
             {
+                m_lastAssetId++;
                 RegisterAsset(entry.path().string());
             }
         }
@@ -65,6 +68,8 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         {
             case AssetType::StaticMesh:
                 return Core::CreateRefPtr<CoreObject::StaticMesh>(type, name, id, 0, 0);
+            case AssetType::Texture2D:
+                return Core::CreateRefPtr<CoreObject::Texture2D>(type, name, id, 0, 0);
             default:
                 spdlog::error("AssetRegistry: Type d'asset non supporte.");
                 return nullptr;
@@ -141,7 +146,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
             {
                 // TODO: Implement for texture
                 RawTextureData textureData = ExternalAssetLoader::LoadAssetFromSource<RawTextureData>(assetPath);
-                //InternalAssetSerializer::WriteAssetRawData(asset, textureData);
+                InternalAssetSerializer::WriteAssetRawData(asset, textureData);
                 spdlog::info("AssetRegistry::CreateAsset: Creating Texture asset from path: {}", assetPath);
                 break;
             }

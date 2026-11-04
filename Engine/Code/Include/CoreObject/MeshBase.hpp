@@ -28,7 +28,7 @@ class MeshBase : public AssetManager::Asset
 {
 public:
     KAPI MeshBase(const AssetManager::AssetType type, const std::string& name, const uint32_t id, uint32_t sourceHash, uint32_t sourceSize);
-    KAPI virtual ~MeshBase() = default;
+    KAPI virtual ~MeshBase();
 
     // Base utility
     KAPI const std::vector<SubMesh>& GetSubmeshesInfo() const { return m_submeshesInfo; }
@@ -37,12 +37,15 @@ public:
     KAPI uint32_t GetVerticesCount() const { return m_verticesCount; }
     KAPI uint32_t GetIndicesCount() const { return m_indicesCount; }
 
+    KAPI Core::BufferHandle GetVertexBuffer() const { return m_vertexBuffer; }
+    KAPI Core::BufferHandle GetIndexBuffer() const { return m_indexBuffer; }
+
 protected:
     KAPI bool Load(std::ifstream& file) override;
     KAPI void UnLoad() override;
 
-    void CreateVertexBuffer(Core::DeviceHandle localDeviceReference, uint32_t bufferSize);
-    void CreateIndexBuffer(Core::DeviceHandle localDeviceReference, uint32_t bufferSize);
+    virtual void CreateVertexBuffer(Core::DeviceHandle localDeviceReference, uint32_t bufferSize);
+    virtual void CreateIndexBuffer(Core::DeviceHandle localDeviceReference, uint32_t bufferSize);
 
     // Data :
     Core::BufferHandle m_vertexBuffer;
@@ -53,8 +56,6 @@ protected:
     uint32_t m_submeshesCount = 0;
     uint32_t m_verticesCount = 0;
     uint32_t m_indicesCount = 0;
-
-    bool hasBeenLoaded = false;
 };
 
 END_NAMESPACE_COREOBJECT
