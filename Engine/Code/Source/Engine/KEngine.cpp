@@ -1,5 +1,6 @@
 #include "../../Include/Engine/KEngine.hpp"
 
+#include "RHI/API/Surface.hpp"
 #include "spdlog/spdlog.h"
 BEGIN_NAMESPACE_CORE
 
@@ -84,13 +85,40 @@ KEngine::KEngine(const KEngineSpecs& specs)
     m_window->Create(windowSpecs);
 
     // ------------ RHI Instance -----------------//
+    m_rhiInstance = RendererInterface::InitRenderer(specs.rendererAPI);
 
+    InstanceSpecs rhiInstanceSpecs;
+    rhiInstanceSpecs.window = m_window;
+    rhiInstanceSpecs.appVersion = specs.version;
+    rhiInstanceSpecs.engineVersion = KENGINE_VERSION;
+    rhiInstanceSpecs.debugLayers = specs.debugLayers;
+
+    m_rhiInstance->Create(rhiInstanceSpecs);
+
+    // ------------ RHI Surface -----------------//
+    SurfaceSpecs windowSurfaceSpecs;
+    windowSurfaceSpecs.window = m_window;
+
+    m_windowSurface = m_rhiInstance->CreateSurface(windowSurfaceSpecs);
+
+    // ------------ RHI Device -----------------//
+    DeviceSpecs deviceSpecs;
+    deviceSpecs.gpuType = GpuType::Discrete;
+    deviceSpecs.extensions = {Core::Extensions::Swapchain, Core::Extensions::DynamicRendering, Core::Extensions::ShaderObject };
+    deviceSpecs.queues = {Core::QueueType::Graphics };
+    deviceSpecs.searchPresentQueue = true;
+    deviceSpecs.surface = m_windowSurface;
+
+    m_deviceHandle = m_rhiInstance->CreateDevice(deviceSpecs);
 }
 
 KEngine::~KEngine()
 {
+    m_rhiInstance->DestroySurface(m_windowSurface);
+    m_rhiInstance->DestroyDevice(m_deviceHandle);
+    m_rhiInstance->Destroy();
+
     m_window->Destroy();
-    m_window = nullptr;
 }
 
 END_NAMESPACE_CORE

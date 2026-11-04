@@ -183,6 +183,10 @@ public:
     T& operator*() const { return *m_ptr; }
     T* Get() const { return m_ptr; }
     explicit operator bool() const { return m_ptr != nullptr; }
+    friend bool operator==(const KSharedPtr& lhs, std::nullptr_t) noexcept { return lhs.m_ptr == nullptr; }
+    friend bool operator==(std::nullptr_t, const KSharedPtr& rhs) noexcept { return rhs.m_ptr == nullptr; }
+    friend bool operator!=(const KSharedPtr& lhs, std::nullptr_t) noexcept { return lhs.m_ptr != nullptr; }
+    friend bool operator!=(std::nullptr_t, const KSharedPtr& rhs) noexcept { return rhs.m_ptr != nullptr; }
 };
 
 template<typename T, typename... Args>

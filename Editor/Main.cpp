@@ -87,18 +87,6 @@ int main()
     //int t_texWidth, t_texHeight, t_texChannels;
     //stbi_uc* texturePixels = stbi_load(texturePath.c_str(), &t_texWidth, &t_texHeight, &t_texChannels, STBI_rgb_alpha);
 
-#pragma region Setup 
-    //Core::KSharedPtr<Window::Window> window = Window::WindowInterface::InitWindow(Window::WindowAPI::SDL);
- //
-    //Window::WindowSpecs specs;
-    //specs.width = 720;
-    //specs.height = 480;
-    //specs.name = "KEngine";
-    //specs.allowResize = true;
-    //specs.rendererAPI = Core::RendererAPI::Vulkan;
-    //
-    //window->Create(specs);
-
     Core::KEngineSpecs engineSpecs;
     engineSpecs.windowAPI = Window::WindowAPI::SDL;
     engineSpecs.windowWidth = 720;
@@ -115,87 +103,64 @@ int main()
     // Window Reference :
     Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
 
-	//Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
-//
-    //AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
-//
-    //{
-    //    Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
-    //    spdlog::info("id {}", vikingRoomMesh->GetID());
-    //}
+    // ------------ Object loading test -----------------//
+	Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
 
-    Core::KEngine::Update();
+    AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
 
-    //float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight( ));
-    //Core::EditorCamera editorCamera;
-    //editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
-    //editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
-    //editorCamera.SetFov(glm::radians(45.f));
-    //editorCamera.SetAspectRatio(aspectRatio);
-    //editorCamera.SetNearPlane(0.1f);
-    //editorCamera.SetFarPlane(100.0f);
+    Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
+    spdlog::info("id {}", vikingRoomMesh->GetID());
 
-    //editorCamera.RecalculateMatrices();
+    // TODO : move this here
+    //Core::KEngine::Update();
+
+    float aspectRatio = static_cast<float>(windowReference->GetWidth()) / static_cast<float>(windowReference->GetHeight( ));
+    Core::EditorCamera editorCamera;
+    editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
+    editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
+    editorCamera.SetFov(glm::radians(45.f));
+    editorCamera.SetAspectRatio(aspectRatio);
+    editorCamera.SetNearPlane(0.1f);
+    editorCamera.SetFarPlane(100.0f);
+    editorCamera.RecalculateMatrices();
     //glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
     //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     //glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
     //glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
-//
-    //float fov = glm::radians(45.f);
-    ////float aspectRatio = static_cast<float>(window->GetWidth()) / static_cast<float>(window->GetHeight());
-    //float nearPlane = 0.1f;
-    //float farPlane = 100.0f;
-    //glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
-    //proj[1][1] *= -1;
-    //CameraData initCam;
-    //initCam.cameraVP = editorCamera.GetViewProjectionMatrix();
-    //initCam.cameraPos = editorCamera.GetPosition();
-//
-    //glm::mat4 model = glm::mat4(1.0f);
-    //model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-    //model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
-    //model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
-    //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-//
-    //glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-//
-    //Model mdl;
-    //mdl.model = glm::transpose(model);
-    //mdl.normal = normalMatrix;
-//
-//
-//
-    //Core::InstanceHandle instance = Core::RendererInterface::InitRenderer(Core::RendererAPI::Vulkan);
-//
-    //Core::InstanceSpecs test;
-    //test.window = window;
-    //test.appVersion = Core::Version(0, 0, 1);
-    //test.engineVersion = Core::Version(0, 0, 1);
-    //test.debugLayers = {Core::DebugLayers::Validation };
-    //
-    //instance->Create(test);
-//
-    //Core::SurfaceHandle surface = instance->CreateSurface({ window });
-//
-    //Core::DeviceSpecs dSpecs;
-    //dSpecs.gpuType = Core::GpuType::Discrete;
-    //dSpecs.extensions = {Core::Extensions::Swapchain, Core::Extensions::DynamicRendering, Core::Extensions::ShaderObject };
-    //dSpecs.queues = {Core::QueueType::Graphics };
-    //dSpecs.searchPresentQueue = true;
-    //dSpecs.surface = surface;
-//
-    //Core::DeviceHandle device = instance->CreateDevice(dSpecs);
-//
-    //Core::SwapchainSpecs sSpecs;
-    //sSpecs.surface = surface;
-    //sSpecs.extent = Core::Extent2D(window->GetWidth(), window->GetHeight());
-    //sSpecs.imageCount = 2;
-    //sSpecs.presentMode = Core::PresentMode::Mailbox;
-    //sSpecs.imageFormat = Core::Format::BGRA8_SRGB;
-    //sSpecs.isDepthEnable = true;
-    //sSpecs.depthImageFormat = Core::Format::D32_SFLOAT;
-    //Core::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
-#pragma endregion
+
+    float fov = glm::radians(45.f);
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+    glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
+    proj[1][1] *= -1;
+    CameraData initCam;
+    initCam.cameraVP = editorCamera.GetViewProjectionMatrix();
+    initCam.cameraPos = editorCamera.GetPosition();
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+    model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
+    model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
+
+    Model mdl;
+    mdl.model = glm::transpose(model);
+    mdl.normal = normalMatrix;
+
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
+    Core::SurfaceHandle surface = Core::KEngine::Get().GetWindowSurface();
+
+    Core::SwapchainSpecs sSpecs;
+    sSpecs.surface = surface;
+    sSpecs.extent = Core::Extent2D(windowReference->GetWidth(), windowReference->GetHeight());
+    sSpecs.imageCount = 2;
+    sSpecs.presentMode = Core::PresentMode::Mailbox;
+    sSpecs.imageFormat = Core::Format::BGRA8_SRGB;
+    sSpecs.isDepthEnable = true;
+    sSpecs.depthImageFormat = Core::Format::D32_SFLOAT;
+    Core::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
 
     //std::vector<Vertex> meshVertices;
     //std::vector<uint32_t> meshIndices;
@@ -386,49 +351,50 @@ int main()
     while (!windowReference->ShouldClose())
     {
         windowReference->PollEvents();
+        Core::KEngine::Update();
 
-        if (windowReference->GetHasResize() /*|| gpuResizeRequest*/)
-        {
-            //device->WaitIdle();
-
-            //// Destroy everything.
-            //device->DestroyPresentationImages(presentationImages);
-            //device->DestroyImage(depthImage);
-            //device->DestroySwapchain(swapchain);
-
-            //// Update everything
-            //device->UpdateCompatibility(surface);
-    
-            // Recreate everything.
-            //uint32_t tWidth = window->GetWidth();
-            //uint32_t tHeight = window->GetHeight();
-            //sSpecs.extent = Core::Extent2D(tWidth, tHeight);
-            //swapchain = device->CreateSwapchain(sSpecs);
-            //presentationImages = device->CreatePresentationImages(swapchain);
-            //depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
-    
-            windowReference->ResizeComplete();
-            //gpuResizeRequest = false;
-    
-            //editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
-            //editorCamera.RecalculateMatrices();
+        //if (windowReference->GetHasResize() || gpuResizeRequest)
+        //{
+        //    device->WaitIdle();
+//
+        //    //// Destroy everything.
+        //    //device->DestroyPresentationImages(presentationImages);
+        //    //device->DestroyImage(depthImage);
+        //    //device->DestroySwapchain(swapchain);
+//
+        //    //// Update everything
+        //    device->UpdateCompatibility(surface);
     //
-            //CameraData resizeCam;
-            //resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
-            //resizeCam.cameraPos = editorCamera.GetPosition();
-            //
-            //auto commandList = device->GetCommandList(Core::QueueType::Graphics);
-            //commandList->Open();
-            //commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
-            //commandList->Close();
-            //
-            //Core::SubmitInfo submitTransfer;
-            //Core::SubmitInfo submitInfo;
-            //submitInfo.stage = Core::PipelineStage::None;
-            //
-            //device->SubmitCommandList(commandList, submitTransfer);
-            //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
-        }
+        //     // Recreate everything.
+        //    uint32_t tWidth = windowReference->GetWidth();
+        //    uint32_t tHeight = windowReference->GetHeight();
+        //    //sSpecs.extent = Core::Extent2D(tWidth, tHeight);
+        //    //swapchain = device->CreateSwapchain(sSpecs);
+        //    //presentationImages = device->CreatePresentationImages(swapchain);
+        //    //depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+    //
+        //    windowReference->ResizeComplete();
+        //    gpuResizeRequest = false;
+    //
+        //    editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
+        //    editorCamera.RecalculateMatrices();
+//
+        //    CameraData resizeCam;
+        //    resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
+        //    resizeCam.cameraPos = editorCamera.GetPosition();
+        //    //
+        //    //auto commandList = device->GetCommandList(Core::QueueType::Graphics);
+        //    //commandList->Open();
+        //    //commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
+        //    //commandList->Close();
+        //    //
+        //    //Core::SubmitInfo submitTransfer;
+        //    //Core::SubmitInfo submitInfo;
+        //    //submitInfo.stage = Core::PipelineStage::None;
+        //    //
+        //    //device->SubmitCommandList(commandList, submitTransfer);
+        //    //device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Camera));
+        //}
     
         //uint32_t maxFramesInFlight = swapchain->GetImageCount();
         //uint32_t syncIndex = frameCounter % maxFramesInFlight;
@@ -551,15 +517,8 @@ int main()
     //device->DestroyImage(depthImage);
 //
     ////device->DestroyImage(textureImage);
-//
-    //device->DestroySwapchain(swapchain);
-//
-    //instance->DestroyDevice(device);
-//
-    //instance->DestroySurface(surface);
-//
-    //instance->Destroy();
 
+    device->DestroySwapchain(swapchain);
 
 	Core::KEngine::Shutdown();
 

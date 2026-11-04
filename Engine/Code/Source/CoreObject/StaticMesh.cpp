@@ -8,15 +8,4 @@ StaticMesh::StaticMesh(const AssetManager::AssetType type, const std::string &na
 
 }
 
-bool StaticMesh::Load(std::ifstream &file)
-{
-    (void)file;
-    return true;
-}
-
-void StaticMesh::UnLoad()
-{
-
-}
-
 END_NAMESPACE_COREOBJECT

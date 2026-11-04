@@ -65,9 +65,9 @@ uint32_t ExternalAssetLoader::GetAssetSize(const std::string_view &path)
 }
 
 template<>
-RawStaticMeshData ExternalAssetLoader::LoadAssetFromSource<RawStaticMeshData>(const std::string_view& path)
+RawMeshData ExternalAssetLoader::LoadAssetFromSource<RawMeshData>(const std::string_view& path)
 {
-    RawStaticMeshData rawData;
+    RawMeshData rawData;
 
     Assimp::Importer importer{};
     const aiScene* scene = importer.ReadFile(path.data(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_FindDegenerates | aiProcess_FindInvalidData | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_GenSmoothNormals | aiProcess_FixInfacingNormals);
@@ -140,6 +140,7 @@ RawStaticMeshData ExternalAssetLoader::LoadAssetFromSource<RawStaticMeshData>(co
 
     importer.FreeScene();
 
+    //spdlog::info("Vertices : {}, Indices : {}, Submeshes : {}", rawData.vertices.size(), rawData.indices.size(), rawData.submeshes.size());
     return rawData;
 }
 

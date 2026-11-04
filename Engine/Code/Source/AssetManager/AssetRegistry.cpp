@@ -113,8 +113,12 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         }
 
         // Write asset header
-        size_t commonDataSize = sizeof(uint32_t) + sizeof(AssetType) + sizeof(uint32_t) + (
-                                    sizeof(char) * usedName.length());
+        uint32_t commonDataSize = sizeof(uint32_t)  // size
+                + sizeof(uint32_t)  // id
+                + sizeof(AssetType) // type (assuré uint32_t)
+                + sizeof(uint32_t)  // nameLength
+                + static_cast<uint32_t>(usedName.length()) * sizeof(char);
+
         AssetHeader header =
         {
             .size = commonDataSize,
@@ -128,7 +132,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         {
             case AssetType::StaticMesh:
             {
-                RawStaticMeshData assetData = ExternalAssetLoader::LoadAssetFromSource<RawStaticMeshData>(assetPath);
+                RawMeshData assetData = ExternalAssetLoader::LoadAssetFromSource<RawMeshData>(assetPath);
                 InternalAssetSerializer::WriteAssetRawData(asset, assetData);
                 spdlog::info("AssetRegistry::CreateAsset: Creating StaticMesh asset from path: {}", assetPath);
                 break;

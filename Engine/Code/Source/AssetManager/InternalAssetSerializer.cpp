@@ -25,7 +25,7 @@ void InternalAssetSerializer::WriteAssetHeader(std::ofstream& asset, const Asset
 
 AssetHeader InternalAssetSerializer::ReadAssetHeader(std::ifstream& asset)
 {
-    size_t headerSize;
+    uint32_t headerSize;
     Core::Read(asset, headerSize);
 
     uint32_t assetId;
@@ -39,6 +39,7 @@ AssetHeader InternalAssetSerializer::ReadAssetHeader(std::ifstream& asset)
     Core::Read(asset, assetNameLength);
 
     std::string assetName;
+    assetName.resize(assetNameLength);
     for (uint32_t i = 0; i < assetNameLength; ++i)
     {
         char c;
@@ -57,7 +58,7 @@ AssetHeader InternalAssetSerializer::ReadAssetHeader(std::ifstream& asset)
 
 // ----- StaticMesh Write / Read ------ //
 template<>
-void InternalAssetSerializer::WriteAssetRawData<RawStaticMeshData>(std::ofstream& file, const RawStaticMeshData& data)
+void InternalAssetSerializer::WriteAssetRawData<RawMeshData>(std::ofstream& file, const RawMeshData& data)
 {
     const std::vector<CoreObject::Vertex>& vertices = data.vertices;
     Core::Write(file, static_cast<uint32_t>(vertices.size()));
@@ -91,14 +92,14 @@ void InternalAssetSerializer::WriteAssetRawData<RawStaticMeshData>(std::ofstream
 }
 
 template<>
-RawStaticMeshData InternalAssetSerializer::ReadAssetRawData<RawStaticMeshData>(std::ifstream& file)
+RawMeshData InternalAssetSerializer::ReadAssetRawData<RawMeshData>(std::ifstream& file)
 {
     // Skip first part of the files to get the data.
     size_t commonDataSize;
     Core::Read(file, commonDataSize);
     file.seekg(commonDataSize, std::ios::beg);
 
-    RawStaticMeshData data;
+    RawMeshData data;
 
     uint32_t verticesCount;
     Core::Read(file, verticesCount);
@@ -140,6 +141,7 @@ RawStaticMeshData InternalAssetSerializer::ReadAssetRawData<RawStaticMeshData>(s
         data.submeshes.push_back(submesh);
     }
 
+    spdlog::info("Vertices : {}, Indices : {}, Submeshes : {}", data.vertices.size(), data.indices.size(), data.submeshes.size());
     return data;
 }
 

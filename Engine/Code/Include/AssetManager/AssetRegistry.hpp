@@ -13,7 +13,7 @@ BEGIN_NAMESPACE_ASSETMANAGER
 
 struct AssetHeader
 {
-    size_t size;
+    uint32_t size;
 
     uint32_t id;
     AssetType type;

@@ -21,9 +21,6 @@ public:
         return AssetManager::AssetType::StaticMesh;
     }
 
-protected:
-    KAPI bool Load(std::ifstream& file) override;
-    KAPI void UnLoad() override;
 };
 
 END_NAMESPACE_COREOBJECT

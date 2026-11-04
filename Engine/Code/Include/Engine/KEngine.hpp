@@ -7,6 +7,7 @@
 
 #include "Window.hpp"
 #include "WindowRenderer.hpp"
+#include "RHI/API/Surface.hpp"
 
 #include "ThreadPool.hpp"
 
@@ -17,6 +18,8 @@
 BEGIN_NAMESPACE_CORE
 #define ENGINE_QUEUE_ASSET "AssetLoaderQueue"
 #define ENGINE_QUEUE_PHYSICS "PhysicsLoaderQueue"
+
+#define KENGINE_VERSION Version(0, 0, 1)
 
 struct KEngineSpecs
 {
@@ -74,6 +77,16 @@ public:
         return m_window;
     }
 
+    SurfaceHandle GetWindowSurface() const
+    {
+        return m_windowSurface;
+    }
+
+    DeviceHandle GetDevice() const
+    {
+        return m_deviceHandle;
+    }
+
 public:
     KEngine() = delete;
     KEngine(KEngine const&) = delete;
@@ -84,10 +97,11 @@ public:
 protected:
     // Window :
     KSharedPtr<Window::Window> m_window;
+    SurfaceHandle m_windowSurface;
 
     // RHI :
-    //InstanceHandle m_rhiInstance;
-    //DeviceHandle m_deviceHandle;
+    InstanceHandle m_rhiInstance;
+    DeviceHandle m_deviceHandle;
 
     // ThreadPool
     ThreadPool m_pool;

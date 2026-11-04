@@ -5,10 +5,10 @@
 #include "Asset.hpp"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
+#include "RHI/API/Buffer.hpp"
 
 BEGIN_NAMESPACE_COREOBJECT
-
-// TODO : Maybe move this struct to the Core ?
+    // TODO : Maybe move this struct to the Core ?
 struct Vertex
 {
     glm::vec3 pos;
@@ -31,29 +31,30 @@ public:
     KAPI virtual ~MeshBase() = default;
 
     // Base utility
-    KAPI const std::vector<Vertex>& GetMesh() const { return m_vertices; }
-    KAPI const std::vector<uint32_t>& GetIndices() const { return m_indices; }
     KAPI const std::vector<SubMesh>& GetSubmeshesInfo() const { return m_submeshesInfo; }
     KAPI SubMesh GetSubmeshInfo(uint32_t index) const;
     KAPI uint32_t GetSubmeshesCount() const { return m_submeshesCount; }
-
-    // Get submeshes infos
-    KAPI std::vector<Vertex> GetSubmeshVertices(uint32_t index) const;
-    KAPI std::vector<uint32_t> GetSubmeshIndices(uint32_t index) const;
-
-
+    KAPI uint32_t GetVerticesCount() const { return m_verticesCount; }
+    KAPI uint32_t GetIndicesCount() const { return m_indicesCount; }
 
 protected:
     KAPI bool Load(std::ifstream& file) override;
     KAPI void UnLoad() override;
 
-    // Raw Data
-    std::vector<Vertex> m_vertices;
-    std::vector<uint32_t> m_indices;
+    void CreateVertexBuffer(Core::DeviceHandle localDeviceReference, uint32_t bufferSize);
+    void CreateIndexBuffer(Core::DeviceHandle localDeviceReference, uint32_t bufferSize);
+
+    // Data :
+    Core::BufferHandle m_vertexBuffer;
+    Core::BufferHandle m_indexBuffer;
 
     // Infos
     std::vector<SubMesh> m_submeshesInfo;
     uint32_t m_submeshesCount = 0;
+    uint32_t m_verticesCount = 0;
+    uint32_t m_indicesCount = 0;
+
+    bool hasBeenLoaded = false;
 };
 
 END_NAMESPACE_COREOBJECT
