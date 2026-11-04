@@ -117,7 +117,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
                 + sizeof(uint32_t)  // id
                 + sizeof(AssetType) // type (assuré uint32_t)
                 + sizeof(uint32_t)  // nameLength
-                + sizeof(usedName);
+                + usedName.size();
 
         AssetHeader header =
         {

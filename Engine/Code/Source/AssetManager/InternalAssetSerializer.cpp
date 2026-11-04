@@ -46,7 +46,8 @@ AssetHeader InternalAssetSerializer::ReadAssetHeader(std::ifstream& asset)
         Core::Read(asset, c);
         assetName[i] = c;
     }
-    spdlog::info("Asset name: {}", assetName);
+
+    //spdlog::info("Asset name: {}", assetName);
     return AssetHeader
     {
         .size = headerSize,
@@ -95,7 +96,7 @@ template<>
 RawMeshData InternalAssetSerializer::ReadAssetRawData<RawMeshData>(std::ifstream& file)
 {
     // Skip first part of the files to get the data.
-    size_t commonDataSize;
+    uint32_t commonDataSize;
     Core::Read(file, commonDataSize);
     file.seekg(commonDataSize, std::ios::beg);
 
@@ -118,7 +119,7 @@ RawMeshData InternalAssetSerializer::ReadAssetRawData<RawMeshData>(std::ifstream
         Core::Read(file, vertex.uv.x);
         Core::Read(file, vertex.uv.y);
 
-        data.vertices.push_back(vertex);
+        data.vertices[i] = vertex;
     }
 
     uint32_t indices;
@@ -128,7 +129,7 @@ RawMeshData InternalAssetSerializer::ReadAssetRawData<RawMeshData>(std::ifstream
     {
         uint32_t indice;
         Core::Read(file, indice);
-        data.indices.push_back(indice);
+        data.indices[i] = indice;
     }
 
     uint32_t submeshes;
@@ -138,10 +139,9 @@ RawMeshData InternalAssetSerializer::ReadAssetRawData<RawMeshData>(std::ifstream
     {
         CoreObject::SubMesh submesh;
         Core::Read(file, submesh);
-        data.submeshes.push_back(submesh);
+        data.submeshes[i] = submesh;
     }
 
-    spdlog::info("Vertices : {}, Indices : {}, Submeshes : {}", data.vertices.size(), data.indices.size(), data.submeshes.size());
     return data;
 }
 
