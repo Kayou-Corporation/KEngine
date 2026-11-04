@@ -104,7 +104,7 @@ int main()
     Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
 
     // ------------ Object loading test -----------------//
-	Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
+	//Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
 
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
 

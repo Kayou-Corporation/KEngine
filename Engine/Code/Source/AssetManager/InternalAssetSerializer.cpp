@@ -44,9 +44,9 @@ AssetHeader InternalAssetSerializer::ReadAssetHeader(std::ifstream& asset)
     {
         char c;
         Core::Read(asset, c);
-        assetName += c;
+        assetName[i] = c;
     }
-
+    spdlog::info("Asset name: {}", assetName);
     return AssetHeader
     {
         .size = headerSize,

@@ -68,7 +68,7 @@ public:
         auto it = m_assetsById.find(id);
         if (it == m_assetsById.end())
         {
-            spdlog::error("AssetRegistry::GetAsset: Asset ID {} non trouve.", id);
+            spdlog::error("AssetRegistry::GetAsset: Asset ID {} not found.", id);
             return nullptr;
         }
 
@@ -95,7 +95,7 @@ public:
         auto it = m_assetsByName.find(name);
         if (it == m_assetsByName.end())
         {
-            spdlog::error("AssetRegistry::GetAsset: Asset name {} non trouve.", name);
+            spdlog::error("AssetRegistry::GetAsset: Asset name {} not found.", name);
             return nullptr;
         }
 
@@ -122,7 +122,7 @@ public:
         auto it = m_assetsById.find(id);
         if (it == m_assetsById.end())
         {
-            spdlog::error("AssetRegistry::GetAsset: Asset ID {} non trouve.", id);
+            spdlog::error("AssetRegistry::GetAsset: Asset ID {} not found.", id);
             return KSoftAssetRef<AssetDerived>(static_cast<uint32_t>(-1), nullptr);
         }
 
@@ -135,7 +135,7 @@ public:
         auto it = m_assetsByName.find(name);
         if (it == m_assetsByName.end())
         {
-            spdlog::error("AssetRegistry::GetAsset: Asset name {} non trouve.", name);
+            spdlog::error("AssetRegistry::GetAsset: Asset name {} not found.", name);
             return KSoftAssetRef<AssetDerived>(static_cast<uint32_t>(-1), nullptr);
         }
 
