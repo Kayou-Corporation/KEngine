@@ -299,55 +299,55 @@ int main()
 
     device->WaitIdle();
     uint64_t frameCounter = 0;
-    //bool gpuResizeRequest = false;
+    bool gpuResizeRequest = false;
 
     while (!windowReference->ShouldClose())
     {
         windowReference->PollEvents();
         //Core::KEngine::Update();
 
-        //if (windowReference->GetHasResize() || gpuResizeRequest)
-        //{
-        //    device->WaitIdle();
-//
-        //    //// Destroy everything.
-        //    //device->DestroyPresentationImages(presentationImages);
-        //    //device->DestroyImage(depthImage);
-        //    //device->DestroySwapchain(swapchain);
-//
-        //    //// Update everything
-        //    device->UpdateCompatibility(surface);
-//
-        //    // Recreate everything.
-        //    uint32_t tWidth = windowReference->GetWidth();
-        //    uint32_t tHeight = windowReference->GetHeight();
-        //    //sSpecs.extent = Core::Extent2D(tWidth, tHeight);
-        //    //swapchain = device->CreateSwapchain(sSpecs);
-        //    //presentationImages = device->CreatePresentationImages(swapchain);
-        //    //depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
-//
-        //    windowReference->ResizeComplete();
-        //    gpuResizeRequest = false;
-//
-        //    editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
-        //    editorCamera.RecalculateMatrices();
-//
-        //    CameraData resizeCam;
-        //    resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
-        //    resizeCam.cameraPos = editorCamera.GetPosition();
-//
-        //    auto commandList = device->GetCommandList(Core::QueueType::Graphics);
-        //    commandList->Open();
-        //    commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
-        //    commandList->Close();
-//
-        //    Core::SubmitInfo submitTransfer;
-        //    Core::SubmitInfo submitInfo;
-        //    submitInfo.stage = Core::PipelineStage::None;
-//
-        //    device->SubmitCommandList(commandList, submitTransfer);
-        //    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Core::Camera));
-        //}
+        if (windowReference->GetHasResize() || gpuResizeRequest)
+        {
+            device->WaitIdle();
+
+            //// Destroy everything.
+            device->DestroyPresentationImages(presentationImages);
+            device->DestroyImage(depthImage);
+            device->DestroySwapchain(swapchain);
+
+            //// Update everything
+            device->UpdateCompatibility(surface);
+
+            // Recreate everything.
+            uint32_t tWidth = windowReference->GetWidth();
+            uint32_t tHeight = windowReference->GetHeight();
+            sSpecs.extent = Core::Extent2D(tWidth, tHeight);
+            swapchain = device->CreateSwapchain(sSpecs);
+            presentationImages = device->CreatePresentationImages(swapchain);
+            depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+
+            windowReference->ResizeComplete();
+            gpuResizeRequest = false;
+
+            editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
+            editorCamera.RecalculateMatrices();
+
+            CameraData resizeCam;
+            resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
+            resizeCam.cameraPos = editorCamera.GetPosition();
+
+            auto commandList = device->GetCommandList(Core::QueueType::Graphics);
+            commandList->Open();
+            commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
+            commandList->Close();
+
+            Core::SubmitInfo submitTransfer;
+            Core::SubmitInfo submitInfo;
+            submitInfo.stage = Core::PipelineStage::None;
+
+            device->SubmitCommandList(commandList, submitTransfer);
+            device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
+        }
 
         uint32_t maxFramesInFlight = swapchain->GetImageCount();
         uint32_t syncIndex = frameCounter % maxFramesInFlight;
@@ -430,11 +430,9 @@ int main()
 
         if (!sucess)
         {
-            //gpuResizeRequest = true;
-
-            frameCounter++;
+            gpuResizeRequest = true;
         }
-
+        frameCounter++;
     }
     device->WaitIdle();
 

@@ -353,4 +353,23 @@ void AssetRegistry::UnloadAsset(uint32_t id)
     }
 }
 
+void AssetRegistry::UnloadAll()
+{
+    for (auto& asset : m_assets)
+    {
+        if (asset && asset->IsLoaded())
+        {
+            asset->UnLoad();
+            asset->isLoaded = false;
+            spdlog::info("Asset '{}' (ID: {}) unloaded.", asset->GetName(), asset->GetID());
+        }
+    }
+
+    m_assets.clear();
+    m_assetsById.clear();
+    m_assetsByName.clear();
+    m_freeIndex.clear();
+    m_lastAssetId = 0;
+}
+
 END_NAMESPACE_ASSETMANAGER

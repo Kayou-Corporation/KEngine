@@ -62,6 +62,8 @@ public:
     KAPI bool LoadAsset(uint32_t id);
     KAPI void UnloadAsset(uint32_t id);
 
+    KAPI void UnloadAll();
+
     template<typename AssetDerived>
     KAPI Core::KSharedPtr<AssetDerived> GetAssetHard(uint32_t id)
     {
