@@ -14,7 +14,7 @@ struct RawData
     // Empty, only useful for heritage.
 };
 
-struct RawStaticMeshData : public RawData
+struct RawMeshData : public RawData
 {
     std::vector<CoreObject::Vertex> vertices;
     std::vector<uint32_t> indices;

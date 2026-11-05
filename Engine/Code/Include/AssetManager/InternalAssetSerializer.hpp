@@ -16,7 +16,7 @@ public:
     static void WriteAssetRawData(std::ofstream& file, const RawData& data);
 
     template<typename RawData>
-    RawData ReadAssetRawData(std::ifstream& file);
+    static RawData ReadAssetRawData(std::ifstream& file);
 
 
 public:

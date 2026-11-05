@@ -18,6 +18,7 @@ public:
     virtual unsigned long AddRef() { return 1; };
     virtual unsigned long Release() { delete this; return 0; };
     virtual unsigned long GetRefCount() { return 1; };
+    virtual void OnUnload() {}
 };
 
 template<typename T>
@@ -43,6 +44,7 @@ public:
         unsigned long currentCount = --m_count;
         if (currentCount == 0)
         {
+            this->OnUnload();
             delete this;
         }
         return currentCount;
@@ -181,6 +183,10 @@ public:
     T& operator*() const { return *m_ptr; }
     T* Get() const { return m_ptr; }
     explicit operator bool() const { return m_ptr != nullptr; }
+    friend bool operator==(const KSharedPtr& lhs, std::nullptr_t) noexcept { return lhs.m_ptr == nullptr; }
+    friend bool operator==(std::nullptr_t, const KSharedPtr& rhs) noexcept { return rhs.m_ptr == nullptr; }
+    friend bool operator!=(const KSharedPtr& lhs, std::nullptr_t) noexcept { return lhs.m_ptr != nullptr; }
+    friend bool operator!=(std::nullptr_t, const KSharedPtr& rhs) noexcept { return rhs.m_ptr != nullptr; }
 };
 
 template<typename T, typename... Args>

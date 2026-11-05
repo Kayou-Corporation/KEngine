@@ -25,7 +25,7 @@ void InternalAssetSerializer::WriteAssetHeader(std::ofstream& asset, const Asset
 
 AssetHeader InternalAssetSerializer::ReadAssetHeader(std::ifstream& asset)
 {
-    size_t headerSize;
+    uint32_t headerSize;
     Core::Read(asset, headerSize);
 
     uint32_t assetId;
@@ -39,13 +39,15 @@ AssetHeader InternalAssetSerializer::ReadAssetHeader(std::ifstream& asset)
     Core::Read(asset, assetNameLength);
 
     std::string assetName;
+    assetName.resize(assetNameLength);
     for (uint32_t i = 0; i < assetNameLength; ++i)
     {
         char c;
         Core::Read(asset, c);
-        assetName += c;
+        assetName[i] = c;
     }
 
+    //spdlog::info("Asset name: {}", assetName);
     return AssetHeader
     {
         .size = headerSize,
@@ -57,7 +59,7 @@ AssetHeader InternalAssetSerializer::ReadAssetHeader(std::ifstream& asset)
 
 // ----- StaticMesh Write / Read ------ //
 template<>
-void InternalAssetSerializer::WriteAssetRawData<RawStaticMeshData>(std::ofstream& file, const RawStaticMeshData& data)
+void InternalAssetSerializer::WriteAssetRawData<RawMeshData>(std::ofstream& file, const RawMeshData& data)
 {
     const std::vector<CoreObject::Vertex>& vertices = data.vertices;
     Core::Write(file, static_cast<uint32_t>(vertices.size()));
@@ -91,14 +93,14 @@ void InternalAssetSerializer::WriteAssetRawData<RawStaticMeshData>(std::ofstream
 }
 
 template<>
-RawStaticMeshData InternalAssetSerializer::ReadAssetRawData<RawStaticMeshData>(std::ifstream& file)
+RawMeshData InternalAssetSerializer::ReadAssetRawData<RawMeshData>(std::ifstream& file)
 {
     // Skip first part of the files to get the data.
-    size_t commonDataSize;
+    uint32_t commonDataSize;
     Core::Read(file, commonDataSize);
     file.seekg(commonDataSize, std::ios::beg);
 
-    RawStaticMeshData data;
+    RawMeshData data;
 
     uint32_t verticesCount;
     Core::Read(file, verticesCount);
@@ -117,7 +119,7 @@ RawStaticMeshData InternalAssetSerializer::ReadAssetRawData<RawStaticMeshData>(s
         Core::Read(file, vertex.uv.x);
         Core::Read(file, vertex.uv.y);
 
-        data.vertices.push_back(vertex);
+        data.vertices[i] = vertex;
     }
 
     uint32_t indices;
@@ -127,7 +129,7 @@ RawStaticMeshData InternalAssetSerializer::ReadAssetRawData<RawStaticMeshData>(s
     {
         uint32_t indice;
         Core::Read(file, indice);
-        data.indices.push_back(indice);
+        data.indices[i] = indice;
     }
 
     uint32_t submeshes;
@@ -137,12 +139,47 @@ RawStaticMeshData InternalAssetSerializer::ReadAssetRawData<RawStaticMeshData>(s
     {
         CoreObject::SubMesh submesh;
         Core::Read(file, submesh);
-        data.submeshes.push_back(submesh);
+        data.submeshes[i] = submesh;
     }
 
     return data;
 }
 
 // ----- Texture2D Write / Read ------ //
+template<>
+void InternalAssetSerializer::WriteAssetRawData<RawTextureData>(std::ofstream& file, const RawTextureData& data)
+{
+    Core::Write(file, data.width);
+    Core::Write(file, data.height);
+    Core::Write(file, data.channels);
+
+    Core::Write(file, static_cast<uint32_t>(data.pixels.size()));
+    for (uint32_t i = 0; i < data.pixels.size(); ++i)
+    {
+        Core::Write(file, data.pixels[i]);
+    }
+}
+
+template<>
+RawTextureData InternalAssetSerializer::ReadAssetRawData<RawTextureData>(std::ifstream& file)
+{
+    // Skip first part of the files to get the data.
+    uint32_t commonDataSize;
+    Core::Read(file, commonDataSize);
+    file.seekg(commonDataSize, std::ios::beg);
+
+    RawTextureData data;
+    Core::Read(file, data.width);
+    Core::Read(file, data.height);
+    Core::Read(file, data.channels);
+
+    data.pixels.resize(data.width * data.height * 4);
+    for (uint32_t i = 0; i < data.pixels.size(); ++i)
+    {
+        Core::Read(file, data.pixels[i]);
+    }
+
+    return data;
+}
 
 END_NAMESPACE_ASSETMANAGER
