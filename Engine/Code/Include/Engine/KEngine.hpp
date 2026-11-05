@@ -45,6 +45,7 @@ public:
 
     // TO BE USED ONLY 1 TIME
     static void Init(const KEngineSpecs& specs);
+    static void Clean();
     static void Shutdown();
     static void Update();
 
@@ -114,6 +115,9 @@ protected:
 
     // Self reference for singleton
     inline static KUniquePtr<KEngine> m_instance{nullptr};
+
+private:
+    void CleanInternal();
 };
 
 END_NAMESPACE_CORE

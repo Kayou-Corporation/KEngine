@@ -16,6 +16,16 @@ void KEngine::Init(const KEngineSpecs& specs)
     }
 }
 
+void KEngine::Clean()
+{
+    if (!m_instance)
+    {
+        spdlog::error("Engine not initialized");
+        return;
+    }
+    m_instance->CleanInternal();
+}
+
 void KEngine::Shutdown()
 {
     if (!m_instance)
@@ -45,6 +55,11 @@ KEngine& KEngine::Get()
         spdlog::error("Engine not initialized");
     }
     return *m_instance;
+}
+
+void KEngine::CleanInternal()
+{
+    m_assetRegistry->UnloadAll();
 }
 
 KEngine::KEngine(const KEngineSpecs& specs)

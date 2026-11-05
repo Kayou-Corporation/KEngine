@@ -465,6 +465,7 @@ int main()
 
     device->DestroySwapchain(swapchain);
 
+    Core::KEngine::Clean();
     Core::KEngine::Shutdown();
 
     return 0;
