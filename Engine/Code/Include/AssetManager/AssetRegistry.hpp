@@ -73,9 +73,12 @@ public:
         }
 
         uint32_t index = it->second;
-        Core::KSharedPtr<Asset>& asset = m_assets[index];
+        Core::KSharedPtr<Asset> asset = m_assets[index];
 
-        if (!asset) return nullptr;
+        if (!asset)
+        {
+            return nullptr;
+        }
 
         if (!asset->IsLoaded())
         {
@@ -139,7 +142,8 @@ public:
             return KSoftAssetRef<AssetDerived>(static_cast<uint32_t>(-1), nullptr);
         }
 
-        return KSoftAssetRef<AssetDerived>(it->second, this);
+        spdlog::info("GetAsset: Asset name {} found at index {}.", name, it->second);
+        return KSoftAssetRef<AssetDerived>(m_assets[it->second]->GetID(), this);
     }
 
     void RegisterAllAssets();

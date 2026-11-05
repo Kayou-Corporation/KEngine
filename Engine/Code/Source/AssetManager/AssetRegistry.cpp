@@ -45,6 +45,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         {
             if (entry.is_regular_file() && entry.path().extension() == ASSET_EXTENSION)
             {
+                // TODO : ISSUE HERE, Change later
                 m_lastAssetId++;
                 RegisterAsset(entry.path().string());
             }
@@ -185,15 +186,16 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
 
         if (m_freeIndex.empty())
         {
-            m_assets.push_back(std::move(assetPtr));
+            m_assets.push_back(assetPtr);
             m_assetsByName[header.name] = m_assets.size() - 1;
             m_assetsById[header.id] = m_assets.size() - 1;
+            spdlog::info("Register Asset : {}, Id : {}, At emplacement : {}", header.name, header.id, m_assets.size() - 1);
         }
         else
         {
             uint32_t listIndex = m_freeIndex.back();
             m_freeIndex.pop_back();
-            m_assets[listIndex] = std::move(assetPtr);
+            m_assets[listIndex] = assetPtr;
             m_assetsByName[header.name] = listIndex;
             m_assetsById[header.id] = listIndex;
         }
@@ -312,7 +314,7 @@ bool AssetRegistry::LoadAsset(uint32_t id)
         return false;
     }
 
-    Core::KSharedPtr<Asset>& asset = m_assets[it->second];
+    Core::KSharedPtr<Asset> asset = m_assets[it->second];
     if (!asset || asset->IsLoaded())
     {
         return true;

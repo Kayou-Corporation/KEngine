@@ -13,6 +13,11 @@ public:
     KAPI Texture2D(const AssetManager::AssetType type, const std::string& name, const uint32_t id, uint32_t sourceHash, uint32_t sourceSize);
     KAPI virtual ~Texture2D();
 
+    KAPI static AssetManager::AssetType GetStaticType()
+    {
+        return AssetManager::AssetType::Texture2D;
+    }
+
     // Base utility
     KAPI uint32_t GetWidth() const {return m_width;}
     KAPI uint32_t GetHeight() const {return m_height;}

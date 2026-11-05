@@ -299,55 +299,55 @@ int main()
 
     device->WaitIdle();
     uint64_t frameCounter = 0;
-    bool gpuResizeRequest = false;
+    //bool gpuResizeRequest = false;
 
     while (!windowReference->ShouldClose())
     {
         windowReference->PollEvents();
-        Core::KEngine::Update();
+        //Core::KEngine::Update();
 
-        if (windowReference->GetHasResize() || gpuResizeRequest)
-        {
-            device->WaitIdle();
-
-            //// Destroy everything.
-            //device->DestroyPresentationImages(presentationImages);
-            //device->DestroyImage(depthImage);
-            //device->DestroySwapchain(swapchain);
-
-            //// Update everything
-            device->UpdateCompatibility(surface);
-
-            // Recreate everything.
-            uint32_t tWidth = windowReference->GetWidth();
-            uint32_t tHeight = windowReference->GetHeight();
-            //sSpecs.extent = Core::Extent2D(tWidth, tHeight);
-            //swapchain = device->CreateSwapchain(sSpecs);
-            //presentationImages = device->CreatePresentationImages(swapchain);
-            //depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
-
-            windowReference->ResizeComplete();
-            gpuResizeRequest = false;
-
-            editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
-            editorCamera.RecalculateMatrices();
-
-            CameraData resizeCam;
-            resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
-            resizeCam.cameraPos = editorCamera.GetPosition();
-
-            auto commandList = device->GetCommandList(Core::QueueType::Graphics);
-            commandList->Open();
-            commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
-            commandList->Close();
-
-            Core::SubmitInfo submitTransfer;
-            Core::SubmitInfo submitInfo;
-            submitInfo.stage = Core::PipelineStage::None;
-
-            device->SubmitCommandList(commandList, submitTransfer);
-            device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Core::Camera));
-        }
+        //if (windowReference->GetHasResize() || gpuResizeRequest)
+        //{
+        //    device->WaitIdle();
+//
+        //    //// Destroy everything.
+        //    //device->DestroyPresentationImages(presentationImages);
+        //    //device->DestroyImage(depthImage);
+        //    //device->DestroySwapchain(swapchain);
+//
+        //    //// Update everything
+        //    device->UpdateCompatibility(surface);
+//
+        //    // Recreate everything.
+        //    uint32_t tWidth = windowReference->GetWidth();
+        //    uint32_t tHeight = windowReference->GetHeight();
+        //    //sSpecs.extent = Core::Extent2D(tWidth, tHeight);
+        //    //swapchain = device->CreateSwapchain(sSpecs);
+        //    //presentationImages = device->CreatePresentationImages(swapchain);
+        //    //depthImage = device->CreateImagesWithSwapchain(depthImageSpecs, swapchain);
+//
+        //    windowReference->ResizeComplete();
+        //    gpuResizeRequest = false;
+//
+        //    editorCamera.SetAspectRatio(static_cast<float>(tWidth) / static_cast<float>(tHeight));
+        //    editorCamera.RecalculateMatrices();
+//
+        //    CameraData resizeCam;
+        //    resizeCam.cameraVP = editorCamera.GetViewProjectionMatrix();
+        //    resizeCam.cameraPos = editorCamera.GetPosition();
+//
+        //    auto commandList = device->GetCommandList(Core::QueueType::Graphics);
+        //    commandList->Open();
+        //    commandList->SetBufferData(uniformCamera, &resizeCam, sizeof(CameraData), 0);
+        //    commandList->Close();
+//
+        //    Core::SubmitInfo submitTransfer;
+        //    Core::SubmitInfo submitInfo;
+        //    submitInfo.stage = Core::PipelineStage::None;
+//
+        //    device->SubmitCommandList(commandList, submitTransfer);
+        //    device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(Core::Camera));
+        //}
 
         uint32_t maxFramesInFlight = swapchain->GetImageCount();
         uint32_t syncIndex = frameCounter % maxFramesInFlight;
@@ -430,46 +430,44 @@ int main()
 
         if (!sucess)
         {
-            gpuResizeRequest = true;
+            //gpuResizeRequest = true;
 
             frameCounter++;
         }
 
-        device->WaitIdle();
-
-        device->DestroySampler(sampler);
-        device->DestroyBuffer(uniformCamera);
-        device->DestroyBuffer(uniformModel);
-
-        device->DestroyDescriptorSet(frameDataDescriptorSet);
-        device->DestroyDescriptorSet(drawDataDescriptorSet);
-
-        device->DestroyPipeline(unlitPipeline);
-        device->DestroyPipelineLayout(globalPipelineLayout);
-        device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
-
-        device->DestroyShader(unlitFrag);
-        device->DestroyShader(baseVert);
-        device->DestroyShader(globalLayoutShader);
-
-        for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
-        {
-            // delete fence & semaphore
-            device->DestroySemaphore(imageAvailablesSemaphores[i]);
-            device->DestroySemaphore(renderFinishedSemaphores[i]);
-        }
-        device->DestroySemaphore(frameTimelineSemaphore);
-
-        device->DestroyPresentationImages(presentationImages);
-
-        device->DestroyImage(depthImage);
-
-        device->DestroySwapchain(swapchain);
-
-        Core::KEngine::Shutdown();
-
-        //stbi_image_free(texturePixels);
-
-        return 0;
     }
+    device->WaitIdle();
+
+    device->DestroySampler(sampler);
+    device->DestroyBuffer(uniformCamera);
+    device->DestroyBuffer(uniformModel);
+
+    device->DestroyDescriptorSet(frameDataDescriptorSet);
+    device->DestroyDescriptorSet(drawDataDescriptorSet);
+
+    device->DestroyPipeline(unlitPipeline);
+    device->DestroyPipelineLayout(globalPipelineLayout);
+    device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
+
+    device->DestroyShader(unlitFrag);
+    device->DestroyShader(baseVert);
+    device->DestroyShader(globalLayoutShader);
+
+    for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
+    {
+        // delete fence & semaphore
+        device->DestroySemaphore(imageAvailablesSemaphores[i]);
+        device->DestroySemaphore(renderFinishedSemaphores[i]);
+    }
+    device->DestroySemaphore(frameTimelineSemaphore);
+
+    device->DestroyPresentationImages(presentationImages);
+
+    device->DestroyImage(depthImage);
+
+    device->DestroySwapchain(swapchain);
+
+    Core::KEngine::Shutdown();
+
+    return 0;
 }
