@@ -45,7 +45,7 @@ DO_PRAGMA(GCC diagnostic ignored "-Winit-self")
 
 #elif defined(KCOMPILER_MSVC)
 // Some warning flags might need to be added, see the flag in the output to add it here
-#define DISABLE_WARNINGS __pragma(warning(push)) __pragma(warning(disable: 4100 4189 4244 4267 4456 4700 4701 4703 4996 4324))
+#define DISABLE_WARNINGS __pragma(warning(push)) __pragma(warning(disable: 4100 4189 4244 4267 4456 4700 4701 4703 4996 4324 4127 26440))
 #define RESTORE_WARNINGS __pragma(warning(pop))
 #else
 #define DISABLE_WARNINGS
