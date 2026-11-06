@@ -342,7 +342,10 @@ bool AssetRegistry::LoadAsset(uint32_t id)
 void AssetRegistry::UnloadAsset(uint32_t id)
 {
     auto it = m_assetsById.find(id);
-    if (it == m_assetsById.end()) return;
+    if (it == m_assetsById.end())
+    {
+        return;
+    }
 
     Core::KSharedPtr<Asset>& asset = m_assets[it->second];
     if (asset && asset->IsLoaded())
