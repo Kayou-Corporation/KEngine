@@ -63,26 +63,14 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     std::string content((std::istreambuf_iterator<char>(fileContent)), std::istreambuf_iterator<char>());
 
     std::string name = GetShaderName(fullFile);
-
     const std::string entry = ShaderStageToEntry(stage);
     const std::string hash = HashFile(content, entry);
-
-    const std::string reflectionPath = CacheShaderPath(hash, name, ".kayou");
-    const std::string spirvPath = CacheShaderPath(hash, name, ".spv");
     const std::string shaderPath = CacheShaderPath(hash, name, ".kshader");
 
-    bool pathExists = std::filesystem::exists(spirvPath) && std::filesystem::exists(reflectionPath);
-
-#if defined(KWINDOWS)
-    const std::string dxilPath = CacheShaderPath(hash, name, ".dxil");
-    
-    pathExists = pathExists && std::filesystem::exists(dxilPath);
-#endif
-
-    if (pathExists)
+    if (std::filesystem::exists(shaderPath))
     {
         std::ifstream sh(shaderPath, std::ios::binary);
-        if (!CheckIsFileOpenOrValid(sh, reflectionPath))
+        if (!CheckIsFileOpenOrValid(sh, shaderPath))
         {
             spdlog::error("Can't open file: {}", shaderPath);
             return {};
@@ -95,31 +83,24 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
         Core::Read(sh, spirvSize);
         Core::Read(sh, dxilSize);
 
-        std::ifstream r(reflectionPath, std::ios::binary);
-        if (CheckIsFileOpenOrValid(r, reflectionPath))
-            ReadReflectionData(r, bin, isGlobalLayout, usesGlobalLayout);
+        ReadReflectionData(sh, bin, isGlobalLayout, usesGlobalLayout);
 
         switch (rendererAPI)
         {
         case RendererAPI::Vulkan:
-        {
-            std::ifstream s(spirvPath, std::ios::binary);
-            if (CheckIsFileOpenOrValid(s, spirvPath))
-                bin.spirv.assign(std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>());
-            else
-                spdlog::error("Can't open file at path {}", spirvPath);
+            bin.spirv.resize(spirvSize);
+            sh.read(reinterpret_cast<char*>(bin.spirv.data()), static_cast<std::streamsize>(spirvSize));
             break;
-        }
 #if defined (KWINDOWS)
         case RendererAPI::D3D12:
-        {
-            std::ifstream d(dxilPath, std::ios::binary);
-            if (CheckIsFileOpenOrValid(d, dxilPath))
-                bin.dxil.assign(std::istreambuf_iterator<char>(d), std::istreambuf_iterator<char>());
-            else
-                spdlog::error("Can't open file at path {}", dxilPath);
+            if (dxilSize == SIZE_MAX || dxilSize <= 0)
+            {
+                spdlog::error("No shader generated for Direct3D: {}", name);
+                return {};
+            }
+            bin.dxil.resize(dxilSize);
+            sh.read(reinterpret_cast<char*>(bin.dxil.data()), static_cast<std::streamsize>(dxilSize));
             break;
-        }
 #endif
         default:
             spdlog::error("Can't load shader for incorrect API");
@@ -141,7 +122,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     }
 
     std::ofstream s(shaderPath, std::ios::binary);
-    if (CheckIsFileOpenOrValid(s, reflectionPath))
+    if (CheckIsFileOpenOrValid(s, shaderPath))
     {
         WriteReflectionData(s, bin, isGlobalLayout, usesGlobalLayout);
         s.write(reinterpret_cast<char*>(bin.spirv.data()), bin.spirv.size());
