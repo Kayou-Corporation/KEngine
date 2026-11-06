@@ -81,6 +81,20 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
 
     if (pathExists)
     {
+        std::ifstream sh(shaderPath, std::ios::binary);
+        if (!CheckIsFileOpenOrValid(sh, reflectionPath))
+        {
+            spdlog::error("Can't open file: {}", shaderPath);
+            return {};
+        }
+
+        size_t reflectionSize;
+        size_t spirvSize;
+        size_t dxilSize;
+        Core::Read(sh, reflectionSize);
+        Core::Read(sh, spirvSize);
+        Core::Read(sh, dxilSize);
+
         std::ifstream r(reflectionPath, std::ios::binary);
         if (CheckIsFileOpenOrValid(r, reflectionPath))
             ReadReflectionData(r, bin, isGlobalLayout, usesGlobalLayout);
