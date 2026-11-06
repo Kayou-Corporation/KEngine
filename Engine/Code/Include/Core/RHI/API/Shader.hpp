@@ -154,6 +154,7 @@ private:
     static inline uint32_t GetFormatSize(ShaderDataType format);
 
 	void WriteReflectionData(std::ofstream& out, const ShaderData& bin, bool isGlobalLayout, bool usesGlobalLayout) const;
+    void WriteReflectionDataSize(std::ofstream& out, const ShaderData& bin) const;
 	void WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const;
 	void WritePushConstants(std::ofstream& out, const std::vector<PushConstant>& pushConstants) const;
 	void WriteVertexAttributes(std::ofstream& out, const std::vector<VertexAttributeLayout>& vertexAttributeLayouts) const;
