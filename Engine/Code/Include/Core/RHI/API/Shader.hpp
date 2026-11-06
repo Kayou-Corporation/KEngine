@@ -120,7 +120,7 @@ struct PushConstant
 struct ShaderData
 {
     std::vector<uint8_t> spirv{};
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     std::vector<uint8_t> dxil{};
 #endif
     std::vector<Descriptor> descriptors{};
@@ -143,7 +143,7 @@ class ShaderCompiler
 public:
     void Initialize();
 
-    ShaderData Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout) const;
+    ShaderData Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout, RendererAPI rendererAPI) const;
 
 private:
     ShaderData Compile(const std::string& file, const std::string& content, const std::string& entry, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout) const;

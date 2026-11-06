@@ -21,11 +21,16 @@ void SDLWindow::Create(const WindowSpecs& specs)
 	switch (specs.rendererAPI)
 	{
 	case Core::RendererAPI::Vulkan:
+	{
 		m_window = SDL_CreateWindow(m_windowName.c_str(), static_cast<int>(m_width), static_cast<int>(m_height), SDL_WINDOW_VULKAN);
 
 		Window* myWindowPtr = static_cast<Window*>(this);
 		m_windowRenderer = Core::CreateRefPtr<SDLVulkanWindowRenderer>(myWindowPtr);
 		break;
+	}
+	case Core::RendererAPI::D3D12:
+	default:
+		spdlog::error("Rendering API not supported, can't create the window");
 	}
 	
 	if (m_window == nullptr)

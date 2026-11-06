@@ -58,7 +58,10 @@ BEGIN_NAMESPACE_CORE
 
 enum class RendererAPI : uint8_t
 {
-    Vulkan = 0
+    Vulkan = 0,
+#ifdef KWINDOWS
+    D3D12,
+#endif
 };
 
 END_NAMESPACE_CORE

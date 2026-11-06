@@ -26,7 +26,7 @@ void ShaderCompiler::Initialize()
 {
     createGlobalSession(m_globalSession.writeRef());
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     constexpr uint8_t nbTargets = 2;
     slang::TargetDesc targets[nbTargets] = {};
 
@@ -50,7 +50,7 @@ void ShaderCompiler::Initialize()
     m_globalSession->createSession(desc, m_session.writeRef());
 }
 
-ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout) const
+ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout, RendererAPI rendererAPI) const
 {
     ShaderData bin{};
 
@@ -72,7 +72,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
 
     bool pathExists = std::filesystem::exists(spirvPath) && std::filesystem::exists(reflectionPath);
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     const std::string dxilPath = CacheShaderPath(hash, name, ".dxil");
     
     pathExists = pathExists && std::filesystem::exists(dxilPath);
@@ -84,15 +84,31 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
         if (CheckIsFileOpenOrValid(r, reflectionPath))
             ReadReflectionData(r, bin, isGlobalLayout, usesGlobalLayout);
 
-        std::ifstream s(spirvPath, std::ios::binary);
-        if (CheckIsFileOpenOrValid(s, spirvPath))
-            bin.spirv.assign(std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>());
-
-#if defined(_WIN32)
-        std::ifstream d(dxilPath, std::ios::binary);
-        if (CheckIsFileOpenOrValid(d, dxilPath))
-            bin.dxil.assign(std::istreambuf_iterator<char>(d), std::istreambuf_iterator<char>());
+        switch (rendererAPI)
+        {
+        case RendererAPI::Vulkan:
+        {
+            std::ifstream s(spirvPath, std::ios::binary);
+            if (CheckIsFileOpenOrValid(s, spirvPath))
+                bin.spirv.assign(std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>());
+            else
+                spdlog::error("Can't open file at path" + spirvPath);
+            break;
+        }
+#if defined (KWINDOWS)
+        case RendererAPI::D3D12:
+        {
+            std::ifstream d(dxilPath, std::ios::binary);
+            if (CheckIsFileOpenOrValid(d, dxilPath))
+                bin.dxil.assign(std::istreambuf_iterator<char>(d), std::istreambuf_iterator<char>());
+            else
+                spdlog::error("Can't open file at path" + dxilPath);
+            break;
+        }
 #endif
+        default:
+            spdlog::error("Can't load shader for incorrect API");
+        }
 
         return bin;
     }
@@ -117,7 +133,7 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     if (CheckIsFileOpenOrValid(s, spirvPath))
         s.write(reinterpret_cast<char*>(bin.spirv.data()), bin.spirv.size());
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     std::ofstream d(dxilPath, std::ios::binary);
     if (CheckIsFileOpenOrValid(d, dxilPath))
         d.write(reinterpret_cast<char*>(bin.dxil.data()), bin.dxil.size());
@@ -191,7 +207,7 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
         return {};
     }
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     constexpr int nbTargets = 2;
 #else
     constexpr int nbTargets = 1;
@@ -223,7 +239,7 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
             continue;
         }
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
         if (target == 0)
             bin.spirv.assign(data, data + size);
         else
@@ -238,7 +254,7 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
         spdlog::warn("SPIR-V compilation failed for {}", file);
     }
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     if (bin.dxil.empty())
     {
         spdlog::warn("DXIL compilation failed for {}", file);
