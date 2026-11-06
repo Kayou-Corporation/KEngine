@@ -26,7 +26,7 @@ void ShaderCompiler::Initialize()
 {
     createGlobalSession(m_globalSession.writeRef());
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     constexpr uint8_t nbTargets = 2;
     slang::TargetDesc targets[nbTargets] = {};
 
@@ -50,7 +50,7 @@ void ShaderCompiler::Initialize()
     m_globalSession->createSession(desc, m_session.writeRef());
 }
 
-ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout) const
+ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stage, bool isGlobalLayout, bool usesGlobalLayout, RendererAPI rendererAPI) const
 {
     ShaderData bin{};
 
@@ -63,36 +63,48 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
     std::string content((std::istreambuf_iterator<char>(fileContent)), std::istreambuf_iterator<char>());
 
     std::string name = GetShaderName(fullFile);
-
     const std::string entry = ShaderStageToEntry(stage);
     const std::string hash = HashFile(content, entry);
+    const std::string shaderPath = CacheShaderPath(hash, name, ".kshader");
 
-    const std::string reflectionPath = CacheShaderPath(hash, name, ".kayou");
-    const std::string spirvPath = CacheShaderPath(hash, name, ".spv");
-
-    bool pathExists = std::filesystem::exists(spirvPath) && std::filesystem::exists(reflectionPath);
-
-#if defined(_WIN32)
-    const std::string dxilPath = CacheShaderPath(hash, name, ".dxil");
-    
-    pathExists = pathExists && std::filesystem::exists(dxilPath);
-#endif
-
-    if (pathExists)
+    if (std::filesystem::exists(shaderPath))
     {
-        std::ifstream r(reflectionPath, std::ios::binary);
-        if (CheckIsFileOpenOrValid(r, reflectionPath))
-            ReadReflectionData(r, bin, isGlobalLayout, usesGlobalLayout);
+        std::ifstream sh(shaderPath, std::ios::binary);
+        if (!CheckIsFileOpenOrValid(sh, shaderPath))
+        {
+            spdlog::error("Can't open file: {}", shaderPath);
+            return {};
+        }
 
-        std::ifstream s(spirvPath, std::ios::binary);
-        if (CheckIsFileOpenOrValid(s, spirvPath))
-            bin.spirv.assign(std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>());
+        size_t reflectionSize;
+        size_t spirvSize;
+        size_t dxilSize;
+        Core::Read(sh, reflectionSize);
+        Core::Read(sh, spirvSize);
+        Core::Read(sh, dxilSize);
 
-#if defined(_WIN32)
-        std::ifstream d(dxilPath, std::ios::binary);
-        if (CheckIsFileOpenOrValid(d, dxilPath))
-            bin.dxil.assign(std::istreambuf_iterator<char>(d), std::istreambuf_iterator<char>());
+        ReadReflectionData(sh, bin, isGlobalLayout, usesGlobalLayout);
+
+        switch (rendererAPI)
+        {
+        case RendererAPI::Vulkan:
+            bin.spirv.resize(spirvSize);
+            sh.read(reinterpret_cast<char*>(bin.spirv.data()), static_cast<std::streamsize>(spirvSize));
+            break;
+#if defined (KWINDOWS)
+        case RendererAPI::D3D12:
+            if (dxilSize == SIZE_MAX || dxilSize <= 0)
+            {
+                spdlog::error("No shader generated for Direct3D: {}", name);
+                return {};
+            }
+            bin.dxil.resize(dxilSize);
+            sh.read(reinterpret_cast<char*>(bin.dxil.data()), static_cast<std::streamsize>(dxilSize));
+            break;
 #endif
+        default:
+            spdlog::error("Can't load shader for incorrect API");
+        }
 
         return bin;
     }
@@ -109,19 +121,15 @@ ShaderData ShaderCompiler::Load(const std::string& file, const ShaderStage& stag
             std::filesystem::remove(f.path());
     }
 
-    std::ofstream r(reflectionPath, std::ios::binary);
-    if (CheckIsFileOpenOrValid(r, reflectionPath))
-        WriteReflectionData(r, bin, isGlobalLayout, usesGlobalLayout);
-
-    std::ofstream s(spirvPath, std::ios::binary);
-    if (CheckIsFileOpenOrValid(s, spirvPath))
+    std::ofstream s(shaderPath, std::ios::binary);
+    if (CheckIsFileOpenOrValid(s, shaderPath))
+    {
+        WriteReflectionData(s, bin, isGlobalLayout, usesGlobalLayout);
         s.write(reinterpret_cast<char*>(bin.spirv.data()), bin.spirv.size());
-
-#if defined(_WIN32)
-    std::ofstream d(dxilPath, std::ios::binary);
-    if (CheckIsFileOpenOrValid(d, dxilPath))
-        d.write(reinterpret_cast<char*>(bin.dxil.data()), bin.dxil.size());
+#if defined(KWINDOWS)
+        s.write(reinterpret_cast<char*>(bin.dxil.data()), bin.dxil.size());
 #endif
+    }
 
     return bin;
 }
@@ -191,7 +199,7 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
         return {};
     }
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     constexpr int nbTargets = 2;
 #else
     constexpr int nbTargets = 1;
@@ -223,7 +231,7 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
             continue;
         }
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
         if (target == 0)
             bin.spirv.assign(data, data + size);
         else
@@ -238,7 +246,7 @@ ShaderData ShaderCompiler::Compile(const std::string& file, const std::string& c
         spdlog::warn("SPIR-V compilation failed for {}", file);
     }
 
-#if defined(_WIN32)
+#if defined(KWINDOWS)
     if (bin.dxil.empty())
     {
         spdlog::warn("DXIL compilation failed for {}", file);
@@ -460,6 +468,7 @@ std::vector<VertexAttributeLayout> ShaderCompiler::ReflectVertexInputs(slang::Pr
 
 void ShaderCompiler::WriteReflectionData(std::ofstream& out, const ShaderData& bin, bool isGlobalLayout, bool usesGlobalLayout) const
 {
+    WriteReflectionDataSize(out, bin);
     WriteVertexAttributes(out, bin.vertexAttributes);
     WriteVertexBindings(out, bin.vertexBindings);
 
@@ -468,6 +477,60 @@ void ShaderCompiler::WriteReflectionData(std::ofstream& out, const ShaderData& b
 
     WriteDescriptors(out, bin.descriptors);
     WritePushConstants(out, bin.pushConstants);
+}
+
+void ShaderCompiler::WriteReflectionDataSize(std::ofstream & out, const ShaderData & bin) const
+{
+    size_t totalSize = 0;
+    size_t spirvSize = bin.spirv.size();
+    size_t dxilSize = bin.dxil.size();
+
+    for (Descriptor desc : bin.descriptors)
+    {
+        totalSize += sizeof(desc.index);
+        totalSize += desc.name.size();
+        for (Binding binding : desc.bindings)
+        {
+            totalSize += sizeof(binding.index);
+            totalSize += sizeof(binding.type);
+            totalSize += sizeof(binding.shape);
+            totalSize += sizeof(binding.stage);
+            totalSize += sizeof(binding.count);
+            totalSize += binding.name.size();
+        }
+    }
+
+    for (PushConstant pc : bin.pushConstants)
+    {
+        totalSize += pc.name.size();
+        totalSize += pc.size;
+        totalSize += sizeof(pc.offset);
+        totalSize += sizeof(pc.stage);
+    }
+
+    for (VertexAttributeLayout va : bin.vertexAttributes)
+    {
+        totalSize += sizeof(va.location);
+        totalSize += sizeof(va.binding);
+        totalSize += sizeof(va.offset);
+        totalSize += sizeof(va.format);
+        totalSize += va.name.size();
+    }
+
+    for (VertexBindingLayout vb : bin.vertexBindings)
+    {
+        totalSize += sizeof(vb.binding);
+        totalSize += sizeof(vb.stride);
+        totalSize += sizeof(vb.inputRate);
+    }
+
+    Core::Write(out, totalSize);
+    Core::Write(out, spirvSize);
+#if defined (KWINDOWS)
+    Core::Write(out, dxilSize);
+#else
+    Core::Write(out, SIZE_MAX);
+#endif
 }
 
 void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Descriptor>& descriptors) const

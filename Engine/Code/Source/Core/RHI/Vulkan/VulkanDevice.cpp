@@ -485,7 +485,7 @@ ShaderHandle VulkanDevice::CreateShader(const std::string& file, const ShaderSta
 
 	shader = Core::CreateRefPtr<VulkanShader>();
 
-	ShaderData bin = m_shaderCompiler.Load(file, sStage, isGlobalLayout, usesGlobalLayout);
+	ShaderData bin = m_shaderCompiler.Load(file, sStage, isGlobalLayout, usesGlobalLayout, RendererAPI::Vulkan);
 
 	size_t size = bin.spirv.size();
 
