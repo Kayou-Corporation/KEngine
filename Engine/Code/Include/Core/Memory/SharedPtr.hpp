@@ -38,7 +38,10 @@ public:
     explicit SharedPtr(T* ptr) noexcept
     : m_ptr(ptr)
     {
-        m_controlBlock = new ControlBlock();
+        if (m_ptr)
+        {
+            m_controlBlock = new ControlBlock();
+        }
     }
 
     // Move constructor
@@ -49,7 +52,7 @@ public:
         other.m_controlBlock = nullptr;
     }
 
-    // Conversion constructor
+    // Conversion copy constructor
     template<typename U>
     requires std::convertible_to<U*, T*>
     SharedPtr(const SharedPtr<U>& other) noexcept
@@ -61,7 +64,7 @@ public:
         }
     }
 
-    // Move conversion constructor
+    // Conversion move constructor
     template<typename U>
     requires std::convertible_to<U*, T*>
     SharedPtr(SharedPtr<U>&& other) noexcept
@@ -69,17 +72,6 @@ public:
     {
         other.m_ptr = nullptr;
         other.m_controlBlock = nullptr;
-    }
-
-    // Aliasing constructor
-    template<typename Y>
-    SharedPtr(const SharedPtr<Y> &other, T *ptr) noexcept
-    : m_ptr(ptr), m_controlBlock(other.m_controlBlock)
-    {
-        if (m_controlBlock)
-        {
-            m_controlBlock->AddReference();
-        }
     }
 
     SharedPtr& operator=(SharedPtr&& other) noexcept
@@ -195,11 +187,11 @@ public:
         return 0;
     }
 
-    T* Get() {return m_ptr;}
+    T* Get() const noexcept {return m_ptr;}
 
     void Reset()
     {
-        if (m_ptr && m_controlBlock)
+        if (m_controlBlock)
         {
             bool releasePointer = m_controlBlock->ReleaseReference();
             if (releasePointer)
