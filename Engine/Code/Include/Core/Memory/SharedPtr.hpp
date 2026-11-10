@@ -82,6 +82,36 @@ public:
         }
     }
 
+    SharedPtr& operator=(SharedPtr&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Reset();
+
+            m_ptr = other.m_ptr;
+            m_controlBlock = other.m_controlBlock;
+
+            other.m_ptr = nullptr;
+            other.m_controlBlock = nullptr;
+        }
+        return *this;
+    }
+
+    template<typename U>
+    requires std::convertible_to<U*, T*>
+    SharedPtr& operator=(SharedPtr<U>&& other) noexcept
+    {
+        Reset();
+
+        m_ptr = other.m_ptr;
+        m_controlBlock = other.m_controlBlock;
+
+        other.m_ptr = nullptr;
+        other.m_controlBlock = nullptr;
+
+        return *this;
+    }
+
     // Default destructor (only) : just decrease ref count and if == 0, delete pointer
     ~SharedPtr() noexcept
     {

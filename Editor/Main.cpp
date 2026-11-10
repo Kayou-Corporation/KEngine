@@ -275,110 +275,8 @@ int main()
     //Core::Test_EdgeCases();
 
 
-    Core::KEngineSpecs engineSpecs;
-    engineSpecs.windowAPI = Window::WindowAPI::SDL;
-    //engineSpecs.windowWidth = 720;
-    //engineSpecs.windowHeight = 480;
-    //engineSpecs.windowName = "KEngine";
-    //engineSpecs.allowWindowResize = true;
-    //engineSpecs.version = Core::Version(0.f, 0.f, 1.f);
-    //engineSpecs.rendererAPI = Core::RendererAPI::Vulkan;
-    //engineSpecs.debugLayers = { Core::DebugLayers::Validation };
-    //engineSpecs.priorityQueuesThreadsCount = { {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} };
-//
-    //Core::KEngine::Init(engineSpecs);
-//
-    //// Window Reference :
-    //Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
-//
-    //// ------------ Object loading test -----------------//
-    ////Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
-    ////Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/viking_room.png", "texture");
-//
-    //AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
-    //AssetManager::KSoftAssetRef<CoreObject::Texture2D> texture = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("texture");
-//
-    //Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
-    //Core::KSharedPtr<CoreObject::Texture2D> vikingRoomTexture = texture.Get();
-//
-//
-    //// TODO : move this here
-    ////Core::KEngine::Update();
-//
-    //float aspectRatio = static_cast<float>(windowReference->GetWidth()) / static_cast<float>(windowReference->GetHeight( ));
-    //Core::EditorCamera editorCamera;
-    //editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
-    //editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
-    //editorCamera.SetFov(glm::radians(45.f));
-    //editorCamera.SetAspectRatio(aspectRatio);
-    //editorCamera.SetNearPlane(0.1f);
-    //editorCamera.SetFarPlane(100.0f);
-    //editorCamera.RecalculateMatrices();
-    ////glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);
-    ////glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    ////glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
-    ////glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);
-//
-    //float fov = glm::radians(45.f);
-    //float nearPlane = 0.1f;
-    //float farPlane = 100.0f;
-    //glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
-    //proj[1][1] *= -1;
-    //CameraData initCam;
-    //initCam.cameraVP = editorCamera.GetViewProjectionMatrix();
-    //initCam.cameraPos = editorCamera.GetPosition();
-//
-    //glm::mat4 model = glm::mat4(1.0f);
-    //model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-    //model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
-    //model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
-    //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-//
-    //glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-//
-    //Model mdl;
-    //mdl.model = glm::transpose(model);
-    //mdl.normal = normalMatrix;
-//
-    //Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
-    //Core::SurfaceHandle surface = Core::KEngine::Get().GetWindowSurface();
-//
-    //Core::SwapchainSpecs sSpecs;
-    //sSpecs.surface = surface;
-    //sSpecs.extent = Core::Extent2D(windowReference->GetWidth(), windowReference->GetHeight());
-    //sSpecs.imageCount = 2;
-    //sSpecs.presentMode = Core::PresentMode::Mailbox;
-    //sSpecs.imageFormat = Core::Format::BGRA8_SRGB;
-    //sSpecs.isDepthEnable = true;
-    //sSpecs.depthImageFormat = Core::Format::D32_SFLOAT;
-    //Core::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);
-//
-    //// Mesh :
-    //Core::BufferHandle vertexBuffer = vikingRoomMesh->GetVertexBuffer();
-    //Core::BufferHandle indexBuffer = vikingRoomMesh->GetIndexBuffer();
-//
-    //// Base Texture
-    //Core::ImageHandle textureImage = vikingRoomTexture->GetImage();
-//
-    //// Base Sampler
-    //Core::SamplerSpecs samplerSpecs;
-    //samplerSpecs.magFilter = Core::Filter::Linear;
-    //samplerSpecs.minFilter = Core::Filter::Linear;
-    //samplerSpecs.mipmapMode = Core::SamplerMipmapMode::Linear;
-    //samplerSpecs.addressU = Core::SamplerAddressMode::Repeat;
-    //samplerSpecs.addressV = Core::SamplerAddressMode::Repeat;
-    //samplerSpecs.addressW = Core::SamplerAddressMode::Repeat;
-    //samplerSpecs.mipLodBias = 0.0f;
-    //samplerSpecs.anisotropyEnable = false;
-    //samplerSpecs.maxAnisotropy = 1.0f;
-    //samplerSpecs.compareEnable = false;
-    //samplerSpecs.compareOp = Core::CompareOp::Always;
-    //samplerSpecs.minLod = 0.0f;
-    //samplerSpecs.maxLod = 0.0f;
-    //samplerSpecs.borderColor = Core::BorderColor::IntOpaqueBlack;
-    //samplerSpecs.unnormalizedCoordinates = false;
-//
-    //Core::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
+    //Core::KEngineSpecs engineSpecs;
+    //engineSpecs.windowAPI = Window::WindowAPI::SDL;engineSpecs.windowWidth = 720;engineSpecs.windowHeight = 480;engineSpecs.windowName = "KEngine";engineSpecs.allowWindowResize = true;engineSpecs.version = Core::Version(0.f, 0.f, 1.f);engineSpecs.rendererAPI = Core::RendererAPI::Vulkan;engineSpecs.debugLayers = { Core::DebugLayers::Validation };engineSpecs.priorityQueuesThreadsCount = { {ENGINE_QUEUE_ASSET, 2}, {ENGINE_QUEUE_PHYSICS, 1} };Core::KEngine::Init(engineSpecs);// Window Reference :Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();// ------------ Object loading test -----------------////Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");//Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/viking_room.png", "texture");AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");AssetManager::KSoftAssetRef<CoreObject::Texture2D> texture = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("texture");Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();Core::KSharedPtr<CoreObject::Texture2D> vikingRoomTexture = texture.Get();// TODO : move this here//Core::KEngine::Update();float aspectRatio = static_cast<float>(windowReference->GetWidth()) / static_cast<float>(windowReference->GetHeight( ));Core::EditorCamera editorCamera;editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));editorCamera.SetRotation(glm::vec3(0, 0, 0.f));editorCamera.SetFov(glm::radians(45.f));editorCamera.SetAspectRatio(aspectRatio);editorCamera.SetNearPlane(0.1f);editorCamera.SetFarPlane(100.0f);editorCamera.RecalculateMatrices();//glm::vec3 cameraPos = glm::vec3(0, 0, 5.0f);//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);//glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);//glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, upVector);float fov = glm::radians(45.f);float nearPlane = 0.1f;float farPlane = 100.0f;glm::mat4 proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);proj[1][1] *= -1;CameraData initCam;initCam.cameraVP = editorCamera.GetViewProjectionMatrix();initCam.cameraPos = editorCamera.GetPosition();glm::mat4 model = glm::mat4(1.0f);model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));Model mdl;mdl.model = glm::transpose(model);mdl.normal = normalMatrix;Core::DeviceHandle device = Core::KEngine::Get().GetDevice();Core::SurfaceHandle surface = Core::KEngine::Get().GetWindowSurface();Core::SwapchainSpecs sSpecs;sSpecs.surface = surface;sSpecs.extent = Core::Extent2D(windowReference->GetWidth(), windowReference->GetHeight());sSpecs.imageCount = 2;sSpecs.presentMode = Core::PresentMode::Mailbox;sSpecs.imageFormat = Core::Format::BGRA8_SRGB;sSpecs.isDepthEnable = true;sSpecs.depthImageFormat = Core::Format::D32_SFLOAT;Core::SwapchainHandle swapchain = device->CreateSwapchain(sSpecs);// Mesh :Core::BufferHandle vertexBuffer = vikingRoomMesh->GetVertexBuffer();Core::BufferHandle indexBuffer = vikingRoomMesh->GetIndexBuffer();// Base TextureCore::ImageHandle textureImage = vikingRoomTexture->GetImage();// Base SamplerCore::SamplerSpecs samplerSpecs;samplerSpecs.magFilter = Core::Filter::Linear;samplerSpecs.minFilter = Core::Filter::Linear;samplerSpecs.mipmapMode = Core::SamplerMipmapMode::Linear;samplerSpecs.addressU = Core::SamplerAddressMode::Repeat;samplerSpecs.addressV = Core::SamplerAddressMode::Repeat;samplerSpecs.addressW = Core::SamplerAddressMode::Repeat;samplerSpecs.mipLodBias = 0.0f;samplerSpecs.anisotropyEnable = false;samplerSpecs.maxAnisotropy = 1.0f;samplerSpecs.compareEnable = false;samplerSpecs.compareOp = Core::CompareOp::Always;samplerSpecs.minLod = 0.0f;samplerSpecs.maxLod = 0.0f;samplerSpecs.borderColor = Core::BorderColor::IntOpaqueBlack;samplerSpecs.unnormalizedCoordinates = false;Core::SamplerHandle sampler = device->CreateSampler(samplerSpecs);
 //
     //// Uniform buffer camera
     //Core::BufferSpecs uniformCameraSpecs{};
@@ -391,7 +289,7 @@ int main()
     //Core::BufferHandle uniformCamera = device->CreateBuffer(uniformCameraSpecs);
 //
 //
-    //// Uniform buffer modelMatrix
+    // Uniform buffer modelMatrix
     //Core::BufferSpecs uniformModelSpecs{};
     //uniformModelSpecs.primaryUsage = Core::BufferUsage::Uniform;
     //uniformModelSpecs.size = sizeof(Model);
