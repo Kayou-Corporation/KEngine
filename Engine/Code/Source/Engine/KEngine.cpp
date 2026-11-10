@@ -8,7 +8,7 @@ void KEngine::Init(const KEngineSpecs& specs)
 {
     if (!m_instance)
     {
-        m_instance = Core::CreateUniquePtr<KEngine>(specs);
+        m_instance = Core::MakeUnique<KEngine>(specs);
     }
     else
     {

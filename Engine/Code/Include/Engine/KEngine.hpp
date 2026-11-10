@@ -10,6 +10,7 @@
 #include "RHI/API/Surface.hpp"
 
 #include "ThreadPool.hpp"
+#include "Memory/UniquePtr.hpp"
 
 #include "RHI/API/Instance.hpp"
 #include "RHI/API/Device.hpp"
@@ -37,11 +38,11 @@ struct KEngineSpecs
     std::vector<DebugLayers> debugLayers;
 };
 
-class KEngine : public virtual Core::IResource
+class KEngine
 {
 public:
     explicit KEngine(const KEngineSpecs& specs);
-    virtual ~KEngine();
+    ~KEngine();
 
     // TO BE USED ONLY 1 TIME
     static void Init(const KEngineSpecs& specs);
@@ -114,7 +115,7 @@ protected:
 
 
     // Self reference for singleton
-    inline static KUniquePtr<KEngine> m_instance{nullptr};
+    inline static UniquePtr<KEngine> m_instance{nullptr};
 
 private:
     void CleanInternal();

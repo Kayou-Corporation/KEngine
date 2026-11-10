@@ -34,7 +34,6 @@ public:
     }
 
     // Constructor from a raw pointer
-    // Remark : Do I really want to allow user to create a shared_ptr from a raw pointer ?
     explicit SharedPtr(T* ptr) noexcept
     : m_ptr(ptr)
     {
@@ -208,5 +207,11 @@ private:
     T* m_ptr;
     ControlBlock* m_controlBlock;
 };
+
+template<typename T, typename... Args>
+SharedPtr<T> MakeShared(Args&&... args)
+{
+    return SharedPtr<T>(new T(std::forward<Args>(args)...));
+}
 
 END_NAMESPACE_CORE
