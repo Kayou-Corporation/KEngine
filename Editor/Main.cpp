@@ -256,6 +256,8 @@ int main()
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
 
+    Core::ShaderHandle testComp = device->CreateShader("test.comp", Core::ShaderStage::Compute, false, false);
+
     Core::ShaderHandle baseVert = device->CreateShader("base.vert", Core::ShaderStage::Vertex, false, true);
     Core::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Core::ShaderStage::Fragment, false, true);
     Core::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", Core::ShaderStage::Vertex, true, true);

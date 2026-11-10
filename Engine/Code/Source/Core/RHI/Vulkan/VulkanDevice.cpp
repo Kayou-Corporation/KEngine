@@ -1019,19 +1019,21 @@ GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipeli
 	RHIVulkanPipeline->SetType(PipelineType::Graphics);
 
 	VulkanGraphicsPipelineStructs RHIVulkanGraphicsPipelineCreateInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
-	vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanGraphicsCreateInfo(RHIVulkanGraphicsPipelineCreateInfo);
-	vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+	const vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanGraphicsCreateInfo(RHIVulkanGraphicsPipelineCreateInfo);
+	const vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
 	RHIVulkanPipeline->SetHandle(pipeline);
 
 	return RHIVulkanPipeline;
 }
 
-ComputePipelineHandle VulkanDevice::CreateGraphicsPipeline(const ComputePipelineSpecs& specs)
+ComputePipelineHandle VulkanDevice::CreateGraphicsPipeline(const ComputePipelineSpecs& RHISpecs)
 {
-	(void)specs;
 	Core::KSharedPtr<VulkanComputePipeline> RHIVulkanPipeline = Core::CreateRefPtr<VulkanComputePipeline>();
-	vk::ComputePipelineCreateInfo createInfo = {};
-	vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+	RHIVulkanPipeline->SetLayout(RHISpecs.pipelineLayout);
+	RHIVulkanPipeline->SetType(PipelineType::Compute);
+
+	const vk::ComputePipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanComputeCreateInfo(RHISpecs);
+	const vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create compute pipeline");
 	RHIVulkanPipeline->SetHandle(pipeline);
 
 	return RHIVulkanPipeline;

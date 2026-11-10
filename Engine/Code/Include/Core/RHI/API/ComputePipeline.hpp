@@ -7,8 +7,7 @@ BEGIN_NAMESPACE_CORE
 
 struct ComputePipelineSpecs
 {
-    std::vector<ShaderHandle> shaders{};
-
+    ShaderHandle shader;
     PipelineLayoutHandle pipelineLayout;
 };
 
