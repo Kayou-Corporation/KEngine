@@ -468,5 +468,12 @@ int main()
     Core::KEngine::Clean();
     Core::KEngine::Shutdown();
 
+#ifdef KDEBUG
+    do
+    {
+        std::cout << '\n' << "Press enter to continue...";
+    } while (std::cin.get() != '\n');
+#endif
+
     return 0;
 }
