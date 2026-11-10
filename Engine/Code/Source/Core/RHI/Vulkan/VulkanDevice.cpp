@@ -19,6 +19,8 @@
 #include <string>
 #include <spdlog/spdlog.h>
 
+#include "RHI/Vulkan/VulkanComputePipeline.hpp"
+
 // TODO : Maybe do more cleanup (Review extension system and constant validation for format usage)
 
 DISABLE_WARNINGS
@@ -1024,18 +1026,31 @@ GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipeli
 	return RHIVulkanPipeline;
 }
 
+ComputePipelineHandle VulkanDevice::CreateGraphicsPipeline(const ComputePipelineSpecs& specs)
+{
+	(void)specs;
+	Core::KSharedPtr<VulkanComputePipeline> RHIVulkanPipeline = Core::CreateRefPtr<VulkanComputePipeline>();
+	vk::ComputePipelineCreateInfo createInfo = {};
+	vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+	RHIVulkanPipeline->SetHandle(pipeline);
+
+	return RHIVulkanPipeline;
+}
+
 void VulkanDevice::DestroyPipeline(PipelineHandle RHIPipeline)
 {
+	vk::Pipeline pipeline;
 	if (RHIPipeline->GetType() == PipelineType::Graphics)
 	{
 		Core::KSharedPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>();
-		vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();
-		m_handle.destroyPipeline(pipeline);
+		pipeline = RHIVulkanPipeline->GetHandle();
 	}
 	else
 	{
-
+		Core::KSharedPtr<VulkanComputePipeline> RHIVulkanPipeline = RHIPipeline.CastAs<VulkanComputePipeline>();
+		pipeline = RHIVulkanPipeline->GetHandle();
 	}
+	m_handle.destroyPipeline(pipeline);
 }
 
 void VulkanDevice::UpdateCompatibility(SurfaceHandle RHISurface)
