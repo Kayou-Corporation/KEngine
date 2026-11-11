@@ -8,30 +8,30 @@
 BEGIN_NAMESPACE_CORE
 
 template<typename T>
-class SharedPtr
+class KSharedPtr
 {
-    template<typename U> friend class SharedPtr;
+    template<typename U> friend class KSharedPtr;
 
     template<typename Target, typename Source>
-    friend SharedPtr<Target> StaticCast(const SharedPtr<Source>& other) noexcept;
+    friend KSharedPtr<Target> StaticCast(const KSharedPtr<Source>& other) noexcept;
 
     template<typename Target, typename Source>
-    friend SharedPtr<Target> DynamicCast(const SharedPtr<Source>& other) noexcept;
+    friend KSharedPtr<Target> DynamicCast(const KSharedPtr<Source>& other) noexcept;
 
 
 public:
     // Default constructor : just create with a nullptr pointer, it's user responsability
     // Remark : Do I really want to allow user to create a shared_ptr from nothing ?
-    constexpr SharedPtr() noexcept
+    constexpr KSharedPtr() noexcept
     : m_ptr(nullptr), m_controlBlock(nullptr) {}
 
     // Null constructor : just create with a nullptr pointer, it's user responsability
     // Remark : Do I really want to allow user to create a shared_ptr from nothing ?
-    constexpr SharedPtr(std::nullptr_t) noexcept
+    constexpr KSharedPtr(std::nullptr_t) noexcept
     : m_ptr(nullptr), m_controlBlock(nullptr) {}
 
     // Copy constructor
-    SharedPtr(const SharedPtr& other) noexcept
+    KSharedPtr(const KSharedPtr& other) noexcept
     : m_ptr(other.m_ptr), m_controlBlock(other.m_controlBlock)
     {
         if (m_controlBlock)
@@ -41,7 +41,7 @@ public:
     }
 
     // Constructor from a raw pointer
-    explicit SharedPtr(T* ptr) noexcept
+    explicit KSharedPtr(T* ptr) noexcept
     : m_ptr(ptr)
     {
         if (m_ptr)
@@ -51,7 +51,7 @@ public:
     }
 
     // Move constructor
-    SharedPtr(SharedPtr&& other) noexcept
+    KSharedPtr(KSharedPtr&& other) noexcept
     : m_ptr(other.m_ptr), m_controlBlock(other.m_controlBlock)
     {
         other.m_ptr = nullptr;
@@ -61,7 +61,7 @@ public:
     // Conversion copy constructor
     template<typename U>
     requires std::convertible_to<U*, T*>
-    SharedPtr(const SharedPtr<U>& other) noexcept
+    KSharedPtr(const KSharedPtr<U>& other) noexcept
     : m_ptr(other.m_ptr),m_controlBlock(other.m_controlBlock)
     {
         if (m_controlBlock)
@@ -73,14 +73,14 @@ public:
     // Conversion move constructor
     template<typename U>
     requires std::convertible_to<U*, T*>
-    SharedPtr(SharedPtr<U>&& other) noexcept
+    KSharedPtr(KSharedPtr<U>&& other) noexcept
     : m_ptr(other.m_ptr), m_controlBlock(other.m_controlBlock)
     {
         other.m_ptr = nullptr;
         other.m_controlBlock = nullptr;
     }
 
-    SharedPtr& operator=(SharedPtr&& other) noexcept
+    KSharedPtr& operator=(KSharedPtr&& other) noexcept
     {
         if (this != &other)
         {
@@ -97,7 +97,7 @@ public:
 
     template<typename U>
     requires std::convertible_to<U*, T*>
-    SharedPtr& operator=(SharedPtr<U>&& other) noexcept
+    KSharedPtr& operator=(KSharedPtr<U>&& other) noexcept
     {
         Reset();
 
@@ -111,7 +111,7 @@ public:
     }
 
     // Default destructor (only) : just decrease ref count and if == 0, delete pointer
-    ~SharedPtr() noexcept
+    ~KSharedPtr() noexcept
     {
        Reset();
     }
@@ -126,13 +126,13 @@ public:
         return m_ptr != nullptr;
     }
 
-    SharedPtr& operator=(std::nullptr_t) noexcept
+    KSharedPtr& operator=(std::nullptr_t) noexcept
     {
         Reset();
         return *this;
     }
 
-    SharedPtr& operator=(const SharedPtr& other) noexcept
+    KSharedPtr& operator=(const KSharedPtr& other) noexcept
     {
         if (this != &other)
         {
@@ -149,7 +149,7 @@ public:
 
     template<typename U>
     requires std::convertible_to<U*, T*>
-    SharedPtr& operator=(const SharedPtr<U>& other) noexcept
+    KSharedPtr& operator=(const KSharedPtr<U>& other) noexcept
     {
         Reset();
         m_ptr = other.m_ptr;
@@ -162,13 +162,13 @@ public:
     }
 
     template<typename U>
-    bool operator==(const SharedPtr<U>& other) const noexcept
+    bool operator==(const KSharedPtr<U>& other) const noexcept
     {
         return m_ptr == other.Get();
     }
 
     template<typename U>
-    bool operator!=(const SharedPtr<U>& other) const noexcept
+    bool operator!=(const KSharedPtr<U>& other) const noexcept
     {
         return m_ptr != other.Get();
     }
@@ -211,7 +211,7 @@ public:
     }
 
 private:
-    SharedPtr(T* ptr, ControlBlock* block) noexcept
+    KSharedPtr(T* ptr, ControlBlock* block) noexcept
         : m_ptr(ptr)
         , m_controlBlock(block)
     {
@@ -226,31 +226,31 @@ private:
 };
 
 template<typename T, typename... Args>
-SharedPtr<T> MakeShared(Args&&... args)
+KSharedPtr<T> MakeShared(Args&&... args)
 {
-    return SharedPtr<T>(new T(std::forward<Args>(args)...));
+    return KSharedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 template<typename T, typename U>
-SharedPtr<T> StaticCast(const SharedPtr<U>& other) noexcept
+KSharedPtr<T> StaticCast(const KSharedPtr<U>& other) noexcept
 {
-    if (!other) return SharedPtr<T>();
+    if (!other) return KSharedPtr<T>();
 
     T* castedPtr = static_cast<T*>(other.Get());
-    return SharedPtr<T>(castedPtr, other.m_controlBlock);
+    return KSharedPtr<T>(castedPtr, other.m_controlBlock);
 }
 
 template<typename T, typename U>
-SharedPtr<T> DynamicCast(const SharedPtr<U>& other) noexcept
+KSharedPtr<T> DynamicCast(const KSharedPtr<U>& other) noexcept
 {
-    if (!other) return SharedPtr<T>();
+    if (!other) return KSharedPtr<T>();
 
     if (T* castedPtr = dynamic_cast<T*>(other.Get()))
     {
-        return SharedPtr<T>(castedPtr, other.m_controlBlock);
+        return KSharedPtr<T>(castedPtr, other.m_controlBlock);
     }
 
-    return SharedPtr<T>();
+    return KSharedPtr<T>();
 }
 
 END_NAMESPACE_CORE

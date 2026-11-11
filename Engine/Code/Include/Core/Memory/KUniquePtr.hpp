@@ -6,27 +6,27 @@
 BEGIN_NAMESPACE_CORE
 
 template<typename T>
-class UniquePtr
+class KUniquePtr
 {
-    template<typename U> friend class UniquePtr;
+    template<typename U> friend class KUniquePtr;
 
 public:
     // Default constructor : just create with a nullptr pointer, it's user responsability
     // Remark : Do I really want to allow user to create a shared_ptr from nothing ?
-    constexpr UniquePtr() noexcept
+    constexpr KUniquePtr() noexcept
     : m_ptr(nullptr) {}
 
     // Null constructor : just create with a nullptr pointer, it's user responsability
     // Remark : Do I really want to allow user to create a shared_ptr from nothing ?
-    constexpr UniquePtr(std::nullptr_t) noexcept
+    constexpr KUniquePtr(std::nullptr_t) noexcept
     : m_ptr(nullptr) {}
 
     // Constructor from a raw pointer
-    explicit UniquePtr(T* ptr) noexcept
+    explicit KUniquePtr(T* ptr) noexcept
     : m_ptr(ptr) {}
 
     // Move constructor
-    UniquePtr(UniquePtr&& other) noexcept
+    KUniquePtr(KUniquePtr&& other) noexcept
     : m_ptr(other.m_ptr)
     {
         other.m_ptr = nullptr;
@@ -35,14 +35,14 @@ public:
     // Conversion move constructor
     template<typename U>
     requires std::convertible_to<U*, T*>
-    UniquePtr(UniquePtr<U>&& other) noexcept
+    KUniquePtr(KUniquePtr<U>&& other) noexcept
     : m_ptr(other.m_ptr)
     {
         other.m_ptr = nullptr;
     }
 
     // Move Assignment cosntructor
-    UniquePtr& operator=(UniquePtr&& other) noexcept
+    KUniquePtr& operator=(KUniquePtr&& other) noexcept
     {
         if (this != &other)
         {
@@ -55,7 +55,7 @@ public:
 
     template<typename U>
     requires std::convertible_to<U*, T*>
-    UniquePtr& operator=(UniquePtr<U>&& other) noexcept
+    KUniquePtr& operator=(KUniquePtr<U>&& other) noexcept
     {
         if (static_cast<const void*>(this) != static_cast<const void*>(&other))
         {
@@ -66,22 +66,22 @@ public:
         return *this;
     }
 
-    UniquePtr& operator=(std::nullptr_t) noexcept
+    KUniquePtr& operator=(std::nullptr_t) noexcept
     {
         Reset();
         return *this;
     }
 
     // No copy constructor for unique ptr
-    UniquePtr(const UniquePtr&) = delete;
-    UniquePtr& operator=(const UniquePtr&) = delete;
+    KUniquePtr(const KUniquePtr&) = delete;
+    KUniquePtr& operator=(const KUniquePtr&) = delete;
     template<typename U>
-    UniquePtr(const UniquePtr<U>&) = delete;
+    KUniquePtr(const KUniquePtr<U>&) = delete;
     template<typename U>
-    UniquePtr& operator=(const UniquePtr<U>&) = delete;
+    KUniquePtr& operator=(const KUniquePtr<U>&) = delete;
 
     // Default destructor (only) : just delete pointer
-    ~UniquePtr()
+    ~KUniquePtr()
     {
         Reset();
     }
@@ -114,9 +114,9 @@ private:
 };
 
 template<typename T, typename... Args>
-UniquePtr<T> MakeUnique(Args&&... args)
+KUniquePtr<T> MakeUnique(Args&&... args)
 {
-    return UniquePtr<T>(new T(std::forward<Args>(args)...));
+    return KUniquePtr<T>(new T(std::forward<Args>(args)...));
 }
 
 

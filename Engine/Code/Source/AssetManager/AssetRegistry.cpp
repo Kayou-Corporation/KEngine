@@ -63,7 +63,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         }
     }
 
-    Core::SharedPtr<Asset> AssetRegistry::CreateAssetInstance(AssetType type, const std::string &name, uint32_t id)
+    Core::KSharedPtr<Asset> AssetRegistry::CreateAssetInstance(AssetType type, const std::string &name, uint32_t id)
     {
         switch (type)
         {
@@ -157,7 +157,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         }
 
         // Create Asset in memory :
-        Core::SharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(usedAssetType, usedName, m_lastAssetId);
+        Core::KSharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(usedAssetType, usedName, m_lastAssetId);
 
         if (m_freeIndex.empty())
         {
@@ -182,7 +182,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         std::ifstream asset(assetPath, std::ios::binary);
         AssetHeader header = InternalAssetSerializer::ReadAssetHeader(asset);
 
-        Core::SharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(header.type, header.name, header.id);
+        Core::KSharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(header.type, header.name, header.id);
 
         if (m_freeIndex.empty())
         {
@@ -314,7 +314,7 @@ bool AssetRegistry::LoadAsset(uint32_t id)
         return false;
     }
 
-    Core::SharedPtr<Asset> asset = m_assets[it->second];
+    Core::KSharedPtr<Asset> asset = m_assets[it->second];
     if (!asset || asset->IsLoaded())
     {
         return true;
@@ -344,7 +344,7 @@ void AssetRegistry::UnloadAsset(uint32_t id)
     auto it = m_assetsById.find(id);
     if (it == m_assetsById.end()) return;
 
-    Core::SharedPtr<Asset>& asset = m_assets[it->second];
+    Core::KSharedPtr<Asset>& asset = m_assets[it->second];
     if (asset && asset->IsLoaded())
     {
         asset->UnLoad();

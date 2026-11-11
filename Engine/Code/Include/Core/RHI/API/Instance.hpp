@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "Memory/SharedPtr.hpp"
+#include "Memory/KSharedPtr.hpp"
 #include "RHI/API/RHI.hpp"
 
 namespace Kayou::Window
@@ -15,7 +15,7 @@ BEGIN_NAMESPACE_CORE
 
 struct InstanceSpecs
 {
-	SharedPtr<Window::Window> window; // To get window specific extensions required.
+	KSharedPtr<Window::Window> window; // To get window specific extensions required.
 
 	Version appVersion;
 	Version engineVersion;

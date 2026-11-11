@@ -9,7 +9,7 @@
 #include "RHI/API/Surface.hpp"
 
 #include "ThreadPool.hpp"
-#include "Memory/UniquePtr.hpp"
+#include "Memory/KUniquePtr.hpp"
 
 #include "RHI/API/Instance.hpp"
 #include "RHI/API/Device.hpp"
@@ -73,7 +73,7 @@ public:
         return m_assetRegistry->GetAsset<AssetDerived>(name);
     }
 
-    Core::SharedPtr<Window::Window> GetWindow() const
+    Core::KSharedPtr<Window::Window> GetWindow() const
     {
         return m_window;
     }
@@ -97,7 +97,7 @@ public:
 
 protected:
     // Window :
-    Core::SharedPtr<Window::Window> m_window;
+    Core::KSharedPtr<Window::Window> m_window;
     SurfaceHandle m_windowSurface;
 
     // RHI :
@@ -110,11 +110,11 @@ protected:
     int m_minimumThreads = 2;
 
     // Assets
-    UniquePtr<AssetManager::AssetRegistry> m_assetRegistry;
+    KUniquePtr<AssetManager::AssetRegistry> m_assetRegistry;
 
 
     // Self reference for singleton
-    inline static UniquePtr<KEngine> m_instance{nullptr};
+    inline static KUniquePtr<KEngine> m_instance{nullptr};
 
 private:
     void CleanInternal();

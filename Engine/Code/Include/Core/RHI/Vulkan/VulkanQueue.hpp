@@ -48,7 +48,7 @@ public:
 	VmaAllocation allocation;
 	VmaAllocationInfo allocationInfo;
 };
-typedef Core::SharedPtr<TrackedStagingBuffer> TrackedStagingBufferPtr;
+typedef Core::KSharedPtr<TrackedStagingBuffer> TrackedStagingBufferPtr;
 
 class TrackedCommandBuffer
 {
@@ -64,7 +64,7 @@ public:
 	std::vector<TrackedStagingBufferPtr> trackedStagingBuffers;
 	VmaAllocator memoryAllocator;
 };
-typedef Core::SharedPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
+typedef Core::KSharedPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
 
 struct Queue
 {

@@ -5,7 +5,7 @@
 #include "Export.hpp"
 #include "Asset.hpp"
 #include "SoftAssetReference.hpp"
-#include "Memory/SharedPtr.hpp"
+#include "Memory/KSharedPtr.hpp"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -70,7 +70,7 @@ public:
     KAPI void UnloadAll();
 
     template<typename AssetDerived>
-    KAPI Core::SharedPtr<AssetDerived> GetAssetHard(uint32_t id)
+    KAPI Core::KSharedPtr<AssetDerived> GetAssetHard(uint32_t id)
     {
         auto it = m_assetsById.find(id);
         if (it == m_assetsById.end())
@@ -80,7 +80,7 @@ public:
         }
 
         uint32_t index = it->second;
-        Core::SharedPtr<Asset> asset = m_assets[index];
+        Core::KSharedPtr<Asset> asset = m_assets[index];
 
         if (!asset)
         {
@@ -100,7 +100,7 @@ public:
     }
 
     template<typename AssetDerived>
-    KAPI Core::SharedPtr<AssetDerived> GetAssetHard(const std::string& name)
+    KAPI Core::KSharedPtr<AssetDerived> GetAssetHard(const std::string& name)
     {
         auto it = m_assetsByName.find(name);
         if (it == m_assetsByName.end())
@@ -110,7 +110,7 @@ public:
         }
 
         uint32_t index = it->second;
-        Core::SharedPtr<Asset>& asset = m_assets[index];
+        Core::KSharedPtr<Asset>& asset = m_assets[index];
 
         if (!asset) return nullptr;
 
@@ -157,7 +157,7 @@ public:
     void RunGarbageCollector();
 
 private:
-    Core::SharedPtr<Asset> CreateAssetInstance(AssetType type, const std::string& name, uint32_t id);
+    Core::KSharedPtr<Asset> CreateAssetInstance(AssetType type, const std::string& name, uint32_t id);
     inline std::string CacheAssetPath(const std::string& name, const char* ext);
 
     // High level functions, to be executed on initalization
@@ -169,7 +169,7 @@ private:
     std::string m_folderPath;
     uint32_t m_lastAssetId = 0;
 
-    std::vector<Core::SharedPtr<Asset>> m_assets;
+    std::vector<Core::KSharedPtr<Asset>> m_assets;
     std::unordered_map<uint32_t, uint32_t> m_assetsById;
     std::vector<uint32_t> m_freeIndex;
 
@@ -177,20 +177,20 @@ private:
 };
 
 template<typename T>
-Core::SharedPtr<T> KSoftAssetRef<T>::Get() const
+Core::KSharedPtr<T> KSoftAssetRef<T>::Get() const
 {
     if (!IsValid())
     {
         spdlog::error("SoftAssetRef::Get: Invalid SoftAssetRef.");
-        return Core::SharedPtr<T>(nullptr);
+        return Core::KSharedPtr<T>(nullptr);
     }
 
-    Core::SharedPtr<T> shared = m_registry->GetAssetHard<T>(m_id);
+    Core::KSharedPtr<T> shared = m_registry->GetAssetHard<T>(m_id);
 
     if (shared.Get() == nullptr)
     {
         spdlog::error("SoftAssetRef::Get: Asset with ID {} not found.", m_id);
-        return Core::SharedPtr<T>(nullptr);
+        return Core::KSharedPtr<T>(nullptr);
     }
 
     return shared;

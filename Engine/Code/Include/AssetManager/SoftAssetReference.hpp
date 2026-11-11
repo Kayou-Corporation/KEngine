@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "AssetManagerModule.hpp"
-#include "Memory/SharedPtr.hpp"
+#include "Memory/KSharedPtr.hpp"
 
 
 BEGIN_NAMESPACE_ASSETMANAGER
@@ -22,7 +22,7 @@ public:
     }
 
     // Automaticely load if unloaded
-    Core::SharedPtr<T> Get() const;
+    Core::KSharedPtr<T> Get() const;
 
     // TODO : Add load async
 

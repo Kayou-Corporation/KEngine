@@ -43,7 +43,7 @@ VulkanDevice::VulkanDevice()
 //----------- Queue / Command --------------//
 CommandListHandle VulkanDevice::GetCommandList(QueueType RHIQueueType)
 {
-	Core::SharedPtr<VulkanCommandList> RHIVulkanCommandList = Core::MakeShared<VulkanCommandList>();
+	Core::KSharedPtr<VulkanCommandList> RHIVulkanCommandList = Core::MakeShared<VulkanCommandList>();
 
 	if (m_queues.find(RHIQueueType) != m_queues.end())
 	{
@@ -61,7 +61,7 @@ CommandListHandle VulkanDevice::GetCommandList(QueueType RHIQueueType)
 
 void VulkanDevice::SubmitCommandList(CommandListHandle RHICommandList, const SubmitInfo& RHISubmitInfo)
 {
-	Core::SharedPtr<VulkanCommandList> RHIVulkanCommandList = StaticCast<VulkanCommandList>(RHICommandList);
+	Core::KSharedPtr<VulkanCommandList> RHIVulkanCommandList = StaticCast<VulkanCommandList>(RHICommandList);
 	
 	TrackedCommandBufferPtr commandBuffer = RHIVulkanCommandList->GetHandle();
 	QueueType RHICommandBufferQueue = RHIVulkanCommandList->GetOwnerQueueType();
@@ -69,7 +69,7 @@ void VulkanDevice::SubmitCommandList(CommandListHandle RHICommandList, const Sub
 	std::vector<vk::Semaphore> signalSemaphores;
 	for (uint32_t i = 0; i < RHISubmitInfo.signalSemaphores.size(); ++i)
 	{
-		Core::SharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISubmitInfo.signalSemaphores[i]);
+		Core::KSharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISubmitInfo.signalSemaphores[i]);
 
 		vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
 
@@ -80,7 +80,7 @@ void VulkanDevice::SubmitCommandList(CommandListHandle RHICommandList, const Sub
 	std::vector<vk::Semaphore> waitSemaphores;
 	for (uint32_t i = 0; i < RHISubmitInfo.waitSemaphores.size(); ++i)
 	{
-		Core::SharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISubmitInfo.waitSemaphores[i]);
+		Core::KSharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISubmitInfo.waitSemaphores[i]);
 
 		vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
 
@@ -114,7 +114,7 @@ void VulkanDevice::RunGarbageCollector()
 //----------- Syncronisation --------------// 
 SemaphoreHandle VulkanDevice::CreateSemaphore(const SemaphoreSpecs& RHISpecs)
 {
-	Core::SharedPtr<VulkanSemaphore> RHIVulkanSemaphore = Core::MakeShared<VulkanSemaphore>();
+	Core::KSharedPtr<VulkanSemaphore> RHIVulkanSemaphore = Core::MakeShared<VulkanSemaphore>();
 
 	vk::SemaphoreCreateInfo createInfo{};
 	vk::SemaphoreTypeCreateInfo typeInfo{};
@@ -135,7 +135,7 @@ SemaphoreHandle VulkanDevice::CreateSemaphore(const SemaphoreSpecs& RHISpecs)
 
 void VulkanDevice::DestroySemaphore(SemaphoreHandle RHISemaphore)
 {
-	Core::SharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISemaphore);
+	Core::KSharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISemaphore);
 
 	vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandleRef();
 
@@ -144,7 +144,7 @@ void VulkanDevice::DestroySemaphore(SemaphoreHandle RHISemaphore)
 
 void VulkanDevice::WaitForSemaphore(SemaphoreHandle RHISemaphore, uint64_t waitValue)
 {
-	Core::SharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISemaphore);
+	Core::KSharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISemaphore);
 
 	vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
 
@@ -159,7 +159,7 @@ void VulkanDevice::WaitForSemaphore(SemaphoreHandle RHISemaphore, uint64_t waitV
 
 FenceHandle VulkanDevice::CreateFence()
 {
-	Core::SharedPtr<VulkanFence> RHIVulkanFence = Core::MakeShared<VulkanFence>();
+	Core::KSharedPtr<VulkanFence> RHIVulkanFence = Core::MakeShared<VulkanFence>();
 
 	vk::FenceCreateInfo createInfo{};
 	createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
@@ -172,7 +172,7 @@ FenceHandle VulkanDevice::CreateFence()
 
 void VulkanDevice::DestroyFence(FenceHandle RHIFence)
 {
-	Core::SharedPtr<VulkanFence> RHIVulkanFence = StaticCast<VulkanFence>(RHIFence);
+	Core::KSharedPtr<VulkanFence> RHIVulkanFence = StaticCast<VulkanFence>(RHIFence);
 
 	vk::Fence fence = RHIVulkanFence->GetHandleRef();
 
@@ -181,7 +181,7 @@ void VulkanDevice::DestroyFence(FenceHandle RHIFence)
 
 void VulkanDevice::WaitForFence(FenceHandle RHIFence)
 {
-	Core::SharedPtr<VulkanFence> RHIVulkanFence = StaticCast<VulkanFence>(RHIFence);
+	Core::KSharedPtr<VulkanFence> RHIVulkanFence = StaticCast<VulkanFence>(RHIFence);
 
 	vk::Fence fence = RHIVulkanFence->GetHandle();
 
@@ -190,7 +190,7 @@ void VulkanDevice::WaitForFence(FenceHandle RHIFence)
 
 void VulkanDevice::ResetFence(FenceHandle RHIFence)
 {
-	Core::SharedPtr<VulkanFence> RHIVulkanFence = StaticCast<VulkanFence>(RHIFence);
+	Core::KSharedPtr<VulkanFence> RHIVulkanFence = StaticCast<VulkanFence>(RHIFence);
 
 	vk::Fence fence = RHIVulkanFence->GetHandle();
 
@@ -201,7 +201,7 @@ void VulkanDevice::ResetFence(FenceHandle RHIFence)
 // TODO (Eliott) : Do some cleanup on GetCreateInfo
 SwapchainHandle VulkanDevice::CreateSwapchain(const SwapchainSpecs& RHISpecs)
 {
-	Core::SharedPtr<VulkanSwapchain> RHIVulkanSwapchain = Core::MakeShared<VulkanSwapchain>();
+	Core::KSharedPtr<VulkanSwapchain> RHIVulkanSwapchain = Core::MakeShared<VulkanSwapchain>();
 
 	std::unordered_map<int, int> map;
 
@@ -230,15 +230,15 @@ SwapchainHandle VulkanDevice::CreateSwapchain(const SwapchainSpecs& RHISpecs)
 
 void VulkanDevice::DestroySwapchain(SwapchainHandle RHISwapchain)
 {
-	Core::SharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHISwapchain);
+	Core::KSharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHISwapchain);
 
 	m_handle.destroySwapchainKHR(RHIVulkanSwapchain->GetHandle());
 }
 
 uint32_t VulkanDevice::AcquirreNextImage(SwapchainHandle RHISwapchain, SemaphoreHandle RHISemaphore)
 {
-	Core::SharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHISwapchain);
-	Core::SharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISemaphore);
+	Core::KSharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHISwapchain);
+	Core::KSharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHISemaphore);
 
 	vk::SwapchainKHR swapchain = RHIVulkanSwapchain->GetHandle();
 	vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
@@ -253,14 +253,14 @@ bool VulkanDevice::Present(const PresentInfo& RHIPresentInfo)
 	std::vector<vk::Semaphore> waitSemaphores;
 	for (uint32_t i = 0; i < RHIPresentInfo.waitSemaphores.size(); ++i)
 	{
-		Core::SharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHIPresentInfo.waitSemaphores[i]);
+		Core::KSharedPtr<VulkanSemaphore> RHIVulkanSemaphore = StaticCast<VulkanSemaphore>(RHIPresentInfo.waitSemaphores[i]);
 
 		vk::Semaphore semaphore = RHIVulkanSemaphore->GetHandle();
 
 		waitSemaphores.push_back(semaphore);
 	}
 
-	Core::SharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHIPresentInfo.swapchain);
+	Core::KSharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHIPresentInfo.swapchain);
 	vk::SwapchainKHR swapchain = RHIVulkanSwapchain->GetHandle();
 
 	vk::PresentInfoKHR presentInfo;
@@ -283,7 +283,7 @@ bool VulkanDevice::Present(const PresentInfo& RHIPresentInfo)
 //-------------- Buffer --------------// 
 BufferHandle VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs)
 {
-	Core::SharedPtr<VulkanBuffer> RHIVulkanBuffer = Core::MakeShared<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHIVulkanBuffer = Core::MakeShared<VulkanBuffer>();
 
 	VkBufferCreateInfo bufferInfo = RHIVulkanBuffer->GetCreateInfo(RHISpecs);
 
@@ -308,7 +308,7 @@ BufferHandle VulkanDevice::CreateBuffer(const BufferSpecs& RHISpecs)
 
 void VulkanDevice::DestroyBuffer(BufferHandle RHIBuffer)
 {
-	Core::SharedPtr<VulkanBuffer> RHIVulkanBuffer = StaticCast<VulkanBuffer>(RHIBuffer);
+	Core::KSharedPtr<VulkanBuffer> RHIVulkanBuffer = StaticCast<VulkanBuffer>(RHIBuffer);
 
 	VkBuffer rawBuffer = static_cast<VkBuffer>(RHIVulkanBuffer->GetHandle());
 	VmaAllocation bufferAllocation = RHIVulkanBuffer->GetAllocation();
@@ -319,7 +319,7 @@ void VulkanDevice::DestroyBuffer(BufferHandle RHIBuffer)
 //-------------- Image --------------// 
 ImageHandle VulkanDevice::CreateImage(const ImageSpecs& RHISpecs)
 {
-	Core::SharedPtr<VulkanImage> RHIVulkanImage = Core::MakeShared<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = Core::MakeShared<VulkanImage>();
 
 	VkImageCreateInfo imageCreateInfo = static_cast<VkImageCreateInfo>(RHIVulkanImage->GetCreateInfo(RHISpecs));
 
@@ -348,7 +348,7 @@ ImageHandle VulkanDevice::CreateImage(const ImageSpecs& RHISpecs)
 
 void VulkanDevice::DestroyImage(ImageHandle RHIImage)
 {
-	Core::SharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
 
 	vk::Image image = RHIVulkanImage->GetHandleRef();
 	vk::ImageView imageView = RHIVulkanImage->GetHandleViewRef();
@@ -361,7 +361,7 @@ void VulkanDevice::DestroyImage(ImageHandle RHIImage)
 
 std::vector<ImageHandle> VulkanDevice::CreatePresentationImages(SwapchainHandle RHISwapchain)
 {
-	Core::SharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHISwapchain);
+	Core::KSharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHISwapchain);
 	uint32_t swapchainImageCount = RHIVulkanSwapchain->GetImageCount();
 
 	std::vector<ImageHandle> RHIImages(swapchainImageCount);
@@ -376,7 +376,7 @@ std::vector<ImageHandle> VulkanDevice::CreatePresentationImages(SwapchainHandle 
 
 	for (uint32_t i = 0; i < RHIImages.size(); ++i)
 	{
-		Core::SharedPtr<VulkanImage> RHIVulkanImage = Core::MakeShared<VulkanImage>();
+		Core::KSharedPtr<VulkanImage> RHIVulkanImage = Core::MakeShared<VulkanImage>();
 
 		RHIVulkanImage->SetHandle(swapchainImages[i]);
 
@@ -398,7 +398,7 @@ void VulkanDevice::DestroyPresentationImages(std::vector<ImageHandle> RHIPresent
 	// With swapchain images you only destroy their vk::ImageView and not the vk::Image
 	for (uint32_t i = 0; i < RHIPresentationImages.size(); ++i)
 	{
-		Core::SharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIPresentationImages[i]);
+		Core::KSharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIPresentationImages[i]);
 		vk::ImageView imageViewHandle = RHIVulkanImage->GetHandleViewRef();
 
 		m_handle.destroyImageView(imageViewHandle);
@@ -407,10 +407,10 @@ void VulkanDevice::DestroyPresentationImages(std::vector<ImageHandle> RHIPresent
 
 ImageHandle VulkanDevice::CreateImagesWithSwapchain(const SwapchainImageSpecs& RHISpecs, SwapchainHandle RHISwapchain)
 {
-	Core::SharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHISwapchain);
+	Core::KSharedPtr<VulkanSwapchain> RHIVulkanSwapchain = StaticCast<VulkanSwapchain>(RHISwapchain);
 	[[maybe_unused]] uint32_t swapchainImageCount = RHIVulkanSwapchain->GetImageCount();
 
-	Core::SharedPtr<VulkanImage> RHIVulkanImage = Core::MakeShared<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = Core::MakeShared<VulkanImage>();
 
 	vk::Format imageFormat;
 	if (RHISpecs.imageType == SwapchainImageType::Color)
@@ -452,7 +452,7 @@ ImageHandle VulkanDevice::CreateImagesWithSwapchain(const SwapchainImageSpecs& R
 // -------------- Sampler -------------- // 
 SamplerHandle VulkanDevice::CreateSampler(const SamplerSpecs& specs)
 {
-	Core::SharedPtr<VulkanSampler> RHIVulkanSampler = Core::MakeShared<VulkanSampler>();
+	Core::KSharedPtr<VulkanSampler> RHIVulkanSampler = Core::MakeShared<VulkanSampler>();
 
 	vk::PhysicalDeviceProperties properties = m_pDevice.getProperties();
 	float maxAnisotropy = properties.limits.maxSamplerAnisotropy;
@@ -467,7 +467,7 @@ SamplerHandle VulkanDevice::CreateSampler(const SamplerSpecs& specs)
 
 void VulkanDevice::DestroySampler(SamplerHandle RHISampler)
 {
-	Core::SharedPtr<VulkanSampler> RHIVulkanSampler = StaticCast<VulkanSampler>(RHISampler);
+	Core::KSharedPtr<VulkanSampler> RHIVulkanSampler = StaticCast<VulkanSampler>(RHISampler);
 
 	vk::Sampler sampler = RHIVulkanSampler->GetHandle();
 	m_handle.destroySampler(sampler);
@@ -476,7 +476,7 @@ void VulkanDevice::DestroySampler(SamplerHandle RHISampler)
 //-------------- Shader --------------// 
 ShaderHandle VulkanDevice::CreateShader(const std::string& file, const ShaderStage& sStage, bool isGlobalLayout, bool usesGlobalLayout)
 {
-	Core::SharedPtr<VulkanShader> shader{};
+	Core::KSharedPtr<VulkanShader> shader{};
 
 	if ((shader = StaticCast<VulkanShader>(m_compiledShaders[file])))
 		return shader;
@@ -526,7 +526,7 @@ std::vector<DescriptorSetLayoutHandle> VulkanDevice::CreateDescriptorSetsLayouts
 	std::vector<Descriptor> SLANGShaderDescriptors = RHIShader->GetDescriptors();
 	for (const Descriptor& SLANGDescriptor : SLANGShaderDescriptors)
 	{
-		Core::SharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::MakeShared<VulkanDescriptorSetLayout>();
+		Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::MakeShared<VulkanDescriptorSetLayout>();
 		RHIVulkanDescriptor->SetName(SLANGDescriptor.name);
 		RHIVulkanDescriptor->SetIndex(SLANGDescriptor.index);
 
@@ -563,7 +563,7 @@ std::vector<DescriptorSetLayoutHandle> VulkanDevice::CreateDescriptorSetsLayouts
 
 DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle RHIShader, std::string name)
 {
-	Core::SharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::MakeShared<VulkanDescriptorSetLayout>();
+	Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::MakeShared<VulkanDescriptorSetLayout>();
 
 	std::vector<Descriptor> SLANGShaderDescriptors = RHIShader->GetDescriptors();
 	for (const Descriptor& SLANGDescriptor : SLANGShaderDescriptors)
@@ -605,7 +605,7 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 
 DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle RHIShader, uint32_t index)
 {
-	Core::SharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::MakeShared<VulkanDescriptorSetLayout>();
+	Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::MakeShared<VulkanDescriptorSetLayout>();
 
 	std::vector<Descriptor> SLANGShaderDescriptors = RHIShader->GetDescriptors();
 	for (const Descriptor& SLANGDescriptor : SLANGShaderDescriptors)
@@ -649,7 +649,7 @@ void VulkanDevice::DestroyDescriptorSetsLayouts(std::vector<DescriptorSetLayoutH
 {
 	for (const DescriptorSetLayoutHandle& RHIDescriptorSetLayout : RHIDescriptors)
 	{
-		Core::SharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptorSetLayout = StaticCast<VulkanDescriptorSetLayout>(RHIDescriptorSetLayout);
+		Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptorSetLayout = StaticCast<VulkanDescriptorSetLayout>(RHIDescriptorSetLayout);
 		
 		m_handle.destroyDescriptorSetLayout(RHIVulkanDescriptorSetLayout->GetHandle());
 	}
@@ -657,7 +657,7 @@ void VulkanDevice::DestroyDescriptorSetsLayouts(std::vector<DescriptorSetLayoutH
 
 void VulkanDevice::DestroyDescriptorSetLayout(DescriptorSetLayoutHandle RHIDescriptor)
 {
-	Core::SharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptorSetLayout = StaticCast<VulkanDescriptorSetLayout>(RHIDescriptor);
+	Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptorSetLayout = StaticCast<VulkanDescriptorSetLayout>(RHIDescriptor);
 
 	m_handle.destroyDescriptorSetLayout(RHIVulkanDescriptorSetLayout->GetHandle());
 }
@@ -665,7 +665,7 @@ void VulkanDevice::DestroyDescriptorSetLayout(DescriptorSetLayoutHandle RHIDescr
 // -------------- PushConstantLayout -------------- // 
 PushConstantLayoutHandle VulkanDevice::CreatePushConstantLayout(ShaderHandle RHIShader)
 {
-	Core::SharedPtr<VulkanPushConstantLayout> RHIVulkanPushConstants = Core::MakeShared<VulkanPushConstantLayout>();
+	Core::KSharedPtr<VulkanPushConstantLayout> RHIVulkanPushConstants = Core::MakeShared<VulkanPushConstantLayout>();
 
 	std::vector<PushConstant> SLANGShaderPushConstants = RHIShader->GetPushConstants();
 	if (!SLANGShaderPushConstants.empty())
@@ -705,9 +705,9 @@ void VulkanDevice::DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHan
 // -------------- Descriptor Set -------------- // 
 DescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle RHILayout)
 {
-	Core::SharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<VulkanDescriptorSet>();
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<VulkanDescriptorSet>();
 
-	Core::SharedPtr<VulkanDescriptorSetLayout> RHIVulkanLayout = StaticCast<VulkanDescriptorSetLayout>(RHILayout);
+	Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanLayout = StaticCast<VulkanDescriptorSetLayout>(RHILayout);
 
 	std::vector<VulkanBinding> bindings = RHIVulkanLayout->GetAllBindings();
 
@@ -744,7 +744,7 @@ DescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle 
 
 void VulkanDevice::DestroyDescriptorSet(DescriptorSetHandle RHIDescriptorSet)
 {
-	Core::SharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorPool pool = RHIVulkanDescriptorSet->GetPool();
 
@@ -753,7 +753,7 @@ void VulkanDevice::DestroyDescriptorSet(DescriptorSetHandle RHIDescriptorSet)
 
 void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, BufferHandle RHIBuffer, uint32_t offset, uint32_t range)
 {
-	Core::SharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::Buffer updateBuffer = StaticCast<VulkanBuffer>(RHIBuffer)->GetHandle();
@@ -785,7 +785,7 @@ void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, 
 
 void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, BufferHandle RHIBuffer, uint32_t offset, uint32_t range)
 {
-	Core::SharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::Buffer updateBuffer = StaticCast<VulkanBuffer>(RHIBuffer)->GetHandle();
@@ -817,9 +817,9 @@ void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, 
 
 void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, ImageHandle RHIImage, SamplerHandle RHISampler)
 {
-	Core::SharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
-	Core::SharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::ImageView updateImageView = RHIVulkanImage->GetHandleView();
@@ -862,9 +862,9 @@ void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, s
 
 void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, ImageHandle RHIImage, SamplerHandle RHISampler)
 {
-	Core::SharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
-	Core::SharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::ImageView updateImageView = RHIVulkanImage->GetHandleView();
@@ -906,7 +906,7 @@ void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, u
 
 void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, SamplerHandle RHISampler)
 {
-	Core::SharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::Sampler updateSampler = StaticCast<VulkanSampler>(RHISampler)->GetHandle();
@@ -936,7 +936,7 @@ void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet,
 
 void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, SamplerHandle RHISampler)
 {
-	Core::SharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::Sampler updateSampler = StaticCast<VulkanSampler>(RHISampler)->GetHandle();
@@ -967,12 +967,12 @@ void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet,
 // -------------- Pipeline Layout -------------- // 
 PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants)
 {
-	Core::SharedPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = Core::MakeShared<VulkanPipelineLayout>();
+	Core::KSharedPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = Core::MakeShared<VulkanPipelineLayout>();
 
 	std::vector<vk::DescriptorSetLayout> descriptorSetsLayouts;
 	for (const DescriptorSetLayoutHandle& RHIDescriptor : descriptors)
 	{
-		Core::SharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = StaticCast<VulkanDescriptorSetLayout>(RHIDescriptor);
+		Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = StaticCast<VulkanDescriptorSetLayout>(RHIDescriptor);
 
 		descriptorSetsLayouts.push_back(RHIVulkanDescriptor->GetHandle());
 		RHIVUlkanPipelineLayout->AddDescriptorSetLayout(RHIDescriptor);
@@ -981,7 +981,7 @@ PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(std::vector<DescriptorSe
 	std::vector<vk::PushConstantRange> pushConstantRanges;
 	for (const PushConstantLayoutHandle& RHIPushConstant: pushConstants)
 	{
-		Core::SharedPtr<VulkanPushConstantLayout> RHIVulkanPushConstant = StaticCast<VulkanPushConstantLayout>(RHIPushConstant);
+		Core::KSharedPtr<VulkanPushConstantLayout> RHIVulkanPushConstant = StaticCast<VulkanPushConstantLayout>(RHIPushConstant);
 
 		pushConstantRanges.push_back(RHIVulkanPushConstant->GetHandle());
 		RHIVUlkanPipelineLayout->AddPushConstantLayout(RHIPushConstant);
@@ -1001,7 +1001,7 @@ PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(std::vector<DescriptorSe
 
 void VulkanDevice::DestroyPipelineLayout(PipelineLayoutHandle RHIPipelineLayout)
 {
-	Core::SharedPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = StaticCast<VulkanPipelineLayout>(RHIPipelineLayout);
+	Core::KSharedPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = StaticCast<VulkanPipelineLayout>(RHIPipelineLayout);
 
 	vk::PipelineLayout layout = RHIVUlkanPipelineLayout->GetHandle();
 	m_handle.destroyPipelineLayout(layout);
@@ -1010,7 +1010,7 @@ void VulkanDevice::DestroyPipelineLayout(PipelineLayoutHandle RHIPipelineLayout)
 //-------------- Pipeline --------------// 
 GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipelineSpecs& RHISpecs)
 {
-	Core::SharedPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = Core::MakeShared<VulkanGraphicsPipeline>();
+	Core::KSharedPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = Core::MakeShared<VulkanGraphicsPipeline>();
 	RHIVulkanPipeline->SetLayout(RHISpecs.pipelineLayout);
 	RHIVulkanPipeline->SetType(PipelineType::Graphics);
 
@@ -1026,7 +1026,7 @@ void VulkanDevice::DestroyPipeline(PipelineHandle RHIPipeline)
 {
 	if (RHIPipeline->GetType() == PipelineType::Graphics)
 	{
-		Core::SharedPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = StaticCast<VulkanGraphicsPipeline>(RHIPipeline);
+		Core::KSharedPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = StaticCast<VulkanGraphicsPipeline>(RHIPipeline);
 		vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();
 		m_handle.destroyPipeline(pipeline);
 	}
@@ -1038,7 +1038,7 @@ void VulkanDevice::DestroyPipeline(PipelineHandle RHIPipeline)
 
 void VulkanDevice::UpdateCompatibility(SurfaceHandle RHISurface)
 {
-	Core::SharedPtr<VulkanSurface> RHIVulkanSurface = StaticCast<VulkanSurface>(RHISurface);
+	Core::KSharedPtr<VulkanSurface> RHIVulkanSurface = StaticCast<VulkanSurface>(RHISurface);
 
 	vk::SurfaceKHR surface = RHIVulkanSurface->GetHandle();
 

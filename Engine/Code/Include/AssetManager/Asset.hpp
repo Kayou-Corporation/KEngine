@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Memory/SharedPtr.hpp"
+#include "Memory/KSharedPtr.hpp"
 #include "Export.hpp"
 #include "AssetManagerModule.hpp"
 #include "AssetManager.hpp"

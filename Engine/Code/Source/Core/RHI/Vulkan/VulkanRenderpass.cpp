@@ -7,7 +7,7 @@ BEGIN_NAMESPACE_CORE
 
 vk::RenderingAttachmentInfo VulkanRenderpass::GetRenderingAttachmentInfo(const RenderingAttachment& attachment)
 {
-	Core::SharedPtr<VulkanImage> RHIVulkanImage = Core::StaticCast<VulkanImage>(attachment.image);
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = Core::StaticCast<VulkanImage>(attachment.image);
 
 	vk::ClearValue clearValue;
 	if (attachment.layout == Layout::DepthStencilAttachment)

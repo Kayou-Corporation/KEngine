@@ -6,7 +6,7 @@
 #include "WindowModule.hpp"
 #include "CoreModule.hpp"
 #include "Export.hpp"
-#include "Memory/SharedPtr.hpp"
+#include "Memory/KSharedPtr.hpp"
 
 BEGIN_NAMESPACE_WINDOW
 	class WindowRenderer;
@@ -41,7 +41,7 @@ public:
 	std::string GetName() const { return m_windowName; }
 	bool GetHasResize() const { return m_HasResize; }
 
-	Core::SharedPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
+	Core::KSharedPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
 
 protected:
 	uint32_t m_width = 0u;
@@ -51,7 +51,7 @@ protected:
 
 	std::string m_windowName;
 
-	Core::SharedPtr<WindowRenderer> m_windowRenderer;
+	Core::KSharedPtr<WindowRenderer> m_windowRenderer;
 };
 
 // -------- Interface ----------
@@ -62,7 +62,7 @@ enum WindowAPI
 
 struct WindowInterface
 {
-	static Core::SharedPtr<Window> InitWindow(WindowAPI api);
+	static Core::KSharedPtr<Window> InitWindow(WindowAPI api);
 };
 
 END_NAMESPACE_WINDOW

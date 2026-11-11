@@ -4,10 +4,10 @@
 
 #include <spdlog/spdlog.h>
 
-#include "Memory/SharedPtr.hpp"
+#include "Memory/KSharedPtr.hpp"
 
 BEGIN_NAMESPACE_WINDOW
-	Core::SharedPtr<Window> WindowInterface::InitWindow(WindowAPI api)
+	Core::KSharedPtr<Window> WindowInterface::InitWindow(WindowAPI api)
 {
 	switch (api)
 	{

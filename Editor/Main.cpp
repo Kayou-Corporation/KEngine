@@ -96,7 +96,7 @@ int main()
     Core::KEngine::Init(engineSpecs);
 
     // Window Reference :
-    Core::SharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
+    Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
 
     // ------------ Object loading test -----------------//
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
@@ -105,8 +105,8 @@ int main()
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
     AssetManager::KSoftAssetRef<CoreObject::Texture2D> texture = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("texture");
 
-    Core::SharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
-    Core::SharedPtr<CoreObject::Texture2D> vikingRoomTexture = texture.Get();
+    Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
+    Core::KSharedPtr<CoreObject::Texture2D> vikingRoomTexture = texture.Get();
 
 
     // TODO : move this here
