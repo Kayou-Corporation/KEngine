@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "RHI/API/RHI.hpp"
 
 #include <vector>
@@ -21,7 +23,7 @@ struct SubmitInfo
 	//FenceHandle fence;
 };
 
-class CommandList : virtual public Core::IResource
+class CommandList
 {
 public:
 	virtual ~CommandList() = default;

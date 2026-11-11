@@ -56,7 +56,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
     {
         for (uint32_t i = 0; i < m_assets.size(); ++i)
         {
-            if (m_assets[i]->GetRefCount() == 1)
+            if (m_assets[i].GetRefCount() == 1)
             {
                 UnloadAsset(m_assets[i]->GetID());
             }
@@ -68,9 +68,9 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         switch (type)
         {
             case AssetType::StaticMesh:
-                return Core::CreateRefPtr<CoreObject::StaticMesh>(type, name, id, 0, 0);
+                return Core::MakeShared<CoreObject::StaticMesh>(type, name, id, 0, 0);
             case AssetType::Texture2D:
-                return Core::CreateRefPtr<CoreObject::Texture2D>(type, name, id, 0, 0);
+                return Core::MakeShared<CoreObject::Texture2D>(type, name, id, 0, 0);
             default:
                 spdlog::error("AssetRegistry: Type d'asset non supporte.");
                 return nullptr;

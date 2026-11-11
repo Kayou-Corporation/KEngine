@@ -7,7 +7,6 @@
 #include <optional>
 
 #include "RHI/API/RHI.hpp"
-#include "Utils/Memory.hpp"
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
 DISABLE_WARNINGS
@@ -39,11 +38,11 @@ private:
 
 class VulkanCommandList;
 
-class TrackedStagingBuffer : virtual public Core::IResource
+class TrackedStagingBuffer
 {
 public:
 	TrackedStagingBuffer() = default;
-	virtual ~TrackedStagingBuffer() override = default;
+	~TrackedStagingBuffer() = default;
 
 	vk::Buffer handle;
 	VmaAllocation allocation;
@@ -51,11 +50,11 @@ public:
 };
 typedef Core::KSharedPtr<TrackedStagingBuffer> TrackedStagingBufferPtr;
 
-class TrackedCommandBuffer : virtual public Core::IResource
+class TrackedCommandBuffer
 {
 public:
 	TrackedCommandBuffer() = default;
-	virtual ~TrackedCommandBuffer() override = default;
+	~TrackedCommandBuffer() = default;
 
 	vk::CommandPool cmdPool;
 	vk::CommandBuffer cmdBuffer;

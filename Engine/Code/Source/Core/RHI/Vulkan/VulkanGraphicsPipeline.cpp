@@ -16,7 +16,7 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	std::vector<VertexAttributeLayout> RHIShadersAttributes;
 	for (const auto& RHIShader : specs.shaders)
 	{
-		Core::KSharedPtr<VulkanShader> RHIVulkanShader = RHIShader.CastAs<VulkanShader>();
+		Core::KSharedPtr<VulkanShader> RHIVulkanShader = StaticCast<VulkanShader>(RHIShader);
 		ShaderStage stage = RHIShader->GetShaderStage();
 
 		vk::PipelineShaderStageCreateInfo shaderStageCreateInfo{};
@@ -122,7 +122,7 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	createInfo.colorBlendState = colorBlendingInfo;
 	createInfo.depthStencilCreateInfo = depthStencilCreateInfo;
 	createInfo.dynamicStates = dynamicStates;
-	createInfo.layout = m_layout.CastAs<VulkanPipelineLayout>()->GetHandle();
+	createInfo.layout = StaticCast<VulkanPipelineLayout>(specs.pipelineLayout)->GetHandle();
 	createInfo.colorBlend = colorBlendAttachment;
 	createInfo.renderPass = nullptr; // Always null for now
 	return createInfo;

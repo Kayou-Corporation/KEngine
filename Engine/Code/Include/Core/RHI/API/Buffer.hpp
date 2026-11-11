@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RHI/API/RHI.hpp"
-
+#include <vector>
 BEGIN_NAMESPACE_CORE
 
 class Device;
@@ -17,7 +17,7 @@ struct BufferSpecs
 	bool isPersistentMapped = true;
 };
 
-class Buffer : public virtual Core::IResource
+class Buffer
 {
 public:
 	virtual ~Buffer() = default;

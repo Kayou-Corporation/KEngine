@@ -55,8 +55,8 @@ void VulkanCommandList::EndRendering()
 //----------- Bind --------------//
 void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, std::string layoutName, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
-	Core::KSharedPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
+	Core::KSharedPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = StaticCast<VulkanPipelineLayout>(RHIPipelineLayout);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
 	vk::PipelineLayout pipelineLayout = RHVulkanIPipelineLayout->GetHandle();
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
@@ -68,8 +68,8 @@ void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout
 
 void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, uint32_t layoutIndex, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
-	Core::KSharedPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = RHIPipelineLayout.CastAs<VulkanPipelineLayout>();
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = RHIDescriptorSet.CastAs<VulkanDescriptorSet>();
+	Core::KSharedPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = StaticCast<VulkanPipelineLayout>(RHIPipelineLayout);
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
 
 	vk::PipelineLayout pipelineLayout = RHVulkanIPipelineLayout->GetHandle();
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
@@ -80,8 +80,8 @@ void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout
 
 void VulkanCommandList::BindVertexBuffer(BufferHandle RHIVertexBuffer, uint32_t offset)
 {
-	Core::KSharedPtr<VulkanBuffer> RHVulkanVertexBuffer = RHIVertexBuffer.CastAs<VulkanBuffer>();
-	
+	Core::KSharedPtr<VulkanBuffer> RHVulkanVertexBuffer = StaticCast<VulkanBuffer>(RHIVertexBuffer);
+
 	vk::Buffer buffer = RHVulkanVertexBuffer->GetHandle();
 	vk::DeviceSize vkOffset = static_cast<vk::DeviceSize>(offset);
 
@@ -90,7 +90,7 @@ void VulkanCommandList::BindVertexBuffer(BufferHandle RHIVertexBuffer, uint32_t 
 
 void VulkanCommandList::BindIndexBuffer(BufferHandle RHIIndexBuffer, uint32_t offset)
 {
-	Core::KSharedPtr<VulkanBuffer> RHVulkanIndexBuffer = RHIIndexBuffer.CastAs<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHVulkanIndexBuffer = StaticCast<VulkanBuffer>(RHIIndexBuffer);
 
 	vk::Buffer buffer = RHVulkanIndexBuffer->GetHandle();
 	vk::DeviceSize vkOffset = static_cast<vk::DeviceSize>(offset);
@@ -131,7 +131,7 @@ void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32
 {
 	ASSERT((size + offset) <= RHIBuffer->GetSize(), "Data is too large");
 
-	Core::KSharedPtr<VulkanBuffer> RHIVulkanBuffer = RHIBuffer.CastAs<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHIVulkanBuffer = StaticCast<VulkanBuffer>(RHIBuffer);
 
 	VmaAllocator memoryAllocator = m_handle->memoryAllocator;
 
@@ -189,7 +189,7 @@ void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32
 
 		cmdBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, pipelineStage, {}, nullptr, bufferMemBarrier2, nullptr);
 
-		TrackedStagingBufferPtr trackedStagingBuffer = Core::CreateRefPtr<TrackedStagingBuffer>();
+		TrackedStagingBufferPtr trackedStagingBuffer = Core::MakeShared<TrackedStagingBuffer>();
 		trackedStagingBuffer->handle = stagingBuf;
 		trackedStagingBuffer->allocation = stagingAlloc;
 		trackedStagingBuffer->allocationInfo = stagingAllocInfo;
@@ -200,8 +200,8 @@ void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32
 
 void VulkanCommandList::CopyBufferToBuffer(BufferHandle RHISrcBuffer, uint32_t srcOffset, BufferHandle RHIDstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage, bool returnDstBufferToInitialStage)
 {
-	Core::KSharedPtr<VulkanBuffer> RHIVulkanSrcBuffer = RHISrcBuffer.CastAs<VulkanBuffer>();
-	Core::KSharedPtr<VulkanBuffer> RHIVulkanDstBuffer = RHIDstBuffer.CastAs<VulkanBuffer>();
+	Core::KSharedPtr<VulkanBuffer> RHIVulkanSrcBuffer = StaticCast<VulkanBuffer>(RHISrcBuffer);
+	Core::KSharedPtr<VulkanBuffer> RHIVulkanDstBuffer = StaticCast<VulkanBuffer>(RHIDstBuffer);
 
 	vk::Buffer srcBuffer = RHIVulkanSrcBuffer->GetHandle();
 	vk::Buffer dstBuffer = RHIVulkanDstBuffer->GetHandle();
@@ -257,7 +257,7 @@ void VulkanCommandList::CopyBufferToBuffer(BufferHandle RHISrcBuffer, uint32_t s
 
 void VulkanCommandList::SetImageData(ImageHandle RHIImage, void* data, uint32_t size)
 {
-	Core::KSharedPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
 
 	VmaAllocator allocator = m_handle->memoryAllocator;
 
@@ -330,7 +330,7 @@ void VulkanCommandList::SetImageData(ImageHandle RHIImage, void* data, uint32_t 
 	// --------------------  GETTING RID OF THE STAGING BUFFER ----------------------- // 
 
 	// Getting rid of the staging buffer later in Queue::Submit
-	TrackedStagingBufferPtr trackedStagingBuffer = Core::CreateRefPtr<TrackedStagingBuffer>();
+	TrackedStagingBufferPtr trackedStagingBuffer = Core::MakeShared<TrackedStagingBuffer>();
 	trackedStagingBuffer->handle = stagingBuf;
 	trackedStagingBuffer->allocation = stagingAlloc;
 	trackedStagingBuffer->allocationInfo = stagingAllocInfo;
@@ -348,8 +348,8 @@ void VulkanCommandList::SetImageData(ImageHandle RHIImage, void* data, uint32_t 
 
 void VulkanCommandList::CopyImageToImage(ImageHandle RHISrcImage, Extent3D srcOffset, ImageHandle RHIDstImage, Extent3D dstOffset, bool returnSrcImageToInitialStage, bool returnDstImageToInitialStage)
 {
-	Core::KSharedPtr<VulkanImage> VulkanSrcImage = RHISrcImage.CastAs<VulkanImage>();
-	Core::KSharedPtr<VulkanImage> VulkanDstImage = RHIDstImage.CastAs<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> VulkanSrcImage = StaticCast<VulkanImage>(RHISrcImage);
+	Core::KSharedPtr<VulkanImage> VulkanDstImage = StaticCast<VulkanImage>(RHIDstImage);
 
 	vk::Image srcHangle = VulkanSrcImage->GetHandle();
 	vk::Image dstHangle = VulkanDstImage->GetHandle();
@@ -408,7 +408,7 @@ void VulkanCommandList::CopyImageToImage(ImageHandle RHISrcImage, Extent3D srcOf
 //----------- Transition Image Layout --------------//
 void VulkanCommandList::TransitionImageLayout(ImageHandle RHIImage, Layout RHIDstLayout)
 {
-	Core::KSharedPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
+	Core::KSharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
 
 	vk::ImageLayout oldLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 	vk::ImageLayout newLayout = TranslateToVulkan(RHIDstLayout);
@@ -473,7 +473,7 @@ void VulkanCommandList::BindPipeline(PipelineHandle RHIPipeline)
 	vk::Pipeline pipeline;
 	if (RHIType == PipelineType::Graphics)
 	{
-		pipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>()->GetHandle();
+		pipeline = StaticCast<VulkanGraphicsPipeline>(RHIPipeline)->GetHandle();
 
 	}
 

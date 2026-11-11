@@ -1,7 +1,6 @@
 #pragma once
 #include "CoreModule.hpp"
 
-#include "Utils/Memory.hpp"
 #include "AssetRegistry.hpp"
 #include "SoftAssetReference.hpp"
 
@@ -10,6 +9,7 @@
 #include "RHI/API/Surface.hpp"
 
 #include "ThreadPool.hpp"
+#include "Memory/KUniquePtr.hpp"
 
 #include "RHI/API/Instance.hpp"
 #include "RHI/API/Device.hpp"
@@ -37,11 +37,11 @@ struct KEngineSpecs
     std::vector<DebugLayers> debugLayers;
 };
 
-class KEngine : public virtual Core::IResource
+class KEngine
 {
 public:
     explicit KEngine(const KEngineSpecs& specs);
-    virtual ~KEngine();
+    ~KEngine();
 
     // TO BE USED ONLY 1 TIME
     static void Init(const KEngineSpecs& specs);
@@ -73,7 +73,7 @@ public:
         return m_assetRegistry->GetAsset<AssetDerived>(name);
     }
 
-    KSharedPtr<Window::Window> GetWindow() const
+    Core::KSharedPtr<Window::Window> GetWindow() const
     {
         return m_window;
     }
@@ -97,7 +97,7 @@ public:
 
 protected:
     // Window :
-    KSharedPtr<Window::Window> m_window;
+    Core::KSharedPtr<Window::Window> m_window;
     SurfaceHandle m_windowSurface;
 
     // RHI :

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RHI/API/RHI.hpp"
+#include "Memory/KSharedPtr.hpp"
 
 namespace Kayou::Window
 {
@@ -16,7 +17,7 @@ struct SurfaceSpecs
 	Core::KSharedPtr<Window::Window> window;
 };
 
-class Surface : virtual public Core::IResource
+class Surface
 {
 public:
 	virtual ~Surface() = default;

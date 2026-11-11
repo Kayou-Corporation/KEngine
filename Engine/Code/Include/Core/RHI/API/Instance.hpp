@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-
+#include "Memory/KSharedPtr.hpp"
 #include "RHI/API/RHI.hpp"
 
 namespace Kayou::Window
@@ -15,7 +15,7 @@ BEGIN_NAMESPACE_CORE
 
 struct InstanceSpecs
 {
-	Core::KSharedPtr<Window::Window> window; // To get window specific extensions required.
+	KSharedPtr<Window::Window> window; // To get window specific extensions required.
 
 	Version appVersion;
 	Version engineVersion;
@@ -23,7 +23,7 @@ struct InstanceSpecs
 	std::vector<DebugLayers> debugLayers; // Debug layers to use.
 };
 
-class Instance : virtual public Core::IResource
+class Instance
 {
 public:
 	virtual ~Instance() = default;

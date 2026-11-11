@@ -10,6 +10,7 @@
 #include <iosfwd>
 #include <string>
 
+#include "spdlog/spdlog.h"
 #include "Utils/File.hpp"
 
 BEGIN_NAMESPACE_CORE
@@ -173,7 +174,7 @@ private:
     Slang::ComPtr<slang::ISession> m_session;
 };
 
-class Shader : public virtual Core::IResource
+class Shader
 {
 public:
     virtual ~Shader();

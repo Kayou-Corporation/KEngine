@@ -5,12 +5,11 @@
 
 #include "WindowModule.hpp"
 #include "CoreModule.hpp"
-#include "Utils/Memory.hpp"
 #include "Export.hpp"
+#include "Memory/KSharedPtr.hpp"
 
 BEGIN_NAMESPACE_WINDOW
-
-class WindowRenderer;
+	class WindowRenderer;
 
 // -------- Base window ----------
 
@@ -24,7 +23,7 @@ struct WindowSpecs
 	Core::RendererAPI rendererAPI = Core::RendererAPI::Vulkan;
 };
 
-class Window : virtual public Core::IResource
+class Window
 {
 public:
 	virtual ~Window() = default;

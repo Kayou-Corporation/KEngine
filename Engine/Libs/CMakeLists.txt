@@ -72,6 +72,7 @@ endif()
 
 # ----------- KTHREADS ----------- #
 set(KTHREAD_PERMISSIVE_EXCEPTIONS OFF)
+set(BUILD_EXECUTABLE OFF)
 add_subdirectory(KThreads)
 
 # ----------- KTHREADS ----------- #

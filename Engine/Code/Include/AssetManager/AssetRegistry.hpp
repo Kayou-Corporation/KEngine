@@ -3,9 +3,14 @@
 #include "AssetManager.hpp"
 #include "AssetManagerModule.hpp"
 #include "Export.hpp"
-#include "Utils/Memory.hpp"
 #include "Asset.hpp"
 #include "SoftAssetReference.hpp"
+#include "Memory/KSharedPtr.hpp"
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "spdlog/spdlog.h"
 
 BEGIN_NAMESPACE_ASSETMANAGER
 #define ASSET_EXTENSION ".kasset"
@@ -40,7 +45,7 @@ enum class AssetCreationRequest
     COUNT = 2
 };
 
-class AssetRegistry : public virtual Core::IResource
+class AssetRegistry
 {
 // Basic stuff for lifetime managment & access
 public:
@@ -91,7 +96,7 @@ public:
             }
         }
 
-        return asset.CastAs<AssetDerived>();
+        return Core::DynamicCast<AssetDerived>(asset);
     }
 
     template<typename AssetDerived>
@@ -118,7 +123,7 @@ public:
             }
         }
 
-        return asset.CastAs<AssetDerived>();
+        return Core::DynamicCast<AssetDerived>(asset);
     }
 
     template<typename AssetDerived>

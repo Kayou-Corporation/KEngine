@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "Utils/Memory.hpp"
 #include "Export.hpp"
 
 #include "Window.hpp"
@@ -15,14 +14,14 @@ BEGIN_NAMESPACE_WINDOW
 
 // -------- Window Renderer ----------
 
-class WindowRenderer : virtual public Core::IResource
+class WindowRenderer
 {
 public:
 	virtual ~WindowRenderer() = default;
 };
 
 #ifdef VULKAN_ENABLE
-class VulkanWindowRenderer : virtual public WindowRenderer
+class VulkanWindowRenderer : public WindowRenderer
 {
 public:
 	virtual ~VulkanWindowRenderer() = default;

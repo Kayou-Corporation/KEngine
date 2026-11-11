@@ -9,7 +9,7 @@ InstanceHandle RendererInterface::InitRenderer(Core::RendererAPI api)
 	switch (api)
 	{
 	case Core::RendererAPI::Vulkan:
-		return Core::CreateRefPtr<VulkanInstance>();
+		return Core::MakeShared<VulkanInstance>();
 	default:
 		break;
 	}

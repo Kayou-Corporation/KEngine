@@ -8,7 +8,7 @@ void KEngine::Init(const KEngineSpecs& specs)
 {
     if (!m_instance)
     {
-        m_instance = Core::CreateUniquePtr<KEngine>(specs);
+        m_instance = Core::MakeUnique<KEngine>(specs);
     }
     else
     {
@@ -84,7 +84,7 @@ KEngine::KEngine(const KEngineSpecs& specs)
     }
 
     //----------- AssetManager --------------//
-    m_assetRegistry = Core::CreateUniquePtr<AssetManager::AssetRegistry>("Cache/Assets/");
+    m_assetRegistry = Core::MakeUnique<AssetManager::AssetRegistry>("Cache/Assets/");
     m_assetRegistry->RegisterAllAssets();
 
     // ------------ Window -----------------//

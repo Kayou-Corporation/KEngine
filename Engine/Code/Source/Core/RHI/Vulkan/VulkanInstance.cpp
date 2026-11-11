@@ -23,7 +23,7 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	appInfo.setApiVersion(VK_API_VERSION_1_4);
 
 	Core::KSharedPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
+	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = Core::StaticCast<Window::VulkanWindowRenderer>(wRenderer);
 	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
 
 #ifdef KDEBUG
@@ -82,10 +82,10 @@ void VulkanInstance::Destroy()
 SurfaceHandle VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
 {
 	Core::KSharedPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
+	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = Core::StaticCast<Window::VulkanWindowRenderer>(wRenderer);
 	VkSurfaceKHR vkSurface = wvkRenderer->CreateVulkanSurface(m_handle);
 
-	auto Surface = Core::CreateRefPtr<VulkanSurface>();
+	KSharedPtr<VulkanSurface> Surface = Core::MakeShared<VulkanSurface>();
 	Surface->SetHandle(vkSurface);
 
 	return Surface;
@@ -93,7 +93,8 @@ SurfaceHandle VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
 
 void VulkanInstance::DestroySurface(SurfaceHandle surface)
 {
-	m_handle.destroySurfaceKHR(surface.CastAs<VulkanSurface>()->GetHandle());
+	Core::KSharedPtr<VulkanSurface> vulkanSurface = StaticCast<VulkanSurface>(surface);
+	m_handle.destroySurfaceKHR(vulkanSurface->GetHandle());
 }
 
 std::vector<const char*> VulkanInstance::CheckValidationLayersSupport(const std::vector<const char*>& requestedLayers)
@@ -171,11 +172,12 @@ VkBool32 VulkanInstance::DebugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT 
 
 DeviceHandle VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 {
-	vk::SurfaceKHR surface = specs.surface.CastAs<VulkanSurface>()->GetHandle();
+	vk::SurfaceKHR surface = StaticCast<VulkanSurface>(specs.surface)->GetHandle();
+
 	vk::PhysicalDeviceType type = TranslateToVulkan(specs.gpuType);
 	std::vector<const char*> extensions = TranslateToVulkan(specs.extensions);
 
-	Core::KSharedPtr<VulkanDevice> device = Core::CreateRefPtr<VulkanDevice>();
+	Core::KSharedPtr<VulkanDevice> device = Core::MakeShared<VulkanDevice>();
 
 	device->PickPhysicalDevice(m_handle, specs.queues, specs.searchPresentQueue, surface, type, extensions);
 
@@ -188,7 +190,8 @@ DeviceHandle VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 
 void VulkanInstance::DestroyDevice(DeviceHandle device)
 {
-	device.CastAs<VulkanDevice>()->Destroy();
+	KSharedPtr<VulkanDevice>	vulkanDevice = StaticCast<VulkanDevice>(device);
+	vulkanDevice->Destroy();
 }
 
 END_NAMESPACE_CORE
