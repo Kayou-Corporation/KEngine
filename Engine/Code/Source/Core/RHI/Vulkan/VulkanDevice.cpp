@@ -1026,7 +1026,7 @@ GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipeli
 	return RHIVulkanPipeline;
 }
 
-ComputePipelineHandle VulkanDevice::CreateGraphicsPipeline(const ComputePipelineSpecs& RHISpecs)
+ComputePipelineHandle VulkanDevice::CreateComputePipeline(const ComputePipelineSpecs& RHISpecs)
 {
 	Core::KSharedPtr<VulkanComputePipeline> RHIVulkanPipeline = Core::CreateRefPtr<VulkanComputePipeline>();
 	RHIVulkanPipeline->SetLayout(RHISpecs.pipelineLayout);

@@ -120,7 +120,7 @@ KEngine::KEngine(const KEngineSpecs& specs)
     DeviceSpecs deviceSpecs;
     deviceSpecs.gpuType = GpuType::Discrete;
     deviceSpecs.extensions = {Core::Extensions::Swapchain, Core::Extensions::DynamicRendering, Core::Extensions::ShaderObject };
-    deviceSpecs.queues = {Core::QueueType::Graphics };
+    deviceSpecs.queues = { Core::QueueType::Graphics, Core::QueueType::Compute };
     deviceSpecs.searchPresentQueue = true;
     deviceSpecs.surface = m_windowSurface;
 

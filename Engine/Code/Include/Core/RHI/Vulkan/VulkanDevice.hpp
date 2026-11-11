@@ -130,7 +130,7 @@ public:
 
     // -------------- Pipeline -------------- // 
     virtual GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) override;
-    virtual ComputePipelineHandle CreateGraphicsPipeline(const ComputePipelineSpecs& specs) override;
+    virtual ComputePipelineHandle CreateComputePipeline(const ComputePipelineSpecs& specs) override;
     virtual void DestroyPipeline(PipelineHandle pipeline) override;
 
     virtual void UpdateCompatibility(SurfaceHandle surface) override;

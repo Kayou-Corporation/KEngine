@@ -1,6 +1,7 @@
 #include "RHI/Vulkan/VulkanCommandList.hpp"
 
 #include "RHI/Vulkan/VulkanBuffer.hpp"
+#include "RHI/Vulkan/VulkanComputePipeline.hpp"
 #include "RHI/Vulkan/VulkanDevice.hpp"
 #include "RHI/Vulkan/VulkanImage.hpp"
 #include "RHI/Vulkan/VulkanRenderpass.hpp"
@@ -481,6 +482,10 @@ void VulkanCommandList::BindPipeline(PipelineHandle RHIPipeline)
 	{
 		pipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>()->GetHandle();
 
+	}
+	else if (RHIType == PipelineType::Compute)
+	{
+		pipeline = RHIPipeline.CastAs<VulkanComputePipeline>()->GetHandle();
 	}
 
 	m_handle->cmdBuffer.bindPipeline(bindPoint, pipeline);

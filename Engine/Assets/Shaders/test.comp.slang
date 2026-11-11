@@ -4,18 +4,18 @@ struct Particle
 {
     int a;
     int b;
-}
+};
 
 struct Input
 {
     StructuredBuffer<Particle> Particles;
-}
+};
 ParameterBlock<Input> InputData;
 
 struct Output
 {
     RWStructuredBuffer<int> Result;
-}
+};
 ParameterBlock<Output> OutputData;
 
 [shader("compute")]

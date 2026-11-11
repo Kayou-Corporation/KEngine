@@ -105,7 +105,7 @@ public:
 
 	// -------------- Pipeline -------------- // 
 	KAPI virtual GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineSpecs& specs) = 0;
-	KAPI virtual ComputePipelineHandle CreateGraphicsPipeline(const ComputePipelineSpecs& specs) = 0;
+	KAPI virtual ComputePipelineHandle CreateComputePipeline(const ComputePipelineSpecs& specs) = 0;
 	KAPI virtual void DestroyPipeline(PipelineHandle pipeline) = 0;
 
 	KAPI virtual void UpdateCompatibility(SurfaceHandle surface) = 0;

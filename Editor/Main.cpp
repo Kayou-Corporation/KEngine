@@ -23,6 +23,7 @@
 #include "BuildMode.hpp"
 #include "MeshBase.hpp"
 #include "Texture2D.hpp"
+#include "RHI/API/ComputePipeline.hpp"
 
 USING_KAYOU
 
@@ -256,7 +257,74 @@ int main()
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
 
+    struct Input
+    {
+        int a;
+        int b;
+    };
+
+    Core::BufferSpecs computeInput{};
+    computeInput.primaryUsage = Core::BufferUsage::Storage;
+    computeInput.size = sizeof(Input);
+    computeInput.memoryAccess = Core::MemoryAccess::Upload;
+    computeInput.pipelineStage = Core::PipelineStage::ComputeShader;
+    computeInput.isPersistentMapped = true;
+    Core::BufferHandle storageInput = device->CreateBuffer(computeInput);
+
+    Core::BufferSpecs computeOutput{};
+    computeOutput.primaryUsage = Core::BufferUsage::RWStorage;
+    computeOutput.size = sizeof(int);
+    computeOutput.memoryAccess = Core::MemoryAccess::Readback;
+    computeOutput.pipelineStage = Core::PipelineStage::ComputeShader;
+    computeOutput.isPersistentMapped = true;
+    Core::BufferHandle storageOutput = device->CreateBuffer(computeOutput);
+
+    Input compInput =
+    {
+        .a = 60,
+        .b = 9
+    };
+
     Core::ShaderHandle testComp = device->CreateShader("test.comp", Core::ShaderStage::Compute, false, false);
+
+    std::vector<Core::DescriptorSetLayoutHandle> computeDescriptors = device->CreateDescriptorSetsLayouts(testComp);
+    Core::PipelineLayoutHandle computePipelineLayout = device->CreatePipelineLayout(computeDescriptors, {});
+
+    Core::ComputePipelineSpecs computePipelineSpecs;
+    computePipelineSpecs.shader = testComp;
+    computePipelineSpecs.pipelineLayout = computePipelineLayout;
+
+    Core::PipelineHandle computePipeline = device->CreateComputePipeline(computePipelineSpecs);
+
+    Core::DescriptorSetLayoutHandle inputDataLayout = computePipelineLayout->GetDescriptorSetLayout("InputData");
+    Core::DescriptorSetLayoutHandle outputDataLayout = computePipelineLayout->GetDescriptorSetLayout("OutputData");
+    Core::DescriptorSetHandle inputDataDescriptorSet = device->CreateDescriptorSet(inputDataLayout);
+    Core::DescriptorSetHandle outputDataDescriptorSet = device->CreateDescriptorSet(outputDataLayout);
+
+    device->SetDescriptorSetBuffer(inputDataDescriptorSet, "Particles", Core::DescriptorType::StorageBuffer, storageInput, 0, sizeof(Input));
+    device->SetDescriptorSetBuffer(outputDataDescriptorSet, "Result", Core::DescriptorType::StorageBuffer, storageOutput, 0, sizeof(int));
+
+    Core::CommandListHandle copySSBODataCommandList = device->GetCommandList(Core::QueueType::Compute);
+    copySSBODataCommandList->Open();
+
+    copySSBODataCommandList->SetBufferData(storageInput, &compInput, sizeof(Input), 0);
+
+    copySSBODataCommandList->BindPipeline(computePipeline);
+    copySSBODataCommandList->BindDescriptorSet(computePipelineLayout, "InputData", inputDataDescriptorSet, Core::PipelineBindPoint::Compute);
+    copySSBODataCommandList->BindDescriptorSet(computePipelineLayout, "OutputData", outputDataDescriptorSet, Core::PipelineBindPoint::Compute);
+
+    copySSBODataCommandList->Dispatch(1, 1, 1);
+
+    copySSBODataCommandList->Close();
+
+    Core::SubmitInfo compSubmitInfo;
+    compSubmitInfo.stage = Core::PipelineStage::ComputeShader;
+    device->SubmitCommandList(copySSBODataCommandList, compSubmitInfo);
+
+    device->WaitIdle();
+    int* resultPtr = static_cast<int*>(storageOutput->GetMappedData());
+    int compResult = *resultPtr;
+    spdlog::info("Compute result: {}", compResult);
 
     Core::ShaderHandle baseVert = device->CreateShader("base.vert", Core::ShaderStage::Vertex, false, true);
     Core::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Core::ShaderStage::Fragment, false, true);
@@ -449,7 +517,15 @@ int main()
     device->DestroyPipelineLayout(globalPipelineLayout);
     device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
 
+    device->DestroyBuffer(storageInput);
+    device->DestroyBuffer(storageOutput);
+    device->DestroyDescriptorSet(inputDataDescriptorSet);
+    device->DestroyDescriptorSet(outputDataDescriptorSet);
+    device->DestroyPipeline(computePipeline);
+    device->DestroyPipelineLayout(computePipelineLayout);
+    device->DestroyDescriptorSetsLayouts(computeDescriptors);
     device->DestroyShader(testComp);
+
     device->DestroyShader(unlitFrag);
     device->DestroyShader(baseVert);
     device->DestroyShader(globalLayoutShader);
