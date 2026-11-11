@@ -172,11 +172,12 @@ VkBool32 VulkanInstance::DebugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT 
 
 DeviceHandle VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 {
-	vk::SurfaceKHR surface = specs.surface.CastAs<VulkanSurface>()->GetHandle();
+	vk::SurfaceKHR surface = StaticCast<VulkanSurface>(specs.surface)->GetHandle();
+
 	vk::PhysicalDeviceType type = TranslateToVulkan(specs.gpuType);
 	std::vector<const char*> extensions = TranslateToVulkan(specs.extensions);
 
-	Core::KSharedPtr<VulkanDevice> device = Core::CreateRefPtr<VulkanDevice>();
+	Core::SharedPtr<VulkanDevice> device = Core::MakeShared<VulkanDevice>();
 
 	device->PickPhysicalDevice(m_handle, specs.queues, specs.searchPresentQueue, surface, type, extensions);
 
@@ -189,7 +190,8 @@ DeviceHandle VulkanInstance::CreateDevice(const DeviceSpecs& specs)
 
 void VulkanInstance::DestroyDevice(DeviceHandle device)
 {
-	device.CastAs<VulkanDevice>()->Destroy();
+	SharedPtr<VulkanDevice>	vulkanDevice = StaticCast<VulkanDevice>(device);
+	vulkanDevice->Destroy();
 }
 
 END_NAMESPACE_CORE

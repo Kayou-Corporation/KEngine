@@ -408,7 +408,7 @@ void VulkanCommandList::CopyImageToImage(ImageHandle RHISrcImage, Extent3D srcOf
 //----------- Transition Image Layout --------------//
 void VulkanCommandList::TransitionImageLayout(ImageHandle RHIImage, Layout RHIDstLayout)
 {
-	Core::KSharedPtr<VulkanImage> RHIVulkanImage = RHIImage.CastAs<VulkanImage>();
+	Core::SharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
 
 	vk::ImageLayout oldLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 	vk::ImageLayout newLayout = TranslateToVulkan(RHIDstLayout);
@@ -473,7 +473,7 @@ void VulkanCommandList::BindPipeline(PipelineHandle RHIPipeline)
 	vk::Pipeline pipeline;
 	if (RHIType == PipelineType::Graphics)
 	{
-		pipeline = RHIPipeline.CastAs<VulkanGraphicsPipeline>()->GetHandle();
+		pipeline = StaticCast<VulkanGraphicsPipeline>(RHIPipeline)->GetHandle();
 
 	}
 
@@ -482,7 +482,7 @@ void VulkanCommandList::BindPipeline(PipelineHandle RHIPipeline)
 
 
 //------------------- PUBLIC VULKAN ------------------//
-vk::BufferMemoryBarrier VulkanCommandList::GetBufferMemoryBarrier(Core::KSharedPtr<VulkanBuffer> RHIVulkanBuffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
+vk::BufferMemoryBarrier VulkanCommandList::GetBufferMemoryBarrier(Core::SharedPtr<VulkanBuffer> RHIVulkanBuffer, uint32_t offset, uint32_t size, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
 {
 	vk::BufferMemoryBarrier barrier{};
 	barrier.srcAccessMask = srcAccessMask;
@@ -510,7 +510,7 @@ vk::BufferMemoryBarrier VulkanCommandList::GetRawBufferMemoryBarrier(vk::Buffer 
 	return barrier;
 }
 
-vk::ImageMemoryBarrier VulkanCommandList::GetImageMemoryBarrier(Core::KSharedPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
+vk::ImageMemoryBarrier VulkanCommandList::GetImageMemoryBarrier(Core::SharedPtr<VulkanImage> RHIVulkanImage, vk::ImageLayout dstLayout, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask)
 {
 	vk::ImageLayout currentLayout = RHIVulkanImage->GetVulkanCurrentLayout();
 

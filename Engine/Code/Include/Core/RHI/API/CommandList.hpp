@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "RHI/API/RHI.hpp"
 
 #include <vector>
