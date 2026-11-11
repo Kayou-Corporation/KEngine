@@ -46,6 +46,9 @@ public:
 	KAPI virtual void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 	KAPI virtual void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) = 0;
 
+	//----------- Compute --------------//
+	virtual void Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ) = 0;
+
 	//----------- Set Buffer / Image Data --------------//
 	KAPI virtual void SetBufferData(BufferHandle buffer, void* data, uint32_t size, uint32_t offset) = 0;
 	KAPI virtual void CopyBufferToBuffer(BufferHandle srcBuffer, uint32_t srcOffset, BufferHandle dstBuffer, uint32_t dstOffset, uint32_t size, bool returnSrcBufferToInitialStage = true, bool returnDstBufferToInitialStage = true) = 0;

@@ -279,6 +279,7 @@ enum class BufferUsage
 	Index,
 
 	Storage,
+	RWStorage,
 
 	Uniform,
 

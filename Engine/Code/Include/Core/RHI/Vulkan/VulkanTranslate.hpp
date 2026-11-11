@@ -507,6 +507,7 @@ inline vk::BufferUsageFlags TranslateToVulkan(BufferUsage usage)
         return vk::BufferUsageFlagBits::eIndexBuffer;
 
     case BufferUsage::Storage:
+    case BufferUsage::RWStorage:
         return vk::BufferUsageFlagBits::eStorageBuffer;
 
     case BufferUsage::Uniform:
@@ -541,6 +542,7 @@ inline vk::BufferUsageFlags TranslateToVulkan(
             break;
 
         case BufferUsage::Storage:
+        case BufferUsage::RWStorage:
             flags |= vk::BufferUsageFlagBits::eStorageBuffer;
             break;
 

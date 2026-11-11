@@ -126,6 +126,12 @@ void VulkanCommandList::DrawIndexed(uint32_t indexCount, uint32_t instanceCount,
 	m_handle->cmdBuffer.drawIndexed(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
+//----------- Compute --------------//
+void VulkanCommandList::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
+{
+	m_handle->cmdBuffer.dispatch(groupCountX, groupCountY, groupCountZ);
+}
+
 //----------- Set Buffer / Image Data --------------//
 void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32_t size, uint32_t offset)
 {
@@ -138,7 +144,7 @@ void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32
 	VmaAllocation bufferAllocation = RHIVulkanBuffer->GetAllocation();
 	vk::PipelineStageFlagBits pipelineStage = RHIVulkanBuffer->GetPipelineStage();
 	vk::Buffer bufferHandle = RHIVulkanBuffer->GetHandle();
-	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(RHIVulkanBuffer->GetPrimaryUsage());
+	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(RHIVulkanBuffer->GetPrimaryUsage(), RHIVulkanBuffer->GetIsReadOnly());
 
 	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
 

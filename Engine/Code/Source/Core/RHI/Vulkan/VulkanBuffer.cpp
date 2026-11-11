@@ -15,6 +15,20 @@ vk::BufferCreateInfo VulkanBuffer::GetCreateInfo(const BufferSpecs& specs)
 	m_pipelineStage = TranslateToVulkan(specs.pipelineStage);
 	m_isPersistentMapped = specs.isPersistentMapped;
 
+	if (specs.primaryUsage == BufferUsage::Storage)
+		m_isReadOnly = true;
+	else
+	{
+		for (const BufferUsage& additionalUsage : specs.additionalUsages)
+		{
+			if (additionalUsage == BufferUsage::Storage)
+			{
+				m_isReadOnly = true;
+				break;
+			}
+		}
+	}
+
 	vk::BufferCreateInfo bufferCreateInfo{};
 	bufferCreateInfo.usage = usage;
 	bufferCreateInfo.size = size;
@@ -29,7 +43,7 @@ vk::AccessFlags VulkanBuffer::GetAccessMask()
         return vk::AccessFlagBits::eHostWrite;
     }
 
-    vk::AccessFlags writeFlags = GetWriteAccessFlagsFromUsage(m_primaryUsage);
+    vk::AccessFlags writeFlags = GetWriteAccessFlagsFromUsage(m_primaryUsage, m_isReadOnly);
 
     if (writeFlags)
     {

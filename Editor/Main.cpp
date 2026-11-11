@@ -449,6 +449,7 @@ int main()
     device->DestroyPipelineLayout(globalPipelineLayout);
     device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
 
+    device->DestroyShader(testComp);
     device->DestroyShader(unlitFrag);
     device->DestroyShader(baseVert);
     device->DestroyShader(globalLayoutShader);

@@ -32,11 +32,14 @@ public:
 
 	virtual bool GetIsPersistentMapped() const { return m_isPersistentMapped; }
 
+	virtual bool GetIsReadOnly() const { return m_isReadOnly; }
+
 protected:
 	uint32_t m_size;
 	MemoryAccess m_access;
 	bool m_isGpuOnly = false;
 	bool m_isPersistentMapped = false;
+	bool m_isReadOnly = false;
 };
 
 END_NAMESPACE_CORE
