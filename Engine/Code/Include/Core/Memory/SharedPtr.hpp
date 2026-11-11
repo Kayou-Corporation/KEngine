@@ -12,6 +12,13 @@ class SharedPtr
 {
     template<typename U> friend class SharedPtr;
 
+    template<typename Target, typename Source>
+    friend SharedPtr<Target> StaticCast(const SharedPtr<Source>& other) noexcept;
+
+    template<typename Target, typename Source>
+    friend SharedPtr<Target> DynamicCast(const SharedPtr<Source>& other) noexcept;
+
+
 public:
     // Default constructor : just create with a nullptr pointer, it's user responsability
     // Remark : Do I really want to allow user to create a shared_ptr from nothing ?
@@ -204,6 +211,16 @@ public:
     }
 
 private:
+    SharedPtr(T* ptr, ControlBlock* block) noexcept
+        : m_ptr(ptr)
+        , m_controlBlock(block)
+    {
+        if (m_controlBlock)
+        {
+            m_controlBlock->AddReference();
+        }
+    }
+
     T* m_ptr;
     ControlBlock* m_controlBlock;
 };
@@ -217,17 +234,22 @@ SharedPtr<T> MakeShared(Args&&... args)
 template<typename T, typename U>
 SharedPtr<T> StaticCast(const SharedPtr<U>& other) noexcept
 {
-    auto ptr = static_cast<T*>(other.Get());
-    return SharedPtr<T>(other, ptr);
+    if (!other) return SharedPtr<T>();
+
+    T* castedPtr = static_cast<T*>(other.Get());
+    return SharedPtr<T>(castedPtr, other.m_controlBlock);
 }
 
 template<typename T, typename U>
 SharedPtr<T> DynamicCast(const SharedPtr<U>& other) noexcept
 {
-    if (auto ptr = dynamic_cast<T*>(other.Get()))
+    if (!other) return SharedPtr<T>();
+
+    if (T* castedPtr = dynamic_cast<T*>(other.Get()))
     {
-        return SharedPtr<T>(other, ptr);
+        return SharedPtr<T>(castedPtr, other.m_controlBlock);
     }
+
     return SharedPtr<T>();
 }
 

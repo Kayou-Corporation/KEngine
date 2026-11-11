@@ -38,23 +38,23 @@ private:
 
 class VulkanCommandList;
 
-class TrackedStagingBuffer : virtual public Core::IResource
+class TrackedStagingBuffer
 {
 public:
 	TrackedStagingBuffer() = default;
-	virtual ~TrackedStagingBuffer() override = default;
+	~TrackedStagingBuffer() = default;
 
 	vk::Buffer handle;
 	VmaAllocation allocation;
 	VmaAllocationInfo allocationInfo;
 };
-typedef Core::KSharedPtr<TrackedStagingBuffer> TrackedStagingBufferPtr;
+typedef Core::SharedPtr<TrackedStagingBuffer> TrackedStagingBufferPtr;
 
-class TrackedCommandBuffer : virtual public Core::IResource
+class TrackedCommandBuffer
 {
 public:
 	TrackedCommandBuffer() = default;
-	virtual ~TrackedCommandBuffer() override = default;
+	~TrackedCommandBuffer() = default;
 
 	vk::CommandPool cmdPool;
 	vk::CommandBuffer cmdBuffer;
@@ -64,7 +64,7 @@ public:
 	std::vector<TrackedStagingBufferPtr> trackedStagingBuffers;
 	VmaAllocator memoryAllocator;
 };
-typedef Core::KSharedPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
+typedef Core::SharedPtr<TrackedCommandBuffer> TrackedCommandBufferPtr;
 
 struct Queue
 {

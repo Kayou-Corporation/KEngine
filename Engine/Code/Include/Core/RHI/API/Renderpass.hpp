@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RHI/API/RHI.hpp"
-
+#include <vector>
 BEGIN_NAMESPACE_CORE
 
 struct RenderingAttachment
