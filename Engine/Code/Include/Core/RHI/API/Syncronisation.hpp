@@ -10,14 +10,14 @@ struct SemaphoreSpecs
 	uint64_t timelineValue = 0;
 };
 
-class Semaphore : virtual public Core::IResource
+class Semaphore
 {
 public:
 	virtual ~Semaphore() = default;
 };
 
 
-class Fence : virtual public Core::IResource
+class Fence
 {
 public:
 	virtual ~Fence() = default;

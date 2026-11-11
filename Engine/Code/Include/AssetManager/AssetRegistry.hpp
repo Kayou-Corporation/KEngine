@@ -3,9 +3,14 @@
 #include "AssetManager.hpp"
 #include "AssetManagerModule.hpp"
 #include "Export.hpp"
-#include "Utils/Memory.hpp"
 #include "Asset.hpp"
 #include "SoftAssetReference.hpp"
+#include "Memory/SharedPtr.hpp"
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "spdlog/spdlog.h"
 
 BEGIN_NAMESPACE_ASSETMANAGER
 #define ASSET_EXTENSION ".kasset"
@@ -40,7 +45,7 @@ enum class AssetCreationRequest
     COUNT = 2
 };
 
-class AssetRegistry : public virtual Core::IResource
+class AssetRegistry
 {
 // Basic stuff for lifetime managment & access
 public:
@@ -65,7 +70,7 @@ public:
     KAPI void UnloadAll();
 
     template<typename AssetDerived>
-    KAPI Core::KSharedPtr<AssetDerived> GetAssetHard(uint32_t id)
+    KAPI Core::SharedPtr<AssetDerived> GetAssetHard(uint32_t id)
     {
         auto it = m_assetsById.find(id);
         if (it == m_assetsById.end())
@@ -75,7 +80,7 @@ public:
         }
 
         uint32_t index = it->second;
-        Core::KSharedPtr<Asset> asset = m_assets[index];
+        Core::SharedPtr<Asset> asset = m_assets[index];
 
         if (!asset)
         {
@@ -91,11 +96,11 @@ public:
             }
         }
 
-        return asset.CastAs<AssetDerived>();
+        return Core::DynamicCast<AssetDerived>(asset);
     }
 
     template<typename AssetDerived>
-    KAPI Core::KSharedPtr<AssetDerived> GetAssetHard(const std::string& name)
+    KAPI Core::SharedPtr<AssetDerived> GetAssetHard(const std::string& name)
     {
         auto it = m_assetsByName.find(name);
         if (it == m_assetsByName.end())
@@ -105,7 +110,7 @@ public:
         }
 
         uint32_t index = it->second;
-        Core::KSharedPtr<Asset>& asset = m_assets[index];
+        Core::SharedPtr<Asset>& asset = m_assets[index];
 
         if (!asset) return nullptr;
 
@@ -118,7 +123,7 @@ public:
             }
         }
 
-        return asset.CastAs<AssetDerived>();
+        return Core::DynamicCast<AssetDerived>(asset);
     }
 
     template<typename AssetDerived>
@@ -152,7 +157,7 @@ public:
     void RunGarbageCollector();
 
 private:
-    Core::KSharedPtr<Asset> CreateAssetInstance(AssetType type, const std::string& name, uint32_t id);
+    Core::SharedPtr<Asset> CreateAssetInstance(AssetType type, const std::string& name, uint32_t id);
     inline std::string CacheAssetPath(const std::string& name, const char* ext);
 
     // High level functions, to be executed on initalization
@@ -164,7 +169,7 @@ private:
     std::string m_folderPath;
     uint32_t m_lastAssetId = 0;
 
-    std::vector<Core::KSharedPtr<Asset>> m_assets;
+    std::vector<Core::SharedPtr<Asset>> m_assets;
     std::unordered_map<uint32_t, uint32_t> m_assetsById;
     std::vector<uint32_t> m_freeIndex;
 
@@ -172,20 +177,20 @@ private:
 };
 
 template<typename T>
-Core::KSharedPtr<T> KSoftAssetRef<T>::Get() const
+Core::SharedPtr<T> KSoftAssetRef<T>::Get() const
 {
     if (!IsValid())
     {
         spdlog::error("SoftAssetRef::Get: Invalid SoftAssetRef.");
-        return Core::KSharedPtr<T>(nullptr);
+        return Core::SharedPtr<T>(nullptr);
     }
 
-    Core::KSharedPtr<T> shared = m_registry->GetAssetHard<T>(m_id);
+    Core::SharedPtr<T> shared = m_registry->GetAssetHard<T>(m_id);
 
     if (shared.Get() == nullptr)
     {
         spdlog::error("SoftAssetRef::Get: Asset with ID {} not found.", m_id);
-        return Core::KSharedPtr<T>(nullptr);
+        return Core::SharedPtr<T>(nullptr);
     }
 
     return shared;

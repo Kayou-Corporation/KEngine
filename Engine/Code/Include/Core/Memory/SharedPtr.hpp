@@ -214,4 +214,21 @@ SharedPtr<T> MakeShared(Args&&... args)
     return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
+template<typename T, typename U>
+SharedPtr<T> StaticCast(const SharedPtr<U>& other) noexcept
+{
+    auto ptr = static_cast<T*>(other.Get());
+    return SharedPtr<T>(other, ptr);
+}
+
+template<typename T, typename U>
+SharedPtr<T> DynamicCast(const SharedPtr<U>& other) noexcept
+{
+    if (auto ptr = dynamic_cast<T*>(other.Get()))
+    {
+        return SharedPtr<T>(other, ptr);
+    }
+    return SharedPtr<T>();
+}
+
 END_NAMESPACE_CORE

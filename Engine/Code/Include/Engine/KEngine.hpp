@@ -1,7 +1,6 @@
 #pragma once
 #include "CoreModule.hpp"
 
-#include "Utils/Memory.hpp"
 #include "AssetRegistry.hpp"
 #include "SoftAssetReference.hpp"
 
@@ -74,7 +73,7 @@ public:
         return m_assetRegistry->GetAsset<AssetDerived>(name);
     }
 
-    KSharedPtr<Window::Window> GetWindow() const
+    Core::SharedPtr<Window::Window> GetWindow() const
     {
         return m_window;
     }
@@ -98,7 +97,7 @@ public:
 
 protected:
     // Window :
-    KSharedPtr<Window::Window> m_window;
+    Core::SharedPtr<Window::Window> m_window;
     SurfaceHandle m_windowSurface;
 
     // RHI :
@@ -111,7 +110,7 @@ protected:
     int m_minimumThreads = 2;
 
     // Assets
-    KUniquePtr<AssetManager::AssetRegistry> m_assetRegistry;
+    UniquePtr<AssetManager::AssetRegistry> m_assetRegistry;
 
 
     // Self reference for singleton

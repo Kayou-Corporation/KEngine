@@ -2,7 +2,7 @@
 
 #include "CoreModule.hpp"
 #include "Export.hpp"
-#include "Utils/Memory.hpp"
+#include "Memory/SharedPtr.hpp"
 
 BEGIN_NAMESPACE_CORE
 
@@ -38,24 +38,24 @@ struct SwapchainImageSpecs;
 struct SwapchainSpecs;
 
 // ---------- HANDLE TYPEDEFS ----------
-typedef Core::KSharedPtr<Buffer> BufferHandle;
-typedef Core::KSharedPtr<CommandList> CommandListHandle;
-typedef Core::KSharedPtr<DescriptorSet> DescriptorSetHandle;
-typedef Core::KSharedPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
-typedef Core::KSharedPtr<Device> DeviceHandle;
-typedef Core::KSharedPtr<Fence> FenceHandle;
-typedef Core::KSharedPtr<GraphicsPipeline> GraphicsPipelineHandle;
-typedef Core::KSharedPtr<Image> ImageHandle;
-typedef Core::KSharedPtr<Instance> InstanceHandle;
-typedef Core::KSharedPtr<Pipeline> PipelineHandle;
-typedef Core::KSharedPtr<PipelineLayout> PipelineLayoutHandle;
-typedef Core::KSharedPtr<PushConstantLayout> PushConstantLayoutHandle;
-typedef Core::KSharedPtr<RenderPass> RenderPassLayout;
-typedef Core::KSharedPtr<Sampler> SamplerHandle;
-typedef Core::KSharedPtr<Semaphore> SemaphoreHandle;
-typedef Core::KSharedPtr<Shader> ShaderHandle;
-typedef Core::KSharedPtr<Surface> SurfaceHandle;
-typedef Core::KSharedPtr<Swapchain> SwapchainHandle;
+typedef Core::SharedPtr<Buffer> BufferHandle;
+typedef Core::SharedPtr<CommandList> CommandListHandle;
+typedef Core::SharedPtr<DescriptorSet> DescriptorSetHandle;
+typedef Core::SharedPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
+typedef Core::SharedPtr<Device> DeviceHandle;
+typedef Core::SharedPtr<Fence> FenceHandle;
+typedef Core::SharedPtr<GraphicsPipeline> GraphicsPipelineHandle;
+typedef Core::SharedPtr<Image> ImageHandle;
+typedef Core::SharedPtr<Instance> InstanceHandle;
+typedef Core::SharedPtr<Pipeline> PipelineHandle;
+typedef Core::SharedPtr<PipelineLayout> PipelineLayoutHandle;
+typedef Core::SharedPtr<PushConstantLayout> PushConstantLayoutHandle;
+typedef Core::SharedPtr<RenderPass> RenderPassLayout;
+typedef Core::SharedPtr<Sampler> SamplerHandle;
+typedef Core::SharedPtr<Semaphore> SemaphoreHandle;
+typedef Core::SharedPtr<Shader> ShaderHandle;
+typedef Core::SharedPtr<Surface> SurfaceHandle;
+typedef Core::SharedPtr<Swapchain> SwapchainHandle;
 
 // ---------- INSTANCE RELATED ----------
 struct Version

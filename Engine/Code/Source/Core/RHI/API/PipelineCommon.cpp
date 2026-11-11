@@ -1,8 +1,9 @@
 #include "RHI/API/PipelineCommon.hpp"
 
-BEGIN_NAMESPACE_CORE
+#include "spdlog/spdlog.h"
 
-DescriptorSetLayoutHandle PipelineLayout::GetDescriptorSetLayout(std::string name) const
+BEGIN_NAMESPACE_CORE
+	DescriptorSetLayoutHandle PipelineLayout::GetDescriptorSetLayout(std::string name) const
 {
 	for (const DescriptorSetLayoutHandle& DescriptorSetLayout : m_descriptorsLayouts)
 	{
@@ -14,7 +15,7 @@ DescriptorSetLayoutHandle PipelineLayout::GetDescriptorSetLayout(std::string nam
 
 	spdlog::warn("DescriptorSetLayout {} doesn't exist in this pipeline layout", name);
 
-	DescriptorSetLayoutHandle EmptyDescriptorSetLayout = Core::CreateRefPtr<DescriptorSetLayout>();
+	DescriptorSetLayoutHandle EmptyDescriptorSetLayout = Core::MakeShared<DescriptorSetLayout>();
 	return EmptyDescriptorSetLayout;
 }
 
@@ -30,7 +31,7 @@ DescriptorSetLayoutHandle PipelineLayout::GetDescriptorSetLayout(uint32_t index)
 
 	spdlog::warn("DescriptorSetLayout index {} doesn't exist in this pipeline layout", index);
 
-	DescriptorSetLayoutHandle EmptyDescriptorSetLayout = Core::CreateRefPtr<DescriptorSetLayout>();
+	DescriptorSetLayoutHandle EmptyDescriptorSetLayout = Core::MakeShared<DescriptorSetLayout>();
 	return EmptyDescriptorSetLayout;
 }
 
@@ -71,7 +72,7 @@ PushConstantLayoutHandle PipelineLayout::GetPushConstantLayouts(std::string name
 
 	spdlog::warn("PushConstantLayout {} doesn't exist in this pipeline layout", name);
 
-	PushConstantLayoutHandle EmptyPushConstantLayout = Core::CreateRefPtr<PushConstantLayout>();
+	PushConstantLayoutHandle EmptyPushConstantLayout = Core::MakeShared<PushConstantLayout>();
 	return EmptyPushConstantLayout;
 }
 

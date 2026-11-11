@@ -27,7 +27,7 @@ struct SamplerSpecs
     bool unnormalizedCoordinates = false;
 };
 
-class Sampler : public virtual Core::IResource
+class Sampler
 {
 public:
 	virtual ~Sampler() = default;

@@ -7,7 +7,6 @@
 #include <optional>
 
 #include "RHI/API/RHI.hpp"
-#include "Utils/Memory.hpp"
 #include "RHI/Vulkan/VulkanUtils.hpp"
 
 DISABLE_WARNINGS

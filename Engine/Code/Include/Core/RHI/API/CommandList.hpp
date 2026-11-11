@@ -21,7 +21,7 @@ struct SubmitInfo
 	//FenceHandle fence;
 };
 
-class CommandList : virtual public Core::IResource
+class CommandList
 {
 public:
 	virtual ~CommandList() = default;

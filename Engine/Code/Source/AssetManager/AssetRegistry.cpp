@@ -56,21 +56,21 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
     {
         for (uint32_t i = 0; i < m_assets.size(); ++i)
         {
-            if (m_assets[i]->GetRefCount() == 1)
+            if (m_assets[i].GetRefCount() == 1)
             {
                 UnloadAsset(m_assets[i]->GetID());
             }
         }
     }
 
-    Core::KSharedPtr<Asset> AssetRegistry::CreateAssetInstance(AssetType type, const std::string &name, uint32_t id)
+    Core::SharedPtr<Asset> AssetRegistry::CreateAssetInstance(AssetType type, const std::string &name, uint32_t id)
     {
         switch (type)
         {
             case AssetType::StaticMesh:
-                return Core::CreateRefPtr<CoreObject::StaticMesh>(type, name, id, 0, 0);
+                return Core::MakeShared<CoreObject::StaticMesh>(type, name, id, 0, 0);
             case AssetType::Texture2D:
-                return Core::CreateRefPtr<CoreObject::Texture2D>(type, name, id, 0, 0);
+                return Core::MakeShared<CoreObject::Texture2D>(type, name, id, 0, 0);
             default:
                 spdlog::error("AssetRegistry: Type d'asset non supporte.");
                 return nullptr;
@@ -157,7 +157,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         }
 
         // Create Asset in memory :
-        Core::KSharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(usedAssetType, usedName, m_lastAssetId);
+        Core::SharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(usedAssetType, usedName, m_lastAssetId);
 
         if (m_freeIndex.empty())
         {
@@ -182,7 +182,7 @@ AssetRegistry::AssetRegistry(const std::string_view &folderPath)
         std::ifstream asset(assetPath, std::ios::binary);
         AssetHeader header = InternalAssetSerializer::ReadAssetHeader(asset);
 
-        Core::KSharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(header.type, header.name, header.id);
+        Core::SharedPtr<AssetManager::Asset> assetPtr = CreateAssetInstance(header.type, header.name, header.id);
 
         if (m_freeIndex.empty())
         {
@@ -314,7 +314,7 @@ bool AssetRegistry::LoadAsset(uint32_t id)
         return false;
     }
 
-    Core::KSharedPtr<Asset> asset = m_assets[it->second];
+    Core::SharedPtr<Asset> asset = m_assets[it->second];
     if (!asset || asset->IsLoaded())
     {
         return true;
@@ -344,7 +344,7 @@ void AssetRegistry::UnloadAsset(uint32_t id)
     auto it = m_assetsById.find(id);
     if (it == m_assetsById.end()) return;
 
-    Core::KSharedPtr<Asset>& asset = m_assets[it->second];
+    Core::SharedPtr<Asset>& asset = m_assets[it->second];
     if (asset && asset->IsLoaded())
     {
         asset->UnLoad();

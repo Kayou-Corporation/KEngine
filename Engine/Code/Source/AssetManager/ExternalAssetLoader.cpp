@@ -1,5 +1,7 @@
 ﻿#include  "ExternalAssetLoader.hpp"
 
+#include "spdlog/spdlog.h"
+
 #ifdef KCOMPILER_CLANG
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmicrosoft-enum-value"

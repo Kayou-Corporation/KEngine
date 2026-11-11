@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "AssetManagerModule.hpp"
+#include "Memory/SharedPtr.hpp"
 
 
 BEGIN_NAMESPACE_ASSETMANAGER
-
-class AssetRegistry;
+    class AssetRegistry;
 
 template<typename T>
 class KSoftAssetRef
@@ -22,7 +22,7 @@ public:
     }
 
     // Automaticely load if unloaded
-    Core::KSharedPtr<T> Get() const;
+    Core::SharedPtr<T> Get() const;
 
     // TODO : Add load async
 

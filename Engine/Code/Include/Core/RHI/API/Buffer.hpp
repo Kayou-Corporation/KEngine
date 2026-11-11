@@ -17,7 +17,7 @@ struct BufferSpecs
 	bool isPersistentMapped = true;
 };
 
-class Buffer : public virtual Core::IResource
+class Buffer
 {
 public:
 	virtual ~Buffer() = default;

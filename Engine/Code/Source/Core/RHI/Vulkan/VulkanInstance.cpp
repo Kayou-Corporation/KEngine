@@ -22,8 +22,8 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	appInfo.setEngineVersion(VK_MAKE_VERSION(specs.engineVersion.major, specs.engineVersion.minor, specs.engineVersion.patch));
 	appInfo.setApiVersion(VK_API_VERSION_1_4);
 
-	Core::KSharedPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
+	Core::SharedPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::SharedPtr<Window::VulkanWindowRenderer> wvkRenderer = wRenderer.CastAs<Window::VulkanWindowRenderer>();
 	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
 
 #ifdef KDEBUG

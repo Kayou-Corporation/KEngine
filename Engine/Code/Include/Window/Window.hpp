@@ -5,12 +5,11 @@
 
 #include "WindowModule.hpp"
 #include "CoreModule.hpp"
-#include "Utils/Memory.hpp"
 #include "Export.hpp"
+#include "Memory/SharedPtr.hpp"
 
 BEGIN_NAMESPACE_WINDOW
-
-class WindowRenderer;
+	class WindowRenderer;
 
 // -------- Base window ----------
 
@@ -24,7 +23,7 @@ struct WindowSpecs
 	Core::RendererAPI rendererAPI = Core::RendererAPI::Vulkan;
 };
 
-class Window : virtual public Core::IResource
+class Window
 {
 public:
 	virtual ~Window() = default;
@@ -42,7 +41,7 @@ public:
 	std::string GetName() const { return m_windowName; }
 	bool GetHasResize() const { return m_HasResize; }
 
-	Core::KSharedPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
+	Core::SharedPtr<WindowRenderer> GetWindowRenderer() const { return m_windowRenderer; }
 
 protected:
 	uint32_t m_width = 0u;
@@ -52,7 +51,7 @@ protected:
 
 	std::string m_windowName;
 
-	Core::KSharedPtr<WindowRenderer> m_windowRenderer;
+	Core::SharedPtr<WindowRenderer> m_windowRenderer;
 };
 
 // -------- Interface ----------
@@ -63,7 +62,7 @@ enum WindowAPI
 
 struct WindowInterface
 {
-	static Core::KSharedPtr<Window> InitWindow(WindowAPI api);
+	static Core::SharedPtr<Window> InitWindow(WindowAPI api);
 };
 
 END_NAMESPACE_WINDOW

@@ -84,7 +84,7 @@ KEngine::KEngine(const KEngineSpecs& specs)
     }
 
     //----------- AssetManager --------------//
-    m_assetRegistry = Core::CreateUniquePtr<AssetManager::AssetRegistry>("Cache/Assets/");
+    m_assetRegistry = Core::MakeUnique<AssetManager::AssetRegistry>("Cache/Assets/");
     m_assetRegistry->RegisterAllAssets();
 
     // ------------ Window -----------------//

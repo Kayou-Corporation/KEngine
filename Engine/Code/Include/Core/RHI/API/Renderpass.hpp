@@ -28,7 +28,7 @@ struct RenderingInfo
 	//RenderingAttachment stencilAttachment;
 };
 
-class Renderpass : public virtual Core::IResource
+class Renderpass
 {
 public:
 	virtual ~Renderpass() = default;
