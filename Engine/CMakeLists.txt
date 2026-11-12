@@ -89,6 +89,9 @@ target_link_libraries(${K_TARGET_NAME} PUBLIC ASSETMANAGER)
 add_subdirectory(${K_INCLUDE_PATH}/CoreObject)
 target_link_libraries(${K_TARGET_NAME} PUBLIC COREOBJECT)
 
+add_subdirectory(${K_INCLUDE_PATH}/Kascade)
+target_link_libraries(${K_TARGET_NAME} PUBLIC KASCADE)
+
 #target_include_directories(${K_TARGET_NAME} "Libs/Stbimage")
 
 #if (LINK_RHI)
