@@ -127,6 +127,18 @@ void VulkanCommandList::DrawIndexed(uint32_t indexCount, uint32_t instanceCount,
 	m_handle->cmdBuffer.drawIndexed(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
+void VulkanCommandList::DrawIndirect(BufferHandle RHIBuffer, size_t offset, uint32_t drawCount, uint32_t stride)
+{
+	vk::Buffer bufferHandle = RHIBuffer.CastAs<VulkanBuffer>()->GetHandle();
+	m_handle->cmdBuffer.drawIndirect(bufferHandle, offset, drawCount, stride);
+}
+
+void VulkanCommandList::DrawIndexedIndirect(BufferHandle RHIBuffer, size_t offset, uint32_t drawCount, uint32_t stride)
+{
+	vk::Buffer bufferHandle = RHIBuffer.CastAs<VulkanBuffer>()->GetHandle();
+	m_handle->cmdBuffer.drawIndexedIndirect(bufferHandle, offset, drawCount, stride);
+}
+
 //----------- Compute --------------//
 void VulkanCommandList::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
 {

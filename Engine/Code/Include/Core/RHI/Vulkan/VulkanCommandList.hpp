@@ -36,6 +36,8 @@ public:
 	virtual void SetViewport(float x, float y, float width, float height) override;
 	virtual void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 	virtual void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) override;
+	virtual void DrawIndirect(BufferHandle RHIBuffer, size_t offset, uint32_t drawCount, uint32_t stride) override;
+	virtual void DrawIndexedIndirect(BufferHandle RHIBuffer, size_t offset, uint32_t drawCount, uint32_t stride) override;
 
 	//----------- Compute --------------//
 	virtual void Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ) override;
