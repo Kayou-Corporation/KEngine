@@ -155,7 +155,7 @@ void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32
 	VmaAllocator memoryAllocator = m_handle->memoryAllocator;
 
 	VmaAllocation bufferAllocation = RHIVulkanBuffer->GetAllocation();
-	vk::PipelineStageFlagBits pipelineStage = RHIVulkanBuffer->GetPipelineStage();
+	vk::PipelineStageFlags pipelineStage = RHIVulkanBuffer->GetPipelineStage();
 	vk::Buffer bufferHandle = RHIVulkanBuffer->GetHandle();
 	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(RHIVulkanBuffer->GetPrimaryUsage(), RHIVulkanBuffer->GetIsReadOnly());
 

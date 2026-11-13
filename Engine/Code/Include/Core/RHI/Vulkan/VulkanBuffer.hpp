@@ -41,7 +41,7 @@ public:
 
 	vk::BufferUsageFlags GetPrimaryUsage() const { return m_primaryUsage; }
 	vk::BufferUsageFlags GetUsage() const { return m_usage; }
-	vk::PipelineStageFlagBits GetPipelineStage() const { return m_pipelineStage; }
+	vk::PipelineStageFlags GetPipelineStage() const { return m_pipelineStage; }
 
 	vk::BufferCreateInfo GetCreateInfo(const BufferSpecs& specs);
 
@@ -52,7 +52,7 @@ private:
 	VmaAllocationInfo m_allocationInfo;
 	vk::BufferUsageFlags m_primaryUsage;
 	vk::BufferUsageFlags m_usage;
-	vk::PipelineStageFlagBits m_pipelineStage;
+	vk::PipelineStageFlags m_pipelineStage;
 
 };
 

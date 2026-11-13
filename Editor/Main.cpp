@@ -1,5 +1,9 @@
 #include <iostream>
 
+#include <random>
+#include <glm/gtc/constants.hpp>
+#include <chrono>
+
 #include "Window.hpp"
 #include "WindowRenderer.hpp"
 #include "../Engine/Code/Include/Engine/KEngine.hpp"
@@ -115,8 +119,8 @@ int main()
 
     float aspectRatio = static_cast<float>(windowReference->GetWidth()) / static_cast<float>(windowReference->GetHeight( ));
     Core::EditorCamera editorCamera;
-    editorCamera.SetPosition(glm::vec3(0, 0, 5.0f));
-    editorCamera.SetRotation(glm::vec3(0, 0, 0.f));
+    editorCamera.SetPosition(glm::vec3(0, 10, 30.0f));
+    editorCamera.SetRotation(glm::vec3(-15.f, 0.f, 0.f));
     editorCamera.SetFov(glm::radians(45.f));
     editorCamera.SetAspectRatio(aspectRatio);
     editorCamera.SetNearPlane(0.1f);
@@ -137,7 +141,7 @@ int main()
     initCam.cameraPos = editorCamera.GetPosition();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+    model = glm::translate(model, glm::vec3(0.0f, -1.0f, -5.0f));
     model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0, 0.0f));
     model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
@@ -257,74 +261,74 @@ int main()
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
 
-    struct Input
-    {
-        int a;
-        int b;
-    };
-
-    Core::BufferSpecs computeInput{};
-    computeInput.primaryUsage = Core::BufferUsage::Storage;
-    computeInput.size = sizeof(Input);
-    computeInput.memoryAccess = Core::MemoryAccess::Upload;
-    computeInput.pipelineStage = Core::PipelineStage::ComputeShader;
-    computeInput.isPersistentMapped = true;
-    Core::BufferHandle storageInput = device->CreateBuffer(computeInput);
-
-    Core::BufferSpecs computeOutput{};
-    computeOutput.primaryUsage = Core::BufferUsage::RWStorage;
-    computeOutput.size = sizeof(int);
-    computeOutput.memoryAccess = Core::MemoryAccess::Readback;
-    computeOutput.pipelineStage = Core::PipelineStage::ComputeShader;
-    computeOutput.isPersistentMapped = true;
-    Core::BufferHandle storageOutput = device->CreateBuffer(computeOutput);
-
-    Input compInput =
-    {
-        .a = 60,
-        .b = 9
-    };
-
-    Core::ShaderHandle testComp = device->CreateShader("test.comp", Core::ShaderStage::Compute, false, false);
-
-    std::vector<Core::DescriptorSetLayoutHandle> computeDescriptors = device->CreateDescriptorSetsLayouts(testComp);
-    Core::PipelineLayoutHandle computePipelineLayout = device->CreatePipelineLayout(computeDescriptors, {});
-
-    Core::ComputePipelineSpecs computePipelineSpecs;
-    computePipelineSpecs.shader = testComp;
-    computePipelineSpecs.pipelineLayout = computePipelineLayout;
-
-    Core::PipelineHandle computePipeline = device->CreateComputePipeline(computePipelineSpecs);
-
-    Core::DescriptorSetLayoutHandle inputDataLayout = computePipelineLayout->GetDescriptorSetLayout("InputData");
-    Core::DescriptorSetLayoutHandle outputDataLayout = computePipelineLayout->GetDescriptorSetLayout("OutputData");
-    Core::DescriptorSetHandle inputDataDescriptorSet = device->CreateDescriptorSet(inputDataLayout);
-    Core::DescriptorSetHandle outputDataDescriptorSet = device->CreateDescriptorSet(outputDataLayout);
-
-    device->SetDescriptorSetBuffer(inputDataDescriptorSet, "Particles", Core::DescriptorType::StorageBuffer, storageInput, 0, sizeof(Input));
-    device->SetDescriptorSetBuffer(outputDataDescriptorSet, "Result", Core::DescriptorType::StorageBuffer, storageOutput, 0, sizeof(int));
-
-    Core::CommandListHandle copySSBODataCommandList = device->GetCommandList(Core::QueueType::Compute);
-    copySSBODataCommandList->Open();
-
-    copySSBODataCommandList->SetBufferData(storageInput, &compInput, sizeof(Input), 0);
-
-    copySSBODataCommandList->BindPipeline(computePipeline);
-    copySSBODataCommandList->BindDescriptorSet(computePipelineLayout, "InputData", inputDataDescriptorSet, Core::PipelineBindPoint::Compute);
-    copySSBODataCommandList->BindDescriptorSet(computePipelineLayout, "OutputData", outputDataDescriptorSet, Core::PipelineBindPoint::Compute);
-
-    copySSBODataCommandList->Dispatch(1, 1, 1);
-
-    copySSBODataCommandList->Close();
-
-    Core::SubmitInfo compSubmitInfo;
-    compSubmitInfo.stage = Core::PipelineStage::ComputeShader;
-    device->SubmitCommandList(copySSBODataCommandList, compSubmitInfo);
-
-    device->WaitIdle();
-    int* resultPtr = static_cast<int*>(storageOutput->GetMappedData());
-    int compResult = *resultPtr;
-    spdlog::info("Compute result: {}", compResult);
+    //struct Input
+    //{
+    //    int a;
+    //    int b;
+    //};
+    //
+    //Core::BufferSpecs computeInput{};
+    //computeInput.primaryUsage = Core::BufferUsage::Storage;
+    //computeInput.size = sizeof(Input);
+    //computeInput.memoryAccess = Core::MemoryAccess::Upload;
+    //computeInput.pipelineStage = Core::PipelineStage::ComputeShader;
+    //computeInput.isPersistentMapped = true;
+    //Core::BufferHandle storageInput = device->CreateBuffer(computeInput);
+    //
+    //Core::BufferSpecs computeOutput{};
+    //computeOutput.primaryUsage = Core::BufferUsage::RWStorage;
+    //computeOutput.size = sizeof(int);
+    //computeOutput.memoryAccess = Core::MemoryAccess::Readback;
+    //computeOutput.pipelineStage = Core::PipelineStage::ComputeShader;
+    //computeOutput.isPersistentMapped = true;
+    //Core::BufferHandle storageOutput = device->CreateBuffer(computeOutput);
+    //
+    //Input compInput =
+    //{
+    //    .a = 60,
+    //    .b = 9
+    //};
+    //
+    //Core::ShaderHandle testComp = device->CreateShader("test.comp", Core::ShaderStage::Compute, false, false);
+    //
+    //std::vector<Core::DescriptorSetLayoutHandle> computeDescriptors = device->CreateDescriptorSetsLayouts(testComp);
+    //Core::PipelineLayoutHandle computePipelineLayout = device->CreatePipelineLayout(computeDescriptors, {});
+    //
+    //Core::ComputePipelineSpecs computePipelineSpecs;
+    //computePipelineSpecs.shader = testComp;
+    //computePipelineSpecs.pipelineLayout = computePipelineLayout;
+    //
+    //Core::PipelineHandle computePipeline = device->CreateComputePipeline(computePipelineSpecs);
+    //
+    //Core::DescriptorSetLayoutHandle inputDataLayout = computePipelineLayout->GetDescriptorSetLayout("InputData");
+    //Core::DescriptorSetLayoutHandle outputDataLayout = computePipelineLayout->GetDescriptorSetLayout("OutputData");
+    //Core::DescriptorSetHandle inputDataDescriptorSet = device->CreateDescriptorSet(inputDataLayout);
+    //Core::DescriptorSetHandle outputDataDescriptorSet = device->CreateDescriptorSet(outputDataLayout);
+    //
+    //device->SetDescriptorSetBuffer(inputDataDescriptorSet, "Particles", Core::DescriptorType::StorageBuffer, storageInput, 0, sizeof(Input));
+    //device->SetDescriptorSetBuffer(outputDataDescriptorSet, "Result", Core::DescriptorType::StorageBuffer, storageOutput, 0, sizeof(int));
+    //
+    //Core::CommandListHandle copySSBODataCommandList = device->GetCommandList(Core::QueueType::Compute);
+    //copySSBODataCommandList->Open();
+    //
+    //copySSBODataCommandList->SetBufferData(storageInput, &compInput, sizeof(Input), 0);
+    //
+    //copySSBODataCommandList->BindPipeline(computePipeline);
+    //copySSBODataCommandList->BindDescriptorSet(computePipelineLayout, "InputData", inputDataDescriptorSet, Core::PipelineBindPoint::Compute);
+    //copySSBODataCommandList->BindDescriptorSet(computePipelineLayout, "OutputData", outputDataDescriptorSet, Core::PipelineBindPoint::Compute);
+    //
+    //copySSBODataCommandList->Dispatch(1, 1, 1);
+    //
+    //copySSBODataCommandList->Close();
+    //
+    //Core::SubmitInfo compSubmitInfo;
+    //compSubmitInfo.stage = Core::PipelineStage::ComputeShader;
+    //device->SubmitCommandList(copySSBODataCommandList, compSubmitInfo);
+    //
+    //device->WaitIdle();
+    //int* resultPtr = static_cast<int*>(storageOutput->GetMappedData());
+    //int compResult = *resultPtr;
+    //spdlog::info("Compute result: {}", compResult);
 
     Core::ShaderHandle baseVert = device->CreateShader("base.vert", Core::ShaderStage::Vertex, false, true);
     Core::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Core::ShaderStage::Fragment, false, true);
@@ -367,12 +371,188 @@ int main()
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
 
+    Core::ShaderHandle particleVert = device->CreateShader("particle.vert", Core::ShaderStage::Vertex, false, true);
+
+    Core::GraphicsPipelineSpecs unlitParticlePipelineSpecs;
+    unlitParticlePipelineSpecs.colorAttachmentCount = 1;
+    unlitParticlePipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
+    unlitParticlePipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
+    unlitParticlePipelineSpecs.viewportCount = 1;
+    unlitParticlePipelineSpecs.scissorCount = 1;
+    unlitParticlePipelineSpecs.lineWidth = 1.f;
+    unlitParticlePipelineSpecs.cullmode = Core::CullMode::Back;
+    unlitParticlePipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
+    unlitParticlePipelineSpecs.SamplesCount = Core::SampleCount::Count1;
+    unlitParticlePipelineSpecs.blendColor = false;
+    unlitParticlePipelineSpecs.depthTest = true;
+    unlitParticlePipelineSpecs.depthWrite = true;
+    unlitParticlePipelineSpecs.depthCompare = Core::CompareOp::LessOrEqual;
+    unlitParticlePipelineSpecs.dynamicStates = { Core::DynamicState::ViewPort, Core::DynamicState::Scissor };
+    unlitParticlePipelineSpecs.topology = Core::PrimitiveTopology::TriangleList;
+    unlitParticlePipelineSpecs.shaders = { particleVert , unlitFrag };
+    unlitParticlePipelineSpecs.pipelineLayout = globalPipelineLayout;
+
+    Core::PipelineHandle unlitParticlePipeline = device->CreateGraphicsPipeline(unlitParticlePipelineSpecs);
+
+    Core::DescriptorSetLayoutHandle particleDataLayout = globalPipelineLayout->GetDescriptorSetLayout("particleData");
+    Core::DescriptorSetHandle oddParticleDataDescriptorSet = device->CreateDescriptorSet(particleDataLayout);
+    Core::DescriptorSetHandle evenParticleDataDescriptorSet = device->CreateDescriptorSet(particleDataLayout);
+
+    uint32_t nbParticles = 4096u;
+
+    Core::BufferSpecs oddPositionsSpecs{};
+    oddPositionsSpecs.primaryUsage = Core::BufferUsage::RWStorage;
+    oddPositionsSpecs.size = 4 * sizeof(float) * nbParticles;
+    oddPositionsSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    oddPositionsSpecs.pipelineStage = Core::PipelineStage::ComputeShader;
+    oddPositionsSpecs.additionalStages = { Core::PipelineStage::VertexShader };
+    oddPositionsSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    Core::BufferHandle oddPositions = device->CreateBuffer(oddPositionsSpecs);
+
+    Core::BufferSpecs oddVelocitiesSpecs{};
+    oddVelocitiesSpecs.primaryUsage = Core::BufferUsage::RWStorage;
+    oddVelocitiesSpecs.size = 4 * sizeof(float) * nbParticles;
+    oddVelocitiesSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    oddVelocitiesSpecs.pipelineStage = Core::PipelineStage::ComputeShader;
+    oddVelocitiesSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    Core::BufferHandle oddVelocities = device->CreateBuffer(oddVelocitiesSpecs);
+
+    Core::BufferSpecs evenPositionsSpecs{};
+    evenPositionsSpecs.primaryUsage = Core::BufferUsage::RWStorage;
+    evenPositionsSpecs.size = 4 * sizeof(float) * nbParticles;
+    evenPositionsSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    evenPositionsSpecs.pipelineStage = Core::PipelineStage::ComputeShader;
+    evenPositionsSpecs.additionalStages = { Core::PipelineStage::VertexShader };
+    evenPositionsSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    Core::BufferHandle evenPositions = device->CreateBuffer(evenPositionsSpecs);
+
+    Core::BufferSpecs evenVelocitiesSpecs{};
+    evenVelocitiesSpecs.primaryUsage = Core::BufferUsage::RWStorage;
+    evenVelocitiesSpecs.size = 4 * sizeof(float) * nbParticles;
+    evenVelocitiesSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    evenVelocitiesSpecs.pipelineStage = Core::PipelineStage::ComputeShader;
+    evenVelocitiesSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    Core::BufferHandle evenVelocities = device->CreateBuffer(evenVelocitiesSpecs);
+
+    struct EffectData
+    {
+        float deltaTime;
+        float gravity;
+        uint32_t nbParticles;
+    };
+
+    Core::BufferSpecs effectDataSpecs{};
+    effectDataSpecs.primaryUsage = Core::BufferUsage::Uniform;
+    effectDataSpecs.size = sizeof(EffectData);
+    effectDataSpecs.memoryAccess = Core::MemoryAccess::Upload;
+    effectDataSpecs.pipelineStage = Core::PipelineStage::ComputeShader;
+    effectDataSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    effectDataSpecs.isPersistentMapped = true;
+    Core::BufferHandle effectDataUniform = device->CreateBuffer(effectDataSpecs);
+
+    Core::ShaderHandle particleLifeComp = device->CreateShader("particleLife.comp", Core::ShaderStage::Compute, false, false);
+
+    std::vector<Core::DescriptorSetLayoutHandle> particleDescriptors = device->CreateDescriptorSetsLayouts(particleLifeComp);
+    Core::PipelineLayoutHandle particlePipelineLayout = device->CreatePipelineLayout(particleDescriptors, {});
+
+    Core::ComputePipelineSpecs particlePipelineSpecs;
+    particlePipelineSpecs.shader = particleLifeComp;
+    particlePipelineSpecs.pipelineLayout = particlePipelineLayout;
+
+    Core::PipelineHandle particlePipeline = device->CreateComputePipeline(particlePipelineSpecs);
+
+    Core::DescriptorSetLayoutHandle particlesLayout = particlePipelineLayout->GetDescriptorSetLayout("particles");
+    Core::DescriptorSetLayoutHandle effectDataLayout = particlePipelineLayout->GetDescriptorSetLayout("effectData");
+    Core::DescriptorSetHandle oddParticlesDescriptorSet = device->CreateDescriptorSet(particlesLayout);
+    Core::DescriptorSetHandle evenParticlesDescriptorSet = device->CreateDescriptorSet(particlesLayout);
+    Core::DescriptorSetHandle effectDataDescriptorSet = device->CreateDescriptorSet(effectDataLayout);
+
+    device->SetDescriptorSetBuffer(oddParticlesDescriptorSet, "inPositions", Core::DescriptorType::StorageBuffer, evenPositions, 0, 4 * sizeof(float) * nbParticles);
+    device->SetDescriptorSetBuffer(oddParticlesDescriptorSet, "inVelocities", Core::DescriptorType::StorageBuffer, evenVelocities, 0, 4 * sizeof(float) * nbParticles);
+    device->SetDescriptorSetBuffer(oddParticlesDescriptorSet, "outPositions", Core::DescriptorType::StorageBuffer, oddPositions, 0, 4 * sizeof(float) * nbParticles);
+    device->SetDescriptorSetBuffer(oddParticlesDescriptorSet, "outVelocities", Core::DescriptorType::StorageBuffer, oddVelocities, 0, 4 * sizeof(float) * nbParticles);
+
+    device->SetDescriptorSetBuffer(evenParticlesDescriptorSet, "inPositions", Core::DescriptorType::StorageBuffer, oddPositions, 0, 4 * sizeof(float) * nbParticles);
+    device->SetDescriptorSetBuffer(evenParticlesDescriptorSet, "inVelocities", Core::DescriptorType::StorageBuffer, oddVelocities, 0, 4 * sizeof(float) * nbParticles);
+    device->SetDescriptorSetBuffer(evenParticlesDescriptorSet, "outPositions", Core::DescriptorType::StorageBuffer, evenPositions, 0, 4 * sizeof(float) * nbParticles);
+    device->SetDescriptorSetBuffer(evenParticlesDescriptorSet, "outVelocities", Core::DescriptorType::StorageBuffer, evenVelocities, 0, 4 * sizeof(float) * nbParticles);
+
+    device->SetDescriptorSetBuffer(effectDataDescriptorSet, "globalUniform", Core::DescriptorType::UniformBuffer, effectDataUniform, 0, sizeof(EffectData));
+
+    device->SetDescriptorSetBuffer(oddParticleDataDescriptorSet, "positions", Core::DescriptorType::StorageBuffer, oddPositions, 0, 4 * sizeof(float) * nbParticles);
+    device->SetDescriptorSetBuffer(evenParticleDataDescriptorSet, "positions", Core::DescriptorType::StorageBuffer, evenPositions, 0, 4 * sizeof(float) * nbParticles);
+
+    Core::DrawIndexedIndirectCommand particleDrawCommand{};
+    particleDrawCommand.indexCount = vikingRoomMesh->GetIndicesCount();
+    particleDrawCommand.instanceCount = nbParticles;
+    particleDrawCommand.firstIndex = 0;
+    particleDrawCommand.vertexOffset = 0;
+    particleDrawCommand.firstInstance = 0;
+
+    Core::BufferSpecs indirectSpecs{};
+    indirectSpecs.primaryUsage = Core::BufferUsage::DrawIndirect;
+    indirectSpecs.size = sizeof(Core::DrawIndexedIndirectCommand);
+    indirectSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
+    indirectSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
+    indirectSpecs.pipelineStage = Core::PipelineStage::Indirect;
+    
+    Core::BufferHandle indirectBuffer = device->CreateBuffer(indirectSpecs);
+
+    std::mt19937 rng(42);
+    std::uniform_real_distribution<float> distUnit(0.0f, 1.0f);
+    std::uniform_real_distribution<float> distSpeed(1.0f, 15.0f);
+
+    std::vector<glm::vec4> positionsVector;
+    std::vector<glm::vec4> velocitiesVector;
+    positionsVector.reserve(nbParticles);
+    velocitiesVector.reserve(nbParticles);
+    for (int i = 0; i < static_cast<int>(nbParticles); ++i)
+    {
+        glm::vec4 pos = glm::vec4(0, 2, -3, 1);
+        positionsVector.push_back(pos);
+
+        float theta = distUnit(rng) * glm::two_pi<float>();
+        float cosPhi = 1.0f - 2.0f * distUnit(rng);
+        float sinPhi = std::sqrt(1.0f - cosPhi * cosPhi);
+
+        glm::vec3 dir(sinPhi * std::cos(theta), cosPhi, sinPhi * std::sin(theta));
+        float speed = distSpeed(rng);
+
+        velocitiesVector.push_back(glm::vec4(dir * speed, 0.0f));
+    }
+
+    Core::CommandListHandle copyParticlesCommandList = device->GetCommandList(Core::QueueType::Transfer);
+
+    copyParticlesCommandList->Open();
+
+    copyParticlesCommandList->SetBufferData(indirectBuffer, &particleDrawCommand, sizeof(Core::DrawIndexedIndirectCommand), 0);
+    
+    copyParticlesCommandList->SetBufferData(oddPositions, positionsVector.data(), 4 * sizeof(float) * nbParticles, 0);
+    copyParticlesCommandList->SetBufferData(evenPositions, positionsVector.data(), 4 * sizeof(float) * nbParticles, 0);
+    copyParticlesCommandList->SetBufferData(oddVelocities, velocitiesVector.data(), 4 * sizeof(float) * nbParticles, 0);
+    copyParticlesCommandList->SetBufferData(evenVelocities, velocitiesVector.data(), 4 * sizeof(float) * nbParticles, 0);
+
+    copyParticlesCommandList->Close();
+
+    Core::SubmitInfo submitInfoCopyParticles;
+    submitInfoCopyParticles.stage = Core::PipelineStage::Transfer;
+
+    device->SubmitCommandList(copyParticlesCommandList, submitInfoCopyParticles);
+
     device->WaitIdle();
     uint64_t frameCounter = 0;
     bool gpuResizeRequest = false;
+    float deltaTime = 0.f;
+    using Clock = std::chrono::high_resolution_clock;
+    auto lastFrameTime = Clock::now();
+    bool isFrameEven = false;
 
     while (!windowReference->ShouldClose())
     {
+        isFrameEven = (frameCounter % 2 == 0);
+        auto currentFrameTime = Clock::now();
+        deltaTime = std::chrono::duration<float>(currentFrameTime - lastFrameTime).count();
+        lastFrameTime = currentFrameTime;
         windowReference->PollEvents();
         //Core::KEngine::Update();
 
@@ -432,6 +612,11 @@ int main()
 
         device->RunGarbageCollector();
 
+        EffectData effData{};
+        effData.deltaTime = deltaTime;
+        effData.gravity = 9.81f;
+        effData.nbParticles = nbParticles;
+
         Core::RenderingAttachment colorAttachment;
         colorAttachment.image = presentationImages[imageIndex];
         colorAttachment.layout = Core::Layout::ColorAttachment;
@@ -456,6 +641,16 @@ int main()
         auto commandList = device->GetCommandList(Core::QueueType::Graphics);
         commandList->Open();
 
+        commandList->SetBufferData(effectDataUniform, &effData, sizeof(EffectData), 0);
+
+        commandList->BindPipeline(particlePipeline);
+
+        Core::DescriptorSetHandle particleDesc = isFrameEven ? evenParticlesDescriptorSet : oddParticlesDescriptorSet;
+        commandList->BindDescriptorSet(particlePipelineLayout, "particles", particleDesc, Core::PipelineBindPoint::Compute);
+        commandList->BindDescriptorSet(particlePipelineLayout, "effectData", effectDataDescriptorSet, Core::PipelineBindPoint::Compute);
+
+        commandList->Dispatch(16, 1, 1);
+
         commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::ColorAttachment);
         commandList->TransitionImageLayout(depthImage, Core::Layout::DepthStencilAttachment);
 
@@ -473,6 +668,19 @@ int main()
         commandList->BindIndexBuffer(indexBuffer, 0);
 
         commandList->DrawIndexed(static_cast<uint32_t>(vikingRoomMesh->GetIndicesCount()), 1, 0, 0, 0);
+
+        commandList->BindPipeline(unlitParticlePipeline);
+
+        commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Core::PipelineBindPoint::Graphics);
+        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
+
+        Core::DescriptorSetHandle particleRenderSet = isFrameEven ? evenParticleDataDescriptorSet : oddParticleDataDescriptorSet;
+        commandList->BindDescriptorSet(globalPipelineLayout, "particleData", particleRenderSet, Core::PipelineBindPoint::Graphics);
+
+        commandList->BindVertexBuffer(vertexBuffer, 0);
+        commandList->BindIndexBuffer(indexBuffer, 0);
+
+        commandList->DrawIndexedIndirect(indirectBuffer, 0, 1, sizeof(Core::DrawIndexedIndirectCommand));
 
         commandList->EndRendering();
 
@@ -513,18 +721,36 @@ int main()
     device->DestroyDescriptorSet(frameDataDescriptorSet);
     device->DestroyDescriptorSet(drawDataDescriptorSet);
 
+    device->DestroyBuffer(oddPositions);
+    device->DestroyBuffer(oddVelocities);
+    device->DestroyBuffer(evenPositions);
+    device->DestroyBuffer(evenVelocities);
+    device->DestroyBuffer(effectDataUniform);
+    device->DestroyBuffer(indirectBuffer);
+    device->DestroyDescriptorSet(oddParticleDataDescriptorSet);
+    device->DestroyDescriptorSet(evenParticleDataDescriptorSet);
+    device->DestroyDescriptorSet(oddParticlesDescriptorSet);
+    device->DestroyDescriptorSet(evenParticlesDescriptorSet);
+    device->DestroyDescriptorSet(effectDataDescriptorSet);
+    device->DestroyPipeline(unlitParticlePipeline);
+    device->DestroyPipeline(particlePipeline);
+    device->DestroyPipelineLayout(particlePipelineLayout);
+    device->DestroyDescriptorSetsLayouts(particleDescriptors);
+    device->DestroyShader(particleLifeComp);
+    device->DestroyShader(particleVert);
+
     device->DestroyPipeline(unlitPipeline);
     device->DestroyPipelineLayout(globalPipelineLayout);
     device->DestroyDescriptorSetsLayouts(globalLayoutDescriptors);
 
-    device->DestroyBuffer(storageInput);
-    device->DestroyBuffer(storageOutput);
-    device->DestroyDescriptorSet(inputDataDescriptorSet);
-    device->DestroyDescriptorSet(outputDataDescriptorSet);
-    device->DestroyPipeline(computePipeline);
-    device->DestroyPipelineLayout(computePipelineLayout);
-    device->DestroyDescriptorSetsLayouts(computeDescriptors);
-    device->DestroyShader(testComp);
+    //device->DestroyBuffer(storageInput);
+    //device->DestroyBuffer(storageOutput);
+    //device->DestroyDescriptorSet(inputDataDescriptorSet);
+    //device->DestroyDescriptorSet(outputDataDescriptorSet);
+    //device->DestroyPipeline(computePipeline);
+    //device->DestroyPipelineLayout(computePipelineLayout);
+    //device->DestroyDescriptorSetsLayouts(computeDescriptors);
+    //device->DestroyShader(testComp);
 
     device->DestroyShader(unlitFrag);
     device->DestroyShader(baseVert);

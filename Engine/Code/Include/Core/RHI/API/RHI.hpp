@@ -284,7 +284,9 @@ enum class BufferUsage
 	Uniform,
 
 	TransferSrc,
-	TransferDst
+	TransferDst,
+
+	DrawIndirect
 };
 
 enum class MemoryAccess
@@ -304,6 +306,7 @@ enum class PipelineStage
 	GeometryShader,
 	Transfer,
 	ColorOutput,
+	Indirect,
 	None
 };
 

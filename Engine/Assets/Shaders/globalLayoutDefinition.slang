@@ -38,6 +38,13 @@ struct DrawData
 };
 ParameterBlock<DrawData> drawData;
 
+// Set 2 --- ParticleData ---
+struct ParticleData
+{
+    StructuredBuffer<float4> positions;
+};
+ParameterBlock<ParticleData> particleData;
+
 //struct PushConstants
 //{
 //     int textureID;

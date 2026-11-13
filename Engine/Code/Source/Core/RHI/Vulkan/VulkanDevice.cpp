@@ -90,7 +90,7 @@ void VulkanDevice::SubmitCommandList(CommandListHandle RHICommandList, const Sub
 	}
 	m_queues[RHICommandBufferQueue].PushWaitSemaphores(waitSemaphores, RHISubmitInfo.waitSemaphoresValues);
 
-	vk::PipelineStageFlagBits stage = TranslateToVulkan(RHISubmitInfo.stage);
+	vk::PipelineStageFlags stage = TranslateToVulkan(RHISubmitInfo.stage);
 
 	m_queues[RHICommandBufferQueue].Submit(commandBuffer, stage);
 }

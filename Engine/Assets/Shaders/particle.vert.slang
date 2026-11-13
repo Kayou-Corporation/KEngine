@@ -2,12 +2,6 @@
 
 import "globalLayoutDefinition";
 
-struct ParticleInput
-{
-    StructuredBuffer<float4> positions;
-};
-ParameterBlock<ParticleInput> particleInput;
-
 struct VSInput
 {
     float3 position : POSITION;
@@ -36,11 +30,11 @@ float4x4 CreateModelMatrix(float4 position)
 }
 
 [shader("vertex")]
-VSOutput vsMain(VSInput input, uint instanceId : SV_InstanceID)
+VSOutput vsMain(VSInput input, uint instanceId : SV_VulkanInstanceID)
 {
     VSOutput o;
 
-    float4x4 model = CreateModelMatrix(particleInput.positions[instanceId]);
+    float4x4 model = CreateModelMatrix(particleData.positions[instanceId]);
 
     float4 world = mul(model, float4(input.position, 1));
     o.worldPos = world.xyz;

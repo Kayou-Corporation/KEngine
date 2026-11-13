@@ -519,6 +519,9 @@ inline vk::BufferUsageFlags TranslateToVulkan(BufferUsage usage)
     case BufferUsage::TransferDst:
         return vk::BufferUsageFlagBits::eTransferDst;
 
+    case BufferUsage::DrawIndirect:
+        return vk::BufferUsageFlagBits::eIndirectBuffer;
+
     default:
         return {};
     }
@@ -557,6 +560,10 @@ inline vk::BufferUsageFlags TranslateToVulkan(
         case BufferUsage::TransferDst:
             flags |= vk::BufferUsageFlagBits::eTransferDst;
             break;
+
+        case BufferUsage::DrawIndirect:
+            flags |= vk::BufferUsageFlagBits::eIndirectBuffer;
+            break;
         }
     }
 
@@ -594,7 +601,7 @@ inline VmaAllocationCreateInfo TranslateToVulkan(MemoryAccess access)
 }
 
 // Pipeline stage
-inline vk::PipelineStageFlagBits TranslateToVulkan(PipelineStage stage)
+inline vk::PipelineStageFlags TranslateToVulkan(PipelineStage stage)
 {
     switch (stage)
     {
@@ -618,10 +625,24 @@ inline vk::PipelineStageFlagBits TranslateToVulkan(PipelineStage stage)
 
     case PipelineStage::ColorOutput:
         return vk::PipelineStageFlagBits::eColorAttachmentOutput;
+
+    case PipelineStage::Indirect:
+        return vk::PipelineStageFlagBits::eDrawIndirect;
+
     case PipelineStage::None:
     default:
         return vk::PipelineStageFlagBits::eNone;
     }
+}
+
+inline vk::PipelineStageFlags TranslateToVulkan(std::vector<PipelineStage> stages)
+{
+    vk::PipelineStageFlags flags{};
+
+    for (PipelineStage stage : stages)
+        flags |= TranslateToVulkan(stage);
+
+    return flags;
 }
 
 inline vk::ShaderStageFlagBits TranslateToVulkan(ShaderStage stage)
