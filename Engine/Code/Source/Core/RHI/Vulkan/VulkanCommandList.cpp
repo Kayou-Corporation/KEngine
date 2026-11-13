@@ -6,13 +6,18 @@
 #include "RHI/Vulkan/VulkanRenderpass.hpp"
 #include "RHI/Vulkan/VulkanGraphicsPipeline.hpp"
 #include"RHI/Vulkan/VulkanPipelineCommon.hpp"
-#include"RHI/Vulkan/VulkanDescriptorSet.hpp"
+#include"RHI/Vulkan/VulkanStandaloneDescriptorSet.hpp"
 
 BEGIN_NAMESPACE_CORE
 
 //----------- Open / Close --------------//
 void VulkanCommandList::Open()
 {
+	if (m_isOpen)
+	{
+		return;
+	}
+
 	vk::CommandBufferBeginInfo beginInfo{};
 	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
@@ -57,10 +62,10 @@ void VulkanCommandList::EndRendering()
 }
 
 //----------- Bind --------------//
-void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, std::string layoutName, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
+void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, std::string layoutName, StandaloneDescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
 	Core::KSharedPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = StaticCast<VulkanPipelineLayout>(RHIPipelineLayout);
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	vk::PipelineLayout pipelineLayout = RHVulkanIPipelineLayout->GetHandle();
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
@@ -70,10 +75,10 @@ void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout
 	m_handle->cmdBuffer.bindDescriptorSets(bindPoint, pipelineLayout, layoutIndex, 1,&descriptorSet, 0, nullptr);
 }
 
-void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, uint32_t layoutIndex, DescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
+void VulkanCommandList::BindDescriptorSet(PipelineLayoutHandle RHIPipelineLayout, uint32_t layoutIndex, StandaloneDescriptorSetHandle RHIDescriptorSet, PipelineBindPoint RHIBindPoint)
 {
 	Core::KSharedPtr<VulkanPipelineLayout> RHVulkanIPipelineLayout = StaticCast<VulkanPipelineLayout>(RHIPipelineLayout);
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	vk::PipelineLayout pipelineLayout = RHVulkanIPipelineLayout->GetHandle();
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();

@@ -27,8 +27,8 @@ public:
 	virtual void EndRendering() override;
 
 	//----------- Bind --------------//
-	virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, std::string layoutName, DescriptorSetHandle DescriptorSet, PipelineBindPoint bindPoint) override;
-	virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, uint32_t layoutIndex, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) override;
+	virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, std::string layoutName, StandaloneDescriptorSetHandle DescriptorSet, PipelineBindPoint bindPoint) override;
+	virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, uint32_t layoutIndex, StandaloneDescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) override;
 	virtual void BindVertexBuffer(BufferHandle vertexBuffer, uint32_t offset) override;
 	virtual void BindIndexBuffer(BufferHandle indexBuffer, uint32_t offset) override;
 

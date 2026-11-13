@@ -1,4 +1,4 @@
-#include "RHI/Vulkan/VulkanDescriptorSet.hpp"
+#include "RHI/Vulkan/VulkanStandaloneDescriptorSet.hpp"
 
 #include "RHI/Vulkan/VulkanBuffer.hpp"
 #include "RHI/Vulkan/VulkanImage.hpp"
@@ -6,7 +6,7 @@
 
 BEGIN_NAMESPACE_CORE
 
-vk::DescriptorSetAllocateInfo VulkanDescriptorSet::GetAllocInfo(vk::DescriptorSetLayout layout)
+vk::DescriptorSetAllocateInfo VulkanStandaloneDescriptorSet::GetAllocInfo(vk::DescriptorSetLayout layout)
 {
 	(void)layout;
 
@@ -17,7 +17,7 @@ vk::DescriptorSetAllocateInfo VulkanDescriptorSet::GetAllocInfo(vk::DescriptorSe
 	return alloInfo;
 }
 
-vk::DescriptorPoolCreateInfo VulkanDescriptorSet::GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t totalCount)
+vk::DescriptorPoolCreateInfo VulkanStandaloneDescriptorSet::GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t totalCount)
 {
 	(void)totalCount;
 	vk::DescriptorPoolCreateInfo createInfo{};

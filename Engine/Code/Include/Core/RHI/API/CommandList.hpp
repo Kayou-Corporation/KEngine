@@ -38,8 +38,8 @@ public:
 	KAPI virtual void EndRendering() = 0;
 
 	//----------- Bind --------------//
-	KAPI virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, std::string layoutName, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
-	KAPI virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, uint32_t layoutIndex, DescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
+	KAPI virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, std::string layoutName, StandaloneDescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
+	KAPI virtual void BindDescriptorSet(PipelineLayoutHandle pipelineLayout, uint32_t layoutIndex, StandaloneDescriptorSetHandle descriptorSet, PipelineBindPoint bindPoint) = 0;
 	KAPI virtual void BindVertexBuffer(BufferHandle vertexBuffer, uint32_t offset) = 0;
 	KAPI virtual void BindIndexBuffer(BufferHandle indexBuffer, uint32_t offset) = 0;
 

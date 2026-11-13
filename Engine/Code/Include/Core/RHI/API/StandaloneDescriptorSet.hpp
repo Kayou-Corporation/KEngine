@@ -5,11 +5,12 @@
 
 BEGIN_NAMESPACE_CORE
 
-class DescriptorSet
+class StandaloneDescriptorSet
 {
 public:
-	virtual ~DescriptorSet() = default;
+	virtual ~StandaloneDescriptorSet() = default;
 
+	std::string GetName() const { return name; }
 protected:
 	std::string name;
 };

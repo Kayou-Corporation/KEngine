@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RHI/API/DescriptorSet.hpp"
+#include "RHI/API/StandaloneDescriptorSet.hpp"
 
 #include "RHI/Vulkan/VulkanUtils.hpp"
 #include "RHI/Vulkan/VulkanPipelineCommon.hpp"
@@ -9,12 +9,12 @@
 
 BEGIN_NAMESPACE_CORE
 
-class VulkanDescriptorSet : public DescriptorSet
+class VulkanStandaloneDescriptorSet : public StandaloneDescriptorSet
 {
 public:
-	VulkanDescriptorSet() = delete;
-	VulkanDescriptorSet(std::string name) { this->name = name; }
-	virtual ~VulkanDescriptorSet() override = default;
+	VulkanStandaloneDescriptorSet() = delete;
+	VulkanStandaloneDescriptorSet(std::string name) { this->name = name; }
+	virtual ~VulkanStandaloneDescriptorSet() override = default;
 
 public:
 	vk::DescriptorSetAllocateInfo GetAllocInfo(vk::DescriptorSetLayout layout);

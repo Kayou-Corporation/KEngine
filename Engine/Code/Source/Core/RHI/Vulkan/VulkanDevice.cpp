@@ -11,7 +11,7 @@
 #include "RHI/Vulkan/VulkanGraphicsPipeline.hpp"
 #include "RHI/Vulkan/VulkanCommandList.hpp"
 #include "RHI/Vulkan/VulkanSyncronisation.hpp"
-#include "RHI/Vulkan/VulkanDescriptorSet.hpp"
+#include "RHI/Vulkan/VulkanStandaloneDescriptorSet.hpp"
 #include "RHI/Vulkan/VulkanSampler.hpp"
 
 #include <map>
@@ -703,9 +703,9 @@ void VulkanDevice::DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHan
 }
 
 // -------------- Descriptor Set -------------- // 
-DescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle RHILayout)
+StandaloneDescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle RHILayout)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<VulkanDescriptorSet>(RHILayout->GetName());
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<VulkanStandaloneDescriptorSet>(RHILayout->GetName());
 
 	Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanLayout = StaticCast<VulkanDescriptorSetLayout>(RHILayout);
 
@@ -742,18 +742,18 @@ DescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle 
 	return RHIVulkanDescriptorSet;
 }
 
-void VulkanDevice::DestroyDescriptorSet(DescriptorSetHandle RHIDescriptorSet)
+void VulkanDevice::DestroyDescriptorSet(StandaloneDescriptorSetHandle RHIDescriptorSet)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorPool pool = RHIVulkanDescriptorSet->GetPool();
 
 	m_handle.destroyDescriptorPool(pool);
 }
 
-void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, BufferHandle RHIBuffer, uint32_t offset, uint32_t range)
+void VulkanDevice::SetDescriptorSetBuffer(StandaloneDescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, BufferHandle RHIBuffer, uint32_t offset, uint32_t range)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::Buffer updateBuffer = StaticCast<VulkanBuffer>(RHIBuffer)->GetHandle();
@@ -783,9 +783,9 @@ void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, 
 	}
 }
 
-void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, BufferHandle RHIBuffer, uint32_t offset, uint32_t range)
+void VulkanDevice::SetDescriptorSetBuffer(StandaloneDescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, BufferHandle RHIBuffer, uint32_t offset, uint32_t range)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::Buffer updateBuffer = StaticCast<VulkanBuffer>(RHIBuffer)->GetHandle();
@@ -815,9 +815,9 @@ void VulkanDevice::SetDescriptorSetBuffer(DescriptorSetHandle RHIDescriptorSet, 
 	}
 }
 
-void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, ImageHandle RHIImage, SamplerHandle RHISampler)
+void VulkanDevice::SetDescriptorSetImage(StandaloneDescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, ImageHandle RHIImage, SamplerHandle RHISampler)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	Core::KSharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
 
@@ -860,9 +860,9 @@ void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, s
 	}
 }
 
-void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, ImageHandle RHIImage, SamplerHandle RHISampler)
+void VulkanDevice::SetDescriptorSetImage(StandaloneDescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, ImageHandle RHIImage, SamplerHandle RHISampler)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	Core::KSharedPtr<VulkanImage> RHIVulkanImage = StaticCast<VulkanImage>(RHIImage);
 
@@ -904,9 +904,9 @@ void VulkanDevice::SetDescriptorSetImage(DescriptorSetHandle RHIDescriptorSet, u
 	}
 }
 
-void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, SamplerHandle RHISampler)
+void VulkanDevice::SetDescriptorSetSampler(StandaloneDescriptorSetHandle RHIDescriptorSet, std::string name, DescriptorType type, SamplerHandle RHISampler)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::Sampler updateSampler = StaticCast<VulkanSampler>(RHISampler)->GetHandle();
@@ -934,9 +934,9 @@ void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet,
 	}
 }
 
-void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, SamplerHandle RHISampler)
+void VulkanDevice::SetDescriptorSetSampler(StandaloneDescriptorSetHandle RHIDescriptorSet, uint32_t index, DescriptorType type, SamplerHandle RHISampler)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(RHIDescriptorSet);
+	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
 	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSet->GetHandle();
 	vk::Sampler updateSampler = StaticCast<VulkanSampler>(RHISampler)->GetHandle();

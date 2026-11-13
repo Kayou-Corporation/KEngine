@@ -10,7 +10,7 @@ BEGIN_NAMESPACE_CORE
 class Buffer;
 struct BufferSpecs;
 class CommandList;
-class DescriptorSet;
+class StandaloneDescriptorSet;
 class DescriptorSetLayout;
 class Device;
 struct DeviceSpecs;
@@ -40,7 +40,7 @@ struct SwapchainSpecs;
 // ---------- HANDLE TYPEDEFS ----------
 typedef Core::KSharedPtr<Buffer> BufferHandle;
 typedef Core::KSharedPtr<CommandList> CommandListHandle;
-typedef Core::KSharedPtr<DescriptorSet> DescriptorSetHandle;
+typedef Core::KSharedPtr<StandaloneDescriptorSet> StandaloneDescriptorSetHandle;
 typedef Core::KSharedPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
 typedef Core::KSharedPtr<Device> DeviceHandle;
 typedef Core::KSharedPtr<Fence> FenceHandle;

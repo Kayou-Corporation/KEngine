@@ -115,14 +115,14 @@ public:
     virtual void DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHandle>& pushConstants) override;
 
     // -------------- Descriptor Set -------------- // 
-    virtual DescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout) override;
-    virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet) override;
-    virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
-    virtual void SetDescriptorSetBuffer(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
-    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, ImageHandle image, SamplerHandle sampler) override;
-    virtual void SetDescriptorSetImage(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, ImageHandle image, SamplerHandle sampler) override;
-    virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) override;
-    virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) override;
+    virtual StandaloneDescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout) override;
+    virtual void DestroyDescriptorSet(StandaloneDescriptorSetHandle descriptorSet) override;
+    virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
+    virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
+    virtual void SetDescriptorSetImage(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, ImageHandle image, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetImage(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, ImageHandle image, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetSampler(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetSampler(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) override;
 
     // -------------- Pipeline Layout -------------- // 
     virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) override;

@@ -15,7 +15,7 @@
 #include "RHI/API/Syncronisation.hpp"
 #include "RHI/API/GraphicsPipeline.hpp"
 #include "RHI/API/Sampler.hpp"
-#include "RHI/API/DescriptorSet.hpp"
+#include "RHI/API/StandaloneDescriptorSet.hpp"
 #include "RHI/API/RHI.hpp"
 #include "Camera/EditorCamera.hpp"
 #include "CoreObject/StaticMesh.hpp"
@@ -289,8 +289,8 @@ int main()
     Core::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
     Core::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
 
-    Core::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
-    Core::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
+    Core::StandaloneDescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
+    Core::StandaloneDescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
     device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Core::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
