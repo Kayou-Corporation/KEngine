@@ -705,7 +705,7 @@ void VulkanDevice::DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHan
 // -------------- Descriptor Set -------------- // 
 DescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle RHILayout)
 {
-	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<VulkanDescriptorSet>();
+	Core::KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<VulkanDescriptorSet>(RHILayout->GetName());
 
 	Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanLayout = StaticCast<VulkanDescriptorSetLayout>(RHILayout);
 

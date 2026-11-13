@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RHI/API/RHI.hpp"
+#include <string>
 
 BEGIN_NAMESPACE_CORE
 
