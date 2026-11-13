@@ -63,6 +63,11 @@ public:
 
 	//----------- Pipeline --------------//
 	KAPI virtual void BindPipeline(PipelineHandle RHIPipeline) = 0;
+
+	KAPI bool GetIsOpen() const { return m_isOpen; }
+
+protected:
+	bool m_isOpen = false;
 };
 
 END_NAMESPACE_CORE

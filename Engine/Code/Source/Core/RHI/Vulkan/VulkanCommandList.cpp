@@ -17,11 +17,15 @@ void VulkanCommandList::Open()
 	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
 	VK_CHECK_VOID(m_handle->cmdBuffer.begin(beginInfo), "Can't begin command buffer");
+
+	m_isOpen = true;
 }
 
 void VulkanCommandList::Close()
 {
 	VK_CHECK_VOID(m_handle->cmdBuffer.end(),"Can't end command buffer");
+
+	m_isOpen = false;
 }
 
 //----------- Dynamic Rendering --------------//

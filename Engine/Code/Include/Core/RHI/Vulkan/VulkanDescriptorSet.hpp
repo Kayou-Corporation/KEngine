@@ -12,7 +12,8 @@ BEGIN_NAMESPACE_CORE
 class VulkanDescriptorSet : public DescriptorSet
 {
 public:
-	VulkanDescriptorSet() = default;
+	VulkanDescriptorSet() = delete;
+	VulkanDescriptorSet(std::string name) { this->name = name; }
 	virtual ~VulkanDescriptorSet() override = default;
 
 public:

@@ -8,6 +8,9 @@ class DescriptorSet
 {
 public:
 	virtual ~DescriptorSet() = default;
+
+protected:
+	std::string name;
 };
 
 END_NAMESPACE_CORE
