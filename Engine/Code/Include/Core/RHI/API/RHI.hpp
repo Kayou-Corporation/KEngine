@@ -2,7 +2,7 @@
 
 #include "CoreModule.hpp"
 #include "Export.hpp"
-#include "Utils/Memory.hpp"
+#include "Memory/KSharedPtr.hpp"
 
 BEGIN_NAMESPACE_CORE
 

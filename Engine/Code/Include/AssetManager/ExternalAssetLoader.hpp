@@ -4,7 +4,6 @@
 #include "AssetManagerModule.hpp"
 
 #include "ThreadPool.hpp"
-#include "Utils/Memory.hpp"
 #include "MeshBase.hpp"
 
 BEGIN_NAMESPACE_ASSETMANAGER

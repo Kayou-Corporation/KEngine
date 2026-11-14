@@ -7,7 +7,7 @@ BEGIN_NAMESPACE_CORE
 
 vk::ComputePipelineCreateInfo VulkanComputePipeline::GetVulkanComputeCreateInfo(const ComputePipelineSpecs& specs) const
 {
-    const Core::KSharedPtr<VulkanShader> RHIVulkanShader = specs.shader.CastAs<VulkanShader>();
+    const Core::KSharedPtr<VulkanShader> RHIVulkanShader = StaticCast<VulkanShader>(specs.shader);
     const ShaderStage stage = specs.shader->GetShaderStage();
 
     vk::PipelineShaderStageCreateInfo shaderStageCreateInfo{};
@@ -16,7 +16,7 @@ vk::ComputePipelineCreateInfo VulkanComputePipeline::GetVulkanComputeCreateInfo(
     shaderStageCreateInfo.pName = "main";
 
     vk::ComputePipelineCreateInfo createInfo;
-    createInfo.layout = m_layout.CastAs<VulkanPipelineLayout>()->GetHandle();
+    createInfo.layout = StaticCast<VulkanPipelineLayout>(m_layout)->GetHandle();
     createInfo.stage = shaderStageCreateInfo;
 
     return createInfo;

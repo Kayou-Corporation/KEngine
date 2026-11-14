@@ -1,8 +1,9 @@
 #include "RHI/Vulkan/VulkanPipelineCommon.hpp"
 
-BEGIN_NAMESPACE_CORE
+#include "spdlog/spdlog.h"
 
-VulkanBinding VulkanDescriptorSetLayout::GetBinding(std::string name)
+BEGIN_NAMESPACE_CORE
+	VulkanBinding VulkanDescriptorSetLayout::GetBinding(std::string name)
 {
 	for (const VulkanBinding& binding : m_bindings)
 	{

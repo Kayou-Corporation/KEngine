@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RHI/API/RHI.hpp"
-
+#include <vector>
 BEGIN_NAMESPACE_CORE
 
 struct ImageSpecs
@@ -42,7 +42,7 @@ struct SwapchainImageSpecs
 	std::vector<ImageUsage> usages;
 };
 
-class Image : virtual public Core::IResource
+class Image
 {
 public:
 	virtual ~Image() = default;

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "RHI.hpp"
+#include <string>
+#include <vector>
 
 BEGIN_NAMESPACE_CORE
-
-class DescriptorSetLayout : virtual public Core::IResource
+	class DescriptorSetLayout
 {
 public:
 	virtual ~DescriptorSetLayout() = default;
@@ -21,7 +22,7 @@ protected:
 };
 
 
-class PushConstantLayout : virtual public Core::IResource
+class PushConstantLayout
 {
 public:
 	virtual ~PushConstantLayout() = default;
@@ -40,7 +41,7 @@ protected:
 	uint32_t m_totalSize;
 };
 
-class PipelineLayout : virtual public Core::IResource
+class PipelineLayout
 {
 public:
 	virtual ~PipelineLayout() = default;
@@ -62,7 +63,7 @@ protected:
 	std::vector<PushConstantLayoutHandle> m_pushConstantsLayouts;
 };
 
-class Pipeline : virtual public Core::IResource
+class Pipeline
 {
 public:
 	virtual ~Pipeline() = default;

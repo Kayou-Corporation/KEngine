@@ -1,11 +1,12 @@
 ﻿#pragma once
 
-#include  "Utils/Memory.hpp"
+#include "Memory/KSharedPtr.hpp"
 #include "Export.hpp"
 #include "AssetManagerModule.hpp"
 #include "AssetManager.hpp"
 //#include "Engine.hpp"
 
+#include <string>
 BEGIN_NAMESPACE_ASSETMANAGER
 
 /*
@@ -16,7 +17,7 @@ BEGIN_NAMESPACE_ASSETMANAGER
  * Copy of original data (std::vector<DataType> depending on Type of mesh)
  *
  */
-class Asset : public virtual Core::IResource
+class Asset
 {
     friend class AssetRegistry;
 
@@ -29,14 +30,14 @@ public:
     KAPI uint32_t GetID() const { return m_id; }
     KAPI bool IsLoaded() const {return isLoaded;}
 
-    void OnUnload() override
-    {
-        if (isLoaded)
-        {
-            UnLoad();
-            isLoaded = false;
-        }
-    }
+    //void OnUnload() override
+    //{
+    //    if (isLoaded)
+    //    {
+    //        UnLoad();
+    //        isLoaded = false;
+    //    }
+    //}
 
 
 protected:

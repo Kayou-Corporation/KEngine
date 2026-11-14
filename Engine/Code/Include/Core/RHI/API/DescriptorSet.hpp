@@ -4,7 +4,7 @@
 
 BEGIN_NAMESPACE_CORE
 
-class DescriptorSet : public virtual Core::IResource
+class DescriptorSet
 {
 public:
 	virtual ~DescriptorSet() = default;

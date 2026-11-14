@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "RHI/API/RHI.hpp"
 
 #include <vector>
@@ -30,7 +32,7 @@ struct DrawIndexedIndirectCommand
     uint32_t firstInstance;
 };
 
-class CommandList : virtual public Core::IResource
+class CommandList
 {
 public:
 	virtual ~CommandList() = default;

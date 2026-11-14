@@ -144,7 +144,7 @@ TrackedCommandBufferPtr Queue::GetOrCreateCommandBuffer(vk::Device& device)
     }
     else
     {
-        cmdBuffer = Core::CreateRefPtr<TrackedCommandBuffer>();
+        cmdBuffer = Core::MakeShared<TrackedCommandBuffer>();
         cmdBuffer->memoryAllocator = m_memoryAllocator;
 
         vk::CommandPoolCreateInfo poolInfo;

@@ -28,7 +28,7 @@ struct PresentInfo
 	uint32_t imageIndex;
 };
 
-class Device : public virtual Core::IResource
+class Device
 {
 public:
 	virtual ~Device() = default;

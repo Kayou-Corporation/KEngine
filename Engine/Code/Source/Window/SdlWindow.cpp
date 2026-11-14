@@ -25,7 +25,7 @@ void SDLWindow::Create(const WindowSpecs& specs)
 		m_window = SDL_CreateWindow(m_windowName.c_str(), static_cast<int>(m_width), static_cast<int>(m_height), SDL_WINDOW_VULKAN);
 
 		Window* myWindowPtr = static_cast<Window*>(this);
-		m_windowRenderer = Core::CreateRefPtr<SDLVulkanWindowRenderer>(myWindowPtr);
+		m_windowRenderer = Core::MakeShared<SDLVulkanWindowRenderer>(myWindowPtr);
 		break;
 	}
 	case Core::RendererAPI::D3D12:

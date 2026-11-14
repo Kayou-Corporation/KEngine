@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "AssetManagerModule.hpp"
+#include "Memory/KSharedPtr.hpp"
 
 
 BEGIN_NAMESPACE_ASSETMANAGER
-
-class AssetRegistry;
+    class AssetRegistry;
 
 template<typename T>
 class KSoftAssetRef

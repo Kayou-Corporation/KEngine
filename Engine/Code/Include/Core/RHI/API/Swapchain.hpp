@@ -22,7 +22,7 @@ struct SwapchainSpecs
 	Format depthImageFormat;
 };
 
-class Swapchain : public virtual Core::IResource
+class Swapchain
 {
 public:
 	virtual ~Swapchain() = default;
