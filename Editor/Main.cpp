@@ -106,13 +106,18 @@ int main()
     // ------------ Object loading test -----------------//
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/viking_room.png", "texture");
+    //Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/particleMesh.obj", "particleMesh");
+    //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/particleTexture.png", "particleTexture");
 
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
     AssetManager::KSoftAssetRef<CoreObject::Texture2D> texture = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("texture");
+    AssetManager::KSoftAssetRef<CoreObject::StaticMesh> partMesh = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("particleMesh");
+    AssetManager::KSoftAssetRef<CoreObject::Texture2D> partText = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("particleTexture");
 
     Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
     Core::KSharedPtr<CoreObject::Texture2D> vikingRoomTexture = texture.Get();
-
+    Core::KSharedPtr<CoreObject::StaticMesh> particleMesh = partMesh.Get();
+    Core::KSharedPtr<CoreObject::Texture2D> particleTexture = partText.Get();
 
     // TODO : move this here
     //Core::KEngine::Update();
@@ -169,8 +174,13 @@ int main()
     Core::BufferHandle vertexBuffer = vikingRoomMesh->GetVertexBuffer();
     Core::BufferHandle indexBuffer = vikingRoomMesh->GetIndexBuffer();
 
+    Core::BufferHandle particleVertexBuffer = particleMesh->GetVertexBuffer();
+    Core::BufferHandle particleIndexBuffer = particleMesh->GetIndexBuffer();
+
     // Base Texture
     Core::ImageHandle textureImage = vikingRoomTexture->GetImage();
+
+    Core::ImageHandle particleImage = particleTexture->GetImage();
 
     // Base Sampler
     Core::SamplerSpecs samplerSpecs;
@@ -365,11 +375,14 @@ int main()
 
     Core::DescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
     Core::DescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
+    Core::DescriptorSetHandle particleDrawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
 
     device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Core::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
+    device->SetDescriptorSetImage(particleDrawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, particleImage, nullptr);
+    device->SetDescriptorSetSampler(particleDrawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
 
     Core::ShaderHandle particleVert = device->CreateShader("particle.vert", Core::ShaderStage::Vertex, false, true);
 
@@ -398,7 +411,7 @@ int main()
     Core::DescriptorSetHandle oddParticleDataDescriptorSet = device->CreateDescriptorSet(particleDataLayout);
     Core::DescriptorSetHandle evenParticleDataDescriptorSet = device->CreateDescriptorSet(particleDataLayout);
 
-    uint32_t nbParticles = 4096u;
+    uint32_t nbParticles = 8192u;
 
     Core::BufferSpecs oddPositionsSpecs{};
     oddPositionsSpecs.primaryUsage = Core::BufferUsage::RWStorage;
@@ -483,7 +496,7 @@ int main()
     device->SetDescriptorSetBuffer(evenParticleDataDescriptorSet, "positions", Core::DescriptorType::StorageBuffer, evenPositions, 0, 4 * sizeof(float) * nbParticles);
 
     Core::DrawIndexedIndirectCommand particleDrawCommand{};
-    particleDrawCommand.indexCount = vikingRoomMesh->GetIndicesCount();
+    particleDrawCommand.indexCount = particleMesh->GetIndicesCount();
     particleDrawCommand.instanceCount = nbParticles;
     particleDrawCommand.firstIndex = 0;
     particleDrawCommand.vertexOffset = 0;
@@ -495,7 +508,7 @@ int main()
     indirectSpecs.memoryAccess = Core::MemoryAccess::GpuOnly;
     indirectSpecs.additionalUsages = { Core::BufferUsage::TransferDst };
     indirectSpecs.pipelineStage = Core::PipelineStage::Indirect;
-    
+
     Core::BufferHandle indirectBuffer = device->CreateBuffer(indirectSpecs);
 
     std::mt19937 rng(42);
@@ -526,7 +539,7 @@ int main()
     copyParticlesCommandList->Open();
 
     copyParticlesCommandList->SetBufferData(indirectBuffer, &particleDrawCommand, sizeof(Core::DrawIndexedIndirectCommand), 0);
-    
+
     copyParticlesCommandList->SetBufferData(oddPositions, positionsVector.data(), 4 * sizeof(float) * nbParticles, 0);
     copyParticlesCommandList->SetBufferData(evenPositions, positionsVector.data(), 4 * sizeof(float) * nbParticles, 0);
     copyParticlesCommandList->SetBufferData(oddVelocities, velocitiesVector.data(), 4 * sizeof(float) * nbParticles, 0);
@@ -649,7 +662,7 @@ int main()
         commandList->BindDescriptorSet(particlePipelineLayout, "particles", particleDesc, Core::PipelineBindPoint::Compute);
         commandList->BindDescriptorSet(particlePipelineLayout, "effectData", effectDataDescriptorSet, Core::PipelineBindPoint::Compute);
 
-        commandList->Dispatch(16, 1, 1);
+        commandList->Dispatch(32, 1, 1);
 
         commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::ColorAttachment);
         commandList->TransitionImageLayout(depthImage, Core::Layout::DepthStencilAttachment);
@@ -672,13 +685,13 @@ int main()
         commandList->BindPipeline(unlitParticlePipeline);
 
         commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Core::PipelineBindPoint::Graphics);
-        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
+        commandList->BindDescriptorSet(globalPipelineLayout, "drawData", particleDrawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
 
         Core::DescriptorSetHandle particleRenderSet = isFrameEven ? evenParticleDataDescriptorSet : oddParticleDataDescriptorSet;
         commandList->BindDescriptorSet(globalPipelineLayout, "particleData", particleRenderSet, Core::PipelineBindPoint::Graphics);
 
-        commandList->BindVertexBuffer(vertexBuffer, 0);
-        commandList->BindIndexBuffer(indexBuffer, 0);
+        commandList->BindVertexBuffer(particleVertexBuffer, 0);
+        commandList->BindIndexBuffer(particleIndexBuffer, 0);
 
         commandList->DrawIndexedIndirect(indirectBuffer, 0, 1, sizeof(Core::DrawIndexedIndirectCommand));
 
@@ -720,6 +733,7 @@ int main()
 
     device->DestroyDescriptorSet(frameDataDescriptorSet);
     device->DestroyDescriptorSet(drawDataDescriptorSet);
+    device->DestroyDescriptorSet(particleDrawDataDescriptorSet);
 
     device->DestroyBuffer(oddPositions);
     device->DestroyBuffer(oddVelocities);
