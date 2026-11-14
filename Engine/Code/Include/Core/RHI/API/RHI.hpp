@@ -10,6 +10,8 @@ BEGIN_NAMESPACE_CORE
 class Buffer;
 struct BufferSpecs;
 class CommandList;
+class ComputePipeline;
+struct ComputePipelineSpecs;
 class DescriptorSet;
 class DescriptorSetLayout;
 class Device;
@@ -40,6 +42,7 @@ struct SwapchainSpecs;
 // ---------- HANDLE TYPEDEFS ----------
 typedef Core::KSharedPtr<Buffer> BufferHandle;
 typedef Core::KSharedPtr<CommandList> CommandListHandle;
+typedef Core::KSharedPtr<ComputePipeline> ComputePipelineHandle;
 typedef Core::KSharedPtr<DescriptorSet> DescriptorSetHandle;
 typedef Core::KSharedPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
 typedef Core::KSharedPtr<Device> DeviceHandle;
@@ -276,11 +279,14 @@ enum class BufferUsage
 	Index,
 
 	Storage,
+	RWStorage,
 
 	Uniform,
 
 	TransferSrc,
-	TransferDst
+	TransferDst,
+
+	DrawIndirect
 };
 
 enum class MemoryAccess
@@ -300,6 +306,7 @@ enum class PipelineStage
 	GeometryShader,
 	Transfer,
 	ColorOutput,
+	Indirect,
 	None
 };
 

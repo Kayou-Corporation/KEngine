@@ -19,6 +19,8 @@
 #include <string>
 #include <spdlog/spdlog.h>
 
+#include "RHI/Vulkan/VulkanComputePipeline.hpp"
+
 // TODO : Maybe do more cleanup (Review extension system and constant validation for format usage)
 
 DISABLE_WARNINGS
@@ -88,7 +90,7 @@ void VulkanDevice::SubmitCommandList(CommandListHandle RHICommandList, const Sub
 	}
 	m_queues[RHICommandBufferQueue].PushWaitSemaphores(waitSemaphores, RHISubmitInfo.waitSemaphoresValues);
 
-	vk::PipelineStageFlagBits stage = TranslateToVulkan(RHISubmitInfo.stage);
+	vk::PipelineStageFlags stage = TranslateToVulkan(RHISubmitInfo.stage);
 
 	m_queues[RHICommandBufferQueue].Submit(commandBuffer, stage);
 }
@@ -1015,8 +1017,21 @@ GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipeli
 	RHIVulkanPipeline->SetType(PipelineType::Graphics);
 
 	VulkanGraphicsPipelineStructs RHIVulkanGraphicsPipelineCreateInfo = RHIVulkanPipeline->GetGraphicsCreateInfo(RHISpecs);
-	vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanGraphicsCreateInfo(RHIVulkanGraphicsPipelineCreateInfo);
-	vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+	const vk::GraphicsPipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanGraphicsCreateInfo(RHIVulkanGraphicsPipelineCreateInfo);
+	const vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createGraphicsPipeline(nullptr, createInfo), "Failed to create graphics pipeline");
+	RHIVulkanPipeline->SetHandle(pipeline);
+
+	return RHIVulkanPipeline;
+}
+
+ComputePipelineHandle VulkanDevice::CreateComputePipeline(const ComputePipelineSpecs& RHISpecs)
+{
+	Core::KSharedPtr<VulkanComputePipeline> RHIVulkanPipeline = Core::MakeShared<VulkanComputePipeline>();
+	RHIVulkanPipeline->SetLayout(RHISpecs.pipelineLayout);
+	RHIVulkanPipeline->SetType(PipelineType::Compute);
+
+	const vk::ComputePipelineCreateInfo createInfo = RHIVulkanPipeline->GetVulkanComputeCreateInfo(RHISpecs);
+	const vk::Pipeline pipeline = VK_CHECK_RESULT(m_handle.createComputePipeline(nullptr, createInfo), "Failed to create compute pipeline");
 	RHIVulkanPipeline->SetHandle(pipeline);
 
 	return RHIVulkanPipeline;
@@ -1024,16 +1039,18 @@ GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipeli
 
 void VulkanDevice::DestroyPipeline(PipelineHandle RHIPipeline)
 {
+	vk::Pipeline pipeline;
 	if (RHIPipeline->GetType() == PipelineType::Graphics)
 	{
 		Core::KSharedPtr<VulkanGraphicsPipeline> RHIVulkanPipeline = StaticCast<VulkanGraphicsPipeline>(RHIPipeline);
-		vk::Pipeline pipeline = RHIVulkanPipeline->GetHandle();
-		m_handle.destroyPipeline(pipeline);
+		pipeline = RHIVulkanPipeline->GetHandle();
 	}
 	else
 	{
-
+		Core::KSharedPtr<VulkanComputePipeline> RHIVulkanPipeline = StaticCast<VulkanComputePipeline>(RHIPipeline);
+		pipeline = RHIVulkanPipeline->GetHandle();
 	}
+	m_handle.destroyPipeline(pipeline);
 }
 
 void VulkanDevice::UpdateCompatibility(SurfaceHandle RHISurface)

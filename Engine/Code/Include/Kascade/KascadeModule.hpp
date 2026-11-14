@@ -1,0 +1,8 @@
+﻿#pragma once
+
+#include "CoreModule.hpp"
+
+#define KASCADE_NAMESPACE Kascade
+
+#define BEGIN_NAMESPACE_KASCADE BEGIN_NAMESPACE_KAYOU namespace KASCADE_NAMESPACE {
+#define END_NAMESPACE_KASCADE } /* namespace KASCADE_NAMESPACE */ END_NAMESPACE_KAYOU

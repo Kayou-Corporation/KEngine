@@ -23,6 +23,15 @@ struct SubmitInfo
 	//FenceHandle fence;
 };
 
+struct DrawIndexedIndirectCommand
+{
+    uint32_t indexCount;
+	uint32_t instanceCount;
+    uint32_t firstIndex;
+    int32_t  vertexOffset;
+    uint32_t firstInstance;
+};
+
 class CommandList
 {
 public:
@@ -47,6 +56,11 @@ public:
 	KAPI virtual void SetViewport(float x, float y, float width, float height) = 0;
 	KAPI virtual void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 	KAPI virtual void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) = 0;
+	KAPI virtual void DrawIndirect(BufferHandle RHIBuffer, size_t offset, uint32_t drawCount, uint32_t stride) = 0;
+	KAPI virtual void DrawIndexedIndirect(BufferHandle RHIBuffer, size_t offset, uint32_t drawCount, uint32_t stride) = 0;
+
+	//----------- Compute --------------//
+	virtual void Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ) = 0;
 
 	//----------- Set Buffer / Image Data --------------//
 	KAPI virtual void SetBufferData(BufferHandle buffer, void* data, uint32_t size, uint32_t offset) = 0;

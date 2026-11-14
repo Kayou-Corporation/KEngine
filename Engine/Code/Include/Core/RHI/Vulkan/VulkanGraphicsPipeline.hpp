@@ -33,11 +33,6 @@ struct VulkanGraphicsPipelineStructs
 	vk::PipelineColorBlendAttachmentState colorBlend{};
 };
 
-struct VulkanDescriptorSetLayoutSpecs
-{
-	std::vector<vk::DescriptorSetLayoutBinding> bindings{};
-};
-
 class VulkanGraphicsPipeline : public GraphicsPipeline
 {
 public:
