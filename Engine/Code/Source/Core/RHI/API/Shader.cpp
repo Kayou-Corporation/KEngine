@@ -483,7 +483,6 @@ void ShaderCompiler::WriteReflectionDataSize(std::ofstream & out, const ShaderDa
 {
     size_t totalSize = 0;
     size_t spirvSize = bin.spirv.size();
-    size_t dxilSize = bin.dxil.size();
 
     for (Descriptor desc : bin.descriptors)
     {
@@ -527,6 +526,7 @@ void ShaderCompiler::WriteReflectionDataSize(std::ofstream & out, const ShaderDa
     Core::Write(out, totalSize);
     Core::Write(out, spirvSize);
 #if defined (KWINDOWS)
+    size_t dxilSize = bin.dxil.size();
     Core::Write(out, dxilSize);
 #else
     Core::Write(out, SIZE_MAX);

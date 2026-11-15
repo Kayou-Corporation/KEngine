@@ -28,7 +28,9 @@ void SDLWindow::Create(const WindowSpecs& specs)
 		m_windowRenderer = Core::MakeShared<SDLVulkanWindowRenderer>(myWindowPtr);
 		break;
 	}
+#if defined KWINDOWS
 	case Core::RendererAPI::D3D12:
+#endif
 	default:
 		spdlog::error("Rendering API not supported, can't create the window");
 	}
