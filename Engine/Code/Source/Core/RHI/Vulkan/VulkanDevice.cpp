@@ -19,6 +19,8 @@
 #include <string>
 #include <spdlog/spdlog.h>
 
+#include "RHI/Vulkan/VulkanDescriptorPool.hpp"
+
 // TODO : Maybe do more cleanup (Review extension system and constant validation for format usage)
 
 DISABLE_WARNINGS
@@ -703,7 +705,7 @@ void VulkanDevice::DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHan
 }
 
 // -------------- Descriptor Set -------------- // 
-StandaloneDescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle RHILayout)
+StandaloneDescriptorSetHandle VulkanDevice::CreateStandaloneDescriptorSet(DescriptorSetLayoutHandle RHILayout)
 {
 	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<VulkanStandaloneDescriptorSet>(RHILayout->GetName());
 
@@ -962,6 +964,33 @@ void VulkanDevice::SetDescriptorSetSampler(StandaloneDescriptorSetHandle RHIDesc
 			break;
 		}
 	}
+}
+
+// -------------- Descriptor Pool -------------- //
+DescriptorPoolHandle VulkanDevice::CreateDescriptorPool(const DescriptorPoolSpecs &specs)
+{
+	Core::KSharedPtr<VulkanDescriptorPool> RHIVulkanDescriptorPool = Core::MakeShared<VulkanDescriptorPool>();
+
+	std::map<vk::DescriptorType, uint32_t> descriptors;
+	for (const auto& [type, count] : specs.descriptors)
+	{
+		descriptors.emplace(TranslateToVulkan(type), count);
+	}
+
+	vk::DescriptorPoolCreateInfo poolCreateInfo = RHIVulkanDescriptorPool->GetPoolCreateInfo(descriptors, specs.maxDescriptorSetsCount);
+	vk::DescriptorPool pool = VK_CHECK_RESULT(m_handle.createDescriptorPool(poolCreateInfo), "Coundn't create Descriptor pool");
+	RHIVulkanDescriptorPool->SetPool(pool);
+
+	return RHIVulkanDescriptorPool;
+}
+
+void VulkanDevice::DestroyDescriptorPool(DescriptorPoolHandle pool)
+{
+	Core::KSharedPtr<VulkanDescriptorPool> RHIVulkanDescriptorPool = StaticCast<VulkanDescriptorPool>(pool);
+	vk::DescriptorPool vkPool =  RHIVulkanDescriptorPool->GetPool();
+
+	m_handle.destroyDescriptorPool(vkPool);
+
 }
 
 // -------------- Pipeline Layout -------------- // 

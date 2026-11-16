@@ -36,6 +36,7 @@ struct SurfaceSpecs;
 class Swapchain;
 struct SwapchainImageSpecs;
 struct SwapchainSpecs;
+class DescriptorPool;
 
 // ---------- HANDLE TYPEDEFS ----------
 typedef Core::KSharedPtr<Buffer> BufferHandle;
@@ -56,6 +57,7 @@ typedef Core::KSharedPtr<Semaphore> SemaphoreHandle;
 typedef Core::KSharedPtr<Shader> ShaderHandle;
 typedef Core::KSharedPtr<Surface> SurfaceHandle;
 typedef Core::KSharedPtr<Swapchain> SwapchainHandle;
+typedef Core::KSharedPtr<DescriptorPool> DescriptorPoolHandle;
 
 // ---------- INSTANCE RELATED ----------
 struct Version

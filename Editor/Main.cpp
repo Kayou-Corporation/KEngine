@@ -167,6 +167,16 @@ int main()
     // Base Texture
     Core::ImageHandle textureImage = vikingRoomTexture->GetImage();
 
+    // Test pool
+    Core::DescriptorPoolSpecs poolSpecs;
+    poolSpecs.maxDescriptorSetsCount = 10;
+    poolSpecs.descriptors = {
+        { Core::DescriptorType::UniformBuffer, 10 },
+        { Core::DescriptorType::CombinedImageSampler, 10 },
+        { Core::DescriptorType::StorageBuffer, 10 }
+    };
+    Core::DescriptorPoolHandle pool = device->CreateDescriptorPool(poolSpecs);
+
     // Base Sampler
     Core::SamplerSpecs samplerSpecs;
     samplerSpecs.magFilter = Core::Filter::Linear;
@@ -243,7 +253,6 @@ int main()
     // Binary
     std::vector<Core::SemaphoreHandle> imageAvailablesSemaphores;
     std::vector<Core::SemaphoreHandle> renderFinishedSemaphores;
-
     for (uint32_t i = 0; i < swapchain->GetImageCount(); ++i)
     {
         Core::SemaphoreSpecs binarySpecs{};
@@ -255,6 +264,7 @@ int main()
         imageAvailablesSemaphores.push_back(imageAvailableSemaphore);
         renderFinishedSemaphores.push_back(renderFinishedSemaphore);
     }
+
 
     Core::ShaderHandle baseVert = device->CreateShader("base.vert", Core::ShaderStage::Vertex, false, true);
     Core::ShaderHandle unlitFrag = device->CreateShader("unlit.frag", Core::ShaderStage::Fragment, false, true);
@@ -289,8 +299,8 @@ int main()
     Core::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
     Core::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
 
-    Core::StandaloneDescriptorSetHandle frameDataDescriptorSet = device->CreateDescriptorSet(frameDataLayout);
-    Core::StandaloneDescriptorSetHandle drawDataDescriptorSet = device->CreateDescriptorSet(drawDataLayout);
+    Core::StandaloneDescriptorSetHandle frameDataDescriptorSet = device->CreateStandaloneDescriptorSet(frameDataLayout);
+    Core::StandaloneDescriptorSetHandle drawDataDescriptorSet = device->CreateStandaloneDescriptorSet(drawDataLayout);
 
     device->SetDescriptorSetBuffer(frameDataDescriptorSet, "camera", Core::DescriptorType::UniformBuffer, uniformCamera, 0, sizeof(CameraData));
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Core::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
@@ -439,6 +449,7 @@ int main()
     device->DestroySampler(sampler);
     device->DestroyBuffer(uniformCamera);
     device->DestroyBuffer(uniformModel);
+    device->DestroyDescriptorPool(pool);
 
     device->DestroyDescriptorSet(frameDataDescriptorSet);
     device->DestroyDescriptorSet(drawDataDescriptorSet);

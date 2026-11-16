@@ -114,8 +114,8 @@ public:
     virtual PushConstantLayoutHandle CreatePushConstantLayout(ShaderHandle shader) override;
     virtual void DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHandle>& pushConstants) override;
 
-    // -------------- Descriptor Set -------------- // 
-    virtual StandaloneDescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout) override;
+    // -------------- Standalone Descriptor Set -------------- //
+    virtual StandaloneDescriptorSetHandle CreateStandaloneDescriptorSet(DescriptorSetLayoutHandle layout) override;
     virtual void DestroyDescriptorSet(StandaloneDescriptorSetHandle descriptorSet) override;
     virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
     virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
@@ -123,6 +123,10 @@ public:
     virtual void SetDescriptorSetImage(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, ImageHandle image, SamplerHandle sampler) override;
     virtual void SetDescriptorSetSampler(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) override;
     virtual void SetDescriptorSetSampler(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) override;
+
+    // -------------- Descriptor Pool -------------- //
+    KAPI virtual DescriptorPoolHandle CreateDescriptorPool(const DescriptorPoolSpecs& specs) override;
+    KAPI virtual void DestroyDescriptorPool(DescriptorPoolHandle pool) override;
 
     // -------------- Pipeline Layout -------------- // 
     virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) override;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 
+#include "DescriptorPool.hpp"
 #include "RHI/API/RHI.hpp"
 #include "RHI/API/Shader.hpp"
 
@@ -89,8 +90,8 @@ public:
 	KAPI virtual PushConstantLayoutHandle CreatePushConstantLayout(ShaderHandle shader) = 0;
 	KAPI virtual void DestroyPushConstantsLayouts(std::vector<PushConstantLayoutHandle>& pushConstants) = 0;
 
-	// -------------- Descriptor Set -------------- // 
-	KAPI virtual StandaloneDescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout) = 0;
+	// -------------- Standalone Descriptor Set -------------- //
+	KAPI virtual StandaloneDescriptorSetHandle CreateStandaloneDescriptorSet(DescriptorSetLayoutHandle layout) = 0;
 	KAPI virtual void DestroyDescriptorSet(StandaloneDescriptorSetHandle descriptorSet) = 0;
 	KAPI virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
 	KAPI virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
@@ -98,6 +99,10 @@ public:
 	KAPI virtual void SetDescriptorSetImage(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, ImageHandle image, SamplerHandle sampler) = 0;
 	KAPI virtual void SetDescriptorSetSampler(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) = 0;
 	KAPI virtual void SetDescriptorSetSampler(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) = 0;
+
+	// -------------- Descriptor Pool -------------- //
+	KAPI virtual DescriptorPoolHandle CreateDescriptorPool(const DescriptorPoolSpecs& specs) = 0;
+	KAPI virtual void DestroyDescriptorPool(DescriptorPoolHandle pool) = 0;
 
 	// -------------- Pipeline Layout -------------- // 
 	KAPI virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) = 0;

@@ -5,7 +5,8 @@
 #include <vector>
 
 BEGIN_NAMESPACE_CORE
-	class DescriptorSetLayout
+
+class DescriptorSetLayout
 {
 public:
 	virtual ~DescriptorSetLayout() = default;
