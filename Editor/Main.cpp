@@ -384,7 +384,7 @@ int main()
     device->SetDescriptorSetImage(particleDrawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, particleImage, nullptr);
     device->SetDescriptorSetSampler(particleDrawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
 
-    Core::ShaderHandle particleVert = device->CreateShader("particle.vert", Core::ShaderStage::Vertex, false, true);
+    Core::ShaderHandle particleVert = device->CreateShader("particleBillboard.vert", Core::ShaderStage::Vertex, false, true);
 
     Core::GraphicsPipelineSpecs unlitParticlePipelineSpecs;
     unlitParticlePipelineSpecs.colorAttachmentCount = 1;
@@ -393,7 +393,7 @@ int main()
     unlitParticlePipelineSpecs.viewportCount = 1;
     unlitParticlePipelineSpecs.scissorCount = 1;
     unlitParticlePipelineSpecs.lineWidth = 1.f;
-    unlitParticlePipelineSpecs.cullmode = Core::CullMode::Back;
+    unlitParticlePipelineSpecs.cullmode = Core::CullMode::None;
     unlitParticlePipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
     unlitParticlePipelineSpecs.SamplesCount = Core::SampleCount::Count1;
     unlitParticlePipelineSpecs.blendColor = false;
@@ -411,7 +411,7 @@ int main()
     Core::DescriptorSetHandle oddParticleDataDescriptorSet = device->CreateDescriptorSet(particleDataLayout);
     Core::DescriptorSetHandle evenParticleDataDescriptorSet = device->CreateDescriptorSet(particleDataLayout);
 
-    uint32_t nbParticles = 8192u;
+    uint32_t nbParticles = 512u;
 
     Core::BufferSpecs oddPositionsSpecs{};
     oddPositionsSpecs.primaryUsage = Core::BufferUsage::RWStorage;
@@ -496,7 +496,7 @@ int main()
     device->SetDescriptorSetBuffer(evenParticleDataDescriptorSet, "positions", Core::DescriptorType::StorageBuffer, evenPositions, 0, 4 * sizeof(float) * nbParticles);
 
     Core::DrawIndexedIndirectCommand particleDrawCommand{};
-    particleDrawCommand.indexCount = particleMesh->GetIndicesCount();
+    particleDrawCommand.indexCount = 6;
     particleDrawCommand.instanceCount = nbParticles;
     particleDrawCommand.firstIndex = 0;
     particleDrawCommand.vertexOffset = 0;
@@ -662,7 +662,7 @@ int main()
         commandList->BindDescriptorSet(particlePipelineLayout, "particles", particleDesc, Core::PipelineBindPoint::Compute);
         commandList->BindDescriptorSet(particlePipelineLayout, "effectData", effectDataDescriptorSet, Core::PipelineBindPoint::Compute);
 
-        commandList->Dispatch(32, 1, 1);
+        commandList->Dispatch(2, 1, 1);
 
         commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::ColorAttachment);
         commandList->TransitionImageLayout(depthImage, Core::Layout::DepthStencilAttachment);
@@ -690,10 +690,10 @@ int main()
         Core::DescriptorSetHandle particleRenderSet = isFrameEven ? evenParticleDataDescriptorSet : oddParticleDataDescriptorSet;
         commandList->BindDescriptorSet(globalPipelineLayout, "particleData", particleRenderSet, Core::PipelineBindPoint::Graphics);
 
-        commandList->BindVertexBuffer(particleVertexBuffer, 0);
-        commandList->BindIndexBuffer(particleIndexBuffer, 0);
+        //commandList->BindVertexBuffer(particleVertexBuffer, 0);
+        //commandList->BindIndexBuffer(particleIndexBuffer, 0);
 
-        commandList->DrawIndexedIndirect(indirectBuffer, 0, 1, sizeof(Core::DrawIndexedIndirectCommand));
+        commandList->DrawIndirect(indirectBuffer, 0, 1, sizeof(Core::DrawIndexedIndirectCommand));
 
         commandList->EndRendering();
 
