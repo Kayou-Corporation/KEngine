@@ -23,6 +23,7 @@
 #include "BuildMode.hpp"
 #include "MeshBase.hpp"
 #include "Texture2D.hpp"
+#include "RHI/API/DescriptorPool.hpp"
 
 USING_KAYOU
 

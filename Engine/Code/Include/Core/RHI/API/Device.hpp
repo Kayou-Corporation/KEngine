@@ -3,7 +3,6 @@
 #include <vector>
 #include <unordered_map>
 
-#include "DescriptorPool.hpp"
 #include "RHI/API/RHI.hpp"
 #include "RHI/API/Shader.hpp"
 
