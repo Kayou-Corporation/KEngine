@@ -37,27 +37,29 @@ class Swapchain;
 struct SwapchainImageSpecs;
 struct SwapchainSpecs;
 class DescriptorPool;
+class DescriptorSet;
 
 // ---------- HANDLE TYPEDEFS ----------
-typedef Core::KSharedPtr<Buffer> BufferHandle;
-typedef Core::KSharedPtr<CommandList> CommandListHandle;
-typedef Core::KSharedPtr<StandaloneDescriptorSet> StandaloneDescriptorSetHandle;
-typedef Core::KSharedPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
-typedef Core::KSharedPtr<Device> DeviceHandle;
-typedef Core::KSharedPtr<Fence> FenceHandle;
-typedef Core::KSharedPtr<GraphicsPipeline> GraphicsPipelineHandle;
-typedef Core::KSharedPtr<Image> ImageHandle;
-typedef Core::KSharedPtr<Instance> InstanceHandle;
-typedef Core::KSharedPtr<Pipeline> PipelineHandle;
-typedef Core::KSharedPtr<PipelineLayout> PipelineLayoutHandle;
-typedef Core::KSharedPtr<PushConstantLayout> PushConstantLayoutHandle;
-typedef Core::KSharedPtr<RenderPass> RenderPassLayout;
-typedef Core::KSharedPtr<Sampler> SamplerHandle;
-typedef Core::KSharedPtr<Semaphore> SemaphoreHandle;
-typedef Core::KSharedPtr<Shader> ShaderHandle;
-typedef Core::KSharedPtr<Surface> SurfaceHandle;
-typedef Core::KSharedPtr<Swapchain> SwapchainHandle;
-typedef Core::KSharedPtr<DescriptorPool> DescriptorPoolHandle;
+typedef KSharedPtr<Buffer> BufferHandle;
+typedef KSharedPtr<CommandList> CommandListHandle;
+typedef KSharedPtr<StandaloneDescriptorSet> StandaloneDescriptorSetHandle;
+typedef KSharedPtr<DescriptorSetLayout> DescriptorSetLayoutHandle;
+typedef KSharedPtr<Device> DeviceHandle;
+typedef KSharedPtr<Fence> FenceHandle;
+typedef KSharedPtr<GraphicsPipeline> GraphicsPipelineHandle;
+typedef KSharedPtr<Image> ImageHandle;
+typedef KSharedPtr<Instance> InstanceHandle;
+typedef KSharedPtr<Pipeline> PipelineHandle;
+typedef KSharedPtr<PipelineLayout> PipelineLayoutHandle;
+typedef KSharedPtr<PushConstantLayout> PushConstantLayoutHandle;
+typedef KSharedPtr<RenderPass> RenderPassLayout;
+typedef KSharedPtr<Sampler> SamplerHandle;
+typedef KSharedPtr<Semaphore> SemaphoreHandle;
+typedef KSharedPtr<Shader> ShaderHandle;
+typedef KSharedPtr<Surface> SurfaceHandle;
+typedef KSharedPtr<Swapchain> SwapchainHandle;
+typedef KSharedPtr<DescriptorPool> DescriptorPoolHandle;
+typedef KSharedPtr<DescriptorSet> DescriptorSetHandle;
 
 // ---------- INSTANCE RELATED ----------
 struct Version
