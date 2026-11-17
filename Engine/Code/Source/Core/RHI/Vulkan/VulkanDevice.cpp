@@ -992,22 +992,6 @@ void VulkanDevice::DestroyDescriptorPool(DescriptorPoolHandle pool)
 	m_handle.destroyDescriptorPool(vkPool);
 
 }
-#include "RHI/Vulkan/VulkanDescriptorSet.hpp"
-// -------------- Descriptor Set -------------- //
-DescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle layout, DescriptorPoolHandle pool)
-{
-	Core::KSharedPtr<Kayou::Core::VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<Kayou::Core::VulkanDescriptorSet>(layout->GetName());
-
-	vk::DescriptorSet descriptorSet = VK_CHECK_RESULT(m_handle.allocateDescriptorSets(vk::DescriptorSetAllocateInfo(StaticCast<VulkanDescriptorPool>(pool)->GetHandle(), 1)), "Coundn't allocate Descriptor set");
-	RHIVulkanDescriptorSet->SetHandle(descriptorSet);
-
-	return RHIVulkanDescriptorSet;
-}
-
-void VulkanDevice::DestroyDescriptorSet(DescriptorSetHandle descriptorSet)
-{
-
-}
 
 // -------------- Pipeline Layout -------------- // 
 PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants)

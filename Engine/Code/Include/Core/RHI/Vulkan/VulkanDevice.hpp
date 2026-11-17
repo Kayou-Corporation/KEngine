@@ -128,10 +128,6 @@ public:
     KAPI virtual DescriptorPoolHandle CreateDescriptorPool(const DescriptorPoolSpecs& specs) override;
     KAPI virtual void DestroyDescriptorPool(DescriptorPoolHandle pool) override;
 
-    // -------------- Descriptor Set -------------- //
-    KAPI virtual DescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout, DescriptorPoolHandle pool) override;
-    KAPI virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet) override;
-
     // -------------- Pipeline Layout -------------- // 
     virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) override;
     virtual void DestroyPipelineLayout(PipelineLayoutHandle) override;
