@@ -18,7 +18,7 @@ public:
     vk::DescriptorPoolCreateInfo GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t maxDescriptorSets);
 
     void SetPool(vk::DescriptorPool pool) {m_pool = pool;}
-    vk::DescriptorPool GetPool() const { return m_pool; }
+    vk::DescriptorPool GetHandle() const { return m_pool; }
 
 private:
     vk::DescriptorPool m_pool;

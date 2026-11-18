@@ -91,7 +91,7 @@ public:
 
 	// -------------- Standalone Descriptor Set -------------- //
 	KAPI virtual StandaloneDescriptorSetHandle CreateStandaloneDescriptorSet(DescriptorSetLayoutHandle layout) = 0;
-	KAPI virtual void DestroyDescriptorSet(StandaloneDescriptorSetHandle descriptorSet) = 0;
+	KAPI virtual void DestroyStandaloneDescriptorSet(StandaloneDescriptorSetHandle descriptorSet) = 0;
 	KAPI virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
 	KAPI virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) = 0;
 	KAPI virtual void SetDescriptorSetImage(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, ImageHandle image, SamplerHandle sampler) = 0;
@@ -102,6 +102,10 @@ public:
 	// -------------- Descriptor Pool -------------- //
 	KAPI virtual DescriptorPoolHandle CreateDescriptorPool(const DescriptorPoolSpecs& specs) = 0;
 	KAPI virtual void DestroyDescriptorPool(DescriptorPoolHandle pool) = 0;
+
+	// -------------- Descriptor Pool -------------- //
+	KAPI virtual DescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout, DescriptorPoolHandle pool) = 0;
+	KAPI virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet, DescriptorPoolHandle pool) = 0;
 
 	// -------------- Pipeline Layout -------------- // 
 	KAPI virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) = 0;

@@ -16,6 +16,7 @@ vk::DescriptorPoolCreateInfo VulkanDescriptorPool::GetPoolCreateInfo(std::map<vk
     createInfo.poolSizeCount = static_cast<uint32_t>(m_poolSizes.size());
     createInfo.pPoolSizes = m_poolSizes.data();
     createInfo.maxSets = maxDescriptorSets;
+    createInfo.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet;
 
     return createInfo;
 }

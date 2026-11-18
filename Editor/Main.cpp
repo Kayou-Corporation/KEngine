@@ -17,6 +17,7 @@
 #include "RHI/API/Sampler.hpp"
 #include "RHI/API/StandaloneDescriptorSet.hpp"
 #include "RHI/API/RHI.hpp"
+#include "RHI/API/DescriptorSet.hpp"
 #include "Camera/EditorCamera.hpp"
 #include "CoreObject/StaticMesh.hpp"
 
@@ -174,7 +175,9 @@ int main()
     poolSpecs.descriptors = {
         { Core::DescriptorType::UniformBuffer, 10 },
         { Core::DescriptorType::CombinedImageSampler, 10 },
-        { Core::DescriptorType::StorageBuffer, 10 }
+        { Core::DescriptorType::StorageBuffer, 10 },
+        {Core::DescriptorType::SampledImage, 10},
+        {Core::DescriptorType::Sampler, 10}
     };
     Core::DescriptorPoolHandle pool = device->CreateDescriptorPool(poolSpecs);
 
@@ -299,6 +302,8 @@ int main()
     // DescriptorSet
     Core::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
     Core::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
+
+    Core::DescriptorSetHandle testDescriptorSet = device->CreateDescriptorSet(drawDataLayout, pool);
 
     Core::StandaloneDescriptorSetHandle frameDataDescriptorSet = device->CreateStandaloneDescriptorSet(frameDataLayout);
     Core::StandaloneDescriptorSetHandle drawDataDescriptorSet = device->CreateStandaloneDescriptorSet(drawDataLayout);
@@ -450,10 +455,11 @@ int main()
     device->DestroySampler(sampler);
     device->DestroyBuffer(uniformCamera);
     device->DestroyBuffer(uniformModel);
+    device->DestroyDescriptorSet(testDescriptorSet, pool);
     device->DestroyDescriptorPool(pool);
 
-    device->DestroyDescriptorSet(frameDataDescriptorSet);
-    device->DestroyDescriptorSet(drawDataDescriptorSet);
+    device->DestroyStandaloneDescriptorSet(frameDataDescriptorSet);
+    device->DestroyStandaloneDescriptorSet(drawDataDescriptorSet);
 
     device->DestroyPipeline(unlitPipeline);
     device->DestroyPipelineLayout(globalPipelineLayout);

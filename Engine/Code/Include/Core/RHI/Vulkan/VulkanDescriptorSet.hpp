@@ -7,6 +7,7 @@
 #include "VulkanPipelineCommon.hpp"
 
 BEGIN_NAMESPACE_CORE
+
 class VulkanDescriptorSet : public DescriptorSet
 {
 public:

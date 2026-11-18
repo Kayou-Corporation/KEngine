@@ -20,6 +20,7 @@
 #include <spdlog/spdlog.h>
 
 #include "RHI/Vulkan/VulkanDescriptorPool.hpp"
+#include "RHI/Vulkan/VulkanDescriptorSet.hpp"
 
 // TODO : Maybe do more cleanup (Review extension system and constant validation for format usage)
 
@@ -744,7 +745,7 @@ StandaloneDescriptorSetHandle VulkanDevice::CreateStandaloneDescriptorSet(Descri
 	return RHIVulkanDescriptorSet;
 }
 
-void VulkanDevice::DestroyDescriptorSet(StandaloneDescriptorSetHandle RHIDescriptorSet)
+void VulkanDevice::DestroyStandaloneDescriptorSet(StandaloneDescriptorSetHandle RHIDescriptorSet)
 {
 	Core::KSharedPtr<VulkanStandaloneDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanStandaloneDescriptorSet>(RHIDescriptorSet);
 
@@ -987,13 +988,63 @@ DescriptorPoolHandle VulkanDevice::CreateDescriptorPool(const DescriptorPoolSpec
 void VulkanDevice::DestroyDescriptorPool(DescriptorPoolHandle pool)
 {
 	Core::KSharedPtr<VulkanDescriptorPool> RHIVulkanDescriptorPool = StaticCast<VulkanDescriptorPool>(pool);
-	vk::DescriptorPool vkPool =  RHIVulkanDescriptorPool->GetPool();
+	vk::DescriptorPool vkPool =  RHIVulkanDescriptorPool->GetHandle();
 
 	m_handle.destroyDescriptorPool(vkPool);
 
 }
 
-// -------------- Pipeline Layout -------------- // 
+// -------------- Descriptor Set -------------- //
+DescriptorSetHandle VulkanDevice::CreateDescriptorSet(DescriptorSetLayoutHandle layout, DescriptorPoolHandle pool)
+{
+	KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = Core::MakeShared<VulkanDescriptorSet>(layout->GetName());
+
+	KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanLayout = StaticCast<VulkanDescriptorSetLayout>(layout);
+	KSharedPtr<VulkanDescriptorPool> RHIVulkanPool = StaticCast<VulkanDescriptorPool>(pool);
+
+	std::vector<VulkanBinding> bindings = RHIVulkanLayout->GetAllBindings();
+
+	std::map<vk::DescriptorType, uint32_t> descriptors;
+	for (const VulkanBinding& binding : bindings)
+	{
+		if (descriptors.find(binding.binding.descriptorType) != descriptors.end())
+		{
+			descriptors[binding.binding.descriptorType] += binding.binding.descriptorCount;
+		}
+		else
+		{
+			descriptors.emplace(binding.binding.descriptorType, binding.binding.descriptorCount);
+		}
+	}
+	RHIVulkanDescriptorSet->SetBindings(bindings);
+
+	vk::DescriptorPool vkPool = RHIVulkanPool->GetHandle();
+	vk::DescriptorSetLayout vkLayout = RHIVulkanLayout->GetHandle();
+
+	vk::DescriptorSetAllocateInfo allocInfo{};
+	allocInfo.descriptorSetCount = 1;
+	allocInfo.descriptorPool = vkPool;
+	allocInfo.pSetLayouts = &vkLayout;
+
+	std::vector<vk::DescriptorSet> descriptorSet = VK_CHECK_RESULT(m_handle.allocateDescriptorSets(allocInfo), "Coundn't allocate descriptor sets");
+
+	RHIVulkanDescriptorSet->SetHanlde(descriptorSet[0]);
+
+	return RHIVulkanDescriptorSet;
+}
+
+void VulkanDevice::DestroyDescriptorSet(DescriptorSetHandle descriptorSet, DescriptorPoolHandle pool)
+{
+	KSharedPtr<VulkanDescriptorSet> RHIVulkanDescriptorSet = StaticCast<VulkanDescriptorSet>(descriptorSet);
+	KSharedPtr<VulkanDescriptorPool> RHIVulkanPool = StaticCast<VulkanDescriptorPool>(pool);
+
+	vk::DescriptorSet vkDescriptorSet = RHIVulkanDescriptorSet->GetHandle();
+	vk::DescriptorPool vkPool = RHIVulkanPool->GetHandle();
+
+	VK_CHECK_VOID(m_handle.freeDescriptorSets(vkPool, { vkDescriptorSet }), "Can't Destroy descriptor set");
+}
+
+// -------------- Pipeline Layout -------------- //
 PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants)
 {
 	Core::KSharedPtr<VulkanPipelineLayout> RHIVUlkanPipelineLayout = Core::MakeShared<VulkanPipelineLayout>();

@@ -116,7 +116,7 @@ public:
 
     // -------------- Standalone Descriptor Set -------------- //
     virtual StandaloneDescriptorSetHandle CreateStandaloneDescriptorSet(DescriptorSetLayoutHandle layout) override;
-    virtual void DestroyDescriptorSet(StandaloneDescriptorSetHandle descriptorSet) override;
+    virtual void DestroyStandaloneDescriptorSet(StandaloneDescriptorSetHandle descriptorSet) override;
     virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
     virtual void SetDescriptorSetBuffer(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, BufferHandle buffer, uint32_t offset, uint32_t range) override;
     virtual void SetDescriptorSetImage(StandaloneDescriptorSetHandle descriptorSet, std::string name, DescriptorType type, ImageHandle image, SamplerHandle sampler) override;
@@ -125,8 +125,12 @@ public:
     virtual void SetDescriptorSetSampler(StandaloneDescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) override;
 
     // -------------- Descriptor Pool -------------- //
-    KAPI virtual DescriptorPoolHandle CreateDescriptorPool(const DescriptorPoolSpecs& specs) override;
-    KAPI virtual void DestroyDescriptorPool(DescriptorPoolHandle pool) override;
+    virtual DescriptorPoolHandle CreateDescriptorPool(const DescriptorPoolSpecs& specs) override;
+    virtual void DestroyDescriptorPool(DescriptorPoolHandle pool) override;
+
+    // -------------- Descriptor Set -------------- //
+    virtual DescriptorSetHandle CreateDescriptorSet(DescriptorSetLayoutHandle layout, DescriptorPoolHandle pool) override;
+    virtual void DestroyDescriptorSet(DescriptorSetHandle descriptorSet, DescriptorPoolHandle pool) override;
 
     // -------------- Pipeline Layout -------------- // 
     virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) override;
