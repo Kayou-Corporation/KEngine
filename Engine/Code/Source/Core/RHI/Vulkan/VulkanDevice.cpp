@@ -978,7 +978,7 @@ DescriptorPoolHandle VulkanDevice::CreateDescriptorPool(const DescriptorPoolSpec
 		descriptors.emplace(TranslateToVulkan(type), count);
 	}
 
-	vk::DescriptorPoolCreateInfo poolCreateInfo = RHIVulkanDescriptorPool->GetPoolCreateInfo(descriptors, specs.maxDescriptorSetsCount);
+	vk::DescriptorPoolCreateInfo poolCreateInfo = RHIVulkanDescriptorPool->GetPoolCreateInfo(descriptors, specs.maxDescriptorSetsCount, specs.poolForArray);
 	vk::DescriptorPool pool = VK_CHECK_RESULT(m_handle.createDescriptorPool(poolCreateInfo), "Coundn't create Descriptor pool");
 	RHIVulkanDescriptorPool->SetPool(pool);
 
@@ -1353,6 +1353,17 @@ void VulkanDevice::BuildFeaturesChain()
 
 			features.sync2Features.pNext = currentPNext;
 			currentPNext = &features.sync2Features;
+		}
+		else if (name == VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)
+		{
+			features.descriptorIndexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
+			features.descriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+			features.descriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+			features.descriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
+			features.descriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+
+			features.descriptorIndexingFeatures.pNext = currentPNext;
+			currentPNext = &features.descriptorIndexingFeatures;
 		}
 	}
 

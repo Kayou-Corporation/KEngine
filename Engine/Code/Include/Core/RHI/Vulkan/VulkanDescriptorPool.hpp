@@ -7,15 +7,13 @@
 
 BEGIN_NAMESPACE_CORE
 
-
-
 class VulkanDescriptorPool : public DescriptorPool
 {
 public:
     VulkanDescriptorPool() = default;
     virtual ~VulkanDescriptorPool() = default;
 
-    vk::DescriptorPoolCreateInfo GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t maxDescriptorSets);
+    vk::DescriptorPoolCreateInfo GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t maxDescriptorSets, bool useForArray);
 
     void SetPool(vk::DescriptorPool pool) {m_pool = pool;}
     vk::DescriptorPool GetHandle() const { return m_pool; }

@@ -1,7 +1,8 @@
 ﻿#include "RHI/Vulkan/VulkanDescriptorPool.hpp"
 
 BEGIN_NAMESPACE_CORE
-vk::DescriptorPoolCreateInfo VulkanDescriptorPool::GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t maxDescriptorSets)
+
+vk::DescriptorPoolCreateInfo VulkanDescriptorPool::GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t maxDescriptorSets, bool useForArray)
 {
     vk::DescriptorPoolCreateInfo createInfo{};
 
@@ -17,6 +18,11 @@ vk::DescriptorPoolCreateInfo VulkanDescriptorPool::GetPoolCreateInfo(std::map<vk
     createInfo.pPoolSizes = m_poolSizes.data();
     createInfo.maxSets = maxDescriptorSets;
     createInfo.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet;
+
+    if (useForArray)
+    {
+        createInfo.flags |= vk::DescriptorPoolCreateFlagBits::eUpdateAfterBind;
+    }
 
     return createInfo;
 }

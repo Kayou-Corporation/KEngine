@@ -38,6 +38,22 @@ struct DrawData
 };
 ParameterBlock<DrawData> drawData;
 
+struct GlobalAccessResources
+{
+    Sampler2D globalTextures[];
+    StructuredBuffer<Object> globalModels[];
+};
+ParameterBlock<GlobalAccessResources> globalAccessResources;
+
+struct PushConstants
+{
+    uint matrixIndex;
+    uint textureIndex;
+};
+
+[push_constant]
+PushConstants pc;
+
 //struct PushConstants
 //{
 //     int textureID;

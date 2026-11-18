@@ -41,6 +41,7 @@ struct DeviceFeatures
     vk::PhysicalDeviceExtendedDynamicState2FeaturesEXT extendedDynamicState2Features;
     vk::PhysicalDeviceSynchronization2Features sync2Features;
     vk::PhysicalDeviceTimelineSemaphoreFeatures timelineSemaphore;
+    vk::PhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures;
 };
 
 // Native extensions required for our API implementation
@@ -48,7 +49,8 @@ static std::vector<const char*> nativeExtensions =
 {
     VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
     VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-    VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME
+    VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+    VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
 };
 
 class VulkanDevice : public Device

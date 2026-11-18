@@ -101,8 +101,8 @@ int main()
     Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
 
     // ------------ Object loading test -----------------//
-    //Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
-    //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/viking_room.png", "texture");
+    Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
+    Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/viking_room.png", "texture");
 
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
     AssetManager::KSoftAssetRef<CoreObject::Texture2D> texture = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("texture");
@@ -302,6 +302,7 @@ int main()
     // DescriptorSet
     Core::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
     Core::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
+    Core::DescriptorSetLayoutHandle globalRessources = globalPipelineLayout->GetDescriptorSetLayout("globalAccessResources");
 
     Core::DescriptorSetHandle testDescriptorSet = device->CreateDescriptorSet(drawDataLayout, pool);
 

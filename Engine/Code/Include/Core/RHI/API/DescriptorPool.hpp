@@ -13,6 +13,7 @@ struct DescriptorPoolSpecs
 {
     std::unordered_map<DescriptorType, uint32_t> descriptors;
     uint32_t maxDescriptorSetsCount;
+    bool poolForArray = false;
 };
 
 class DescriptorPool
