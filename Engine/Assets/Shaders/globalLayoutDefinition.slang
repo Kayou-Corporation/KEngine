@@ -26,8 +26,9 @@ struct Object
 {
     float4x4 model;
     float4x4 normalMatrix;
-}
-// Set 1 --- DrawData ---
+};
+
+//Set 1 --- DrawData ---
 struct DrawData
 {
     ConstantBuffer<Object> object;
@@ -38,27 +39,14 @@ struct DrawData
 };
 ParameterBlock<DrawData> drawData;
 
-struct GlobalAccessResources
-{
-    Sampler2D globalTextures[];
-    StructuredBuffer<Object> globalModels[];
-};
-ParameterBlock<GlobalAccessResources> globalAccessResources;
+Texture2D globalTextures[];
+StructuredBuffer<Object> globalModels[];
 
 struct PushConstants
 {
-    uint matrixIndex;
-    uint textureIndex;
-};
+     int textureID;
+     int modelID;
+}
 
 [push_constant]
 PushConstants pc;
-
-//struct PushConstants
-//{
-//     int textureID;
-//     int modelID;
-//}
-//
-//[push_constant]
-//ConstantBuffer<PushConstants> pushConstants;

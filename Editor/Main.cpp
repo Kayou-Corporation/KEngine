@@ -101,8 +101,8 @@ int main()
     Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
 
     // ------------ Object loading test -----------------//
-    Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
-    Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/viking_room.png", "texture");
+    //Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");
+    //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/viking_room.png", "texture");
 
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
     AssetManager::KSoftAssetRef<CoreObject::Texture2D> texture = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("texture");
@@ -275,8 +275,9 @@ int main()
     Core::ShaderHandle globalLayoutShader = device->CreateShader("globalLayout", Core::ShaderStage::Vertex, true, true);
 
     std::vector<Core::DescriptorSetLayoutHandle> globalLayoutDescriptors = device->CreateDescriptorSetsLayouts(globalLayoutShader);
+    Core::PushConstantLayoutHandle globalLayoutPushConstants = device->CreatePushConstantLayout(globalLayoutShader);
 
-    Core::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
+    Core::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {globalLayoutPushConstants});
 
     Core::GraphicsPipelineSpecs unlitPipelineSpecs;
     unlitPipelineSpecs.colorAttachmentCount = 1;

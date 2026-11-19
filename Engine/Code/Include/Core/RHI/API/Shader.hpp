@@ -98,6 +98,7 @@ struct Descriptor
     uint32_t index = UINT32_MAX;
     std::string name{};
     std::vector<Binding> bindings{};
+    bool boundless = false;
 
     bool operator==(const Descriptor& other) const
     {

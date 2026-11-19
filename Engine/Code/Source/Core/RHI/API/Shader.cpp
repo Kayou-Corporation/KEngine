@@ -6,9 +6,10 @@
 #include <map>
 #include <spdlog/spdlog.h>
 
-BEGIN_NAMESPACE_CORE
+#include "RHI/API/DescriptorSetArray.hpp"
 
-std::string GetShaderName(const std::string& path)
+BEGIN_NAMESPACE_CORE
+    std::string GetShaderName(const std::string& path)
 {
     std::filesystem::path p(path);
     return p.stem().string();
@@ -389,6 +390,54 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
 
                 pushConstantIdx++;
             }
+        }
+        else if (typeLayout->getKind() == slang::TypeReflection::Kind::Array)
+        {
+            trueSetCount++;
+
+            // Set Info (set = X, binding = Y) :
+            uint32_t setIndex = field->getBindingIndex();
+            std::string setName = field->getName();
+
+            Descriptor& descriptorSet = descriptorMap[setIndex];
+            descriptorSet.index = setIndex;
+            descriptorSet.name = setName;
+            descriptorSet.boundless = true;
+
+
+            slang::TypeLayoutReflection* elementTypeLayout = typeLayout->getElementTypeLayout();
+            //const uint32_t bindingCount = elementTypeLayout->getFieldCount();
+
+            descriptorSet.bindings.reserve(1);
+
+            // Binding Info (set = X, binding = Y) :
+            slang::VariableLayoutReflection* subField = elementTypeLayout->getFieldByIndex(0);
+            if (!subField)
+            {
+                continue;
+            }
+
+            slang::TypeLayoutReflection* subTypeLayout = subField->getTypeLayout();
+
+            const uint32_t bindingIndex = subField->getBindingIndex();
+
+            const slang::BindingType bindingType = subTypeLayout->getBindingRangeType(0);
+
+            const SlangResourceShape bindingShape = subTypeLayout->getType()->getResourceShape();
+
+            uint32_t descriptorCount = MAX_DESCRIPTORSETARRAY_SIZE;
+
+            std::string bindingName = subField->getName();
+
+            Binding binding{};
+            binding.index = bindingIndex;
+            binding.type = bindingType;
+            binding.shape = bindingShape;
+            binding.count = descriptorCount;
+            binding.stage = isGlobalLayout ? ShaderStage::All : stage;
+            binding.name = bindingName;
+
+            descriptorSet.bindings[0] = binding;
         }
     }
 

@@ -4,6 +4,7 @@ BEGIN_NAMESPACE_CORE
 
 vk::DescriptorPoolCreateInfo VulkanDescriptorPool::GetPoolCreateInfo(std::map<vk::DescriptorType, uint32_t> descriptors, uint32_t maxDescriptorSets, bool useForArray)
 {
+    m_poolSizes.clear();
     vk::DescriptorPoolCreateInfo createInfo{};
 
     for (const auto& [type, count] : descriptors)
@@ -21,6 +22,7 @@ vk::DescriptorPoolCreateInfo VulkanDescriptorPool::GetPoolCreateInfo(std::map<vk
 
     if (useForArray)
     {
+        createInfo.maxSets = 1;
         createInfo.flags |= vk::DescriptorPoolCreateFlagBits::eUpdateAfterBind;
     }
 
