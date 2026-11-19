@@ -279,6 +279,12 @@ int main()
 
     Core::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {globalLayoutPushConstants});
 
+    Core::GraphicsPipelineColorBlendAttachment unlitPipelineColorBlendAttachement;
+    unlitPipelineColorBlendAttachement.blendColor = false;
+    unlitPipelineColorBlendAttachement.srcColorBlendFactor = Core::BlendFactor::One;
+    unlitPipelineColorBlendAttachement.dstColorBlendFactor = Core::BlendFactor::Zero;
+    unlitPipelineColorBlendAttachement.colorBlendOperation = Core::BlendOperation::Add;
+    unlitPipelineColorBlendAttachement.colorWriteMask = Core::ColorComponentFlagBits::R | Core::ColorComponentFlagBits::G | Core::ColorComponentFlagBits::B | Core::ColorComponentFlagBits::A;
     Core::GraphicsPipelineSpecs unlitPipelineSpecs;
     unlitPipelineSpecs.colorAttachmentCount = 1;
     unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
@@ -289,7 +295,7 @@ int main()
     unlitPipelineSpecs.cullmode = Core::CullMode::Back;
     unlitPipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
     unlitPipelineSpecs.SamplesCount = Core::SampleCount::Count1;
-    unlitPipelineSpecs.blendColor = false;
+    unlitPipelineSpecs.colorBlendAttachements = { unlitPipelineColorBlendAttachement };
     unlitPipelineSpecs.depthTest = true;
     unlitPipelineSpecs.depthWrite = true;
     unlitPipelineSpecs.depthCompare = Core::CompareOp::LessOrEqual;
@@ -416,13 +422,13 @@ int main()
         commandList->SetScissor(0, 0, windowReference->GetWidth(), windowReference->GetHeight());
 
         commandList->BindPipeline(unlitPipeline);
-
+        
         commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Core::PipelineBindPoint::Graphics);
         commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
-
+        
         commandList->BindVertexBuffer(vertexBuffer, 0);
         commandList->BindIndexBuffer(indexBuffer, 0);
-
+        
         commandList->DrawIndexed(static_cast<uint32_t>(vikingRoomMesh->GetIndicesCount()), 1, 0, 0, 0);
 
         commandList->EndRendering();

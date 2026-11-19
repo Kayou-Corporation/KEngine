@@ -499,4 +499,57 @@ enum class CompareOp
 	Always
 };
 
+enum class ColorComponentFlagBits : uint32_t
+{
+	R = 0x00000001,
+	G = 0x00000002,
+	B = 0x00000004,
+	A = 0x00000008
+};
+typedef uint32_t ColorComponentFlags;
+
+inline constexpr ColorComponentFlags operator|(ColorComponentFlagBits a, ColorComponentFlagBits b)
+{
+    return static_cast<ColorComponentFlags>(a) | static_cast<ColorComponentFlags>(b);
+}
+
+inline constexpr ColorComponentFlags operator|(ColorComponentFlags a, ColorComponentFlagBits b)
+{
+    return a | static_cast<ColorComponentFlags>(b);
+}
+
+inline constexpr ColorComponentFlags& operator|=(ColorComponentFlags& a, ColorComponentFlagBits b)
+{
+    a |= static_cast<ColorComponentFlags>(b);
+    return a;
+}
+
+enum class BlendFactor
+{
+	Zero,
+	One,
+	SrcColor,
+	OneMinusSrcColor,
+	DstColor,
+	OneMinusDstColor,
+	SrcAlpha,
+	OneMinusSrcAlpha,
+	DstAlpha,
+	OneMinusDstAlpha,
+	ConstantColor,
+	OneMinusConstantColor,
+	ConstantAlpha,
+	OneMinusConstantAlpha,
+	SrcAlphaSaturate
+};
+
+enum class BlendOperation
+{
+	Add,
+	Subtract,
+	ReverseSubtract,
+	Min,
+	Max
+};
+
 END_NAMESPACE_CORE

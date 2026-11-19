@@ -83,20 +83,24 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	vk::PipelineMultisampleStateCreateInfo multisamplingInfo{};
 	multisamplingInfo.rasterizationSamples = TranslateToVulkan(specs.SamplesCount);
 
-
-	vk::PipelineColorBlendAttachmentState colorBlendAttachment{};
-	colorBlendAttachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
-	colorBlendAttachment.blendEnable = VK_FALSE;
-	colorBlendAttachment.srcColorBlendFactor = vk::BlendFactor::eOne;
-	colorBlendAttachment.dstColorBlendFactor = vk::BlendFactor::eZero;
-	colorBlendAttachment.colorBlendOp = vk::BlendOp::eAdd;
-	if (specs.blendColor)
+	createInfo.colorBlends.reserve(specs.colorBlendAttachements.size());
+	for (GraphicsPipelineColorBlendAttachment att : specs.colorBlendAttachements)
 	{
-		colorBlendAttachment.blendEnable = VK_TRUE;
+		vk::PipelineColorBlendAttachmentState colorBlendAttachment{};
+		colorBlendAttachment.colorWriteMask = static_cast<vk::ColorComponentFlags>(att.colorWriteMask);
+		colorBlendAttachment.blendEnable = VK_FALSE;
+		colorBlendAttachment.srcColorBlendFactor = TranslateToVulkan(att.srcColorBlendFactor);
+		colorBlendAttachment.dstColorBlendFactor = TranslateToVulkan(att.dstColorBlendFactor);
+		colorBlendAttachment.colorBlendOp = TranslateToVulkan(att.colorBlendOperation);
+		colorBlendAttachment.srcAlphaBlendFactor = TranslateToVulkan(att.srcAlphaBlendFactor);
+		colorBlendAttachment.dstAlphaBlendFactor = TranslateToVulkan(att.dstAlphaBlendFactor);
+		colorBlendAttachment.alphaBlendOp = TranslateToVulkan(att.alphaBlendOperation);
+		if (att.blendColor)
+		{
+			colorBlendAttachment.blendEnable = VK_TRUE;
+		}
+		createInfo.colorBlends.push_back(colorBlendAttachment);
 	}
-	vk::PipelineColorBlendStateCreateInfo colorBlendingInfo{};
-	colorBlendingInfo.attachmentCount = 1;
-	colorBlendingInfo.pAttachments = &colorBlendAttachment;
 
 	vk::PipelineDepthStencilStateCreateInfo depthStencilCreateInfo{};
 	depthStencilCreateInfo.depthTestEnable = specs.depthTest;
@@ -119,11 +123,9 @@ VulkanGraphicsPipelineStructs VulkanGraphicsPipeline::GetGraphicsCreateInfo(cons
 	createInfo.viewportState = viewportStateInfo;
 	createInfo.rasterizationState = rasterizationInfo;
 	createInfo.multisampleState = multisamplingInfo;
-	createInfo.colorBlendState = colorBlendingInfo;
 	createInfo.depthStencilCreateInfo = depthStencilCreateInfo;
 	createInfo.dynamicStates = dynamicStates;
 	createInfo.layout = StaticCast<VulkanPipelineLayout>(specs.pipelineLayout)->GetHandle();
-	createInfo.colorBlend = colorBlendAttachment;
 	createInfo.renderPass = nullptr; // Always null for now
 	return createInfo;
 }
@@ -153,8 +155,8 @@ vk::GraphicsPipelineCreateInfo VulkanGraphicsPipeline::GetVulkanGraphicsCreateIn
 	createInfo.pRasterizationState = &vulkanGraphicsPipelineSpecs.rasterizationState;
 	createInfo.pMultisampleState = &vulkanGraphicsPipelineSpecs.multisampleState;
 
-	vulkanGraphicsPipelineSpecs.colorBlendState.attachmentCount = 1;
-	vulkanGraphicsPipelineSpecs.colorBlendState.pAttachments = &vulkanGraphicsPipelineSpecs.colorBlend;
+	vulkanGraphicsPipelineSpecs.colorBlendState.attachmentCount = static_cast<uint32_t>(vulkanGraphicsPipelineSpecs.colorBlends.size());
+	vulkanGraphicsPipelineSpecs.colorBlendState.pAttachments = vulkanGraphicsPipelineSpecs.colorBlends.data();
 	createInfo.pColorBlendState = &vulkanGraphicsPipelineSpecs.colorBlendState;
 	createInfo.pDepthStencilState = &vulkanGraphicsPipelineSpecs.depthStencilCreateInfo;
 	createInfo.pDynamicState = &vulkanGraphicsPipelineSpecs.dynamicStateInfo;
