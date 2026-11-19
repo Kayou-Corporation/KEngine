@@ -610,6 +610,19 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 			createInfo.bindingCount = static_cast<uint32_t>(allBindings.size());
 			createInfo.pBindings = allBindings.data();
 
+			// For descriptor indexing
+			if (SLANGDescriptor.boundless)
+			{
+				vk::DescriptorBindingFlags bindingFlags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind;
+
+				vk::DescriptorSetLayoutBindingFlagsCreateInfo flagsInfo{};
+				flagsInfo.bindingCount = 1;
+				flagsInfo.pBindingFlags = &bindingFlags;
+
+				createInfo.pNext = &flagsInfo;
+				createInfo.flags = vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool;
+			}
+
 			vk::DescriptorSetLayout layout = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(createInfo), "Coundn't create DescriptorSetLayout");
 			RHIVulkanDescriptor->SetHandle(layout);
 
@@ -651,6 +664,19 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 			vk::DescriptorSetLayoutCreateInfo createInfo{};
 			createInfo.bindingCount = static_cast<uint32_t>(allBindings.size());
 			createInfo.pBindings = allBindings.data();
+
+			// For descriptor indexing
+			if (SLANGDescriptor.boundless)
+			{
+				vk::DescriptorBindingFlags bindingFlags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind;
+
+				vk::DescriptorSetLayoutBindingFlagsCreateInfo flagsInfo{};
+				flagsInfo.bindingCount = 1;
+				flagsInfo.pBindingFlags = &bindingFlags;
+
+				createInfo.pNext = &flagsInfo;
+				createInfo.flags = vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool;
+			}
 
 			vk::DescriptorSetLayout layout = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(createInfo), "Coundn't create DescriptorSetLayout");
 			RHIVulkanDescriptor->SetHandle(layout);
