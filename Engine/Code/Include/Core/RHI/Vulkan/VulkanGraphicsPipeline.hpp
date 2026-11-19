@@ -19,18 +19,18 @@ struct VulkanGraphicsPipelineStructs
 	vk::PipelineViewportStateCreateInfo viewportState{};
 	vk::PipelineRasterizationStateCreateInfo rasterizationState{};
 	vk::PipelineMultisampleStateCreateInfo multisampleState{};
-	vk::PipelineColorBlendStateCreateInfo colorBlendState{};
+	std::vector<vk::PipelineColorBlendAttachmentState> colorBlends{};
 	vk::PipelineDepthStencilStateCreateInfo depthStencilCreateInfo{};
 	std::vector<vk::DynamicState> dynamicStates{};
 	vk::PipelineLayout layout{};
 	vk::RenderPass renderPass{};
 
-	// Do not manually set the members bellow
+	// Do not manually set the members below
 
 	vk::PipelineRenderingCreateInfo renderingInfo{}; // Do not manually set
 	vk::PipelineVertexInputStateCreateInfo vertexInputInfo{}; // Do not manually set
 	vk::PipelineDynamicStateCreateInfo dynamicStateInfo{}; // Do not manually set
-	vk::PipelineColorBlendAttachmentState colorBlend{};
+	vk::PipelineColorBlendStateCreateInfo colorBlendState{}; // Do not manually set
 };
 
 class VulkanGraphicsPipeline : public GraphicsPipeline

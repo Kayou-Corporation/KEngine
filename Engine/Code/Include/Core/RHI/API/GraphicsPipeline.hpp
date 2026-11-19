@@ -5,6 +5,18 @@
 
 BEGIN_NAMESPACE_CORE
 
+struct GraphicsPipelineColorBlendAttachment
+{
+	bool blendColor; // if true all channel in colorWriteMask
+	BlendFactor srcColorBlendFactor = BlendFactor::Zero;
+	BlendFactor dstColorBlendFactor = BlendFactor::Zero;
+	BlendOperation colorBlendOperation = BlendOperation::Add;
+	BlendFactor srcAlphaBlendFactor = BlendFactor::Zero;
+	BlendFactor dstAlphaBlendFactor = BlendFactor::Zero;
+	BlendOperation alphaBlendOperation = BlendOperation::Add;
+	ColorComponentFlags colorWriteMask;
+};
+
 struct GraphicsPipelineSpecs
 {
 	// vk::PipelineRenderingCreateInfo	
@@ -21,7 +33,7 @@ struct GraphicsPipelineSpecs
 	FrontFace frontFace;
 
 	SampleCount SamplesCount;
-	bool blendColor; // if true all channel in colorWriteMask
+	std::vector<GraphicsPipelineColorBlendAttachment> colorBlendAttachements;
 
 	std::vector<DynamicState> dynamicStates;
 

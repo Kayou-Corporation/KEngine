@@ -1026,4 +1026,62 @@ inline vk::PipelineBindPoint TranslateToVulkan(const PipelineBindPoint point)
     }
 }
 
+inline vk::BlendFactor TranslateToVulkan(const BlendFactor blendFactor)
+{
+    switch (blendFactor)
+    {
+    case BlendFactor::Zero:
+        return vk::BlendFactor::eZero;
+    case BlendFactor::One:
+        return vk::BlendFactor::eOne;
+    case BlendFactor::SrcColor:
+        return vk::BlendFactor::eSrcColor;
+    case BlendFactor::OneMinusSrcColor:
+        return vk::BlendFactor::eOneMinusSrcColor;
+    case BlendFactor::DstColor:
+        return vk::BlendFactor::eDstColor;
+    case BlendFactor::OneMinusDstColor:
+        return vk::BlendFactor::eOneMinusDstColor;
+    case BlendFactor::SrcAlpha:
+        return vk::BlendFactor::eSrcAlpha;
+    case BlendFactor::OneMinusSrcAlpha:
+        return vk::BlendFactor::eOneMinusSrcAlpha;
+    case BlendFactor::DstAlpha:
+        return vk::BlendFactor::eDstAlpha;
+    case BlendFactor::OneMinusDstAlpha:
+        return vk::BlendFactor::eOneMinusDstAlpha;
+    case BlendFactor::ConstantColor:
+        return vk::BlendFactor::eConstantColor;
+    case BlendFactor::OneMinusConstantColor:
+        return vk::BlendFactor::eOneMinusConstantColor;
+    case BlendFactor::ConstantAlpha:
+        return vk::BlendFactor::eConstantAlpha;
+    case BlendFactor::OneMinusConstantAlpha:
+        return vk::BlendFactor::eOneMinusConstantAlpha;
+    case BlendFactor::SrcAlphaSaturate:
+        return vk::BlendFactor::eSrcAlphaSaturate;
+    default:
+        return vk::BlendFactor::eZero;
+    }
+}
+
+inline vk::BlendOp TranslateToVulkan(const BlendOperation blendOperation)
+{
+    switch (blendOperation)
+    {
+    case BlendOperation::Add:
+        return vk::BlendOp::eAdd;
+    case BlendOperation::Subtract:
+        return vk::BlendOp::eSubtract;
+    case BlendOperation::ReverseSubtract:
+        return vk::BlendOp::eReverseSubtract;
+    case BlendOperation::Min:
+        return vk::BlendOp::eMin;
+    case BlendOperation::Max:
+        return vk::BlendOp::eMax;
+    default:
+        return vk::BlendOp::eAdd;
+    }
+}
+
 END_NAMESPACE_CORE

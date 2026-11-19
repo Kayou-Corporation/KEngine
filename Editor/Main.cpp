@@ -108,16 +108,19 @@ int main()
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/viking_room.png", "texture");
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/particleMesh.obj", "particleMesh");
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/particleTexture.png", "particleTexture");
+    //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/flame.png", "flameTexture");
 
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
     AssetManager::KSoftAssetRef<CoreObject::Texture2D> texture = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("texture");
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> partMesh = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("particleMesh");
     AssetManager::KSoftAssetRef<CoreObject::Texture2D> partText = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("particleTexture");
+    AssetManager::KSoftAssetRef<CoreObject::Texture2D> flameText = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("flameTexture");
 
     Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
     Core::KSharedPtr<CoreObject::Texture2D> vikingRoomTexture = texture.Get();
     Core::KSharedPtr<CoreObject::StaticMesh> particleMesh = partMesh.Get();
     Core::KSharedPtr<CoreObject::Texture2D> particleTexture = partText.Get();
+    Core::KSharedPtr<CoreObject::Texture2D> flameTexture = flameText.Get();
 
     // TODO : move this here
     //Core::KEngine::Update();
@@ -181,6 +184,7 @@ int main()
     Core::ImageHandle textureImage = vikingRoomTexture->GetImage();
 
     Core::ImageHandle particleImage = particleTexture->GetImage();
+    Core::ImageHandle flameImage = flameTexture->GetImage();
 
     // Base Sampler
     Core::SamplerSpecs samplerSpecs;
@@ -348,6 +352,12 @@ int main()
 
     Core::PipelineLayoutHandle globalPipelineLayout = device->CreatePipelineLayout(globalLayoutDescriptors, {});
 
+    Core::GraphicsPipelineColorBlendAttachment unlitPipelineColorBlendAttachement;
+    unlitPipelineColorBlendAttachement.blendColor = false;
+    unlitPipelineColorBlendAttachement.srcColorBlendFactor = Core::BlendFactor::One;
+    unlitPipelineColorBlendAttachement.dstColorBlendFactor = Core::BlendFactor::Zero;
+    unlitPipelineColorBlendAttachement.colorBlendOperation = Core::BlendOperation::Add;
+    unlitPipelineColorBlendAttachement.colorWriteMask = Core::ColorComponentFlagBits::R | Core::ColorComponentFlagBits::G | Core::ColorComponentFlagBits::B | Core::ColorComponentFlagBits::A;
     Core::GraphicsPipelineSpecs unlitPipelineSpecs;
     unlitPipelineSpecs.colorAttachmentCount = 1;
     unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
@@ -358,7 +368,7 @@ int main()
     unlitPipelineSpecs.cullmode = Core::CullMode::Back;
     unlitPipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
     unlitPipelineSpecs.SamplesCount = Core::SampleCount::Count1;
-    unlitPipelineSpecs.blendColor = false;
+    unlitPipelineSpecs.colorBlendAttachements = { unlitPipelineColorBlendAttachement };
     unlitPipelineSpecs.depthTest = true;
     unlitPipelineSpecs.depthWrite = true;
     unlitPipelineSpecs.depthCompare = Core::CompareOp::LessOrEqual;
@@ -381,11 +391,20 @@ int main()
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Core::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
-    device->SetDescriptorSetImage(particleDrawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, particleImage, nullptr);
+    device->SetDescriptorSetImage(particleDrawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, flameImage, nullptr);
     device->SetDescriptorSetSampler(particleDrawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
 
     Core::ShaderHandle particleVert = device->CreateShader("particleBillboard.vert", Core::ShaderStage::Vertex, false, true);
 
+    Core::GraphicsPipelineColorBlendAttachment unlitParticlePipelineColorBlendAttachement;
+    unlitParticlePipelineColorBlendAttachement.blendColor = true;
+    unlitParticlePipelineColorBlendAttachement.srcColorBlendFactor = Core::BlendFactor::SrcAlpha;
+    unlitParticlePipelineColorBlendAttachement.dstColorBlendFactor = Core::BlendFactor::OneMinusSrcAlpha;
+    unlitParticlePipelineColorBlendAttachement.colorBlendOperation = Core::BlendOperation::Add;
+    unlitParticlePipelineColorBlendAttachement.srcAlphaBlendFactor = Core::BlendFactor::One;
+    unlitParticlePipelineColorBlendAttachement.dstAlphaBlendFactor = Core::BlendFactor::OneMinusSrcAlpha;
+    unlitParticlePipelineColorBlendAttachement.alphaBlendOperation = Core::BlendOperation::Add;
+    unlitParticlePipelineColorBlendAttachement.colorWriteMask = Core::ColorComponentFlagBits::R | Core::ColorComponentFlagBits::G | Core::ColorComponentFlagBits::B | Core::ColorComponentFlagBits::A;
     Core::GraphicsPipelineSpecs unlitParticlePipelineSpecs;
     unlitParticlePipelineSpecs.colorAttachmentCount = 1;
     unlitParticlePipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
@@ -396,9 +415,9 @@ int main()
     unlitParticlePipelineSpecs.cullmode = Core::CullMode::None;
     unlitParticlePipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
     unlitParticlePipelineSpecs.SamplesCount = Core::SampleCount::Count1;
-    unlitParticlePipelineSpecs.blendColor = false;
+    unlitParticlePipelineSpecs.colorBlendAttachements = { unlitParticlePipelineColorBlendAttachement };
     unlitParticlePipelineSpecs.depthTest = true;
-    unlitParticlePipelineSpecs.depthWrite = true;
+    unlitParticlePipelineSpecs.depthWrite = false;
     unlitParticlePipelineSpecs.depthCompare = Core::CompareOp::LessOrEqual;
     unlitParticlePipelineSpecs.dynamicStates = { Core::DynamicState::ViewPort, Core::DynamicState::Scissor };
     unlitParticlePipelineSpecs.topology = Core::PrimitiveTopology::TriangleList;
@@ -673,13 +692,13 @@ int main()
         commandList->SetScissor(0, 0, windowReference->GetWidth(), windowReference->GetHeight());
 
         commandList->BindPipeline(unlitPipeline);
-
+        
         commandList->BindDescriptorSet(globalPipelineLayout, "frameData", frameDataDescriptorSet, Core::PipelineBindPoint::Graphics);
         commandList->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
-
+        
         commandList->BindVertexBuffer(vertexBuffer, 0);
         commandList->BindIndexBuffer(indexBuffer, 0);
-
+        
         commandList->DrawIndexed(static_cast<uint32_t>(vikingRoomMesh->GetIndicesCount()), 1, 0, 0, 0);
 
         commandList->BindPipeline(unlitParticlePipeline);
