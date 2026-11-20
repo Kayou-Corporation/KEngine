@@ -21,6 +21,7 @@
 
 #include "RHI/Vulkan/VulkanDescriptorPool.hpp"
 #include "RHI/Vulkan/VulkanDescriptorSet.hpp"
+#include "RHI/Vulkan/VulkanDescriptorSetArray.hpp"
 
 // TODO : Maybe do more cleanup (Review extension system and constant validation for format usage)
 
@@ -559,7 +560,7 @@ std::vector<DescriptorSetLayoutHandle> VulkanDevice::CreateDescriptorSetsLayouts
 		// For descriptor indexing
 		if (SLANGDescriptor.boundless)
 		{
-			vk::DescriptorBindingFlags bindingFlags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind;
+			vk::DescriptorBindingFlags bindingFlags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind | vk::DescriptorBindingFlagBits::eVariableDescriptorCount;
 
 			vk::DescriptorSetLayoutBindingFlagsCreateInfo flagsInfo{};
 			flagsInfo.bindingCount = 1;
@@ -613,7 +614,7 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 			// For descriptor indexing
 			if (SLANGDescriptor.boundless)
 			{
-				vk::DescriptorBindingFlags bindingFlags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind;
+				vk::DescriptorBindingFlags bindingFlags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind | vk::DescriptorBindingFlagBits::eVariableDescriptorCount;
 
 				vk::DescriptorSetLayoutBindingFlagsCreateInfo flagsInfo{};
 				flagsInfo.bindingCount = 1;
@@ -668,7 +669,7 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 			// For descriptor indexing
 			if (SLANGDescriptor.boundless)
 			{
-				vk::DescriptorBindingFlags bindingFlags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind;
+				vk::DescriptorBindingFlags bindingFlags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind | vk::DescriptorBindingFlagBits::eVariableDescriptorCount;
 
 				vk::DescriptorSetLayoutBindingFlagsCreateInfo flagsInfo{};
 				flagsInfo.bindingCount = 1;
@@ -1297,6 +1298,67 @@ void VulkanDevice::SetDescriptorSetSampler(DescriptorSetHandle RHIDescriptorSet,
 	}
 }
 
+// -------------- Descriptor Set Array -------------- //
+DescriptorSetArrayHandle VulkanDevice::CreateDescriptorSetArray(DescriptorSetLayoutHandle layout, DescriptorPoolHandle pool, uint32_t descriptorCount)
+{
+	KSharedPtr<VulkanDescriptorSetArray> RHIVulkanDescriptorSetArray = Core::MakeShared<VulkanDescriptorSetArray>(layout->GetName());
+
+	KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanLayout = StaticCast<VulkanDescriptorSetLayout>(layout);
+	KSharedPtr<VulkanDescriptorPool> RHIVulkanPool = StaticCast<VulkanDescriptorPool>(pool);
+
+	std::vector<VulkanBinding> bindings = RHIVulkanLayout->GetAllBindings();
+
+	std::map<vk::DescriptorType, uint32_t> descriptors;
+	for (const VulkanBinding& binding : bindings)
+	{
+		if (descriptors.find(binding.binding.descriptorType) != descriptors.end())
+		{
+			descriptors[binding.binding.descriptorType] += binding.binding.descriptorCount;
+		}
+		else
+		{
+			descriptors.emplace(binding.binding.descriptorType, binding.binding.descriptorCount);
+		}
+	}
+	RHIVulkanDescriptorSetArray->SetBindings(bindings);
+
+	vk::DescriptorPool vkPool = RHIVulkanPool->GetHandle();
+	vk::DescriptorSetLayout vkLayout = RHIVulkanLayout->GetHandle();
+
+	if (descriptorCount > MAX_DESCRIPTORSETARRAY_SIZE)
+	{
+		spdlog::warn("DescriptorSetArray count is greater than the maximum allowed size of {}. Clamping to maximum.", MAX_DESCRIPTORSETARRAY_SIZE);
+		descriptorCount = MAX_DESCRIPTORSETARRAY_SIZE;
+	}
+
+	vk::DescriptorSetVariableDescriptorCountAllocateInfo variableCountInfo{};
+	variableCountInfo.descriptorSetCount = 1;
+	variableCountInfo.pDescriptorCounts = &descriptorCount;
+
+	vk::DescriptorSetAllocateInfo allocInfo{};
+	allocInfo.pNext = &variableCountInfo;
+	allocInfo.descriptorSetCount = 1;
+	allocInfo.descriptorPool = vkPool;
+	allocInfo.pSetLayouts = &vkLayout;
+
+	std::vector<vk::DescriptorSet> descriptorSet = VK_CHECK_RESULT(m_handle.allocateDescriptorSets(allocInfo), "Coundn't allocate descriptor sets");
+
+	RHIVulkanDescriptorSetArray->SetHanlde(descriptorSet[0]);
+
+	return RHIVulkanDescriptorSetArray;
+}
+
+void VulkanDevice::DestroyDescriptorSetArray(DescriptorSetArrayHandle RHIDescriptorSetArray, DescriptorPoolHandle RHIPool)
+{
+	KSharedPtr<VulkanDescriptorSetArray> RHIVulkanDescriptorSetArray = StaticCast<VulkanDescriptorSetArray>(RHIDescriptorSetArray);
+	KSharedPtr<VulkanDescriptorPool> RHIVulkanPool = StaticCast<VulkanDescriptorPool>(RHIPool);
+
+	vk::DescriptorSet descriptorSet = RHIVulkanDescriptorSetArray->GetHandle();
+	vk::DescriptorPool descriptorPool = RHIVulkanPool->GetHandle();
+
+	VK_CHECK_VOID(m_handle.freeDescriptorSets(descriptorPool, { descriptorSet }), "Can't free descriptorSetArray");
+}
+
 // -------------- Pipeline Layout -------------- //
 PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants)
 {
@@ -1614,6 +1676,10 @@ void VulkanDevice::BuildFeaturesChain()
 			features.descriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
 			features.descriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
 			features.descriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+
+			features.descriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+			features.descriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+			features.descriptorIndexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
 
 			features.descriptorIndexingFeatures.pNext = currentPNext;
 			currentPNext = &features.descriptorIndexingFeatures;

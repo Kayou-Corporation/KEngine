@@ -39,8 +39,17 @@ struct DrawData
 };
 ParameterBlock<DrawData> drawData;
 
-Texture2D globalTextures[];
-StructuredBuffer<Object> globalModels[];
+struct TextureHeap
+{
+    Texture2D textures[];
+};
+ParameterBlock<TextureHeap> globalTextures;
+
+struct ModelHeap
+{
+    StructuredBuffer<Object> models[];
+};
+ParameterBlock<ModelHeap> globalModels;
 
 struct PushConstants
 {

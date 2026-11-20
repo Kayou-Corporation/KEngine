@@ -20,6 +20,7 @@
 #include "RHI/API/DescriptorSet.hpp"
 #include "Camera/EditorCamera.hpp"
 #include "CoreObject/StaticMesh.hpp"
+#include "RHI/API/DescriptorSetArray.hpp"
 
 #include "BuildMode.hpp"
 #include "MeshBase.hpp"
@@ -169,16 +170,15 @@ int main()
     // Base Texture
     Core::ImageHandle textureImage = vikingRoomTexture->GetImage();
 
+    uint32_t numberOfTextures = 12;
     // Test pool
     Core::DescriptorPoolSpecs poolSpecs;
-    poolSpecs.maxDescriptorSetsCount = 10;
+    poolSpecs.maxDescriptorSetsCount = 2;
     poolSpecs.descriptors = {
-        { Core::DescriptorType::UniformBuffer, 10 },
-        { Core::DescriptorType::CombinedImageSampler, 10 },
-        { Core::DescriptorType::StorageBuffer, 10 },
-        {Core::DescriptorType::SampledImage, 10},
-        {Core::DescriptorType::Sampler, 10}
+        { Core::DescriptorType::StorageBuffer, numberOfTextures },
+        {Core::DescriptorType::SampledImage, numberOfTextures},
     };
+    poolSpecs.poolForArray = true;
     Core::DescriptorPoolHandle pool = device->CreateDescriptorPool(poolSpecs);
 
     // Base Sampler
@@ -303,9 +303,12 @@ int main()
     // DescriptorSet
     Core::DescriptorSetLayoutHandle frameDataLayout = globalPipelineLayout->GetDescriptorSetLayout("frameData");
     Core::DescriptorSetLayoutHandle drawDataLayout = globalPipelineLayout->GetDescriptorSetLayout("drawData");
-    Core::DescriptorSetLayoutHandle globalRessources = globalPipelineLayout->GetDescriptorSetLayout("globalAccessResources");
 
-    Core::DescriptorSetHandle testDescriptorSet = device->CreateDescriptorSet(drawDataLayout, pool);
+    Core::DescriptorSetLayoutHandle globalTextures = globalPipelineLayout->GetDescriptorSetLayout("globalTextures");
+    Core::DescriptorSetLayoutHandle globalModels = globalPipelineLayout->GetDescriptorSetLayout("globalModels");
+
+    Core::DescriptorSetArrayHandle texturesDescriptorSet = device->CreateDescriptorSetArray(globalTextures, pool, numberOfTextures);
+    Core::DescriptorSetArrayHandle ModelsDescriptorSet = device->CreateDescriptorSetArray(globalModels, pool, numberOfTextures);
 
     Core::StandaloneDescriptorSetHandle frameDataDescriptorSet = device->CreateStandaloneDescriptorSet(frameDataLayout);
     Core::StandaloneDescriptorSetHandle drawDataDescriptorSet = device->CreateStandaloneDescriptorSet(drawDataLayout);
@@ -457,7 +460,8 @@ int main()
     device->DestroySampler(sampler);
     device->DestroyBuffer(uniformCamera);
     device->DestroyBuffer(uniformModel);
-    device->DestroyDescriptorSet(testDescriptorSet, pool);
+    device->DestroyDescriptorSetArray(texturesDescriptorSet, pool);
+    device->DestroyDescriptorSetArray(ModelsDescriptorSet, pool);
     device->DestroyDescriptorPool(pool);
 
     device->DestroyStandaloneDescriptorSet(frameDataDescriptorSet);

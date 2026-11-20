@@ -273,7 +273,7 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
             binding.stride = 0;
             binding.inputRate = VertexInputRate::PerVertex;
 
-            for (const Kayou::Core::VertexAttributeLayout& attribute : bin.vertexAttributes)
+            for (const VertexAttributeLayout& attribute : bin.vertexAttributes)
             {
                 binding.stride += GetFormatSize(attribute.format);
             }
@@ -300,41 +300,54 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
             continue;
     
         slang::TypeLayoutReflection* typeLayout = field->getTypeLayout();
-    
+
         if (typeLayout->getKind() == slang::TypeReflection::Kind::ParameterBlock)
         {
             trueSetCount++;
 
             uint32_t setIndex = field->getBindingIndex();
-
             std::string setName = field->getName();
 
-            Descriptor& descriptorSet = descriptorMap[setIndex];
+            Descriptor &descriptorSet = descriptorMap[setIndex];
             descriptorSet.index = setIndex;
             descriptorSet.name = setName;
+            descriptorSet.boundless = false;
 
-            slang::TypeLayoutReflection* elementTypeLayout = typeLayout->getElementTypeLayout();
+            slang::TypeLayoutReflection *elementTypeLayout = typeLayout->getElementTypeLayout();
             const uint32_t bindingCount = elementTypeLayout->getFieldCount();
 
             descriptorSet.bindings.reserve(bindingCount);
             for (uint32_t j = 0; j < bindingCount; ++j)
             {
-                slang::VariableLayoutReflection* subField = elementTypeLayout->getFieldByIndex(j);
+                slang::VariableLayoutReflection *subField = elementTypeLayout->getFieldByIndex(j);
                 if (!subField)
                     continue;
 
-                slang::TypeLayoutReflection* subTypeLayout = subField->getTypeLayout();
+                slang::TypeLayoutReflection *subTypeLayout = subField->getTypeLayout();
 
                 const uint32_t bindingIndex = subField->getBindingIndex();
-
                 const slang::BindingType bindingType = subTypeLayout->getBindingRangeType(0);
 
-                const SlangResourceShape bindingShape = subTypeLayout->getType()->getResourceShape();
-
                 uint32_t descriptorCount = 1;
-                if (typeLayout->getKind() == slang::TypeReflection::Kind::Array)
+                SlangResourceShape bindingShape = subTypeLayout->getType()->getResourceShape();
+
+                if (subTypeLayout->getKind() == slang::TypeReflection::Kind::Array)
                 {
-                    descriptorCount = static_cast<uint32_t>(typeLayout->getElementCount());
+                    slang::TypeLayoutReflection *arrayElementLayout = subTypeLayout->getElementTypeLayout();
+                    if (arrayElementLayout)
+                    {
+                        bindingShape = arrayElementLayout->getType()->getResourceShape();
+                    }
+
+                    size_t elementCount = subTypeLayout->getElementCount();
+                    if (elementCount == 0 || elementCount == SLANG_UNBOUNDED_SIZE)
+                    {
+                        descriptorCount = MAX_DESCRIPTORSETARRAY_SIZE;
+                        descriptorSet.boundless = true;
+                    } else
+                    {
+                        descriptorCount = static_cast<uint32_t>(elementCount);
+                    }
                 }
 
                 std::string bindingName = subField->getName();
@@ -395,39 +408,24 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
         {
             trueSetCount++;
 
-            // Set Info (set = X, binding = Y) :
-            uint32_t setIndex = field->getBindingIndex();
-            std::string setName = field->getName();
+            uint32_t setIndex = field->getBindingSpace();
+            uint32_t bindingIndex = field->getBindingIndex();
+            std::string bindingName = field->getName();
 
             Descriptor& descriptorSet = descriptorMap[setIndex];
             descriptorSet.index = setIndex;
-            descriptorSet.name = setName;
+            descriptorSet.name = bindingName;
             descriptorSet.boundless = true;
 
-
             slang::TypeLayoutReflection* elementTypeLayout = typeLayout->getElementTypeLayout();
-            //const uint32_t bindingCount = elementTypeLayout->getFieldCount();
 
-            descriptorSet.bindings.reserve(1);
+            const slang::BindingType bindingType = elementTypeLayout->getBindingRangeType(0);
+            const SlangResourceShape bindingShape = elementTypeLayout->getType()->getResourceShape();
 
-            // Binding Info (set = X, binding = Y) :
-            slang::VariableLayoutReflection* subField = elementTypeLayout->getFieldByIndex(0);
-            if (!subField)
-            {
-                continue;
-            }
-
-            slang::TypeLayoutReflection* subTypeLayout = subField->getTypeLayout();
-
-            const uint32_t bindingIndex = subField->getBindingIndex();
-
-            const slang::BindingType bindingType = subTypeLayout->getBindingRangeType(0);
-
-            const SlangResourceShape bindingShape = subTypeLayout->getType()->getResourceShape();
-
-            uint32_t descriptorCount = MAX_DESCRIPTORSETARRAY_SIZE;
-
-            std::string bindingName = subField->getName();
+            size_t elementCount = typeLayout->getElementCount();
+            uint32_t descriptorCount = (elementCount > 0 && elementCount != SLANG_UNBOUNDED_SIZE)
+                                       ? static_cast<uint32_t>(elementCount)
+                                       : MAX_DESCRIPTORSETARRAY_SIZE;
 
             Binding binding{};
             binding.index = bindingIndex;
@@ -437,7 +435,7 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
             binding.stage = isGlobalLayout ? ShaderStage::All : stage;
             binding.name = bindingName;
 
-            descriptorSet.bindings[0] = binding;
+            descriptorSet.bindings.push_back(binding);
         }
     }
 
@@ -596,6 +594,9 @@ void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Desc
         {
             Core::Write(out, descriptor.name[i]);
         }
+
+        Core::Write(out, descriptor.boundless);
+
         uint32_t bindingCount = static_cast<uint32_t>(descriptor.bindings.size());
         Core::Write(out, bindingCount);
 		for (const Binding& binding : descriptor.bindings)
@@ -698,6 +699,9 @@ std::vector<Descriptor> ShaderCompiler::ReadDescriptors(std::ifstream& in) const
             Core::Read(in, nameChar);
             descriptors[i].name += nameChar;
         }
+
+	    Core::Read(in, descriptors[i].boundless);
+
 		uint32_t bindingCount;
 		Core::Read(in, bindingCount);
 		descriptors[i].bindings.resize(bindingCount);

@@ -140,6 +140,10 @@ public:
     virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, std::string name, DescriptorType type, SamplerHandle sampler) override;
     virtual void SetDescriptorSetSampler(DescriptorSetHandle descriptorSet, uint32_t index, DescriptorType type, SamplerHandle sampler) override;
 
+    // -------------- Descriptor Set Array -------------- //
+    virtual DescriptorSetArrayHandle CreateDescriptorSetArray(DescriptorSetLayoutHandle layout, DescriptorPoolHandle pool, uint32_t descriptorCount) override;
+    virtual void DestroyDescriptorSetArray(DescriptorSetArrayHandle descriptorSetArray, DescriptorPoolHandle pool) override;
+
     // -------------- Pipeline Layout -------------- // 
     virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) override;
     virtual void DestroyPipelineLayout(PipelineLayoutHandle) override;

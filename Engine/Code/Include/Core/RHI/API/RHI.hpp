@@ -39,6 +39,7 @@ struct SwapchainSpecs;
 class DescriptorPool;
 struct DescriptorPoolSpecs;
 class DescriptorSet;
+class DescriptorSetArray;
 
 // ---------- HANDLE TYPEDEFS ----------
 typedef Core::KSharedPtr<Buffer> BufferHandle;
@@ -60,6 +61,7 @@ typedef Core::KSharedPtr<Surface> SurfaceHandle;
 typedef Core::KSharedPtr<Swapchain> SwapchainHandle;
 typedef Core::KSharedPtr<DescriptorSet> DescriptorSetHandle;
 typedef Core::KSharedPtr<DescriptorPool> DescriptorPoolHandle;
+typedef Core::KSharedPtr<DescriptorSetArray> DescriptorSetArrayHandle;
 
 
 // ---------- INSTANCE RELATED ----------
