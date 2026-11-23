@@ -41,7 +41,7 @@ public:
 
 	vk::BufferUsageFlags GetPrimaryUsage() const { return m_primaryUsage; }
 	vk::BufferUsageFlags GetUsage() const { return m_usage; }
-	vk::PipelineStageFlagBits GetPipelineStage() const { return m_pipelineStage; }
+	vk::PipelineStageFlags GetPipelineStage() const { return m_pipelineStage; }
 
 	vk::BufferCreateInfo GetCreateInfo(const BufferSpecs& specs);
 
@@ -52,12 +52,24 @@ private:
 	VmaAllocationInfo m_allocationInfo;
 	vk::BufferUsageFlags m_primaryUsage;
 	vk::BufferUsageFlags m_usage;
-	vk::PipelineStageFlagBits m_pipelineStage;
+	vk::PipelineStageFlags m_pipelineStage;
 
 };
 
-// It will probably be useful to implement more flags later...
-inline vk::AccessFlags GetAccessFlagsFromUsage(vk::BufferUsageFlags usage)
+inline vk::AccessFlags GetWriteAccessFlagsFromUsage(vk::BufferUsageFlags usage, bool isReadOnly)
+{
+	vk::AccessFlags flags{};
+
+	if ((usage & vk::BufferUsageFlagBits::eStorageBuffer) && !isReadOnly)
+		flags |= vk::AccessFlagBits::eShaderWrite;
+
+	if (usage & vk::BufferUsageFlagBits::eTransferDst)
+		flags |= vk::AccessFlagBits::eTransferWrite;
+
+	return flags;
+}
+
+inline vk::AccessFlags GetReadAccessFlagsFromUsage(vk::BufferUsageFlags usage)
 {
 	vk::AccessFlags flags{};
 
@@ -71,26 +83,24 @@ inline vk::AccessFlags GetAccessFlagsFromUsage(vk::BufferUsageFlags usage)
 		flags |= vk::AccessFlagBits::eUniformRead;
 
 	if (usage & vk::BufferUsageFlagBits::eStorageBuffer)
-		flags |= vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite;
+		flags |= vk::AccessFlagBits::eShaderRead;
 
 	if (usage & vk::BufferUsageFlagBits::eTransferSrc)
 		flags |= vk::AccessFlagBits::eTransferRead;
 
-	if (usage & vk::BufferUsageFlagBits::eTransferDst)
-		flags |= vk::AccessFlagBits::eTransferWrite;
+	if (usage & vk::BufferUsageFlagBits::eIndirectBuffer)
+		flags |= vk::AccessFlagBits::eIndirectCommandRead;
 
 	return flags;
 }
 
-inline vk::AccessFlags GetWriteAccessFlagsFromUsage(vk::BufferUsageFlags usage)
+// It will probably be useful to implement more flags later...
+inline vk::AccessFlags GetAccessFlagsFromUsage(vk::BufferUsageFlags usage, bool isReadOnly)
 {
 	vk::AccessFlags flags{};
 
-	if (usage & vk::BufferUsageFlagBits::eStorageBuffer)
-		flags |= vk::AccessFlagBits::eShaderWrite;
-
-	if (usage & vk::BufferUsageFlagBits::eTransferDst)
-		flags |= vk::AccessFlagBits::eTransferWrite;
+	flags |= GetWriteAccessFlagsFromUsage(usage, isReadOnly);
+	flags |= GetReadAccessFlagsFromUsage(usage);
 
 	return flags;
 }

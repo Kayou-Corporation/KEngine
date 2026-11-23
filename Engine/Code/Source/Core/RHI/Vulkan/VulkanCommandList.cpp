@@ -1,6 +1,7 @@
 #include "RHI/Vulkan/VulkanCommandList.hpp"
 
 #include "RHI/Vulkan/VulkanBuffer.hpp"
+#include "RHI/Vulkan/VulkanComputePipeline.hpp"
 #include "RHI/Vulkan/VulkanDevice.hpp"
 #include "RHI/Vulkan/VulkanImage.hpp"
 #include "RHI/Vulkan/VulkanRenderpass.hpp"
@@ -135,6 +136,24 @@ void VulkanCommandList::DrawIndexed(uint32_t indexCount, uint32_t instanceCount,
 	m_handle->cmdBuffer.drawIndexed(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
+void VulkanCommandList::DrawIndirect(BufferHandle RHIBuffer, size_t offset, uint32_t drawCount, uint32_t stride)
+{
+	vk::Buffer bufferHandle = StaticCast<VulkanBuffer>(RHIBuffer)->GetHandle();
+	m_handle->cmdBuffer.drawIndirect(bufferHandle, offset, drawCount, stride);
+}
+
+void VulkanCommandList::DrawIndexedIndirect(BufferHandle RHIBuffer, size_t offset, uint32_t drawCount, uint32_t stride)
+{
+	vk::Buffer bufferHandle = StaticCast<VulkanBuffer>(RHIBuffer)->GetHandle();
+	m_handle->cmdBuffer.drawIndexedIndirect(bufferHandle, offset, drawCount, stride);
+}
+
+//----------- Compute --------------//
+void VulkanCommandList::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
+{
+	m_handle->cmdBuffer.dispatch(groupCountX, groupCountY, groupCountZ);
+}
+
 //----------- Set Buffer / Image Data --------------//
 void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32_t size, uint32_t offset)
 {
@@ -145,9 +164,9 @@ void VulkanCommandList::SetBufferData(BufferHandle RHIBuffer, void* data, uint32
 	VmaAllocator memoryAllocator = m_handle->memoryAllocator;
 
 	VmaAllocation bufferAllocation = RHIVulkanBuffer->GetAllocation();
-	vk::PipelineStageFlagBits pipelineStage = RHIVulkanBuffer->GetPipelineStage();
+	vk::PipelineStageFlags pipelineStage = RHIVulkanBuffer->GetPipelineStage();
 	vk::Buffer bufferHandle = RHIVulkanBuffer->GetHandle();
-	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(RHIVulkanBuffer->GetPrimaryUsage());
+	vk::AccessFlags bufferAccessFlags = GetAccessFlagsFromUsage(RHIVulkanBuffer->GetPrimaryUsage(), RHIVulkanBuffer->GetIsReadOnly());
 
 	vk::CommandBuffer cmdBuffer = m_handle->cmdBuffer;
 
@@ -484,6 +503,10 @@ void VulkanCommandList::BindPipeline(PipelineHandle RHIPipeline)
 	{
 		pipeline = StaticCast<VulkanGraphicsPipeline>(RHIPipeline)->GetHandle();
 
+	}
+	else if (RHIType == PipelineType::Compute)
+	{
+		pipeline = StaticCast<VulkanComputePipeline>(RHIPipeline)->GetHandle();
 	}
 
 	m_handle->cmdBuffer.bindPipeline(bindPoint, pipeline);
