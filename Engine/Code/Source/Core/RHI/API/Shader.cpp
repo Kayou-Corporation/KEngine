@@ -44,9 +44,16 @@ void ShaderCompiler::Initialize()
     targets[0].profile = m_globalSession->findProfile("spirv_1_5");
 #endif
 
+    slang::CompilerOptionEntry options[1] = {};
+    options[0].name = slang::CompilerOptionName::PreserveParameters;
+    options[0].value.kind = slang::CompilerOptionValueKind::Int;
+    options[0].value.intValue0 = 1;
+
     slang::SessionDesc desc = {};
     desc.targets = targets;
     desc.targetCount = nbTargets;
+    desc.compilerOptionEntries = options;
+    desc.compilerOptionEntryCount = 1;
 
     m_globalSession->createSession(desc, m_session.writeRef());
 }

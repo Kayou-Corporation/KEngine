@@ -450,7 +450,7 @@ void VulkanCommandList::TransitionImageLayout(ImageHandle RHIImage, Layout RHIDs
 
 	if (newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
 	{
-		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth;
+			barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth;
 	}
 	else 
 	{

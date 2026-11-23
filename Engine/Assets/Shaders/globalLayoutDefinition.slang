@@ -34,8 +34,8 @@ struct DrawData
     ConstantBuffer<Object> object;
     //ConstantBuffer<float4x4> model;        // UniformBuffer
     //ConstantBuffer<float4x4> normalMatrix; // UniformBuffer
-    Texture2D texture2D;
-    SamplerState sampler;
+    //Texture2D texture2D;
+    //SamplerState sampler;
 };
 ParameterBlock<DrawData> drawData;
 
@@ -67,10 +67,17 @@ struct ModelHeap
 };
 ParameterBlock<ModelHeap> globalModels;
 
+struct SamplerHeap
+{
+    SamplerState samplers[];
+};
+ParameterBlock<SamplerHeap> globalSamplers;
+
 struct PushConstants
 {
      int textureID;
      int modelID;
+     int samplerID;
 }
 
 [push_constant]

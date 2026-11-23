@@ -7,10 +7,44 @@
 
 BEGIN_NAMESPACE_3DRENDERER
 
-struct DrawBinding
+enum DefaultLayoutUsage
+{
+    UseOnly,
+    UseShared,
+    UseNone,
+};
+
+struct GraphicPassStep
 {
     std::string name;
-    Core::PipelineHandle pipeline;
+
+    DefaultLayoutUsage globalLayoutUsage;
+
+    Core::GraphicsPipelineSpecs pipelineSpecs;
+    std::vector<std::string> DescriptorSetLayoutNames;
+    std::vector<std::string> PushConstantLayoutNames;
+};
+
+struct GraphicPassDesc
+{
+    // Name
+    std::string name;
+
+    // Attachments
+    std::vector<Core::RenderingAttachment> colorAttachments;
+    Core::RenderingAttachment depthAttachment;
+
+    // Shared ressources in pass
+    std::vector<Core::DescriptorSetLayoutHandle> descriptorSetLayouts;
+    std::vector<Core::PushConstantLayoutHandle> pushConstantLayouts;
+
+    // Sub graphic step (pipeline)
+    std::vector<GraphicPassStep> steps;
+
+    // Global layout reference :
+    Core::PipelineLayoutHandle globalLayout;
+    std::vector<Core::DescriptorSetLayoutHandle> globalDescriptorSetLayouts;
+    Core::PushConstantLayoutHandle globalPushConstantLayout;
 };
 
 class GraphicPass
@@ -23,27 +57,26 @@ public:
     void BeginPass(Core::Offset2D drawOffset, Core::Extent2D drawExtent, Core::ImageHandle colorImageTarget, Core::ImageHandle depthImageTarget);
     void EndPass();
 
-    void PushDrawStep(const DrawBinding& drawBinding) {m_drawSteps.push_back(drawBinding);}
 
-    Core::CommandListHandle GetMainCommandList() const;
+    void GiveExecutionCommandList(Core::CommandListHandle commandList);
+    void ResetExeuctionCommandLIst() const;
 
 private:
-    DrawBinding FindFirstDrawBinding();
-
-    // Base attachments
-    Core::RenderingAttachment colorAttachments;
-    Core::RenderingAttachment depthAttachment;
-
-    // Associated pass :
-    std::vector<DrawBinding> m_drawStep;
-
-    // Execution :
-    Core::CommandListHandle m_mainCommandList;
-    Core::SemaphoreHandle m_mainSemaphore;
-
+    // Info
     std::string m_name;
 
-    std::vector<DrawBinding> m_drawSteps;
+    // Attachments :
+    std::vector<Core::RenderingAttachment> m_colorAttachments;
+    Core::RenderingAttachment m_depthAttachment;
+
+    // Global Layout reference :
+    Core::PipelineLayoutHandle globalLayout;
+    std::vector<Core::DescriptorSetLayoutHandle> globalDescriptorSetLayouts;
+    Core::PushConstantLayoutHandle globalPushConstantLayout;
+
+    // Execution (On Flight) :
+    Core::CommandListHandle m_executionCommandList;
+
 };
 
 END_NAMESPACE_3DRENDERER

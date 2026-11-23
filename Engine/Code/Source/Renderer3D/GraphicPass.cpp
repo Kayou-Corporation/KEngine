@@ -11,12 +11,7 @@ BEGIN_NAMESPACE_3DRENDERER
 GraphicPass::GraphicPass(std::string name)
 : m_name(name)
 {
-    Core::DeviceHandle localDeviceReference = Core::KEngine::GetDevice();
-    m_mainCommandList = localDeviceReference->GetCommandList(Core::QueueType::Graphics);
 
-    Core::SemaphoreSpecs mainSemaphoreSpecs;
-    mainSemaphoreSpecs.type = Core::SemaphoreType::Binary;
-    m_mainSemaphore = localDeviceReference->CreateSemaphore(mainSemaphoreSpecs);
 }
 
 void GraphicPass::BeginPass(Core::Offset2D drawOffset, Core::Extent2D drawExtent, Core::ImageHandle colorImageTargets, Core::ImageHandle depthImageTarget)
@@ -24,7 +19,6 @@ void GraphicPass::BeginPass(Core::Offset2D drawOffset, Core::Extent2D drawExtent
     depthAttachment.image = depthImageTarget;
 
     colorAttachments.image = colorImageTargets;
-
 
     Core::RenderingInfo renderingInfo;
     renderingInfo.offset = drawOffset;
@@ -34,18 +28,21 @@ void GraphicPass::BeginPass(Core::Offset2D drawOffset, Core::Extent2D drawExtent
     renderingInfo.colorAttachments = {colorAttachments};
     renderingInfo.depthAttachment = depthAttachment;
 
-    m_mainCommandList->Open();
-    m_mainCommandList->BeginRendering(renderingInfo);
+    if (!m_executionCommandList->GetIsOpen())
+    {
+        m_executionCommandList->Open();
+    }
+
+    m_executionCommandList->BeginRendering(renderingInfo);
 }
 
 
 void GraphicPass::EndPass()
 {
-    m_mainCommandList->EndRendering();
-    m_mainCommandList->Close();
+    m_executionCommandList->EndRendering();
 }
 
-void GraphicPass::SetMainCommandList(Core::CommandList commandList)
+void GraphicPass::GiveExecutionCommandList(Core::CommandListHandle commandList)
 {
     if (commandList == nullptr)
     {
@@ -53,51 +50,21 @@ void GraphicPass::SetMainCommandList(Core::CommandList commandList)
         return;
     }
 
-    if (m_mainCommandList != nullptr)
+    if (m_executionCommandList != nullptr)
     {
-        if (m_mainCommandList->GetIsOpen())
+        if (m_executionCommandList->GetIsOpen())
         {
-            spdlog::error("GraphicPass::SetMainCommandList : Cannot change main commandlist while the current one is open");
+            spdlog::error("GraphicPass::SetMainCommandList : Cannot change execution commandlist while the current one is open");
             return;
         }
     }
 
-    m_mainCommandList = commandList;
+    m_executionCommandList = commandList;
 }
 
-Core::CommandList GraphicPass::GetMainCommandList() const
+void GraphicPass::ResetExeuctionCommandLIst() const
 {
-    if (m_mainCommandList == nullptr)
-    {
-        spdlog::error("GraphicPass::GetMainCommandList : main command list is nullptr");
-        return nullptr;
-    }
-
-    if (m_mainCommandList->GetIsOpen())
-    {
-        spdlog::warn("GraphicPass::GetMainCommandList : main command list is open");
-    }
-
-    return m_mainCommandList;
-}
-
-DrawBinding GraphicPass::FindFirstDrawBinding()
-{
-    for (const DrawBinding& drawBinding : m_drawSteps)
-    {
-        if (drawBinding.waitPipeline.empty())
-        {
-            return drawBinding;
-        }
-    }
-
-    if (m_drawStep.empty())
-    {
-        spdlog::error("GraphicPass::FindFirstDrawBinding : No draw steps found in pass {}", m_name);
-        return DrawBinding{};
-    }
-
-    return m_drawSteps[0];
+    m_executionCommandList = nullptr;
 }
 
 END_NAMESPACE_3DRENDERER
