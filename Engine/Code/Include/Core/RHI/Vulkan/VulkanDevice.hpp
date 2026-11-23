@@ -143,6 +143,12 @@ public:
     // -------------- Descriptor Set Array -------------- //
     virtual DescriptorSetArrayHandle CreateDescriptorSetArray(DescriptorSetLayoutHandle layout, DescriptorPoolHandle pool, uint32_t descriptorCount) override;
     virtual void DestroyDescriptorSetArray(DescriptorSetArrayHandle descriptorSetArray, DescriptorPoolHandle pool) override;
+    virtual void SetDescriptorSetArrayBuffer(DescriptorSetArrayHandle descriptorSet, std::string name, DescriptorType type, uint32_t dstIndex, BufferHandle buffer, uint32_t offset, uint32_t range) override;
+    virtual void SetDescriptorSetArrayBuffer(DescriptorSetArrayHandle descriptorSet, uint32_t index, DescriptorType type, uint32_t dstIndex, BufferHandle buffer, uint32_t offset, uint32_t range) override;
+    virtual void SetDescriptorSetArrayImage(DescriptorSetArrayHandle descriptorSet, std::string name, DescriptorType type, uint32_t dstIndex, ImageHandle image, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetArrayImage(DescriptorSetArrayHandle descriptorSet, uint32_t index, DescriptorType type, uint32_t dstIndex, ImageHandle image, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetArraySampler(DescriptorSetArrayHandle descriptorSet, std::string name, DescriptorType type, uint32_t dstIndex, SamplerHandle sampler) override;
+    virtual void SetDescriptorSetArraySampler(DescriptorSetArrayHandle descriptorSet, uint32_t index, DescriptorType type, uint32_t dstIndex, SamplerHandle sampler) override;
 
     // -------------- Pipeline Layout -------------- // 
     virtual PipelineLayoutHandle CreatePipelineLayout(std::vector<DescriptorSetLayoutHandle> descriptors, std::vector<PushConstantLayoutHandle> pushConstants) override;
