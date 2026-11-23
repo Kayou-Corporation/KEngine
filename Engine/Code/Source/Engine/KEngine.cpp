@@ -137,8 +137,6 @@ KEngine::KEngine(const KEngineSpecs& specs)
 
 KEngine::~KEngine()
 {
-    m_assetRegistry->UnloadAll();
-
     m_rhiInstance->DestroySurface(m_windowSurface);
     m_rhiInstance->DestroyDevice(m_deviceHandle);
     m_rhiInstance->Destroy();
