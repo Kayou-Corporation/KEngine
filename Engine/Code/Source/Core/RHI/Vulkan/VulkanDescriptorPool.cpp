@@ -22,7 +22,6 @@ vk::DescriptorPoolCreateInfo VulkanDescriptorPool::GetPoolCreateInfo(std::map<vk
 
     if (useForArray)
     {
-        createInfo.maxSets = 1;
         createInfo.flags |= vk::DescriptorPoolCreateFlagBits::eUpdateAfterBind;
     }
 

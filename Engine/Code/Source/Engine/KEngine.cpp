@@ -59,7 +59,15 @@ KEngine& KEngine::Get()
 
 void KEngine::CleanInternal()
 {
-    m_assetRegistry->UnloadAll();
+    if (m_deviceHandle)
+    {
+        m_deviceHandle->WaitIdle();
+    }
+
+    if (m_assetRegistry)
+    {
+        m_assetRegistry->UnloadAll();
+    }
 }
 
 KEngine::KEngine(const KEngineSpecs& specs)
