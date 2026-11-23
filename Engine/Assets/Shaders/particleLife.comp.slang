@@ -38,13 +38,13 @@ void csMain(uint3 threadId : SV_DispatchThreadID)
 
     // Bounce on invisible floor
     if (position.y < -5.0f && velocity.y < 0)
-        velocity.y += -velocity.y * 1.5f;
+        velocity.y += -velocity.y * 1.0f;
 
     if (abs(position.x) >= 12.f)
-        velocity.x += -velocity.x * 1.5f;
+        velocity.x += -velocity.x * 1.0f;
 
     if (abs(position.z) >= 8.f)
-        velocity.z += -velocity.z * 1.5f;
+        velocity.z += -velocity.z * 1.0f;
 
     // Update position with velocity
     position += velocity * effectData.globalUniform.deltaTime;

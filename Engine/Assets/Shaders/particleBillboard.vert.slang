@@ -41,7 +41,7 @@ VSOutput vsMain(uint vertexID : SV_VulkanVertexID, uint instanceID : SV_VulkanIn
     float3 centerWorldPos = particleData.positions[instanceID].xyz;
     float4 clipPos = mul(frameData.camera.cameraVP, float4(centerWorldPos, 1.0));
 
-    float particleSize = 4.0;
+    float particleSize = 0.15;
     float aspectRatio = 16.0 / 9.0; // maybe with push constant or idk
 
     clipPos.xy += offset * particleSize * float2(1.0 / aspectRatio, 1.0);

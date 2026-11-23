@@ -109,19 +109,21 @@ int main()
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/particleMesh.obj", "particleMesh");
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/particleTexture.png", "particleTexture");
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/flame.png", "flameTexture");
+    //Core::KEngine::Get().CreateAsset("Engine/Assets/Textures/waterTextureParticle.png", "waterTexture");
 
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> vikingRoom = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("viking_room");
     AssetManager::KSoftAssetRef<CoreObject::Texture2D> texture = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("texture");
     AssetManager::KSoftAssetRef<CoreObject::StaticMesh> partMesh = Core::KEngine::Get().GetAsset<CoreObject::StaticMesh>("particleMesh");
     AssetManager::KSoftAssetRef<CoreObject::Texture2D> partText = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("particleTexture");
-    AssetManager::KSoftAssetRef<CoreObject::Texture2D> flameText = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("flameTexture");
+    //AssetManager::KSoftAssetRef<CoreObject::Texture2D> flameText = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("flameTexture");
+    AssetManager::KSoftAssetRef<CoreObject::Texture2D> waterText = Core::KEngine::Get().GetAsset<CoreObject::Texture2D>("waterTexture");
 
     Core::KSharedPtr<CoreObject::StaticMesh> vikingRoomMesh = vikingRoom.Get();
     Core::KSharedPtr<CoreObject::Texture2D> vikingRoomTexture = texture.Get();
     Core::KSharedPtr<CoreObject::StaticMesh> particleMesh = partMesh.Get();
     Core::KSharedPtr<CoreObject::Texture2D> particleTexture = partText.Get();
-    Core::KSharedPtr<CoreObject::Texture2D> flameTexture = flameText.Get();
-
+    //Core::KSharedPtr<CoreObject::Texture2D> flameTexture = flameText.Get();
+    Core::KSharedPtr<CoreObject::Texture2D> waterTexture = waterText.Get();
     // TODO : move this here
     //Core::KEngine::Update();
 
@@ -184,7 +186,8 @@ int main()
     Core::ImageHandle textureImage = vikingRoomTexture->GetImage();
 
     Core::ImageHandle particleImage = particleTexture->GetImage();
-    Core::ImageHandle flameImage = flameTexture->GetImage();
+    //Core::ImageHandle flameImage = flameTexture->GetImage();
+    Core::ImageHandle waterImage = waterTexture->GetImage();
 
     // Base Sampler
     Core::SamplerSpecs samplerSpecs;
@@ -391,7 +394,7 @@ int main()
     device->SetDescriptorSetBuffer(drawDataDescriptorSet, "object", Core::DescriptorType::UniformBuffer, uniformModel, 0, sizeof(Model));
     device->SetDescriptorSetImage(drawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, textureImage, nullptr);
     device->SetDescriptorSetSampler(drawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
-    device->SetDescriptorSetImage(particleDrawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, flameImage, nullptr);
+    device->SetDescriptorSetImage(particleDrawDataDescriptorSet, "texture2D", Core::DescriptorType::SampledImage, waterImage, nullptr);
     device->SetDescriptorSetSampler(particleDrawDataDescriptorSet, "sampler", Core::DescriptorType::Sampler, sampler);
 
     Core::ShaderHandle particleVert = device->CreateShader("particleBillboard.vert", Core::ShaderStage::Vertex, false, true);
@@ -430,7 +433,7 @@ int main()
     Core::DescriptorSetHandle oddParticleDataDescriptorSet = device->CreateDescriptorSet(particleDataLayout);
     Core::DescriptorSetHandle evenParticleDataDescriptorSet = device->CreateDescriptorSet(particleDataLayout);
 
-    uint32_t nbParticles = 512u;
+    uint32_t nbParticles = 2097152u;
 
     Core::BufferSpecs oddPositionsSpecs{};
     oddPositionsSpecs.primaryUsage = Core::BufferUsage::RWStorage;
@@ -681,7 +684,7 @@ int main()
         commandList->BindDescriptorSet(particlePipelineLayout, "particles", particleDesc, Core::PipelineBindPoint::Compute);
         commandList->BindDescriptorSet(particlePipelineLayout, "effectData", effectDataDescriptorSet, Core::PipelineBindPoint::Compute);
 
-        commandList->Dispatch(2, 1, 1);
+        commandList->Dispatch(8192, 1, 1);
 
         commandList->TransitionImageLayout(presentationImages[imageIndex], Core::Layout::ColorAttachment);
         commandList->TransitionImageLayout(depthImage, Core::Layout::DepthStencilAttachment);
