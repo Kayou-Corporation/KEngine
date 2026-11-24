@@ -1,5 +1,10 @@
 #pragma once
 
+#include <slang.h>
+#include <slang-com-ptr.h>
+#include <slang-com-helper.h>
+#include <spdlog/spdlog.h>
+
 #include "CoreModule.hpp"
 #include "Export.hpp"
 #include "Memory/KSharedPtr.hpp"
@@ -542,5 +547,100 @@ enum class BlendOperation
 	Min,
 	Max
 };
+
+inline DescriptorType TranslateToRHI(const slang::BindingType bindingType)
+{
+    switch (bindingType)
+    {
+    case slang::BindingType::Sampler:
+        return DescriptorType::Sampler;
+
+    case slang::BindingType::Texture:
+        return DescriptorType::SampledImage;
+
+    case slang::BindingType::CombinedTextureSampler:
+        return DescriptorType::CombinedImageSampler;
+
+    case slang::BindingType::ConstantBuffer:
+    case slang::BindingType::ParameterBlock:
+        return DescriptorType::UniformBuffer;
+
+    case slang::BindingType::RawBuffer:
+    case slang::BindingType::TypedBuffer:
+        return DescriptorType::StorageBuffer;
+
+    case slang::BindingType::MutableTexture:
+        return DescriptorType::StorageImage;
+
+    case slang::BindingType::MutableRawBuffer:
+    case slang::BindingType::MutableTypedBuffer:
+        return DescriptorType::StorageBuffer;
+
+    case slang::BindingType::InputRenderTarget:
+        return DescriptorType::InputAttachment;
+
+    case slang::BindingType::RayTracingAccelerationStructure:
+        return DescriptorType::AccelerationStructure;
+
+    case slang::BindingType::PushConstant:
+    case slang::BindingType::VaryingInput:
+    case slang::BindingType::VaryingOutput:
+    default:
+        return DescriptorType::Sampler;
+    }
+}
+
+// TODO: See if shape is useful for now
+inline DescriptorType TranslateToRHI(const slang::BindingType bindingType, [[maybe_unused]] const SlangResourceShape shape)
+{
+	return TranslateToRHI(bindingType);
+
+	//switch (bindingType)
+    //{
+    //case slang::BindingType::ConstantBuffer:
+    //case slang::BindingType::ParameterBlock:
+    //    return DescriptorType::UniformBuffer;
+	//
+    //case slang::BindingType::Sampler:
+    //    return DescriptorType::Sampler;
+	//
+    //case slang::BindingType::Texture:
+    //{
+    //    switch (shape)
+    //    {
+    //    case SLANG_TEXTURE_1D:
+    //    case SLANG_TEXTURE_2D:
+    //    case SLANG_TEXTURE_3D:
+    //    case SLANG_TEXTURE_CUBE:
+    //    case SLANG_TEXTURE_1D_ARRAY:
+    //    case SLANG_TEXTURE_2D_ARRAY:
+    //    case SLANG_TEXTURE_CUBE_ARRAY:
+    //        return DescriptorType::SampledImage;
+	//
+    //    default:
+    //        return DescriptorType::SampledImage;
+    //    }
+    //}
+	//
+    //case slang::BindingType::CombinedTextureSampler:
+    //    return DescriptorType::CombinedImageSampler;
+	//
+    //case slang::BindingType::RawBuffer:
+    //case slang::BindingType::TypedBuffer:
+    //case slang::BindingType::MutableTypedBuffer:
+    //case slang::BindingType::MutableRawBuffer:
+    //    return DescriptorType::StorageBuffer;
+	//
+	//case slang::BindingType::MutableTexture:
+	//	return DescriptorType::StorageImage;
+	//
+    //case slang::BindingType::RayTracingAccelerationStructure:
+    //    return DescriptorType::AccelerationStructure;
+	//
+    //default:
+    //    spdlog::error("Unsupported Slang binding type");
+    //    return DescriptorType::UniformBuffer;
+    //}
+}
 
 END_NAMESPACE_CORE
