@@ -86,8 +86,7 @@ struct VertexBindingLayout
 struct Binding
 {
     uint32_t index = UINT32_MAX;
-	slang::BindingType type = slang::BindingType::Unknown;
-	SlangResourceShape shape = SLANG_RESOURCE_UNKNOWN;
+	DescriptorType type = DescriptorType::Sampler;
     ShaderStage stage{};
     uint32_t count = 0;
     std::string name{};

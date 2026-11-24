@@ -361,8 +361,7 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
 
                 Binding binding{};
                 binding.index = bindingIndex;
-                binding.type = bindingType;
-                binding.shape = bindingShape;
+                binding.type = TranslateToRHI(bindingType, bindingShape);
                 binding.count = descriptorCount;
                 binding.stage = isGlobalLayout ? ShaderStage::All : stage;
                 binding.name = bindingName;
@@ -547,7 +546,6 @@ void ShaderCompiler::WriteReflectionDataSize(std::ofstream & out, const ShaderDa
         {
             totalSize += sizeof(binding.index);
             totalSize += sizeof(binding.type);
-            totalSize += sizeof(binding.shape);
             totalSize += sizeof(binding.stage);
             totalSize += sizeof(binding.count);
             totalSize += binding.name.size();
@@ -612,7 +610,6 @@ void ShaderCompiler::WriteDescriptors(std::ofstream& out, const std::vector<Desc
 			Core::Write(out, binding.stage);
 			Core::Write(out, binding.count);
 			Core::Write(out, binding.type);
-			Core::Write(out, binding.shape);
             nameLen = binding.name.size();
             Core::Write(out, nameLen);
             for (size_t i = 0; i < nameLen; ++i)
@@ -718,7 +715,6 @@ std::vector<Descriptor> ShaderCompiler::ReadDescriptors(std::ifstream& in) const
 			Core::Read(in, descriptors[i].bindings[j].stage);
 			Core::Read(in, descriptors[i].bindings[j].count);
 			Core::Read(in, descriptors[i].bindings[j].type);
-			Core::Read(in, descriptors[i].bindings[j].shape);
             Core::Read(in, nameLen);
             for (size_t k = 0; k < nameLen; ++k)
             {
