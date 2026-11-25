@@ -435,8 +435,7 @@ ShaderData ShaderCompiler::Reflect(ShaderData& bin, slang::ProgramLayout* layout
 
             Binding binding{};
             binding.index = bindingIndex;
-            binding.type = bindingType;
-            binding.shape = bindingShape;
+            binding.type = TranslateToRHI(bindingType, bindingShape);
             binding.count = descriptorCount;
             binding.stage = isGlobalLayout ? ShaderStage::All : stage;
             binding.name = bindingName;

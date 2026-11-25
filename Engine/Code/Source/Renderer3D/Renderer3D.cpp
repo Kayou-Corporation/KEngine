@@ -1,13 +1,17 @@
-﻿#include "Renderer3D/Renderer3D.hpp"
+﻿#include "Renderer3D.hpp"
 
-#include "Engine/KEngine.hpp"
+#include "KEngine.hpp"
 #include "RHI/API/Device.hpp"
 #include "RHI/API/GraphicsPipeline.hpp"
-#include "Renderer3D/GraphicPass.hpp"
+#include "GraphicPass.hpp"
+#include "RHI/API/DescriptorPool.hpp"
+#include "RHI/API/DescriptorSetArray.hpp"
 #include "RHI/API/Image.hpp"
+#include "RHI/API/Syncronisation.hpp"
 
 BEGIN_NAMESPACE_3DRENDERER
 
+// Constructor (protected)
 Renderer3D::Renderer3D(Core::SwapchainHandle targetSwapchain)
 {
     // Setup properties
@@ -15,10 +19,10 @@ Renderer3D::Renderer3D(Core::SwapchainHandle targetSwapchain)
     m_frameInFlight = targetSwapchain->GetImageCount();
 
     // local device reference
-    Core::DeviceHandle localDevice = Core::KEngine::GetDevice();
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
 
     // Target images
-    m_renderTargetImages = localDevice->CreatePresentationImages(targetSwapchain);
+    m_renderTargetImages = device->CreatePresentationImages(targetSwapchain);
     if (m_renderTargetImages.size() == 0)
     {
         spdlog::error("Renderer3D::Renderer3D : Failed to create presentation images from swapchain, number of images: {}", m_renderTargetImages.size());
@@ -33,123 +37,41 @@ Renderer3D::Renderer3D(Core::SwapchainHandle targetSwapchain)
     depthImageSpecs.viewType = Core::ImageViewType::Image2D;
     depthImageSpecs.viewAspect = Core::ImageViewAspect::Depth;
 
-    m_renderTargetDepthImages = localDevice->CreateImagesWithSwapchain(depthImageSpecs, m_targetSwapchain);
+    m_renderTargetDepthImages = device->CreateImagesWithSwapchain(depthImageSpecs, m_targetSwapchain);
 
     // Syncronisation
-    m_renderTargetAvailableSemaphores.resize(m_frameInFlight);
-    m_renderFinishedSemaphores.resize(m_frameInFlight);
+    CreateSyncronisationObjects();
 
-    Core::SemaphoreSpecs semaphoreSpecs;
-    semaphoreSpecs.type = Core::SemaphoreType::Binary;
-    for (uint64_t i = 0; i < m_frameInFlight; i++)
-    {
-        m_renderTargetAvailableSemaphores[i] = localDevice->CreateSemaphore(semaphoreSpecs);
-        m_renderFinishedSemaphores[i] = localDevice->CreateSemaphore(semaphoreSpecs);
-    }
+    // Global resources BP:
+    CreateGlobalLayouts();
 
-    Core::SemaphoreSpecs frameTimelineSemaphoreSpecs;
-    frameTimelineSemaphoreSpecs.type = Core::SemaphoreType::Timeline;
-    m_frameTimelineSemaphore = localDevice->CreateSemaphore(frameTimelineSemaphoreSpecs);
-
-    // Global resources :
-    m_globalLayoutShader = localDevice->CreateShader("globalLayout", Core::ShaderStage::Vertex, true, true);
-    m_globalLayoutDescriptorSets = localDevice->CreateDescriptorSetsLayouts(m_globalLayoutShader);
-    m_globalLayoutPushConstants = localDevice->CreatePushConstantLayout(m_globalLayoutShader);
-    m_globalLayout = localDevice->CreatePipelineLayout(m_globalLayoutDescriptorSets, {m_globalLayoutPushConstants});
-
-    //for (uint32_t i = 0; i < m_globalDescriptorSetsLayouts.size(); ++i)
-    //{
-    //    Core::DescriptorSetHandle globalDescriptorSet = localDevice->CreateDescriptorSet(m_globalDescriptorSetsLayouts[i]);
-    //    m_globalDescriptorSets.push_back(globalDescriptorSet);
-    //}
-//
-    //Core::ShaderHandle baseVert = localDevice->CreateShader("base.vert", Core::ShaderStage::Vertex, false, true);
-    //Core::ShaderHandle unlitFrag = localDevice->CreateShader("unlit.frag", Core::ShaderStage::Fragment, false, true);
-    //m_shadersLibrary.push_back(baseVert);
-    //m_shadersLibrary.push_back(unlitFrag);
+    // Actual global resources :
+    CreateGlobalRessourcesDescriptors();
 }
 
+// Destructor (public)
 Renderer3D::~Renderer3D()
 {
-    // local device reference
-    Core::DeviceHandle localDevice = Core::KEngine::GetDevice();
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
 
-    localDevice->WaitIdle();
+    device->WaitIdle();
 
-    localDevice->DestroyPresentationImages(m_renderTargetImages);
-    localDevice->DestroyImage(m_renderTargetDepthImages);
+    // Destroy presentation images
+    device->DestroyPresentationImages(m_renderTargetImages);
+    device->DestroyImage(m_renderTargetDepthImages);
 
-    for (uint64_t i = 0; i < m_frameInFlight; i++)
-    {
-        localDevice->DestroySemaphore(m_renderTargetAvailableSemaphores[i]);
-        localDevice->DestroySemaphore(m_renderFinishedSemaphores[i]);
-    }
+    DestroySyncronisationObjects();
 
-    localDevice->DestroySemaphore(m_frameTimelineSemaphore);
+    DestroyGlobalRessourcesDescriptors();
 
-    //for (uint32_t i = 0; i < m_globalDescriptorSets.size(); ++i)
-    //{
-    //    localDevice->DestroyDescriptorSet(m_globalDescriptorSets[i]);
-    //}
-
-    // TODO : Destroy graphic pass
-
-    // Destroy global pipeline layout
-    //localDevice->DestroyPipelineLayout(m_globalPipelineLayout);
-    //localDevice->DestroyDescriptorSetsLayouts(m_globalDescriptorSetsLayouts);
-    //localDevice->DestroyShader(m_globalShader);
-//
-    //for (uint32_t i = 0; i < m_shadersLibrary.size(); ++i)
-    //{
-    //    localDevice->DestroyShader(m_shadersLibrary[i]);
-    //}
+    DestroyGlobalLayouts();
 
 }
-
-// ACTUAL RENDERER IMPLEMENTATION
-void Renderer3D::SetupRenderer()
-{
-    // local device reference :
-    Core::DeviceHandle localDevice = Core::KEngine::GetDevice();
-
-    // Create all shader needed for the renderer (User implemented)
-    CreateShaderLibrary();
-
-    //Core::KSharedPtr<GraphicPass> unlitPass = Core::MakeShared<GraphicPass>("UnlitPass");
-
-    // Base unlit pipeline
-    Core::GraphicsPipelineSpecs unlitPipelineSpecs;
-    unlitPipelineSpecs.colorAttachmentCount = 1;
-    unlitPipelineSpecs.colorAttachmentFormats = { swapchain->GetColorImageFormat() };
-    unlitPipelineSpecs.depthAttachment = swapchain->GetDepthImageFormat();
-    unlitPipelineSpecs.viewportCount = 1;
-    unlitPipelineSpecs.scissorCount = 1;
-    unlitPipelineSpecs.lineWidth = 1.f;
-    unlitPipelineSpecs.cullmode = Core::CullMode::Back;
-    unlitPipelineSpecs.frontFace = Core::FrontFace::CounterClockWise;
-    unlitPipelineSpecs.SamplesCount = Core::SampleCount::Count1;
-    unlitPipelineSpecs.blendColor = false;
-    unlitPipelineSpecs.depthTest = true;
-    unlitPipelineSpecs.depthWrite = true;
-    unlitPipelineSpecs.depthCompare = Core::CompareOp::LessOrEqual;
-    unlitPipelineSpecs.dynamicStates = { Core::DynamicState::ViewPort, Core::DynamicState::Scissor };
-    unlitPipelineSpecs.topology = Core::PrimitiveTopology::TriangleList;
-    unlitPipelineSpecs.shaders = { baseVert , unlitFrag };
-    unlitPipelineSpecs.pipelineLayout = globalPipelineLayout;
-
-    //DrawBinding unlitDrawBinding;
-    //unlitDrawBinding.name = "UnlitPipeline";
-    //unlitDrawBinding.pipeline = unlitPipeline;
-    //unlitPass->PushDrawStep(unlitDrawBinding);
-//
-    //m_graphicPasses.push_back(unlitPass);
-}
-
 
 void Renderer3D::Draw()
 {
     // local device reference
-    Core::DeviceHandle device = Core::KEngine::GetDevice();
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
     device->RunGarbageCollector();
 
     // Basic syncronisation
@@ -163,8 +85,8 @@ void Renderer3D::Draw()
     uint32_t imageIndex = device->AcquirreNextImage(m_targetSwapchain, m_renderTargetAvailableSemaphores[syncIndex]);
 
     // Basic infos :
-    Core::Extent3D drawExtent = m_renderTargetImages[imageIndex]->GetExtent();
-    Core::Extent2D drawOffset = Core::Offset2D(0, 0);
+    //Core::Extent3D drawExtent = m_renderTargetImages[imageIndex]->GetExtent();
+    //Core::Extent2D drawOffset = Core::Extent2D  (0, 0);
 
     // Global ressources :
     //for (uint32_t i = 0; i < m_globalDescriptorSets.size(); ++i)
@@ -172,12 +94,13 @@ void Renderer3D::Draw()
     //    device->BindDescriptorSet(globalPipelineLayout, "drawData", drawDataDescriptorSet, Core::PipelineBindPoint::Graphics);
     //}
 
+    Core::CommandListHandle mainCommandList = device->GetCommandList(Core::QueueType::Graphics);
+
     for (uint32_t i = 0; i < m_graphicPasses.size(); ++i)
     {
         ExecuteGraphicPass(m_graphicPasses[i], imageIndex);
     }
 
-    Core::CommandListHandle commandList = device->GetCommandList(Core::QueueType::Graphics);
 
     // One main commandBuffer here :
     /*
@@ -193,85 +116,194 @@ void Renderer3D::Draw()
     m_frameCounter++;
 }
 
-void Renderer3D::ExecuteGraphicPass(const GraphicPass &pass, uint32_t imageIndex)
+void Renderer3D::CreateSyncronisationObjects()
+{
+    // Get the device
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
+
+    // Syncronisation
+    m_renderTargetAvailableSemaphores.resize(m_frameInFlight);
+    m_renderFinishedSemaphores.resize(m_frameInFlight);
+
+    Core::SemaphoreSpecs semaphoreSpecs;
+    semaphoreSpecs.type = Core::SemaphoreType::Binary;
+    for (uint64_t i = 0; i < m_frameInFlight; i++)
+    {
+        m_renderTargetAvailableSemaphores[i] = device->CreateSemaphore(semaphoreSpecs);
+        m_renderFinishedSemaphores[i] = device->CreateSemaphore(semaphoreSpecs);
+    }
+
+    Core::SemaphoreSpecs frameTimelineSemaphoreSpecs;
+    frameTimelineSemaphoreSpecs.type = Core::SemaphoreType::Timeline;
+    m_frameTimelineSemaphore = device->CreateSemaphore(frameTimelineSemaphoreSpecs);
+}
+
+void Renderer3D::DestroySyncronisationObjects()
+{
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
+
+    // Destroy syncronisation objects
+    for (uint64_t i = 0; i < m_frameInFlight; i++)
+    {
+        device->DestroySemaphore(m_renderTargetAvailableSemaphores[i]);
+        device->DestroySemaphore(m_renderFinishedSemaphores[i]);
+    }
+
+    device->DestroySemaphore(m_frameTimelineSemaphore);
+}
+
+void Renderer3D::CreateGlobalLayouts()
+{
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
+
+    m_globalLayoutShader = device->CreateShader("globalLayout", Core::ShaderStage::Vertex, true, true);
+    m_globalLayoutDescriptorSets = device->CreateDescriptorSetsLayouts(m_globalLayoutShader);
+    m_globalLayoutPushConstants = device->CreatePushConstantLayout(m_globalLayoutShader);
+    m_globalLayout = device->CreatePipelineLayout(m_globalLayoutDescriptorSets, {m_globalLayoutPushConstants});
+}
+
+void Renderer3D::DestroyGlobalLayouts()
+{
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
+
+    for (uint32_t i = 0; i < m_globalLayoutDescriptorSets.size(); ++i)
+    {
+        device->DestroyDescriptorSetLayout(m_globalLayoutDescriptorSets[i]);
+    }
+    device->DestroyPipelineLayout(m_globalLayout);
+    device->DestroyShader(m_globalLayoutShader);
+}
+
+void Renderer3D::CreateGlobalRessourcesDescriptors()
+{
+    std::vector<Core::DescriptorSetLayoutHandle> descriptorSetArrayLayouts;
+    std::vector<Core::DescriptorSetLayoutHandle> descriptorSetLayouts;
+    for (uint32_t i = 0; i < m_globalLayoutDescriptorSets.size(); ++i)
+    {
+        Core::DescriptorSetLayoutHandle layout = m_globalLayoutDescriptorSets[i];
+
+        bool asArray = layout->GetAsArray();
+
+        if (asArray)
+        {
+            descriptorSetArrayLayouts.push_back(layout);
+        }
+        else
+        {
+            descriptorSetLayouts.push_back(layout);
+        }
+    }
+
+    CreateGlobalRessourcesDescriptorType(descriptorSetArrayLayouts, true);
+    CreateGlobalRessourcesDescriptorType(descriptorSetLayouts, false);
+}
+
+void Renderer3D::DestroyGlobalRessourcesDescriptors()
+{
+    // Get the device
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
+
+    for (uint32_t i = 0; i < m_globalDescriptorSetsArray.size(); ++i)
+    {
+        device->DestroyDescriptorSetArray(m_globalDescriptorSetsArray[i], m_globalDescriptorSetsArrayPool[i]);
+    }
+    for (uint32_t i = 0; i < m_globalDescriptorSetsArrayPool.size(); ++i)
+    {
+        device->DestroyDescriptorPool(m_globalDescriptorSetsArrayPool[i]);
+    }
+
+    for (uint32_t i = 0; i < m_globalDescriptorSets.size(); ++i)
+    {
+        device->DestroyDescriptorSet(m_globalDescriptorSets[i], m_globalDescriptorSetsPool);
+    }
+    device->DestroyDescriptorPool(m_globalDescriptorSetsPool);
+}
+
+void Renderer3D::CreateGlobalRessourcesDescriptorType(const std::vector<Core::DescriptorSetLayoutHandle>& layouts, bool array)
+{
+    if (layouts.empty())
+        return;
+
+    Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
+    if (array)
+    {
+        std::unordered_map<Core::DescriptorType, uint32_t> descriptors;
+        for (uint32_t i = 0; i < layouts.size(); ++i)
+        {
+            Core::DescriptorSetLayoutHandle layout = layouts[i];
+            const std::vector<Core::Binding> &bindings = layout->GetShaderBindings();
+            for (uint32_t j = 0; j < bindings.size(); ++j)
+            {
+                const Core::Binding &binding = bindings[j];
+                // TODO : Add translation funciton
+                descriptors[binding.type] += MAX_DESCRIPTORSETARRAY_SIZE;
+            }
+
+            Core::DescriptorPoolSpecs poolSpecs;
+            poolSpecs.maxDescriptorSetsCount = static_cast<uint32_t>(layouts.size());
+            poolSpecs.descriptors = descriptors;
+            poolSpecs.poolForArray = true;
+
+            Core::DescriptorPoolHandle pool = device->CreateDescriptorPool(poolSpecs);
+            if (pool == nullptr)
+            {
+                spdlog::error("Renderer3D::CreateGlobalRessourcesDescriptors : Failed to create descriptor pool for global ressources array descriptors");
+                return;
+            }
+
+            m_globalDescriptorSetsArrayPool.push_back(pool);
+        }
+
+        for (uint32_t i = 0; i < layouts.size(); ++i)
+        {
+            Core::DescriptorSetArrayHandle arraySet = device->CreateDescriptorSetArray(layouts[i], m_globalDescriptorSetsArrayPool[i], MAX_DESCRIPTORSETARRAY_SIZE / 2);
+            m_globalDescriptorSetsArray.push_back(arraySet);
+        }
+        return;
+    }
+
+    std::unordered_map<Core::DescriptorType, uint32_t> descriptors;
+    for (uint32_t i = 0; i < layouts.size(); ++i)
+    {
+        Core::DescriptorSetLayoutHandle layout = layouts[i];
+        const std::vector<Core::Binding> &bindings = layout->GetShaderBindings();
+        for (uint32_t j = 0; j < bindings.size(); ++j)
+        {
+            const Core::Binding &binding = bindings[j];
+            descriptors[binding.type] += binding.count;
+        }
+    }
+
+    Core::DescriptorPoolSpecs poolSpecs;
+    poolSpecs.maxDescriptorSetsCount = static_cast<uint32_t>(layouts.size());
+    poolSpecs.descriptors = descriptors;
+    poolSpecs.poolForArray = false;
+
+    m_globalDescriptorSetsPool = device->CreateDescriptorPool(poolSpecs);
+
+    if (m_globalDescriptorSetsPool == nullptr)
+    {
+        spdlog::error("Renderer3D::CreateGlobalRessourcesDescriptors : Failed to create descriptor pool for global ressources descriptors");
+        return;
+    }
+
+    for (uint32_t i = 0; i < layouts.size(); ++i)
+    {
+        Core::DescriptorSetHandle descriptorSet = device->CreateDescriptorSet(layouts[i], m_globalDescriptorSetsPool);
+        m_globalDescriptorSets.push_back(descriptorSet);
+    }
+}
+
+void Renderer3D::ExecuteGraphicPass(GraphicPass &pass, uint32_t imageIndex)
 {
     Core::Extent3D drawExtent = m_renderTargetImages[imageIndex]->GetExtent();
-    Core::Extent2D drawOffset = Core::Offset2D(0, 0);
+    Core::Offset2D drawOffset = Core::Offset2D(0, 0);
 
     pass.BeginPass(drawOffset, Core::Extent2D(drawExtent.x, drawExtent.y), m_renderTargetImages[imageIndex], m_renderTargetDepthImages);
 
 
 
     pass.EndPass();
-}
-
-void Renderer3D::CreateShaderLibrary()
-{
-    Core::DeviceHandle device = Core::KEngine::GetDevice();
-
-    // Base Unlit :
-    Core::ShaderHandle forwardSharedRenderingVert = device->CreateShader("forwardSharedRendering.vert", Core::ShaderStage::Vertex, false, true);
-    m_shadersLibrary.push_back(forwardSharedRenderingVert);
-
-    Core::ShaderHandle forwardSharedRenderingFrag = device->CreateShader("forwardSharedRendering.frag", Core::ShaderStage::Fragment, false, true);
-    m_shadersLibrary.push_back(forwardSharedRenderingFrag);
-}
-
-void Renderer3D::DestroyShaderLibrary()
-{
-    Core::DeviceHandle device = Core::KEngine::GetDevice();
-
-    for (uint32_t i = 0; i < m_shadersLibrary.size(); ++i)
-    {
-        device->DestroyShader(m_shadersLibrary[i]);
-    }
-}
-
-void Renderer3D::CreateBasePass()
-{
-    // Create the base graphic pass
-    GraphicPassDesc basePassDesc;
-    basePassDesc.name = "BasePass";
-    basePassDesc.globalLayout = m_globalLayout;
-    basePassDesc.globalDescriptorSetLayouts = m_globalLayoutDescriptorSets;
-    basePassDesc.globalPushConstantLayout = m_globalLayoutPushConstants;
-
-
-    // Base color :
-    Core::RenderingAttachment colorAttachment;
-    colorAttachment.image = nullptr;
-    colorAttachment.layout = Core::Layout::ColorAttachment;
-    colorAttachment.loadOp = Core::LoadOp::Clear;
-    colorAttachment.storeOp = Core::StoreOp::Store;
-    colorAttachment.clearValueColor = Core::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
-    basePassDesc.colorAttachments.push_back(colorAttachment);
-
-
-    // Base depth :
-    Core::RenderingAttachment depthAttachment;
-    depthAttachment.image = nullptr;
-    depthAttachment.layout = Core::Layout::DepthStencilAttachment;
-    depthAttachment.loadOp = Core::LoadOp::Clear;
-    depthAttachment.storeOp = Core::StoreOp::Store;
-    depthAttachment.clearValueDepth = Core::ClearValue(1.0f, 0.f, 0.f, 0.f);
-    basePassDesc.depthAttachment = depthAttachment;
-
-    // Base draw step :
-    GraphicPassStep unlitDrawStep;
-    unlitDrawStep.name = "UnlitDrawStep";
-    unlitDrawStep.globalLayoutUsage = DefaultLayoutUsage::UseOnly;
-
-    Core::GraphicsPipelineSpecs unlitPipelineSpecs;
-
-
-
-    //basePassDesc.drawSteps.push_back(unlitDrawStep);
-
-}
-
-void Renderer3D::DestroyBasePass()
-{
-    // Destroy the base graphic pass
 }
 
 END_NAMESPACE_3DRENDERER

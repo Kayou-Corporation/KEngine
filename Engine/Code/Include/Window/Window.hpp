@@ -9,12 +9,18 @@
 #include "Memory/KSharedPtr.hpp"
 
 BEGIN_NAMESPACE_WINDOW
-	class WindowRenderer;
+class WindowRenderer;
 
 // -------- Base window ----------
 
+enum WindowAPI
+{
+	SDL = 0
+};
+
 struct WindowSpecs
 {
+	WindowAPI api = WindowAPI::SDL;
 	uint32_t width = 1280;
 	uint32_t height = 720; 
 	std::string name = "Window";
@@ -55,10 +61,6 @@ protected:
 };
 
 // -------- Interface ----------
-enum WindowAPI
-{
-	SDL = 0
-};
 
 struct WindowInterface
 {

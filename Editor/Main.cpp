@@ -86,7 +86,7 @@ int main()
 #endif
 
     Core::KEngineSpecs engineSpecs;
-    engineSpecs.windowAPI = Window::WindowAPI::SDL;
+    engineSpecs.windowAPI = WindowNamespace::WindowAPI::SDL;
     engineSpecs.windowWidth = 720;
     engineSpecs.windowHeight = 480;
     engineSpecs.windowName = "KEngine";
@@ -99,7 +99,7 @@ int main()
     Core::KEngine::Init(engineSpecs);
 
     // Window Reference :
-    Core::KSharedPtr<Window::Window> windowReference = Core::KEngine::Get().GetWindow();
+    Core::KSharedPtr<WindowNamespace::Window> windowReference = Core::KEngine::Get().GetWindow();
 
     // ------------ Object loading test -----------------//
     //Core::KEngine::Get().CreateAsset("Engine/Assets/Meshes/viking_room.obj", "viking_room");

@@ -96,10 +96,10 @@ KEngine::KEngine(const KEngineSpecs& specs)
     m_assetRegistry->RegisterAllAssets();
 
     // ------------ Window -----------------//
-    m_window = Window::WindowInterface::InitWindow(specs.windowAPI);
+    m_window = WindowNamespace::WindowInterface::InitWindow(specs.windowAPI);
 
-    Window::WindowSpecs windowSpecs;
-    windowSpecs.width = specs.windowWidth;
+    WindowNamespace::WindowSpecs windowSpecs;
+        windowSpecs.width = specs.windowWidth;
     windowSpecs.height = specs.windowHeight;
     windowSpecs.name = specs.windowName;
     windowSpecs.allowResize = specs.allowWindowResize;

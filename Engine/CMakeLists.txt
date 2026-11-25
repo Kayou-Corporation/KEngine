@@ -49,6 +49,7 @@ function(engine_add_module MODULE_NAME)
     add_library(${MODULE_NAME} STATIC ${ARGN})
     target_compile_features(${MODULE_NAME} PUBLIC ${ENGINE_COMPILE_FEATURES})
     target_compile_options(${MODULE_NAME} PUBLIC ${ENGINE_COMPILE_OPTIONS})
+    target_include_directories(${MODULE_NAME} PUBLIC "${K_INCLUDE_PATH}")
     target_include_directories(${MODULE_NAME} PUBLIC Include)
     target_compile_definitions(${MODULE_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
     target_compile_definitions(${MODULE_NAME} PRIVATE _CRT_SECURE_NO_DEPRECATE)
@@ -91,6 +92,9 @@ target_link_libraries(${K_TARGET_NAME} PUBLIC COREOBJECT)
 
 add_subdirectory(${K_INCLUDE_PATH}/Kascade)
 target_link_libraries(${K_TARGET_NAME} PUBLIC KASCADE)
+
+add_subdirectory(${K_INCLUDE_PATH}/Renderer3D)
+target_link_libraries(${K_TARGET_NAME} PUBLIC RENDERER3D)
 
 #target_include_directories(${K_TARGET_NAME} "Libs/Stbimage")
 

@@ -1,10 +1,13 @@
 #pragma once
 
 #include "RHI.hpp"
+#include "RHI/API/Shader.hpp"
 #include <string>
 #include <vector>
 
 BEGIN_NAMESPACE_CORE
+
+//std::vector<Core::DescriptorType>
 
 class DescriptorSetLayout
 {
@@ -13,13 +16,19 @@ public:
 
 	KAPI std::string GetName() const { return m_descriptorName; }
 	KAPI uint32_t GetIndex() const { return m_descriptorIndex; }
+	KAPI bool GetAsArray() const { return asArray; }
+	KAPI const std::vector<Binding>& GetShaderBindings() const { return m_shaderBindings; }
 
 	KAPI void SetName(std::string name) { m_descriptorName = name; }
 	KAPI void SetIndex(uint32_t index) { m_descriptorIndex = index; }
+	KAPI void SetAsArray(bool array) { asArray = array; }
+	KAPI void SetShaderBinding(const std::vector<Binding>& bindings) { m_shaderBindings = bindings; }
 
 protected:
 	std::string m_descriptorName;
 	uint32_t m_descriptorIndex;
+	bool asArray = false;
+	std::vector<Binding> m_shaderBindings;
 };
 
 

@@ -1,11 +1,11 @@
 #pragma once
 #include "CoreModule.hpp"
 
-#include "AssetRegistry.hpp"
-#include "SoftAssetReference.hpp"
+#include "AssetManager/AssetRegistry.hpp"
+#include "AssetManager/SoftAssetReference.hpp"
 
-#include "Window.hpp"
-#include "WindowRenderer.hpp"
+#include "Window/Window.hpp"
+#include "Window/WindowRenderer.hpp"
 #include "RHI/API/Surface.hpp"
 
 #include "ThreadPool.hpp"
@@ -14,6 +14,7 @@
 #include "RHI/API/Instance.hpp"
 #include "RHI/API/Device.hpp"
 #include "RHI/API/RHI.hpp"
+#include "Renderer3D/Renderer3D.hpp"
 
 BEGIN_NAMESPACE_CORE
 #define ENGINE_QUEUE_ASSET "AssetLoaderQueue"
@@ -23,7 +24,7 @@ BEGIN_NAMESPACE_CORE
 
 struct KEngineSpecs
 {
-    Window::WindowAPI windowAPI;
+    WindowNamespace::WindowAPI windowAPI;
     uint32_t windowWidth;
     uint32_t windowHeight;
     std::string windowName;
@@ -73,7 +74,7 @@ public:
         return m_assetRegistry->GetAsset<AssetDerived>(name);
     }
 
-    Core::KSharedPtr<Window::Window> GetWindow() const
+    Core::KSharedPtr<WindowNamespace::Window> GetWindow() const
     {
         return m_window;
     }
@@ -97,7 +98,7 @@ public:
 
 protected:
     // Window :
-    Core::KSharedPtr<Window::Window> m_window;
+    Core::KSharedPtr<WindowNamespace::Window> m_window;
     SurfaceHandle m_windowSurface;
 
     // RHI :
@@ -111,6 +112,8 @@ protected:
 
     // Assets
     KUniquePtr<AssetManager::AssetRegistry> m_assetRegistry;
+
+    // Renderer
 
 
     // Self reference for singleton

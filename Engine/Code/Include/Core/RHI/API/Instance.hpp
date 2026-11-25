@@ -6,7 +6,7 @@
 #include "Memory/KSharedPtr.hpp"
 #include "RHI/API/RHI.hpp"
 
-namespace Kayou::Window
+namespace Kayou::WindowNamespace
 {
 	class Window;
 }
@@ -15,7 +15,7 @@ BEGIN_NAMESPACE_CORE
 
 struct InstanceSpecs
 {
-	KSharedPtr<Window::Window> window; // To get window specific extensions required.
+	KSharedPtr<WindowNamespace::Window> window; // To get window specific extensions required.
 
 	Version appVersion;
 	Version engineVersion;

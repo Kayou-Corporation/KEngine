@@ -534,6 +534,8 @@ std::vector<DescriptorSetLayoutHandle> VulkanDevice::CreateDescriptorSetsLayouts
 		Core::KSharedPtr<VulkanDescriptorSetLayout> RHIVulkanDescriptor = Core::MakeShared<VulkanDescriptorSetLayout>();
 		RHIVulkanDescriptor->SetName(SLANGDescriptor.name);
 		RHIVulkanDescriptor->SetIndex(SLANGDescriptor.index);
+		std::vector<Binding> shaderBindings = SLANGDescriptor.bindings;
+		RHIVulkanDescriptor->SetShaderBinding(shaderBindings);
 
 		for (const Binding& SLANGBinding : SLANGDescriptor.bindings)
 		{
@@ -569,6 +571,8 @@ std::vector<DescriptorSetLayoutHandle> VulkanDevice::CreateDescriptorSetsLayouts
 
 			createInfo.pNext = &flagsInfo;
 			createInfo.flags = vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool;
+
+			RHIVulkanDescriptor->SetAsArray(true);
 		}
 
 		vk::DescriptorSetLayout layout = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(createInfo), "Coundn't create DescriptorSetLayout");
@@ -591,6 +595,9 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 		{
 			RHIVulkanDescriptor->SetName(SLANGDescriptor.name);
 			RHIVulkanDescriptor->SetIndex(SLANGDescriptor.index);
+			std::vector<Binding> shaderBindings = SLANGDescriptor.bindings;
+			RHIVulkanDescriptor->SetShaderBinding(shaderBindings);
+
 			for (const Binding& SLANGBinding : SLANGDescriptor.bindings)
 			{
 				VulkanBinding binding;
@@ -623,6 +630,8 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 
 				createInfo.pNext = &flagsInfo;
 				createInfo.flags = vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool;
+
+				RHIVulkanDescriptor->SetAsArray(true);
 			}
 
 			vk::DescriptorSetLayout layout = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(createInfo), "Coundn't create DescriptorSetLayout");
@@ -646,6 +655,9 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 		{
 			RHIVulkanDescriptor->SetName(SLANGDescriptor.name);
 			RHIVulkanDescriptor->SetIndex(SLANGDescriptor.index);
+			std::vector<Binding> shaderBindings = SLANGDescriptor.bindings;
+			RHIVulkanDescriptor->SetShaderBinding(shaderBindings);
+			
 			for (const Binding& SLANGBinding : SLANGDescriptor.bindings)
 			{
 				VulkanBinding binding;
@@ -678,6 +690,8 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(ShaderHandle R
 
 				createInfo.pNext = &flagsInfo;
 				createInfo.flags = vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool;
+
+				RHIVulkanDescriptor->SetAsArray(true);
 			}
 
 			vk::DescriptorSetLayout layout = VK_CHECK_RESULT(m_handle.createDescriptorSetLayout(createInfo), "Coundn't create DescriptorSetLayout");
@@ -1309,18 +1323,18 @@ DescriptorSetArrayHandle VulkanDevice::CreateDescriptorSetArray(DescriptorSetLay
 
 	std::vector<VulkanBinding> bindings = RHIVulkanLayout->GetAllBindings();
 
-	std::map<vk::DescriptorType, uint32_t> descriptors;
-	for (const VulkanBinding& binding : bindings)
-	{
-		if (descriptors.find(binding.binding.descriptorType) != descriptors.end())
-		{
-			descriptors[binding.binding.descriptorType] += binding.binding.descriptorCount;
-		}
-		else
-		{
-			descriptors.emplace(binding.binding.descriptorType, binding.binding.descriptorCount);
-		}
-	}
+	//std::map<vk::DescriptorType, uint32_t> descriptors;
+	//for (const VulkanBinding& binding : bindings)
+	//{
+	//	if (descriptors.find(binding.binding.descriptorType) != descriptors.end())
+	//	{
+	//		descriptors[binding.binding.descriptorType] += binding.binding.descriptorCount;
+	//	}
+	//	else
+	//	{
+	//		descriptors.emplace(binding.binding.descriptorType, binding.binding.descriptorCount);
+	//	}
+	//}
 	RHIVulkanDescriptorSetArray->SetBindings(bindings);
 
 	vk::DescriptorPool vkPool = RHIVulkanPool->GetHandle();

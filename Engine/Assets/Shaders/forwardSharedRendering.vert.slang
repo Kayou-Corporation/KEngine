@@ -17,12 +17,6 @@ struct VSOutput
     float3 camPos : CAMPOS;
 };
 
-struct Test
-{
-naea
-}
-ParameterBlock<Test>
-
 [shader("vertex")]
 VSOutput vsMain(VSInput input)
 {

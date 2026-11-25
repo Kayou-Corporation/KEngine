@@ -14,7 +14,7 @@ class Instance;
 
 struct SurfaceSpecs
 {
-	Core::KSharedPtr<Window::Window> window;
+	Core::KSharedPtr<WindowNamespace::Window> window;
 };
 
 class Surface
