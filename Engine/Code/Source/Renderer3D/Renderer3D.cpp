@@ -1,13 +1,15 @@
 ﻿#include "Renderer3D.hpp"
 
 #include "KEngine.hpp"
-#include "RHI/API/Device.hpp"
-#include "RHI/API/GraphicsPipeline.hpp"
+
 #include "GraphicPass.hpp"
+#include "RHI/API/Device.hpp"
+#include "RHI/API/CommandList.hpp"
+#include "RHI/API/GraphicsPipeline.hpp"
 #include "RHI/API/DescriptorPool.hpp"
 #include "RHI/API/DescriptorSetArray.hpp"
-#include "RHI/API/Image.hpp"
 #include "RHI/API/Syncronisation.hpp"
+#include "RHI/API/Image.hpp"
 
 BEGIN_NAMESPACE_3DRENDERER
 
@@ -296,14 +298,16 @@ void Renderer3D::CreateGlobalRessourcesDescriptorType(const std::vector<Core::De
 
 void Renderer3D::ExecuteGraphicPass(GraphicPass &pass, uint32_t imageIndex)
 {
-    Core::Extent3D drawExtent = m_renderTargetImages[imageIndex]->GetExtent();
-    Core::Offset2D drawOffset = Core::Offset2D(0, 0);
+    (void)pass;
+    (void)imageIndex;
+    //Core::Extent3D drawExtent = m_renderTargetImages[imageIndex]->GetExtent();
+    //Core::Offset2D drawOffset = Core::Offset2D(0, 0);
 
-    pass.BeginPass(drawOffset, Core::Extent2D(drawExtent.x, drawExtent.y), m_renderTargetImages[imageIndex], m_renderTargetDepthImages);
+    //pass.BeginPass(drawOffset, Core::Extent2D(drawExtent.x, drawExtent.y), m_renderTargetImages[imageIndex], m_renderTargetDepthImages);
 
 
 
-    pass.EndPass();
+    //pass.EndPass();
 }
 
 END_NAMESPACE_3DRENDERER

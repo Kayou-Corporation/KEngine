@@ -57,39 +57,39 @@ void ForwardRenderer3D::CreateBasePass()
     Core::DeviceHandle device = Core::KEngine::Get().GetDevice();
 
     // Create the base graphic pass
-    GraphicPassDesc basePassDesc;
-    basePassDesc.name = "BasePass";
-    basePassDesc.globalLayout = m_globalLayout;
-    basePassDesc.globalDescriptorSetLayouts = m_globalLayoutDescriptorSets;
-    basePassDesc.globalPushConstantLayout = m_globalLayoutPushConstants;
-
-
-    // Base color :
-    Core::RenderingAttachment colorAttachment;
-    colorAttachment.image = nullptr;
-    colorAttachment.layout = Core::Layout::ColorAttachment;
-    colorAttachment.loadOp = Core::LoadOp::Clear;
-    colorAttachment.storeOp = Core::StoreOp::Store;
-    colorAttachment.clearValueColor = Core::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
-
-    basePassDesc.colorAttachments.push_back(colorAttachment);
-
-
-    // Base depth :
-    Core::RenderingAttachment depthAttachment;
-    depthAttachment.image = nullptr;
-    depthAttachment.layout = Core::Layout::DepthStencilAttachment;
-    depthAttachment.loadOp = Core::LoadOp::Clear;
-    depthAttachment.storeOp = Core::StoreOp::Store;
-    depthAttachment.clearValueDepth = Core::ClearValue(1.0f, 0.f, 0.f, 0.f);
-
-    basePassDesc.depthAttachment = depthAttachment;
-
-
-    // Base draw step :
-    GraphicPassStep unlitDrawStep;
-    unlitDrawStep.name = "UnlitDrawStep";
-    unlitDrawStep.globalLayoutUsage = DefaultLayoutUsage::UseOnly;
+    //GraphicPassDesc basePassDesc;
+    //basePassDesc.name = "BasePass";
+    //basePassDesc.globalLayout = m_globalLayout;
+    //basePassDesc.globalDescriptorSetLayouts = m_globalLayoutDescriptorSets;
+    //basePassDesc.globalPushConstantLayout = m_globalLayoutPushConstants;
+//
+//
+    //// Base color :
+    //Core::RenderingAttachment colorAttachment;
+    //colorAttachment.image = nullptr;
+    //colorAttachment.layout = Core::Layout::ColorAttachment;
+    //colorAttachment.loadOp = Core::LoadOp::Clear;
+    //colorAttachment.storeOp = Core::StoreOp::Store;
+    //colorAttachment.clearValueColor = Core::ClearValue(0.1f, 0.1f, 0.1f, 1.0f);
+//
+    //basePassDesc.colorAttachments.push_back(colorAttachment);
+//
+//
+    //// Base depth :
+    //Core::RenderingAttachment depthAttachment;
+    //depthAttachment.image = nullptr;
+    //depthAttachment.layout = Core::Layout::DepthStencilAttachment;
+    //depthAttachment.loadOp = Core::LoadOp::Clear;
+    //depthAttachment.storeOp = Core::StoreOp::Store;
+    //depthAttachment.clearValueDepth = Core::ClearValue(1.0f, 0.f, 0.f, 0.f);
+//
+    //basePassDesc.depthAttachment = depthAttachment;
+//
+//
+    //// Base draw step :
+    //GraphicPassStep unlitDrawStep;
+    //unlitDrawStep.name = "UnlitDrawStep";
+    //unlitDrawStep.globalLayoutUsage = DefaultLayoutUsage::UseOnly;
 
     // Shaders :
     Core::ShaderHandle forwardSharedRenderingVert = device->CreateShader("forwardSharedRendering.vert", Core::ShaderStage::Vertex, false, true);
@@ -120,11 +120,11 @@ void ForwardRenderer3D::CreateBasePass()
     unlitPipelineSpecs.topology = Core::PrimitiveTopology::TriangleList;
     unlitPipelineSpecs.shaders = { forwardSharedRenderingVert , forwardSharedRenderingFrag };
 
-    unlitDrawStep.pipelineSpecs = unlitPipelineSpecs;
+    //unlitDrawStep.pipelineSpecs = unlitPipelineSpecs;
 
-    GraphicPass basePass = GraphicPass(basePassDesc);
+    //GraphicPass basePass = GraphicPass(basePassDesc);
 
-    m_graphicPasses.push_back(basePass);
+    //m_graphicPasses.push_back(basePass);
 }
 
 void ForwardRenderer3D::DestroyBasePass()

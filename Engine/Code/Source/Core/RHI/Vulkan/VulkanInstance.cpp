@@ -22,8 +22,8 @@ void VulkanInstance::Create(const InstanceSpecs& specs)
 	appInfo.setEngineVersion(VK_MAKE_VERSION(specs.engineVersion.major, specs.engineVersion.minor, specs.engineVersion.patch));
 	appInfo.setApiVersion(VK_API_VERSION_1_4);
 
-	Core::KSharedPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = Core::StaticCast<Window::VulkanWindowRenderer>(wRenderer);
+	Core::KSharedPtr<WindowNamespace::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::KSharedPtr<WindowNamespace::VulkanWindowRenderer> wvkRenderer = Core::StaticCast<WindowNamespace::VulkanWindowRenderer>(wRenderer);
 	std::vector<const char*> vkExtensions = wvkRenderer->GetVulkanInstanceExtensions();
 
 #ifdef KDEBUG
@@ -81,8 +81,8 @@ void VulkanInstance::Destroy()
 
 SurfaceHandle VulkanInstance::CreateSurface(const SurfaceSpecs& specs)
 {
-	Core::KSharedPtr<Window::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
-	Core::KSharedPtr<Window::VulkanWindowRenderer> wvkRenderer = Core::StaticCast<Window::VulkanWindowRenderer>(wRenderer);
+	Core::KSharedPtr<WindowNamespace::WindowRenderer> wRenderer = specs.window->GetWindowRenderer();
+	Core::KSharedPtr<WindowNamespace::VulkanWindowRenderer> wvkRenderer = Core::StaticCast<WindowNamespace::VulkanWindowRenderer>(wRenderer);
 	VkSurfaceKHR vkSurface = wvkRenderer->CreateVulkanSurface(m_handle);
 
 	KSharedPtr<VulkanSurface> Surface = Core::MakeShared<VulkanSurface>();

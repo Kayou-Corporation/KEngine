@@ -3,7 +3,7 @@
 #include "RHI/API/RHI.hpp"
 #include "Memory/KSharedPtr.hpp"
 
-namespace Kayou::Window
+namespace Kayou::WindowNamespace
 {
 	class Window;
 }
